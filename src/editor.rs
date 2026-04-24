@@ -620,14 +620,17 @@ fn parse_loudnorm_stats(stderr: &str) -> Option<LoudnormStats> {
     let json_str = &json_str[..json_end];
 
     let get_val = |key: &str| -> Option<String> {
-        let pattern = format!("\"{}\":", key);
+        // Pattern matches quoted key (handles spaces around colon)
+        let pattern = format!("\"{}\"", key);
         let idx = json_str.find(&pattern)?;
         let after = &json_str[idx + pattern.len()..];
-        let after = after.trim();
+        // Skip whitespace and colon
+        let after = after.trim_start().strip_prefix(':')?;
+        let after = after.trim_start();
         // Handle quoted strings and numbers
         if let Some(stripped) = after.strip_prefix('"') {
             let end = stripped.find('"')?;
-            Some(stripped[..=end].to_string())
+            Some(stripped[..end].to_string())
         } else {
             let end = after
                 .find(|c| [',', '\n', '}'].contains(&c))
