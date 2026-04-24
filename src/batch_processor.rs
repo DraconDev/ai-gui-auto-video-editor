@@ -756,6 +756,7 @@ mod tests {
             _music: &Path,
             _output: &Path,
             _transcript: &[crate::stt_analyzer::TranscriptSegment],
+            _duck_volume: f32,
         ) -> Result<()> {
             Ok(())
         }
