@@ -251,10 +251,14 @@ impl VideoEditor for FfmpegEditor {
             .output()
             .context("failed to run loudnorm measurement pass")?;
 
-        let stderr = String::from_utf8_lossy(&measure_output.stderr);
-
-        // Parse loudnorm JSON stats from stderr
-        let stats = parse_loudnorm_stats(&stderr);
+        // Only parse stats if measurement succeeded
+        let stats = if measure_output.status.success() {
+            let stderr = String::from_utf8_lossy(&measure_output.stderr);
+            parse_loudnorm_stats(&stderr)
+        } else {
+            warn!("loudnorm measurement pass failed, falling back to single-pass");
+            None
+        };
 
         // Pass 2: Apply measured normalization
         let filter = if let Some(s) = stats {
