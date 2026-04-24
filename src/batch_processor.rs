@@ -268,7 +268,7 @@ where
 
         let empty_transcript = vec![];
         editor
-            .mix_with_music(&enhanced_file, music_path, &with_music, &empty_transcript)
+            .mix_with_music(&enhanced_file, music_path, &with_music, &empty_transcript, config.audio.duck_volume)
             .context("Failed to mix music")?;
 
         if enhanced_file != output_file {

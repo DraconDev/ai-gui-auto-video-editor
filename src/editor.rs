@@ -828,9 +828,34 @@ mod tests {
             text: "hello".to_string(),
             confidence: 1.0,
         }];
-        let filter = generate_duck_filter(&transcript);
+        let filter = generate_duck_filter(&transcript, 0.2);
         assert!(filter.contains("between(t,1,2)"));
         assert!(filter.contains("volume='if(between(t,1,2),0.2,1.0)'"));
         assert!(filter.contains("amix=inputs=2"));
+    }
+
+    #[test]
+    fn test_parse_loudnorm_stats() {
+        let ffmpeg_output = r#"[Parsed_loudnorm_0 @ 0x7f6be8003740] 
+{
+	"input_i" : "-21.05",
+	"input_tp" : "-18.06",
+	"input_lra" : "0.00",
+	"input_thresh" : "-31.05",
+	"output_i" : "-14.04",
+	"output_tp" : "-10.97",
+	"output_lra" : "0.00",
+	"output_thresh" : "-24.04",
+	"normalization_type" : "dynamic",
+	"target_offset" : "0.04"
+}
+[out#0/null @ 0x55b50aa50140] video:4KiB"#;
+
+        let stats = parse_loudnorm_stats(ffmpeg_output).expect("should parse loudnorm stats");
+        assert_eq!(stats.i, "-21.05");
+        assert_eq!(stats.tp, "-18.06");
+        assert_eq!(stats.lra, "0.00");
+        assert_eq!(stats.thresh, "-31.05");
+        assert_eq!(stats.offset, "0.04");
     }
 }

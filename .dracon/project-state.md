@@ -1,9 +1,10 @@
 # Project State
 
 ## Current Focus
-Added configurable duck volume for audio ducking in video editor
+Added configurable duck volume parameter to audio ducking functionality
 
 ## Completed
-- [x] Added `duck_volume` parameter to `add_music` method in `FfmpegEditor`
-- [x] Updated `generate_duck_filter` to use configurable volume level
-- [x] Maintained backward compatibility by keeping default volume at 0.2 when parameter not specified
+- [x] Added duck volume parameter to `mix_with_music` call in batch processor
+- [x] Enhanced `generate_duck_filter` to accept configurable volume level
+- [x] Added test for loudnorm stats parsing in editor.rs
+- [x] Improved error handling for loudnorm measurement pass
