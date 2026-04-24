@@ -1,9 +1,9 @@
 # Project State
 
 ## Current Focus
-Improved error handling for loudnorm measurement pass in video editor
+Added configurable duck volume for audio ducking in video editor
 
 ## Completed
-- [x] Added check for successful loudnorm measurement before parsing stats
-- [x] Added fallback behavior when measurement fails with warning message
-- [x] Maintained existing functionality when measurement succeeds
+- [x] Added `duck_volume` parameter to `add_music` method in `FfmpegEditor`
+- [x] Updated `generate_duck_filter` to use configurable volume level
+- [x] Maintained backward compatibility by keeping default volume at 0.2 when parameter not specified

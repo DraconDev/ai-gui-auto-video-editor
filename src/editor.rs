@@ -152,6 +152,7 @@ pub trait VideoEditor {
         music: &Path,
         output: &Path,
         transcript: &[TranscriptSegment],
+        duck_volume: f32,
     ) -> Result<()>;
     fn enhance_audio(&self, input: &Path, output: &Path, target_lufs: f32) -> Result<()>;
     fn reduce_noise(&self, input: &Path, output: &Path) -> Result<()>;
@@ -209,8 +210,9 @@ impl VideoEditor for FfmpegEditor {
         music: &Path,
         output: &Path,
         transcript: &[TranscriptSegment],
+        duck_volume: f32,
     ) -> Result<()> {
-        let duck_filter = generate_duck_filter(transcript);
+        let duck_filter = generate_duck_filter(transcript, duck_volume);
 
         let status = Command::new("ffmpeg")
             .args([
@@ -698,14 +700,14 @@ fn generate_trim_filters(segments: &[ProcessedSegment]) -> (String, String) {
     (v_filter, a_filter)
 }
 
-fn generate_duck_filter(transcript: &[TranscriptSegment]) -> String {
+fn generate_duck_filter(transcript: &[TranscriptSegment], duck_volume: f32) -> String {
     let mut volume_expr = "1.0".to_string();
 
     // For each speech segment, lower the music volume
     for seg in transcript {
         volume_expr = format!(
-            "if(between(t,{},{}),0.2,{})",
-            seg.start, seg.end, volume_expr
+            "if(between(t,{},{}),{},{volume_expr})",
+            seg.start, seg.end, duck_volume
         );
     }
 
