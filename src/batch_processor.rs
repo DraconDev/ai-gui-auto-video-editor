@@ -63,41 +63,31 @@ fn concatenate_videos(
     }
 
     // Build ffmpeg concat filter
-    let mut inputs: Vec<String> = vec![];
+    let mut args: Vec<String> = vec![];
     let mut concat_inputs = String::new();
     let mut input_idx = 0;
 
     if let Some(intro_path) = intro {
-        inputs.push(format!(
-            "-i {}",
-            intro_path.to_str().context("invalid intro path")?
-        ));
+        args.push("-i".to_string());
+        args.push(intro_path.to_str().context("invalid intro path")?.to_string());
         concat_inputs.push_str(&format!("[{}:v][{}:a]", input_idx, input_idx));
         input_idx += 1;
     }
 
-    inputs.push(format!(
-        "-i {}",
-        main.to_str().context("invalid main path")?
-    ));
+    args.push("-i".to_string());
+    args.push(main.to_str().context("invalid main path")?.to_string());
     concat_inputs.push_str(&format!("[{}:v][{}:a]", input_idx, input_idx));
     input_idx += 1;
 
     if let Some(outro_path) = outro {
-        inputs.push(format!(
-            "-i {}",
-            outro_path.to_str().context("invalid outro path")?
-        ));
+        args.push("-i".to_string());
+        args.push(outro_path.to_str().context("invalid outro path")?.to_string());
         concat_inputs.push_str(&format!("[{}:v][{}:a]", input_idx, input_idx));
     }
 
-    let n = inputs.len();
+    let n = input_idx;
     let filter = format!("{}concat=n={}:v=1:a=1[outv][outa]", concat_inputs, n);
 
-    let mut args = vec![];
-    for input in &inputs {
-        args.push(input.clone());
-    }
     args.push("-filter_complex".to_string());
     args.push(filter);
     args.push("-map".to_string());
