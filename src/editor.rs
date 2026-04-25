@@ -164,6 +164,32 @@ pub trait VideoEditor {
 
 pub struct FfmpegEditor;
 
+impl FfmpegEditor {
+    fn run_reframe_filter(&self, input: &Path, output: &Path, filter: &str) -> Result<()> {
+        info!(filter = %filter, "Applying crop filter");
+
+        let status = Command::new("ffmpeg")
+            .args([
+                "-i",
+                input.to_str().context("invalid input path")?,
+                "-vf",
+                filter,
+                "-c:a",
+                "copy",
+                "-y",
+                output.to_str().context("invalid output path")?,
+            ])
+            .status()
+            .context("failed to execute ffmpeg")?;
+
+        if !status.success() {
+            anyhow::bail!("ffmpeg failed with status: {}", status);
+        }
+
+        Ok(())
+    }
+}
+
 impl VideoEditor for FfmpegEditor {
     fn trim_video(&self, input: &Path, output: &Path, segments: &[ProcessedSegment]) -> Result<()> {
         self.trim_video_with_progress(input, output, segments, &mut |_| {})
