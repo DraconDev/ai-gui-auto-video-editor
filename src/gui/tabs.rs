@@ -10,7 +10,7 @@ use ai_vid_editor::{
 use super::theme::*;
 
 impl App {
-    fn draw_header(&mut self, ui: &mut egui::Ui) {
+    pub(crate) fn draw_header(&mut self, ui: &mut egui::Ui) {
         accent_bar().show(ui, |_ui| {});
         ui.add_space(10.0);
 
@@ -49,7 +49,7 @@ impl App {
             });
     }
 
-    fn draw_folders_panel(&mut self, ui: &mut egui::Ui) {
+    pub(crate) fn draw_folders_panel(&mut self, ui: &mut egui::Ui) {
         panel_frame().show(ui, |ui| {
             ui.horizontal(|ui| {
                 ui.label(
@@ -172,7 +172,7 @@ impl App {
         });
     }
 
-    fn draw_delete_confirm_modal(&mut self, ctx: &egui::Context) {
+    pub(crate) fn draw_delete_confirm_modal(&mut self, ctx: &egui::Context) {
         let mut should_delete = false;
         let mut should_close = false;
 
@@ -255,7 +255,7 @@ impl App {
         }
     }
 
-    fn draw_setup_wizard(&mut self, ctx: &egui::Context) {
+    pub(crate) fn draw_setup_wizard(&mut self, ctx: &egui::Context) {
         let screen_rect = ctx.screen_rect();
 
         // Background overlay
@@ -291,7 +291,7 @@ impl App {
             });
     }
 
-    fn draw_setup_welcome(&mut self, ui: &mut egui::Ui) {
+    pub(crate) fn draw_setup_welcome(&mut self, ui: &mut egui::Ui) {
         ui.vertical_centered(|ui| {
             ui.label(
                 RichText::new("Welcome to AI Video Editor")
@@ -346,7 +346,7 @@ impl App {
         });
     }
 
-    fn setup_feature_row(&self, ui: &mut egui::Ui, title: &str, desc: &str) {
+    pub(crate) fn setup_feature_row(&self, ui: &mut egui::Ui, title: &str, desc: &str) {
         ui.horizontal(|ui| {
             ui.label(RichText::new("✓").size(18.0).color(SUCCESS));
             ui.add_space(12.0);
@@ -357,7 +357,7 @@ impl App {
         });
     }
 
-    fn draw_setup_folder(&mut self, ui: &mut egui::Ui) {
+    pub(crate) fn draw_setup_folder(&mut self, ui: &mut egui::Ui) {
         ui.label(
             RichText::new("Choose Your Video Folder")
                 .size(24.0)
@@ -439,7 +439,7 @@ impl App {
         });
     }
 
-    fn setup_preset_card(
+    pub(crate) fn setup_preset_card(
         &self,
         ui: &mut egui::Ui,
         selected: bool,
@@ -484,7 +484,7 @@ impl App {
             .response
     }
 
-    fn draw_setup_options(&mut self, ui: &mut egui::Ui) {
+    pub(crate) fn draw_setup_options(&mut self, ui: &mut egui::Ui) {
         ui.label(
             RichText::new("Processing Options")
                 .size(24.0)
@@ -529,7 +529,7 @@ impl App {
         });
     }
 
-    fn setup_toggle(&self, ui: &mut egui::Ui, title: &str, desc: &str, value: bool) -> bool {
+    pub(crate) fn setup_toggle(&self, ui: &mut egui::Ui, title: &str, desc: &str, value: bool) -> bool {
         let mut new_value = value;
         settings_toggle_frame(value).show(ui, |ui| {
             ui.horizontal(|ui| {
@@ -556,7 +556,7 @@ impl App {
         new_value
     }
 
-    fn draw_setup_complete(&mut self, ui: &mut egui::Ui) {
+    pub(crate) fn draw_setup_complete(&mut self, ui: &mut egui::Ui) {
         ui.vertical_centered(|ui| {
             ui.label(RichText::new("🎉").size(64.0));
             ui.add_space(16.0);
@@ -642,7 +642,7 @@ impl App {
         });
     }
 
-    fn complete_setup(&mut self) {
+    pub(crate) fn complete_setup(&mut self) {
         // Create output folder
         let output_folder = self.state.setup_folder.join("output");
         let _ = std::fs::create_dir_all(&output_folder);
@@ -674,7 +674,7 @@ impl App {
         self.state.auto_save_config();
     }
 
-    fn draw_modal(&mut self, ctx: &egui::Context) {
+    pub(crate) fn draw_modal(&mut self, ctx: &egui::Context) {
         let mut should_close = false;
         let mut should_save = false;
 
@@ -795,7 +795,7 @@ impl App {
         }
     }
 
-    fn is_default_path(path: &std::path::Path, preset: &str) -> bool {
+    pub(crate) fn is_default_path(path: &std::path::Path, preset: &str) -> bool {
         let default_input = format!("videos/{}", preset);
         let default_output = format!("videos/{}/output", preset);
         path.to_string_lossy() == default_input
@@ -804,7 +804,7 @@ impl App {
             || path.to_string_lossy() == "videos/output"
     }
 
-    fn draw_settings_panel(&mut self, ui: &mut egui::Ui) {
+    pub(crate) fn draw_settings_panel(&mut self, ui: &mut egui::Ui) {
         let folder_names: Vec<String> = self
             .state
             .folders
@@ -1136,7 +1136,7 @@ impl App {
     }
 
     #[allow(dead_code)]
-    fn draw_settings_metric(ui: &mut egui::Ui, label: &str, value: &str, color: egui::Color32) {
+    pub(crate) fn draw_settings_metric(ui: &mut egui::Ui, label: &str, value: &str, color: egui::Color32) {
         let bg = egui::Color32::from_rgba_unmultiplied(color.r(), color.g(), color.b(), 24);
         egui::Frame::NONE
             .fill(bg)
@@ -1151,7 +1151,7 @@ impl App {
             });
     }
 
-    fn draw_settings_toggle(
+    pub(crate) fn draw_settings_toggle(
         ui: &mut egui::Ui,
         label: &str,
         help_text: &str,
@@ -1181,7 +1181,7 @@ impl App {
         changed
     }
 
-    fn draw_advanced_slider(
+    pub(crate) fn draw_advanced_slider(
         ui: &mut egui::Ui,
         title: &str,
         help_text: &str,
@@ -1207,7 +1207,7 @@ impl App {
         changed
     }
 
-    fn draw_activity_log(&mut self, ui: &mut egui::Ui, full_height: bool) {
+    pub(crate) fn draw_activity_log(&mut self, ui: &mut egui::Ui, full_height: bool) {
         panel_frame().show(ui, |ui| {
             ui.horizontal(|ui| {
                 ui.label(

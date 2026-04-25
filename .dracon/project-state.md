@@ -1,7 +1,9 @@
 # Project State
 
 ## Current Focus
-Added `SetupStep` enum to the module imports for improved video processing configuration
+Refactored GUI tab methods to be more modular and accessible across modules
 
 ## Completed
-- [x] Added `SetupStep` to the module imports in `tabs.rs` to support enhanced video processing workflows
+- [x] Made all tab-related methods `pub(crate)` to enable cross-module access
+- [x] Improved code organization by making GUI drawing methods explicitly accessible
+```
