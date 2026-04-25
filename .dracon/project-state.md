@@ -1,11 +1,8 @@
 # Project State
 
 ## Current Focus
-Added face detection-based video cropping with fallback to center crop
+Improved loudness normalization stats parsing with validation for finite numbers
 
 ## Completed
-- [x] Implemented `run_reframe_filter` method to apply FFmpeg crop filters
-- [x] Added face detection integration with fallback to center crop
-- [x] Enhanced error handling for face detection failures
-- [x] Added logging for crop filter application
-- [x] Implemented proper path validation for input/output files
+- [x] Added validation for finite numbers in loudness normalization stats
+- [x] Improved error handling by rejecting NaN/infinite values in audio processing metrics

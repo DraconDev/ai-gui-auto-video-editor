@@ -696,13 +696,23 @@ fn parse_loudnorm_stats(stderr: &str) -> Option<LoudnormStats> {
         }
     };
 
-    Some(LoudnormStats {
+    // Parse all values and validate they are valid finite numbers
+    let stats = LoudnormStats {
         i: get_val("input_i")?,
         tp: get_val("input_tp")?,
         lra: get_val("input_lra")?,
         thresh: get_val("input_thresh")?,
         offset: get_val("target_offset")?,
-    })
+    };
+
+    // Validate all fields are valid finite numbers
+    for val in [&stats.i, &stats.tp, &stats.lra, &stats.thresh, &stats.offset] {
+        if val.is_empty() || val.parse::<f64>().ok()?.is_nan() || val.parse::<f64>().ok()?.is_infinite() {
+            return None;
+        }
+    }
+
+    Some(stats)
 }
 
 fn generate_trim_filters(segments: &[ProcessedSegment]) -> (String, String) {
