@@ -329,7 +329,8 @@ impl VideoEditor for FfmpegEditor {
 
         let input_str = input.to_str().context("invalid input path")?;
         let output_str = output.to_str().context("invalid output path")?;
-        let trf_file = "/tmp/transforms.trf";
+        let trf_file = std::env::temp_dir().join(format!("ai-vid-editor-vidstab-{}.trf", std::process::id()));
+        let trf_path = trf_file.to_str().context("invalid temp path")?;
 
         // Pass 1: Detect motion and generate transforms
         let status1 = Command::new("ffmpeg")
@@ -339,7 +340,7 @@ impl VideoEditor for FfmpegEditor {
                 "-vf",
                 &format!(
                     "vidstabdetect=stepsize=6:shakiness=5:accuracy=15:result={}",
-                    trf_file
+                    trf_path
                 ),
                 "-f",
                 "null",
@@ -349,6 +350,7 @@ impl VideoEditor for FfmpegEditor {
             .context("failed to execute ffmpeg (stabilize pass 1)")?;
 
         if !status1.success() {
+            let _ = std::fs::remove_file(&trf_file);
             anyhow::bail!("ffmpeg stabilize pass 1 failed with status: {}", status1);
         }
 
@@ -360,7 +362,7 @@ impl VideoEditor for FfmpegEditor {
                 "-vf",
                 &format!(
                     "vidstabtransform=input={}:smoothing=10:optzoom=1:interpol=bicubic",
-                    trf_file
+                    trf_path
                 ),
                 "-c:a",
                 "copy",
@@ -371,7 +373,7 @@ impl VideoEditor for FfmpegEditor {
             .context("failed to execute ffmpeg (stabilize pass 2)")?;
 
         // Cleanup temp file
-        let _ = std::fs::remove_file(trf_file);
+        let _ = std::fs::remove_file(&trf_file);
 
         if !status2.success() {
             anyhow::bail!("ffmpeg stabilize pass 2 failed with status: {}", status2);
