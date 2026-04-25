@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Dependency version updates in Cargo.toml (binary modification to Cargo.lock)
+Added new platform-specific video presets for TikTok, Instagram Reels, and Twitter
 
 ## Completed
-- [x] Updated dependency versions in Cargo.toml (binary modification to Cargo.lock)
-```
+- [x] Updated `Preset::from_str()` test cases to include new platform presets (TikTok, Reels, Twitter)
+- [x] Fixed incorrect preset mappings for TikTok and Reels (previously mapped to Shorts)

@@ -1210,9 +1210,10 @@ enhance = false
     fn test_preset_from_str() {
         assert_eq!(Preset::from_str("youtube"), Some(Preset::Youtube));
         assert_eq!(Preset::from_str("SHORTS"), Some(Preset::Shorts));
-        assert_eq!(Preset::from_str("tiktok"), Some(Preset::Shorts));
-        assert_eq!(Preset::from_str("reels"), Some(Preset::Shorts));
+        assert_eq!(Preset::from_str("tiktok"), Some(Preset::Tiktok));
+        assert_eq!(Preset::from_str("reels"), Some(Preset::Reels));
         assert_eq!(Preset::from_str("podcast"), Some(Preset::Podcast));
+        assert_eq!(Preset::from_str("twitter"), Some(Preset::Twitter));
         assert_eq!(Preset::from_str("minimal"), Some(Preset::Minimal));
         assert_eq!(Preset::from_str("invalid"), None);
     }
