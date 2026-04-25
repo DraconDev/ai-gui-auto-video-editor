@@ -14,7 +14,7 @@ pub struct ProcessedSegment {
     pub speed: f32,
 }
 
-pub trait VideoAnalyzer {
+pub trait VideoAnalyzer: Send + Sync {
     fn detect_silence(
         &self,
         path: &Path,

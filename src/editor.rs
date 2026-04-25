@@ -132,7 +132,7 @@ pub fn calculate_keep_segments_from_transcript(
     processed
 }
 
-pub trait VideoEditor {
+pub trait VideoEditor: Send + Sync {
     fn trim_video(&self, input: &Path, output: &Path, segments: &[ProcessedSegment]) -> Result<()>;
     fn trim_video_with_progress(
         &self,
