@@ -489,6 +489,17 @@ fn main() -> Result<()> {
         config.video.target_resolution =
             parse_resolution(resolution_str).unwrap_or(crate::config::VideoResolution::Fhd1080p);
     }
+    if let Some(ref gpu_str) = cli.gpu {
+        config.video.hw_accel = if gpu_str == "auto" {
+            crate::hwaccel::HwAccel::detect()
+        } else {
+            crate::hwaccel::HwAccel::from_str(gpu_str)
+                .unwrap_or_else(|| {
+                    eprintln!("Warning: unknown GPU type '{}', using CPU encoding", gpu_str);
+                    crate::hwaccel::HwAccel::None
+                })
+        };
+    }
 
     // Print config (unless JSON mode)
     if !cli.json {
