@@ -55,11 +55,10 @@ impl BatchProgress {
 
     /// Get the default progress file path for a given input directory
     pub fn default_path(input_dir: &Path) -> PathBuf {
-        let hash = format!(
-            "{:x}",
-            md5::compute(input_dir.to_string_lossy().as_bytes())
-        );
-        std::env::temp_dir().join(format!("ai-vid-editor-progress-{}.json", hash))
+        let dir_name = input_dir.file_name()
+            .and_then(|n| n.to_str())
+            .unwrap_or("default");
+        std::env::temp_dir().join(format!("ai-vid-editor-progress-{}.json", dir_name))
     }
 }
 

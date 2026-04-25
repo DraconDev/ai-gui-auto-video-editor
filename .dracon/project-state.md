@@ -1,11 +1,9 @@
 # Project State
 
 ## Current Focus
-Added batch progress tracking for resumable video processing jobs
+Refactored progress file naming to use directory name instead of MD5 hash for better readability and debugging
 
 ## Completed
-- [x] Created `BatchProgress` struct to track completed/failed files in batch processing
-- [x] Implemented file I/O operations for progress state persistence
-- [x] Added methods for marking files as completed/failed and checking progress
-- [x] Included test cases for progress tracking functionality
-- [x] Added default progress file path generation using directory hashing
+- [x] Changed progress file naming from MD5 hash to directory name for better traceability
+- [x] Simplified path generation logic while maintaining unique file naming
+- [x] Improved debugging experience by making progress files more human-readable
