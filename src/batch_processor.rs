@@ -900,12 +900,21 @@ where
     let mut failed_files = 0;
     let mut skipped_files = 0;
 
+    let pb = ProgressBar::new(total_files as u64);
+    pb.set_style(
+        ProgressStyle::default_bar()
+            .template("{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {pos}/{len} {msg}")
+            .unwrap()
+            .progress_chars("#>-"),
+    );
+
     let preset_rules = crate::preset_rules::default_preset_rules();
 
     for (index, input_file) in video_files.iter().enumerate() {
         if progress.is_completed(input_file) {
             info!(file = ?input_file, "Skipping already processed file");
             skipped_files += 1;
+            pb.inc(1);
             continue;
         }
 
@@ -913,6 +922,8 @@ where
             .file_name()
             .context(format!("Could not get file name for {:?}", input_file))?;
         let output_file = output_dir.join(file_name);
+
+        pb.set_message(format!("{}", input_file.display()));
 
         // Apply per-file preset based on filename
         let file_preset = crate::preset_rules::preset_for_file(
@@ -930,7 +941,6 @@ where
             config.clone()
         };
 
-        info!(current = index + 1, total = total_files, file = ?input_file, "Processing file");
         match process_single_file(
             input_file.clone(),
             output_file.clone(),
@@ -954,7 +964,17 @@ where
         if let Err(e) = progress.to_file(&progress_path) {
             warn!("Failed to save progress file: {}", e);
         }
+        pb.inc(1);
     }
+
+    pb.finish_with_message("Done");
+
+    println!("\n=== BATCH SUMMARY ===");
+    println!("  Total files:     {}", total_files);
+    println!("  Successful:      {}", successful_files);
+    println!("  Failed:          {}", failed_files);
+    println!("  Skipped (done):  {}", skipped_files);
+    println!("=====================\n");
 
     info!(
         total = total_files,
