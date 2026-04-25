@@ -1,10 +1,8 @@
 # Project State
 
 ## Current Focus
-Improved center crop functionality to handle variable video aspect ratios
+Improved frame extraction cleanup by adding process-specific temp directories and automatic cleanup
 
 ## Completed
-- [x] Modified `center_crop_9_16()` to accept video aspect ratio parameter
-- [x] Added dynamic calculation of crop width based on input aspect ratio
-- [x] Updated face detection fallback to use the new aspect-aware crop method
-- [x] Added bounds checking to prevent invalid crop calculations
+- [x] Added process-specific temp directory paths by including the process ID
+- [x] Implemented automatic cleanup of temp directories before frame extraction
