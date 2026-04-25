@@ -868,17 +868,35 @@ where
     let mut successful_files = 0;
     let mut failed_files = 0;
 
+    let preset_rules = crate::preset_rules::default_preset_rules();
+
     for (index, input_file) in video_files.iter().enumerate() {
         let file_name = input_file
             .file_name()
             .context(format!("Could not get file name for {:?}", input_file))?;
         let output_file = output_dir.join(file_name);
 
+        // Apply per-file preset based on filename
+        let file_preset = crate::preset_rules::preset_for_file(
+            input_file,
+            &preset_rules,
+            crate::config::Preset::Youtube, // Default when no rule matches
+        );
+        let file_config = if file_preset != crate::config::Preset::Youtube {
+            info!(preset = ?file_preset, file = ?file_name, "Applying filename-based preset");
+            let mut c = file_preset.to_config();
+            // Merge with base config to preserve paths, exports, etc.
+            c = c.merge(config.clone());
+            c
+        } else {
+            config.clone()
+        };
+
         info!(current = index + 1, total = total_files, file = ?input_file, "Processing file");
         match process_single_file(
             input_file.clone(),
             output_file.clone(),
-            config,
+            &file_config,
             analyzer,
             editor,
             duration_getter,
