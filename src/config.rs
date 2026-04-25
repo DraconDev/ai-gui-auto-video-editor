@@ -191,6 +191,12 @@ fn default_min_silence_for_speedup() -> f32 {
 fn default_scene_threshold() -> f32 {
     0.3
 }
+fn default_watermark_position() -> String {
+    "bottom-right".to_string()
+}
+fn default_watermark_scale() -> f32 {
+    1.0
+}
 
 impl Default for SilenceConfig {
     fn default() -> Self {

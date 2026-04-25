@@ -4,6 +4,5 @@
 Added watermark configuration options for video processing
 
 ## Completed
-- [x] Added watermark image path configuration with PathBuf type
-- [x] Added watermark position configuration with default value
-- [x] Added watermark scale factor configuration with default value
+- [x] Added default watermark position ("bottom-right") configuration
+- [x] Added default watermark scale (1.0) configuration
