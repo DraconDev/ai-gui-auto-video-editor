@@ -1,9 +1,8 @@
 # Project State
 
 ## Current Focus
-Improved video dimension extraction and duration calculation with better error handling
+Improved audio sample loading robustness by handling partial trailing chunks in STT analyzer
 
 ## Completed
-- [x] Added video dimension extraction using ffprobe with proper error handling for UTF-8 paths
-- [x] Improved error handling for path conversions in video duration calculation
-- [x] Standardized ffprobe command formatting for both dimension extraction and duration calculation
+- [x] Fixed potential panic on partial audio chunks by ignoring trailing incomplete samples
+- [x] Maintained existing functionality for complete 4-byte chunks while adding safety for malformed data

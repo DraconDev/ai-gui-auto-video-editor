@@ -93,8 +93,15 @@ fn load_audio_as_f32(path: &Path) -> Result<Vec<f32>> {
 
     let bytes = output.stdout;
     let samples: Vec<f32> = bytes
-        .chunks_exact(4)
-        .map(|chunk| f32::from_le_bytes(chunk.try_into().unwrap()))
+        .chunks(4)
+        .filter_map(|chunk| {
+            if chunk.len() == 4 {
+                Some(f32::from_le_bytes(chunk.try_into().unwrap()))
+            } else {
+                // Ignore partial trailing chunk
+                None
+            }
+        })
         .collect();
 
     Ok(samples)
