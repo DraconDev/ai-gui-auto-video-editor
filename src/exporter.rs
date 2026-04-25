@@ -297,7 +297,7 @@ mod tests {
             ProcessedSegment { start: 10.0, end: 20.0, speed: 1.0 },
         ];
 
-        export_edl(&segments, &input_path, &output_edl)?;
+        export_edl(&segments, &input_path, &output_edl, 25.0)?;
 
         let content = fs::read_to_string(output_edl)?;
         // Check that timestamps are present, not all zeros

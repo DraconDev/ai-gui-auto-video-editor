@@ -459,7 +459,7 @@ fn export_additional_files(
     if config.export.edl {
         let edl_path = format!("{}.edl", base_path.display());
         debug!(path = %edl_path, "Exporting EDL");
-        exporter::export_edl(segments, input_file, Path::new(&edl_path))?;
+        exporter::export_edl(segments, input_file, Path::new(&edl_path), 25.0)?;
     }
 
     Ok(())
