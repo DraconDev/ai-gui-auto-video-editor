@@ -14,31 +14,31 @@ use crate::utils::find_video_files;
 
 /// RAII guard for cleaning up temporary video files on drop.
 /// Tracks intermediate files and removes them when the guard goes out of scope.
-struct TempFileGuard<'a> {
-    temps: Vec<&'a Path>,
-    output: &'a Path,
+struct TempFileGuard {
+    temps: Vec<PathBuf>,
+    output: PathBuf,
 }
 
-impl<'a> TempFileGuard<'a> {
-    fn new(output: &'a Path) -> Self {
+impl TempFileGuard {
+    fn new(output: PathBuf) -> Self {
         Self {
             temps: Vec::new(),
             output,
         }
     }
 
-    fn track(&mut self, path: &'a Path) {
-        if path != self.output {
+    fn track(&mut self, path: PathBuf) {
+        if path != self.output && !self.temps.contains(&path) {
             self.temps.push(path);
         }
     }
 
     fn untrack(&mut self, path: &Path) {
-        self.temps.retain(|p| *p != path);
+        self.temps.retain(|p| p != path);
     }
 }
 
-impl<'a> Drop for TempFileGuard<'a> {
+impl Drop for TempFileGuard {
     fn drop(&mut self) {
         for path in &self.temps {
             if let Err(e) = fs::remove_file(path) {

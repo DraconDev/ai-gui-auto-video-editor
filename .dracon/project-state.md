@@ -1,9 +1,11 @@
 # Project State
 
 ## Current Focus
-Added RAII-based temporary file cleanup for batch processing
+Refactored `TempFileGuard` to use owned `PathBuf` instead of borrowed `Path` references
 
 ## Completed
-- [x] Implemented `TempFileGuard` struct to track and automatically clean up intermediate files
-- [x] Added tracking methods to manage temporary file lifecycle
-- [x] Ensured output files are preserved while temporary files are cleaned up
+- [x] Changed `TempFileGuard` to store owned `PathBuf` instead of borrowed `Path` references
+- [x] Updated `track()` method to accept and store `PathBuf` instead of `&Path`
+- [x] Improved `track()` to prevent duplicate paths from being added
+- [x] Simplified `untrack()` comparison logic by removing dereferencing
+- [x] Removed lifetime parameter from `TempFileGuard` and `Drop` implementation
