@@ -1,10 +1,7 @@
 # Project State
 
 ## Current Focus
-Added comprehensive video and silence configuration options to the Config struct
+Dependency version updates for video processing features
 
 ## Completed
-- [x] Added video target resolution configuration
-- [x] Added watermark configuration with optional scaling
-- [x] Added scene detection configuration for silence processing
-- [x] Added customizable scene threshold for silence detection
+- [x] Updated Cargo.lock with new dependency versions for video processing features
