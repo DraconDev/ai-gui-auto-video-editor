@@ -798,6 +798,12 @@ impl Config {
 
         // Fix floating point precision artifacts (e.g., 0.10000000149011612 -> 0.1)
         // This happens because f32 values get serialized as f64
+        // Only fix known float fields to avoid corrupting strings/paths
+        const FLOAT_KEYS: &[&str] = &[
+            "threshold_db", "min_duration", "padding", "speedup_factor",
+            "min_silence_for_speedup", "target_lufs", "duck_volume",
+            "clip_min_duration", "clip_max_duration",
+        ];
         fn fix_floats(s: &str) -> String {
             let mut result = String::new();
             for line in s.lines() {
@@ -806,7 +812,10 @@ impl Config {
                     if parts.len() == 2 {
                         let key = parts[0].trim_end();
                         let value = parts[1].trim();
-                        if let Ok(float_val) = value.parse::<f64>() {
+                        // Only round values for known float fields
+                        let is_float_key = FLOAT_KEYS.iter().any(|&k| key.ends_with(k));
+                        if is_float_key && value.parse::<f64>().is_ok() {
+                            let float_val = value.parse::<f64>().unwrap();
                             let rounded = (float_val * 100.0).round() / 100.0;
                             if rounded == rounded.trunc() {
                                 result.push_str(&format!("{} = {}\n", key, rounded as i64));
