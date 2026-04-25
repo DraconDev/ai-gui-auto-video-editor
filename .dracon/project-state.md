@@ -1,8 +1,9 @@
 # Project State
 
 ## Current Focus
-Dependency version updates for video processing features
+Updated CHANGELOG.md to reflect new preview generation feature (0.72.0)
 
 ## Completed
-- [x] Updated dependency versions in Cargo.lock for video processing features
+- [x] Updated version number from 0.69.0 to 0.72.0 in CHANGELOG.md
+- [x] Added documentation for preview generation feature with `--preview` CLI flag
 ```
