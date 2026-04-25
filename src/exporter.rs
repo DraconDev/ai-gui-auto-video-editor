@@ -175,10 +175,12 @@ pub fn export_youtube_chapters(transcript: &[TranscriptSegment], output_path: &P
 }
 
 fn format_srt_time(seconds: f32) -> String {
-    let hours = (seconds / 3600.0) as u32;
-    let minutes = ((seconds % 3600.0) / 60.0) as u32;
-    let secs = (seconds % 60.0) as u32;
-    let millis = ((seconds % 1.0) * 1000.0).round() as u32;
+    // Round to nearest millisecond to avoid truncation artifacts
+    let total_millis = (seconds * 1000.0).round() as u64;
+    let hours = (total_millis / 3_600_000) as u32;
+    let minutes = ((total_millis % 3_600_000) / 60_000) as u32;
+    let secs = ((total_millis % 60_000) / 1_000) as u32;
+    let millis = (total_millis % 1_000) as u32;
     format!("{:02}:{:02}:{:02},{:03}", hours, minutes, secs, millis)
 }
 
