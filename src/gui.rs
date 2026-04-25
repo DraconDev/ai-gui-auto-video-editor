@@ -5,6 +5,7 @@ mod tabs;
 use eframe::egui;
 use std::path::PathBuf;
 use std::sync::{
+    Arc,
     atomic::{AtomicBool, Ordering},
     mpsc::Receiver,
 };
