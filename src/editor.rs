@@ -219,8 +219,10 @@ impl VideoEditor for FfmpegEditor {
             anyhow::bail!("No segments to process");
         }
 
+        let codec = self.hw_accel.video_codec();
+
         if segments.len() <= TRIM_SEGMENTS_PER_CHUNK {
-            run_trim_filter_job(input, output, segments)?;
+            run_trim_filter_job(input, output, segments, codec)?;
             progress(1.0);
             return Ok(());
         }
@@ -231,7 +233,7 @@ impl VideoEditor for FfmpegEditor {
 
         for (idx, chunk) in segments.chunks(TRIM_SEGMENTS_PER_CHUNK).enumerate() {
             let chunk_path = chunk_dir.join(format!("chunk_{idx:04}.mp4"));
-            run_trim_filter_job(input, &chunk_path, chunk)?;
+            run_trim_filter_job(input, &chunk_path, chunk, codec)?;
             chunk_files.push(chunk_path);
             progress((idx + 1) as f32 / (chunk_count + 1) as f32);
         }

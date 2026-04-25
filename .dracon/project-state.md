@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Added codec parameter to `run_trim_filter_job` for flexible video encoding
+Added hardware-accelerated codec parameter to video trim operations
 
 ## Completed
-- [x] Modified `run_trim_filter_job` to accept a codec parameter instead of hardcoding "libx264"
-- [x] Enabled dynamic codec selection for video processing operations
+- [x] feat(editor): Pass hardware-accelerated video codec to `run_trim_filter_job` for consistent encoding
+```
