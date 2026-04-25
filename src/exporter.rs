@@ -92,6 +92,7 @@ pub fn export_edl(
 
 /// Convert seconds to SMPTE timecode (HH:MM:SS:FF)
 fn seconds_to_timecode(seconds: f32, fps: f32) -> (u32, u32, u32, u32) {
+    let seconds = seconds.max(0.0);
     let hours = (seconds / 3600.0) as u32;
     let minutes = ((seconds % 3600.0) / 60.0) as u32;
     let secs = (seconds % 60.0) as u32;

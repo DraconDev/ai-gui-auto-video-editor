@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Dependency version updates in Cargo.toml (binary modification to Cargo.lock)
+Added input validation to prevent negative time values in timecode formatting functions
 
 ## Completed
-- [x] Updated dependency versions in Cargo.toml (triggered Cargo.lock modification)
-```
+- [x] Added `seconds.max(0.0)` check in `generate_styled_captions` to prevent negative time values
+- [x] Added `seconds.max(0.0)` check in `seconds_to_timecode` to prevent negative time values

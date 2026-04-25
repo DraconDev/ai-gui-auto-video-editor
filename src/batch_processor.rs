@@ -562,6 +562,7 @@ fn generate_styled_captions(transcript: &[TranscriptSegment], output_path: &Path
 }
 
 fn format_ass_time(seconds: f32) -> String {
+    let seconds = seconds.max(0.0);
     let hours = (seconds / 3600.0) as u32;
     let minutes = ((seconds % 3600.0) / 60.0) as u32;
     let secs = (seconds % 60.0) as u32;
