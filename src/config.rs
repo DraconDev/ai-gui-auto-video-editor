@@ -311,6 +311,26 @@ pub struct ExportConfig {
     /// Generate EDL
     #[serde(default)]
     pub edl: bool,
+
+    /// Generate thumbnail image for the video
+    #[serde(default)]
+    pub thumbnail: bool,
+
+    /// Thumbnail width in pixels
+    #[serde(default = "default_thumbnail_width")]
+    pub thumbnail_width: u32,
+
+    /// Thumbnail height in pixels
+    #[serde(default = "default_thumbnail_height")]
+    pub thumbnail_height: u32,
+
+    /// Generate multiple format outputs simultaneously
+    #[serde(default)]
+    pub multi_format: bool,
+
+    /// Additional resolutions to output (when multi_format is true)
+    #[serde(default)]
+    pub extra_resolutions: Vec<VideoResolution>,
 }
 
 impl Default for ExportConfig {
@@ -325,8 +345,20 @@ impl Default for ExportConfig {
             clip_max_duration: default_clip_max_duration(),
             fcpxml: false,
             edl: false,
+            thumbnail: false,
+            thumbnail_width: default_thumbnail_width(),
+            thumbnail_height: default_thumbnail_height(),
+            multi_format: false,
+            extra_resolutions: Vec::new(),
         }
     }
+}
+
+fn default_thumbnail_width() -> u32 {
+    1280
+}
+fn default_thumbnail_height() -> u32 {
+    720
 }
 
 fn default_clip_count() -> u32 {
