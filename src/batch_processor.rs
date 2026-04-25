@@ -873,13 +873,25 @@ where
         return Ok(());
     }
 
+    // Load or initialize progress tracking
+    let progress_path = BatchProgress::default_path(&input_dir);
+    let mut progress = BatchProgress::from_file(&progress_path).unwrap_or_default();
+    progress.total = video_files.len();
+
     let total_files = video_files.len();
     let mut successful_files = 0;
     let mut failed_files = 0;
+    let mut skipped_files = 0;
 
     let preset_rules = crate::preset_rules::default_preset_rules();
 
     for (index, input_file) in video_files.iter().enumerate() {
+        if progress.is_completed(input_file) {
+            info!(file = ?input_file, "Skipping already processed file");
+            skipped_files += 1;
+            continue;
+        }
+
         let file_name = input_file
             .file_name()
             .context(format!("Could not get file name for {:?}", input_file))?;
@@ -913,11 +925,17 @@ where
             Ok(_) => {
                 info!(file = ?input_file, "Successfully processed");
                 successful_files += 1;
+                progress.mark_completed(input_file);
             }
             Err(e) => {
                 warn!(file = ?input_file, error = %e, "Failed to process");
                 failed_files += 1;
+                progress.mark_failed(input_file);
             }
+        }
+
+        if let Err(e) = progress.to_file(&progress_path) {
+            warn!("Failed to save progress file: {}", e);
         }
     }
 
@@ -925,6 +943,7 @@ where
         total = total_files,
         successful = successful_files,
         failed = failed_files,
+        skipped = skipped_files,
         "Batch processing complete"
     );
 

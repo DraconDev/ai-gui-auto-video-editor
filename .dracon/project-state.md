@@ -1,10 +1,10 @@
 # Project State
 
 ## Current Focus
-Added preview generation for batch exports when enabled in configuration
+Added progress tracking for batch processing to skip already processed files and persist processing state
 
 ## Completed
-- [x] Added conditional preview generation when `config.export.preview` is true
-- [x] Implemented preview generation with fixed 30.0s duration and 480px width
-- [x] Added error handling for preview generation failures with warning logging
-```
+- [x] Added progress tracking system that loads/saves state between runs
+- [x] Implemented file skipping for already processed items
+- [x] Added counters for skipped files in progress reporting
+- [x] Included progress persistence with error handling for file operations
