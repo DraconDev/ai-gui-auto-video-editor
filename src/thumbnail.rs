@@ -48,9 +48,9 @@ pub fn generate_thumbnail(
         std::fs::copy(&best, output_path)?;
         info!(frame = ?best, "Selected best thumbnail frame");
     } else {
-        // Fallback: just extract a frame at 10% into the video
-        extract_frame_at_time(video_path, output_path, width, height, 0.1)?;
-        info!("Fallback thumbnail extracted at 10% mark");
+        // Fallback: just extract a frame at 1 second into the video
+        extract_frame_at_time(video_path, output_path, width, height, 1.0)?;
+        info!("Fallback thumbnail extracted at 1 second mark");
     }
 
     let _ = std::fs::remove_dir_all(&temp_dir);

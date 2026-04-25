@@ -1,10 +1,8 @@
 # Project State
 
 ## Current Focus
-Refactored frame extraction to use absolute time in seconds instead of fractional duration
+Refactored thumbnail fallback to use absolute 1-second mark instead of percentage-based fallback
 
 ## Completed
-- [x] Changed `extract_frame_at_time` to accept time in seconds instead of fractional duration
-- [x] Updated ffmpeg time argument format from percentage to decimal seconds
-- [x] Improved time specification consistency with other video processing functions
-```
+- [x] Changed fallback thumbnail extraction from 10% video duration to fixed 1-second mark for more consistent results
+- [x] Updated logging to reflect the new absolute time fallback behavior
