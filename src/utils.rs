@@ -38,10 +38,14 @@ mod tests {
         fs::write(&text_file, "dummy text content")?;
         fs::write(&unsupported_video, "dummy video content")?;
 
+        let video3 = dir.path().join("video3.mkv");
+        fs::write(&video3, "dummy video content")?;
+
         let found_files = find_video_files(dir.path())?;
-        assert_eq!(found_files.len(), 2);
+        assert_eq!(found_files.len(), 3);
         assert!(found_files.contains(&video1));
         assert!(found_files.contains(&video2));
+        assert!(found_files.contains(&video3));
         assert!(!found_files.contains(&text_file));
         assert!(!found_files.contains(&unsupported_video));
 
