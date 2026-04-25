@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Dependency version updates in Cargo.toml (binary modification to Cargo.lock)
+Improved watermark positioning and entropy parsing in video processing modules
 
 ## Completed
-- [x] Updated dependency versions in Cargo.toml (binary modification to Cargo.lock)
-```
+- [x] Refactored watermark position calculation to use `next_back()` for entropy parsing in thumbnail generation
+- [x] Made `to_ffmpeg_coords` public in watermark module for better API consistency

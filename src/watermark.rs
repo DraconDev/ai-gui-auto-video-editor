@@ -15,7 +15,7 @@ pub enum WatermarkPosition {
 
 impl WatermarkPosition {
     /// Get the ffmpeg overlay position string
-    fn to_ffmpeg_coords(&self, _watermark_w: u32, _watermark_h: u32) -> String {
+    pub fn to_ffmpeg_coords(self, _watermark_w: u32, _watermark_h: u32) -> String {
         let pad = 10; // Padding from edges
         match self {
             WatermarkPosition::TopLeft => format!("{pad}:{pad}"),
