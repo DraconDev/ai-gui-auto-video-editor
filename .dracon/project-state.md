@@ -1,9 +1,11 @@
 # Project State
 
 ## Current Focus
-Added silence segment merging with scene-change boundaries for more accurate video trimming
+Added watermark functionality to video processing pipeline
 
 ## Completed
-- [x] Implemented `merge_silences_and_scenes` function to combine silence detection with scene detection boundaries
-- [x] Added logic to extend silence segments to nearest scene boundaries within 0.5 seconds
-- [x] Integrated with existing segment processing pipeline for batch video processing
+- [x] Implemented watermark application with configurable position and scale
+- [x] Integrated watermark processing after video effects (blur, scene detection)
+- [x] Added progress tracking for watermark application step
+- [x] Implemented proper file cleanup and tracking for intermediate files
+- [x] Added logging for watermark processing with path information

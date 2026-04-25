@@ -429,6 +429,31 @@ where
         current_file = blurred;
     }
 
+    // Apply watermark if configured
+    if let Some(ref watermark_path) = config.video.watermark {
+        let watermarked = output_file.with_extension("watermarked.mp4");
+        report_progress(&mut progress, 0.98, "Adding watermark");
+        info!(watermark = ?watermark_path, "Adding watermark");
+
+        let position = crate::watermark::WatermarkPosition::BottomRight; // Default
+        let scale = config.video.watermark_scale;
+
+        crate::watermark::add_watermark(
+            &current_file,
+            watermark_path,
+            &watermarked,
+            position,
+            scale,
+        )?;
+
+        if current_file != output_file {
+            guard.untrack(&current_file);
+            let _ = fs::remove_file(&current_file);
+        }
+        guard.track(watermarked.clone());
+        current_file = watermarked;
+    }
+
     // Move final temp file to output if needed
     if current_file != output_file {
         fs::rename(&current_file, &output_file)?;
