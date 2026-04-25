@@ -493,12 +493,18 @@ fn main() -> Result<()> {
             println!("  Background music: {:?}", music);
         }
         println!(
-            "  Export: SRT={} Chapters={} FCPXML={} EDL={}",
+            "  Export: SRT={} Chapters={} FCPXML={} EDL={} Thumbnail={} MultiFormat={}",
             config.export.subtitles,
             config.export.chapters,
             config.export.fcpxml,
-            config.export.edl
+            config.export.edl,
+            config.export.thumbnail,
+            config.export.multi_format
         );
+        println!("  Resolution: {:?}", config.video.target_resolution);
+        if cli.parallel_workers > 1 {
+            println!("  Parallel workers: {}", cli.parallel_workers);
+        }
     }
 
     // Handle dry-run mode
