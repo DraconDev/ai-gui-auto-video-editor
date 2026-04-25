@@ -686,76 +686,9 @@ impl Config {
         let config: Config = toml::from_str(&content)
             .with_context(|| format!("Failed to parse config file: {:?}", path))?;
 
-        config.validate();
+        config.validate()?;
 
         Ok(config)
-    }
-
-    /// Validate configuration and warn about incompatible feature combinations
-    pub fn validate(&self) {
-        // Check for incompatible video processing combinations
-        if self.video.reframe && self.video.blur_background {
-            tracing::warn!(
-                "Both reframe and blur_background are enabled. Blur background will be applied after reframing."
-            );
-        }
-
-        // Check for resolution/preset mismatches
-        match self.video.target_resolution {
-            VideoResolution::Vertical1080p | VideoResolution::Vertical720p => {
-                if !self.video.reframe {
-                    tracing::info!(
-                        "Vertical resolution selected but reframe is not enabled. Output may have black bars."
-                    );
-                }
-            }
-            _ => {
-                if self.video.reframe {
-                    tracing::info!(
-                        "Reframe is enabled but target resolution is landscape. Consider using a vertical resolution preset."
-                    );
-                }
-            }
-        }
-
-        // Check export combinations
-        if self.export.captions && !self.export.subtitles {
-            tracing::info!(
-                "Captions export enabled without subtitles. Transcription will still be performed for captions."
-            );
-        }
-
-        if self.export.multi_format && self.export.extra_resolutions.is_empty() {
-            tracing::warn!(
-                "Multi-format export enabled but no extra resolutions specified. Only the target resolution will be output."
-            );
-        }
-
-        // Check audio settings
-        if self.audio.noise_reduction && !self.audio.enhance {
-            tracing::info!(
-                "Noise reduction enabled without audio enhancement. Consider enabling audio.enhance for better results."
-            );
-        }
-
-        // Check silence mode settings
-        if self.silence.mode == SilenceMode::Speedup && self.silence.speedup_factor < 1.0 {
-            tracing::warn!(
-                "Speedup factor {} is less than 1.0. This will slow down silences instead of speeding them up.",
-                self.silence.speedup_factor
-            );
-        }
-
-        // Check clip settings
-        if self.export.clips {
-            if self.export.clip_min_duration > self.export.clip_max_duration {
-                tracing::warn!(
-                    "Clip min duration ({}) is greater than max duration ({}). No clips will be extracted.",
-                    self.export.clip_min_duration,
-                    self.export.clip_max_duration
-                );
-            }
-        }
     }
 
     /// Save configuration to a file
