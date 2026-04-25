@@ -1,8 +1,9 @@
 # Project State
 
 ## Current Focus
-Improved ASS subtitle formatting and error handling in video processing
+Improved clip duration clamping in batch processing to prevent exceeding video duration
 
 ## Completed
-- [x] Fixed ASS subtitle escaping to properly handle backslashes and newlines
-- [x] Added error handling for missing output file in subtitle burning process
+- [x] Added video duration check to prevent clip times from exceeding video duration
+- [x] Removed incorrect maximum duration calculation that used segment energy values
+- [x] Updated clip end calculation to properly respect video duration boundaries

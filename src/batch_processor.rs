@@ -584,16 +584,16 @@ fn extract_highlight_clips(
     // Find peaks: sort by energy and take top N segments
     segment_energy.sort_by(|a, b| b.2.partial_cmp(&a.2).unwrap_or(std::cmp::Ordering::Equal));
 
+    // Get video duration to clamp clips properly
+    let video_duration = crate::ml::FrameExtractor::get_video_duration(video_path).unwrap_or(
+        transcript.last().map(|s| s.end).unwrap_or(60.0)
+    );
+
     let mut clip_times: Vec<(f32, f32)> = Vec::new();
     for &(start, end, _) in segment_energy.iter().take(clip_count as usize) {
         // Expand segment to reasonable clip duration
         let clip_start = (start - 2.0).max(0.0);
-        let clip_end = (end + 2.0).min(
-            segment_energy
-                .iter()
-                .map(|(_, e, _)| *e)
-                .fold(0.0f32, f32::max),
-        );
+        let clip_end = (end + 2.0).min(video_duration);
         let clip_duration = clip_end - clip_start;
 
         if clip_duration >= min_duration && clip_duration <= max_duration {
