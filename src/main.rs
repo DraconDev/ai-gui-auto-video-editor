@@ -169,6 +169,46 @@ pub struct Cli {
     #[arg(long)]
     pub blur_background: bool,
 
+    /// Export thumbnail image for the video
+    #[arg(long)]
+    pub export_thumbnail: bool,
+
+    /// Add watermark image overlay
+    #[arg(long)]
+    pub watermark: Option<PathBuf>,
+
+    /// Watermark position (top-left, top-right, bottom-left, bottom-right, center)
+    #[arg(long, default_value = "bottom-right")]
+    pub watermark_position: String,
+
+    /// Watermark scale factor (1.0 = original size)
+    #[arg(long, default_value = "1.0")]
+    pub watermark_scale: f32,
+
+    /// Generate a quick low-resolution preview
+    #[arg(long)]
+    pub preview: bool,
+
+    /// Use scene-change detection in addition to silence detection
+    #[arg(long)]
+    pub scene_detect: bool,
+
+    /// Scene detection threshold (0.0-1.0, higher = fewer scenes)
+    #[arg(long, default_value = "0.3")]
+    pub scene_threshold: f32,
+
+    /// Enable multi-format output (generates additional resolutions)
+    #[arg(long)]
+    pub multi_format: bool,
+
+    /// Target output resolution (720p, 1080p, 1440p, 4k, vertical-1080p, vertical-720p)
+    #[arg(long)]
+    pub resolution: Option<String>,
+
+    /// Number of parallel workers for batch processing (0 = auto)
+    #[arg(long, default_value = "1")]
+    pub parallel_workers: usize,
+
     /// Send desktop notifications on processing events
     #[arg(long)]
     pub notify: bool,
