@@ -1,12 +1,10 @@
 # Project State
 
 ## Current Focus
-Improved timestamp handling in EDL exports with proper timecode conversion
+Improved error handling for audio extraction in STT analyzer
 
 ## Completed
-- [x] Added dynamic sequence duration calculation based on segment durations
-- [x] Implemented proper timecode conversion (HH:MM:SS:FF) for EDL exports
-- [x] Added test for EDL timestamp formatting
-- [x] Improved SRT time formatting with proper millisecond rounding
-- [x] Added test for SRT time rounding behavior
+- [x] Added explicit error handling for ffmpeg failures in audio extraction
+- [x] Added validation for ffmpeg command success status
+- [x] Modified chunk processing to handle short final chunks only when they're not the first chunk
 ```

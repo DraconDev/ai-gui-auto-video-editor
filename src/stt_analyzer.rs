@@ -86,6 +86,11 @@ fn load_audio_as_f32(path: &Path) -> Result<Vec<f32>> {
         .output()
         .context("failed to extract audio with ffmpeg")?;
 
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        anyhow::bail!("ffmpeg failed to extract audio: {}", stderr);
+    }
+
     let bytes = output.stdout;
     let samples: Vec<f32> = bytes
         .chunks_exact(4)
@@ -167,7 +172,8 @@ fn decode_greedy(
     for chunk_start in (0..mel_len).step_by(chunk_size) {
         let chunk_end = (chunk_start + chunk_size).min(mel_len);
         let chunk_len = chunk_end - chunk_start;
-        if chunk_len < 100 {
+        // Process short final chunks (at least 1 second = 100 frames)
+        if chunk_len < 100 && chunk_start > 0 {
             continue;
         }
 
