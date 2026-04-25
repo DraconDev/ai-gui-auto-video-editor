@@ -1,8 +1,7 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock for video processing features
+Removed unused `anyhow` import from hardware acceleration module
 
 ## Completed
-- [x] Updated Cargo.lock to reflect latest dependency versions for video processing features
-```
+- [x] Removed unused `anyhow` import to reduce dependency bloat in the hardware acceleration module
