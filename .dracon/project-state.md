@@ -1,14 +1,14 @@
 # Project State
 
 ## Current Focus
-Enhanced config merging with strict precedence for boolean and enum values
+Added configuration validation to ensure all config values are within sensible bounds
 
 ## Completed
-- [x] Silence config: always take other's mode value (enables Cut ↔ Speedup switching)
-- [x] Filler words: always take other's enabled boolean
-- [x] Audio config: always take other's boolean values (enhance, noise_reduction)
-- [x] Export config: always take other's boolean values (subtitles, captions, chapters, clips, fcpxml, edl)
-- [x] Watch config: always take other's enabled boolean
-- [x] Video config: always take other's boolean values (stabilize, color_correct, reframe, blur_background)
-- [x] Processing config: always take other's join_mode and join_output_pattern
-```
+- [x] Added `validate()` method to `Config` that checks:
+  - Silence threshold must be negative
+  - Silence durations must be non-negative
+  - Speedup factor must be positive
+  - Duck volume must be between 0.0 and 1.0
+  - Clip duration constraints must be valid
+  - Watch interval must be positive
+- [x] Updated Cargo.lock to reflect dependency changes
