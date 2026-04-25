@@ -974,18 +974,32 @@ where
         output_dir
     ))?;
 
-    let video_files = find_video_files(&input_dir)?;
+    let mut video_files = find_video_files(&input_dir)?;
 
     if video_files.is_empty() {
         warn!(dir = ?input_dir, "No supported video files found");
         return Ok(());
     }
 
+    // Load progress and filter out completed files
+    let progress_path = BatchProgress::default_path(&input_dir);
+    let mut progress = BatchProgress::from_file(&progress_path).unwrap_or_default();
+    video_files.retain(|f| !progress.is_completed(f));
+
+    if video_files.is_empty() {
+        info!("All files already processed");
+        return Ok(());
+    }
+
+    progress.total = video_files.len();
+
     let total_files = video_files.len();
     let successful_files = Arc::new(AtomicUsize::new(0));
     let failed_files = Arc::new(AtomicUsize::new(0));
     let config = Arc::new(config.clone());
     let output_dir = Arc::new(output_dir);
+    let progress = Arc::new(std::sync::Mutex::new(progress));
+    let progress_path = Arc::new(progress_path);
 
     // Split files into chunks for each worker
     let chunks: Vec<Vec<PathBuf>> = video_files
@@ -999,6 +1013,8 @@ where
             let output_dir = Arc::clone(&output_dir);
             let successful = Arc::clone(&successful_files);
             let failed = Arc::clone(&failed_files);
+            let progress = Arc::clone(&progress);
+            let progress_path = Arc::clone(&progress_path);
 
             s.spawn(move || {
                 for input_file in chunk {
@@ -1024,10 +1040,16 @@ where
                         Ok(_) => {
                             info!(file = ?input_file, "Successfully processed");
                             successful.fetch_add(1, Ordering::SeqCst);
+                            let mut p = progress.lock().unwrap();
+                            p.mark_completed(&input_file);
+                            let _ = p.to_file(&progress_path);
                         }
                         Err(e) => {
                             warn!(file = ?input_file, error = %e, "Failed to process");
                             failed.fetch_add(1, Ordering::SeqCst);
+                            let mut p = progress.lock().unwrap();
+                            p.mark_failed(&input_file);
+                            let _ = p.to_file(&progress_path);
                         }
                     }
                 }

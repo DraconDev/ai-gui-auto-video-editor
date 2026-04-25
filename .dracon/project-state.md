@@ -1,10 +1,11 @@
 # Project State
 
 ## Current Focus
-Added progress tracking for batch processing to skip already processed files and persist processing state
+Added progress tracking to skip already processed files in batch processing
 
 ## Completed
-- [x] Added progress tracking system that loads/saves state between runs
-- [x] Implemented file skipping for already processed items
-- [x] Added counters for skipped files in progress reporting
-- [x] Included progress persistence with error handling for file operations
+- [x] Added progress tracking system to track completed and failed files
+- [x] Implemented file filtering to skip already processed files
+- [x] Added progress persistence to save state between runs
+- [x] Updated progress tracking in worker threads
+```
