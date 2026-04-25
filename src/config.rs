@@ -921,6 +921,9 @@ impl Config {
         self.video.reframe = other.video.reframe;
         self.video.blur_background = other.video.blur_background;
         self.video.target_resolution = other.video.target_resolution;
+        if other.video.hw_accel != crate::hwaccel::HwAccel::None {
+            self.video.hw_accel = other.video.hw_accel;
+        }
         if other.video.watermark.is_some() {
             self.video.watermark = other.video.watermark.clone();
         }
