@@ -1,10 +1,8 @@
 # Project State
 
 ## Current Focus
-Removed face detection-based video cropping fallback logic
+Removed the reframe filter implementation from the video editor
 
 ## Completed
-- [x] Removed face detection-based cropping implementation
-- [x] Removed fallback to center crop when face detection fails
-- [x] Removed all related error handling for face detection failures
-- [x] Simplified video processing to use only direct ffmpeg calls without conditional logic
+- [x] Removed the `run_reframe_filter` method and its FFmpeg-based implementation
+- [x] Deleted the associated logging and error handling code for the reframe operation

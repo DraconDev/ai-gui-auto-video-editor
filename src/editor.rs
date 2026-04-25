@@ -447,30 +447,6 @@ impl VideoEditor for FfmpegEditor {
         self.run_reframe_filter(input, output, &filter)
     }
 
-    fn run_reframe_filter(&self, input: &Path, output: &Path, filter: &str) -> Result<()> {
-        info!(filter = %filter, "Applying crop filter");
-
-        let status = Command::new("ffmpeg")
-            .args([
-                "-i",
-                input.to_str().context("invalid input path")?,
-                "-vf",
-                filter,
-                "-c:a",
-                "copy",
-                "-y",
-                output.to_str().context("invalid output path")?,
-            ])
-            .status()
-            .context("failed to execute ffmpeg")?;
-
-        if !status.success() {
-            anyhow::bail!("ffmpeg failed with status: {}", status);
-        }
-
-        Ok(())
-    }
-
     fn blur_background(&self, input: &Path, output: &Path) -> Result<()> {
         // Background blur using person segmentation
         // Falls back to simple blur if ML not available
