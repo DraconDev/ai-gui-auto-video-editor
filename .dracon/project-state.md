@@ -1,9 +1,9 @@
 # Project State
 
 ## Current Focus
-Improved error handling for floating-point parsing in configuration processing
+Refactored audio sample parsing to use more robust chunk handling with guaranteed 4-byte chunks
 
 ## Completed
-- [x] Added explicit error handling for floating-point parsing in config processing
-- [x] Maintained consistent rounding behavior for known float fields
-- [x] Improved code structure by removing redundant checks and simplifying control flow
+- [x] Replaced manual chunk filtering with `chunks_exact(4)` for guaranteed 4-byte chunks
+- [x] Simplified error handling by removing partial chunk checks
+- [x] Improved safety by using `expect()` with a clear invariant guarantee
