@@ -354,6 +354,10 @@ pub struct ExportConfig {
     /// Generate a quick low-resolution preview file alongside the main output
     #[serde(default)]
     pub preview: bool,
+
+    /// Preview duration in seconds
+    #[serde(default = "default_preview_duration")]
+    pub preview_duration: f32,
 }
 
 impl Default for ExportConfig {
@@ -374,6 +378,7 @@ impl Default for ExportConfig {
             multi_format: false,
             extra_resolutions: Vec::new(),
             preview: false,
+            preview_duration: default_preview_duration(),
         }
     }
 }

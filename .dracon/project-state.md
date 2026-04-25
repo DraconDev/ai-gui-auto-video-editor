@@ -1,7 +1,8 @@
 # Project State
 
 ## Current Focus
-Removed unused `anyhow` import from hardware acceleration module
+Added configurable preview duration for video exports
 
 ## Completed
-- [x] Removed unused `anyhow` import to reduce dependency bloat in the hardware acceleration module
+- [x] Added `preview_duration` field to `ExportConfig` with default value of 5.0 seconds
+- [x] Updated default implementation to include the new field
