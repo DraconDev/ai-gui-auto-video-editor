@@ -469,7 +469,8 @@ fn main() -> Result<()> {
         config.export.thumbnail = true;
     }
     if cli.preview {
-        // Preview mode: set low quality for fast rendering
+        config.export.preview = true;
+        // Also lower target resolution for faster full render
         config.video.target_resolution = crate::config::VideoResolution::Hd720p;
     }
     if cli.scene_detect {

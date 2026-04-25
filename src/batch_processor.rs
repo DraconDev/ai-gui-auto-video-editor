@@ -11,6 +11,7 @@ use crate::config::Config;
 use crate::editor::VideoEditor;
 use crate::editor::calculate_keep_segments;
 use crate::exporter;
+use crate::progress::BatchProgress;
 use crate::stt_analyzer::{CandleSttAnalyzer, TranscriptSegment, VideoSttAnalyzer};
 use crate::utils::find_video_files;
 
