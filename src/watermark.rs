@@ -3,6 +3,64 @@ use std::path::Path;
 use std::process::Command;
 use tracing::info;
 
+/// Common system font paths to try for text watermark
+const SYSTEM_FONT_PATHS: &[&str] = &[
+    // Linux/Debian/Ubuntu
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+    "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+    "/usr/share/fonts/truetype/freefont/FreeSans.ttf",
+    // Arch/Manjaro
+    "/usr/share/fonts/TTF/DejaVuSans.ttf",
+    // Fedora/RHEL
+    "/usr/share/fonts/dejavu-sans-fonts/DejaVuSans.ttf",
+    // macOS
+    "/System/Library/Fonts/Helvetica.ttc",
+    "/Library/Fonts/Arial.ttf",
+    "/System/Library/Fonts/Supplemental/Arial.ttf",
+    // NixOS
+    "/run/current-system/sw/share/X11/fonts/truetype/dejavu/DejaVuSans.ttf",
+    // Windows (WSL)
+    "/mnt/c/Windows/Fonts/arial.ttf",
+];
+
+/// Find the first available system font for text watermark
+fn find_system_font() -> Option<String> {
+    for path in SYSTEM_FONT_PATHS {
+        if std::path::Path::new(path).exists() {
+            return Some(path.to_string());
+        }
+    }
+    // Fallback: try to find any .ttf font
+    if let Ok(entries) = std::fs::read_dir("/usr/share/fonts") {
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.is_dir() {
+                if let Some(font) = find_first_ttf(&path) {
+                    return Some(font);
+                }
+            }
+        }
+    }
+    None
+}
+
+fn find_first_ttf(dir: &std::path::Path) -> Option<String> {
+    if let Ok(entries) = std::fs::read_dir(dir) {
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.extension().and_then(|e| e.to_str()) == Some("ttf") {
+                return path.to_str().map(|s| s.to_string());
+            }
+            if path.is_dir() {
+                if let Some(font) = find_first_ttf(&path) {
+                    return Some(font);
+                }
+            }
+        }
+    }
+    None
+}
+
 /// Position for watermark overlay
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum WatermarkPosition {
