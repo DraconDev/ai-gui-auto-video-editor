@@ -1,0 +1,271 @@
+use std::collections::HashSet;
+use std::path::Path;
+use std::sync::{
+    Arc,
+    atomic::{AtomicBool, Ordering},
+    mpsc::{self, Receiver, Sender},
+};
+use std::time::Duration;
+
+use super::{FolderState, ProcessingStatus, WatcherEvent};
+use ai_vid_editor::{
+    Config, FfmpegAnalyzer, FfmpegDurationGetter, FfmpegEditor, ProcessingProgress,
+    SilenceMode, WatchFolder, process_single_file_with_intro_outro_progress,
+};
+
+fn spawn_watcher(
+    config: Config,
+    folders: Vec<FolderState>,
+) -> (Receiver<WatcherEvent>, Arc<AtomicBool>) {
+    let (tx, rx) = mpsc::channel();
+    let stop = Arc::new(AtomicBool::new(false));
+    let thread_stop = Arc::clone(&stop);
+
+    std::thread::spawn(move || {
+        watch_folders_loop(config, folders, tx, thread_stop);
+    });
+
+    (rx, stop)
+}
+
+fn watch_folders_loop(
+    config: Config,
+    folders: Vec<FolderState>,
+    tx: mpsc::Sender<WatcherEvent>,
+    stop: Arc<AtomicBool>,
+) {
+    let poll_interval = Duration::from_secs(config.watch.interval.max(1));
+    let mut attempted = HashSet::new();
+    let intro = config.paths.intro.clone();
+    let outro = config.paths.outro.clone();
+    let analyzer = FfmpegAnalyzer;
+    let editor = FfmpegEditor;
+    let duration_getter = FfmpegDurationGetter;
+
+    if tx
+        .send(WatcherEvent::Log {
+            message: format!("Watching {} folder(s) for new videos", folders.len()),
+            success: true,
+        })
+        .is_err()
+    {
+        return;
+    }
+    if tx
+        .send(WatcherEvent::Status(ProcessingStatus::Watching))
+        .is_err()
+    {
+        return;
+    }
+
+    while !stop.load(Ordering::SeqCst) {
+        for folder in &folders {
+            if stop.load(Ordering::SeqCst) {
+                return;
+            }
+
+            if let Err(err) = std::fs::create_dir_all(&folder.input) {
+                if tx
+                    .send(WatcherEvent::Log {
+                        message: format!(
+                            "Failed to create input folder {}: {}",
+                            folder.input.display(),
+                            err
+                        ),
+                        success: false,
+                    })
+                    .is_err()
+                {
+                    return;
+                }
+                continue;
+            }
+
+            if let Err(err) = std::fs::create_dir_all(&folder.output) {
+                if tx
+                    .send(WatcherEvent::Log {
+                        message: format!(
+                            "Failed to create output folder {}: {}",
+                            folder.output.display(),
+                            err
+                        ),
+                        success: false,
+                    })
+                    .is_err()
+                {
+                    return;
+                }
+                continue;
+            }
+
+            let entries = match std::fs::read_dir(&folder.input) {
+                Ok(entries) => entries,
+                Err(err) => {
+                    if tx
+                        .send(WatcherEvent::Log {
+                            message: format!(
+                                "Failed to read watch folder {}: {}",
+                                folder.input.display(),
+                                err
+                            ),
+                            success: false,
+                        })
+                        .is_err()
+                    {
+                        return;
+                    }
+                    continue;
+                }
+            };
+
+            for entry in entries.flatten() {
+                if stop.load(Ordering::SeqCst) {
+                    return;
+                }
+
+                let path = entry.path();
+                if !is_video_file(&path) || attempted.contains(&path) {
+                    continue;
+                }
+
+                let Some(file_name) = path.file_name().map(|name| name.to_os_string()) else {
+                    continue;
+                };
+
+                let output_path = folder.output.join(&file_name);
+                if output_path.exists() {
+                    attempted.insert(path);
+                    continue;
+                }
+
+                let metadata = entry.metadata().ok();
+                let file_size = metadata.as_ref().map_or(0, |m| m.len());
+                let file_label = PathBuf::from(&file_name).display().to_string();
+
+                if tx
+                    .send(WatcherEvent::Processing {
+                        filename: file_label.clone(),
+                        file_size,
+                    })
+                    .is_err()
+                {
+                    return;
+                }
+
+                let started = Instant::now();
+                let folder_config = build_folder_config(&config, folder);
+                let result = process_single_file_with_intro_outro_progress(
+                    path.clone(),
+                    output_path,
+                    &folder_config,
+                    &analyzer,
+                    &editor,
+                    &duration_getter,
+                    intro.clone(),
+                    outro.clone(),
+                    |progress: ProcessingProgress| {
+                        let _ = tx.send(WatcherEvent::Progress {
+                            filename: file_label.clone(),
+                            progress: progress.fraction,
+                            message: progress.stage,
+                        });
+                    },
+                );
+
+                attempted.insert(path);
+
+                match result {
+                    Ok(()) => {
+                        if tx
+                            .send(WatcherEvent::Completed {
+                                filename: file_label,
+                                file_size,
+                                duration_secs: started.elapsed().as_secs().max(1),
+                            })
+                            .is_err()
+                        {
+                            return;
+                        }
+                    }
+                    Err(err) => {
+                        if tx
+                            .send(WatcherEvent::Failed {
+                                filename: file_label,
+                                message: err.to_string(),
+                            })
+                            .is_err()
+                        {
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
+        if tx
+            .send(WatcherEvent::Status(ProcessingStatus::Watching))
+            .is_err()
+        {
+            return;
+        }
+
+        for _ in 0..poll_interval.as_millis().div_ceil(250) {
+            if stop.load(Ordering::SeqCst) {
+                return;
+            }
+            std::thread::sleep(Duration::from_millis(250));
+        }
+    }
+}
+
+fn build_folder_config(config: &Config, folder: &FolderState) -> Config {
+    let mut merged = if let Some(preset) = Preset::from_str(&folder.preset) {
+        preset.to_config().merge(config.clone())
+    } else {
+        config.clone()
+    };
+
+    if let Some(remove_silence) = folder.settings.remove_silence
+        && !remove_silence
+    {
+        merged.silence.mode = SilenceMode::Cut;
+        merged.silence.min_duration = f32::MAX;
+    }
+    if let Some(threshold) = folder.settings.silence_threshold_db {
+        merged.silence.threshold_db = threshold;
+    }
+    if let Some(enhance_audio) = folder.settings.enhance_audio {
+        merged.audio.enhance = enhance_audio;
+    }
+    if let Some(target_lufs) = folder.settings.target_lufs {
+        merged.audio.target_lufs = target_lufs;
+    }
+    if let Some(stabilize) = folder.settings.stabilize {
+        merged.video.stabilize = stabilize;
+    }
+    if let Some(color_correct) = folder.settings.color_correct {
+        merged.video.color_correct = color_correct;
+    }
+    if let Some(reframe) = folder.settings.reframe {
+        merged.video.reframe = reframe;
+    }
+    if let Some(blur_background) = folder.settings.blur_background {
+        merged.video.blur_background = blur_background;
+    }
+
+    merged
+}
+
+fn is_video_file(path: &Path) -> bool {
+    path.is_file()
+        && path
+            .extension()
+            .and_then(|ext| ext.to_str())
+            .map(|ext| {
+                matches!(
+                    ext.to_ascii_lowercase().as_str(),
+                    "mp4" | "mov" | "avi" | "mkv" | "webm"
+                )
+            })
+            .unwrap_or(false)
+}
