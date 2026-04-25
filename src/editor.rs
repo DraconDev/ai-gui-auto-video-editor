@@ -802,6 +802,143 @@ fn generate_duck_filter(transcript: &[TranscriptSegment], duck_volume: f32) -> S
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::process::Command;
+
+    /// Helper: create a small test video using ffmpeg
+    fn create_test_video(path: &Path, duration_secs: f32) {
+        let status = Command::new("ffmpeg")
+            .args([
+                "-f", "lavfi",
+                "-i", &format!("testsrc=duration={}:size=320x240:rate=30", duration_secs),
+                "-f", "lavfi",
+                "-i", "sine=frequency=1000:duration=0.1",
+                "-c:v", "libx264",
+                "-preset", "ultrafast",
+                "-crf", "28",
+                "-c:a", "aac",
+                "-b:a", "32k",
+                "-shortest",
+                "-y",
+                path.to_str().unwrap(),
+            ])
+            .status()
+            .expect("ffmpeg not found - install ffmpeg to run integration tests");
+        assert!(status.success(), "ffmpeg test video creation failed");
+    }
+
+    #[test]
+    fn test_trim_video_single_segment() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let input = temp_dir.path().join("input.mp4");
+        let output = temp_dir.path().join("output.mp4");
+        create_test_video(&input, 3.0);
+
+        let editor = FfmpegEditor;
+        let segments = vec![
+            ProcessedSegment { start: 0.5, end: 2.0, speed: 1.0 },
+        ];
+
+        editor.trim_video(&input, &output, &segments).unwrap();
+        assert!(output.exists(), "trimmed output should exist");
+    }
+
+    #[test]
+    fn test_trim_video_multiple_segments() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let input = temp_dir.path().join("input.mp4");
+        let output = temp_dir.path().join("output.mp4");
+        create_test_video(&input, 5.0);
+
+        let editor = FfmpegEditor;
+        let segments = vec![
+            ProcessedSegment { start: 0.0, end: 1.0, speed: 1.0 },
+            ProcessedSegment { start: 2.0, end: 3.0, speed: 1.0 },
+        ];
+
+        editor.trim_video(&input, &output, &segments).unwrap();
+        assert!(output.exists(), "trimmed output should exist");
+    }
+
+    #[test]
+    fn test_trim_video_empty_segments_fails() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let input = temp_dir.path().join("input.mp4");
+        let output = temp_dir.path().join("output.mp4");
+        create_test_video(&input, 1.0);
+
+        let editor = FfmpegEditor;
+        let result = editor.trim_video(&input, &output, &[]);
+        assert!(result.is_err(), "trim with empty segments should fail");
+    }
+
+    #[test]
+    fn test_enhance_audio() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let input = temp_dir.path().join("input.mp4");
+        let output = temp_dir.path().join("output.mp4");
+        create_test_video(&input, 2.0);
+
+        let editor = FfmpegEditor;
+        editor.enhance_audio(&input, &output, -14.0).unwrap();
+        assert!(output.exists(), "enhanced output should exist");
+    }
+
+    #[test]
+    fn test_reduce_noise() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let input = temp_dir.path().join("input.mp4");
+        let output = temp_dir.path().join("output.mp4");
+        create_test_video(&input, 2.0);
+
+        let editor = FfmpegEditor;
+        editor.reduce_noise(&input, &output).unwrap();
+        assert!(output.exists(), "noise-reduced output should exist");
+    }
+
+    #[test]
+    fn test_color_correct() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let input = temp_dir.path().join("input.mp4");
+        let output = temp_dir.path().join("output.mp4");
+        create_test_video(&input, 2.0);
+
+        let editor = FfmpegEditor;
+        editor.color_correct(&input, &output).unwrap();
+        assert!(output.exists(), "color-corrected output should exist");
+    }
+
+    #[test]
+    fn test_concat_chunk_files_single() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let chunk = temp_dir.path().join("chunk.mp4");
+        let output = temp_dir.path().join("output.mp4");
+        create_test_video(&chunk, 1.0);
+
+        concat_chunk_files(&[chunk], &output).unwrap();
+        assert!(output.exists(), "concat output should exist");
+    }
+
+    #[test]
+    fn test_concat_chunk_files_multiple() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let chunk1 = temp_dir.path().join("chunk1.mp4");
+        let chunk2 = temp_dir.path().join("chunk2.mp4");
+        let output = temp_dir.path().join("output.mp4");
+        create_test_video(&chunk1, 1.0);
+        create_test_video(&chunk2, 1.0);
+
+        concat_chunk_files(&[chunk1, chunk2], &output).unwrap();
+        assert!(output.exists(), "concat output should exist");
+    }
+
+    #[test]
+    fn test_concat_chunk_files_empty_fails() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let output = temp_dir.path().join("output.mp4");
+
+        let result = concat_chunk_files(&[], &output);
+        assert!(result.is_err(), "concat with empty list should fail");
+    }
 
     #[test]
     fn test_calculate_keep_segments_cut_mode() {
