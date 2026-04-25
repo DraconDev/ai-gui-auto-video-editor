@@ -162,11 +162,7 @@ pub fn export_youtube_chapters(transcript: &[TranscriptSegment], output_path: &P
     if !chapter_texts.is_empty() {
         let joined = chapter_texts.join(" ");
         let title = joined.trim();
-        let title = if title.len() > 50 {
-            &title[..50]
-        } else {
-            title
-        };
+        let title: String = title.chars().take(50).collect();
         let title = title.replace('\n', " ").replace('\r', "");
         chapters.push_str(&format!(
             "{} {}\n",

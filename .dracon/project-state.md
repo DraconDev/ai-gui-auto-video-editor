@@ -4,6 +4,6 @@
 Improved Unicode-safe chapter title truncation in YouTube chapter export
 
 ## Completed
-- [x] Replaced length-based truncation with Unicode-safe character truncation (first 50 chars)
-- [x] Maintained existing newline replacement for chapter titles
-```
+- [x] Refactored chapter title truncation to use `chars().take(50).collect()` for proper Unicode handling
+- [x] Removed manual string slicing which could break multi-byte characters
+- [x] Maintained existing functionality of trimming to 50 characters while ensuring text integrity
