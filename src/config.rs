@@ -47,6 +47,7 @@ impl Preset {
                 config.audio.enhance = true;
                 config.export.chapters = true;
                 config.export.fcpxml = true;
+                config.video.target_resolution = VideoResolution::Fhd1080p;
             }
             Preset::Shorts => {
                 // Short-form: speedup silences, enhance audio, extract clips
@@ -55,6 +56,30 @@ impl Preset {
                 config.silence.padding = 0.05; // Tighter for fast-paced content
                 config.audio.enhance = true;
                 config.export.clips = true;
+                config.video.reframe = true; // Auto vertical
+                config.video.target_resolution = VideoResolution::Vertical1080p;
+            }
+            Preset::Tiktok => {
+                // TikTok: 9:16 vertical, fast cuts, max 3min, trending style
+                config.silence.mode = SilenceMode::Speedup;
+                config.silence.speedup_factor = 4.0;
+                config.silence.padding = 0.03;
+                config.audio.enhance = true;
+                config.audio.target_lufs = -12.0; // Louder for mobile
+                config.video.reframe = true;
+                config.video.target_resolution = VideoResolution::Vertical1080p;
+                config.export.captions = true; // Burn captions for accessibility
+            }
+            Preset::Reels => {
+                // Instagram Reels: 9:16, 90s max, engaging
+                config.silence.mode = SilenceMode::Speedup;
+                config.silence.speedup_factor = 3.5;
+                config.silence.padding = 0.05;
+                config.audio.enhance = true;
+                config.video.reframe = true;
+                config.video.target_resolution = VideoResolution::Vertical1080p;
+                config.export.clips = true;
+                config.export.clip_max_duration = 90;
             }
             Preset::Podcast => {
                 // Podcast: cut silences, enhance audio, generate subtitles
@@ -64,6 +89,15 @@ impl Preset {
                 config.audio.target_lufs = -16.0; // Podcast standard
                 config.export.subtitles = true;
                 config.export.captions = true;
+            }
+            Preset::Twitter => {
+                // Twitter/X: 2:20 max, landscape 16:9
+                config.silence.mode = SilenceMode::Cut;
+                config.silence.padding = 0.1;
+                config.audio.enhance = true;
+                config.video.target_resolution = VideoResolution::Fhd1080p;
+                config.export.clips = true;
+                config.export.clip_max_duration = 140; // 2:20
             }
             Preset::Minimal => {
                 // Just silence detection, nothing else
@@ -80,7 +114,10 @@ impl Preset {
         match self {
             Preset::Youtube => "youtube",
             Preset::Shorts => "shorts",
+            Preset::Tiktok => "tiktok",
+            Preset::Reels => "reels",
             Preset::Podcast => "podcast",
+            Preset::Twitter => "twitter",
             Preset::Minimal => "minimal",
         }
     }
@@ -89,8 +126,11 @@ impl Preset {
     pub fn from_str(s: &str) -> Option<Self> {
         match s.to_lowercase().as_str() {
             "youtube" => Some(Preset::Youtube),
-            "shorts" | "tiktok" | "reels" => Some(Preset::Shorts),
+            "shorts" | "ytshorts" => Some(Preset::Shorts),
+            "tiktok" => Some(Preset::Tiktok),
+            "reels" | "instagram" => Some(Preset::Reels),
             "podcast" => Some(Preset::Podcast),
+            "twitter" | "x" => Some(Preset::Twitter),
             "minimal" => Some(Preset::Minimal),
             _ => None,
         }
