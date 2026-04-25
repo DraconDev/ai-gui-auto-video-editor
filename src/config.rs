@@ -22,8 +22,14 @@ pub enum Preset {
     Youtube,
     /// YouTube Shorts/TikTok: speedup mode + audio enhance
     Shorts,
+    /// TikTok-specific: vertical 9:16, fast cuts, trending style
+    Tiktok,
+    /// Instagram Reels: vertical 9:16, 90s max, engaging style
+    Reels,
     /// Podcast: silence cut + audio enhance + SRT subtitles
     Podcast,
+    /// Twitter/X: 2:20 max, landscape 16:9
+    Twitter,
     /// Minimal: just silence detection, no enhancement
     Minimal,
 }
