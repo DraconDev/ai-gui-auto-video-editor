@@ -712,7 +712,9 @@ fn watch_folders_loop(
             }
         }
 
-        let _ = tx.send(WatcherEvent::Status(ProcessingStatus::Watching));
+        if tx.send(WatcherEvent::Status(ProcessingStatus::Watching)).is_err() {
+            return;
+        }
 
         for _ in 0..poll_interval.as_millis().div_ceil(250) {
             if stop.load(Ordering::SeqCst) {
