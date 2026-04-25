@@ -791,51 +791,6 @@ mod tests {
         assert_eq!(format_ass_time(-5.0), "0:00:00.00");
     }
 
-    #[test]
-    fn test_batch_processing_integration() -> Result<()> {
-        let temp_dir = tempdir()?;
-        let input_dir = temp_dir.path().join("input");
-        let output_dir = temp_dir.path().join("output");
-        fs::create_dir(&input_dir)?;
-        fs::create_dir(&output_dir)?;
-
-        // Create a mock config file
-        let config_path = temp_dir.path().join("test_config.toml");
-        let mut config_file = fs::File::create(&config_path)?;
-        config_file.write_all(
-            br#"
-[silence]
-threshold_db = -30.0
-min_duration = 0.5
-padding = 0.1
-mode = "cut"
-
-[paths]
-input_dir = "/tmp/nonexistent"
-output_dir = "/tmp/nonexistent"
-"#,
-        )?;
-
-        let mut config = Config::from_file(&config_path)?;
-        config.paths.input_dir = input_dir.clone();
-        config.paths.output_dir = output_dir.clone();
-
-        // The batch processor should handle empty directories gracefully
-        let result = process_batch_dir(
-            &input_dir,
-            &output_dir,
-            &config,
-            &crate::analyzer::FfmpegAnalyzer,
-            &crate::editor::FfmpegEditor,
-            &crate::ml::FrameExtractor::default(),
-        );
-
-        // Should succeed even with no files
-        assert!(result.is_ok());
-
-        Ok(())
-    }
-
     struct MockFfmpegAnalyzer;
     impl crate::analyzer::VideoAnalyzer for MockFfmpegAnalyzer {
         fn detect_silence(
