@@ -1,8 +1,9 @@
 # Project State
 
 ## Current Focus
-Dependency version updates in Cargo.toml (binary modification to Cargo.lock)
+Cleanup unused imports in test modules and refactor watermark coordinate calculation
 
 ## Completed
-- [x] Updated dependency versions in Cargo.toml (binary modification to Cargo.lock)
-```
+- [x] Removed unused `std::io::Write` import from batch processor tests
+- [x] Removed unused `std::path::PathBuf` import from preset rules tests
+- [x] Refactored watermark coordinate calculation to ignore unused dimensions

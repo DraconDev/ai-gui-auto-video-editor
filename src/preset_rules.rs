@@ -59,7 +59,6 @@ pub fn default_preset_rules() -> Vec<PresetRule> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::path::PathBuf;
 
     #[test]
     fn test_preset_for_file_matching() {
