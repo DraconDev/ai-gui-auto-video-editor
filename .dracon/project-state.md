@@ -1,8 +1,10 @@
 # Project State
 
 ## Current Focus
-Dependency version updates in Cargo.toml (binary modification to Cargo.lock)
+Removed face detection-based video cropping fallback logic
 
 ## Completed
-- [x] Updated dependency versions (Cargo.lock binary modification)
-```
+- [x] Removed face detection-based cropping implementation
+- [x] Removed fallback to center crop when face detection fails
+- [x] Removed all related error handling for face detection failures
+- [x] Simplified video processing to use only direct ffmpeg calls without conditional logic
