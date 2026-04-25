@@ -192,6 +192,10 @@ pub struct Cli {
     #[arg(long)]
     pub preview: bool,
 
+    /// Preview duration in seconds (default: 30)
+    #[arg(long)]
+    pub preview_duration: Option<f32>,
+
     /// Use scene-change detection in addition to silence detection
     #[arg(long)]
     pub scene_detect: bool,
