@@ -27,15 +27,20 @@ impl FrameExtractor {
     ) -> Result<Vec<std::path::PathBuf>> {
         std::fs::create_dir_all(output_dir)?;
 
+        let path_str = video_path.to_str()
+            .ok_or_else(|| anyhow::anyhow!("Video path contains invalid UTF-8 characters"))?;
+        let out_dir_str = output_dir.to_str()
+            .ok_or_else(|| anyhow::anyhow!("Output path contains invalid UTF-8 characters"))?;
+
         // Extract frames at specified rate (e.g., 1 fps = 1 frame per second)
         let status = Command::new("ffmpeg")
             .args([
                 "-i",
-                video_path.to_str().unwrap_or(""),
+                path_str,
                 "-vf",
                 &format!("fps={}", interval_fps),
                 "-y",
-                &format!("{}/frame_%04d.png", output_dir.to_str().unwrap_or("")),
+                &format!("{}/frame_%04d.png", out_dir_str),
             ])
             .status()?;
 
@@ -59,19 +64,8 @@ impl FrameExtractor {
 
     /// Get video dimensions (width, height)
     pub fn get_video_dimensions(video_path: &Path) -> Result<(u32, u32)> {
-        let output = Command::new("ffprobe")
-            .args([
-                "-v",
-                "error",
-                "-select_streams",
-                "v:0",
-                "-show_entries",
-                "stream=width,height",
-                "-of",
-                "csv=p=0",
-                video_path.to_str().unwrap_or(""),
-            ])
-            .output()?;
+        let path_str = video_path.to_str()
+            .ok_or_else(|| anyhow::anyhow!("Video path contains invalid UTF-8 characters"))?;
 
         let dims = String::from_utf8_lossy(&output.stdout);
         let parts: Vec<&str> = dims.trim().split(',').collect();
