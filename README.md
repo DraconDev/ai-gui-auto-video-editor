@@ -220,6 +220,8 @@ stabilize = false
 color_correct = false
 reframe = false
 blur_background = false
+# Target output resolution: hd720p, fhd1080p, qhd1440p, uhd4k, vertical1080p, vertical720p
+target_resolution = "fhd1080p"
 
 [export]
 subtitles = false       # Generate SRT subtitles (Whisper transcription)
@@ -231,6 +233,11 @@ clips = false           # Extract highlight clips for Shorts/Reels
 clip_count = 3          # Number of clips to extract
 clip_min_duration = 15  # Minimum clip duration (seconds)
 clip_max_duration = 60  # Maximum clip duration (seconds)
+thumbnail = false       # Generate thumbnail image
+thumbnail_width = 1280
+thumbnail_height = 720
+multi_format = false    # Generate multiple resolutions
+extra_resolutions = ["hd720p", "vertical1080p"]  # Additional outputs
 
 [watch]
 enabled = false
