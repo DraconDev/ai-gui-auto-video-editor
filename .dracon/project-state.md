@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Enhanced watermark positioning configuration with fallback to default
+Added string parsing for watermark position configuration
 
 ## Completed
-- [x] Made watermark position configurable via config with BottomRight as fallback
-- [x] Updated ffmpeg command construction to use std::process::Command instead of Proc
+- [x] Implemented `from_str` method to parse position strings into `WatermarkPosition` enum variants
+- [x] Supported multiple string formats (full names, abbreviations, and shorthand) for all position types

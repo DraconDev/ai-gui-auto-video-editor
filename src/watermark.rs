@@ -25,6 +25,18 @@ impl WatermarkPosition {
             WatermarkPosition::Center => "(W-w)/2:(H-h)/2".to_string(),
         }
     }
+
+    /// Parse a position string into WatermarkPosition
+    pub fn from_str(s: &str) -> Option<Self> {
+        match s.to_lowercase().as_str() {
+            "top-left" | "topleft" | "tl" => Some(WatermarkPosition::TopLeft),
+            "top-right" | "topright" | "tr" => Some(WatermarkPosition::TopRight),
+            "bottom-left" | "bottomleft" | "bl" => Some(WatermarkPosition::BottomLeft),
+            "bottom-right" | "bottomright" | "br" => Some(WatermarkPosition::BottomRight),
+            "center" | "c" | "middle" => Some(WatermarkPosition::Center),
+            _ => None,
+        }
+    }
 }
 
 /// Add a watermark/logo overlay to a video
