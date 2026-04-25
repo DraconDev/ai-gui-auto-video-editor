@@ -1,9 +1,8 @@
 # Project State
 
 ## Current Focus
-Improved error handling in logging directives and removed hidden CLI option
+Binary modification to Cargo.toml (likely dependency version updates or metadata changes)
 
 ## Completed
-- [x] Fixed potential panic in logging directives by using `expect` instead of `unwrap`
-- [x] Removed hidden `--join` CLI option
+- [x] Updated Cargo.toml with binary changes (likely dependency version adjustments or metadata updates)
 ```
