@@ -704,11 +704,52 @@ fn generate_trim_filters(segments: &[ProcessedSegment]) -> (String, String) {
     (v_filter, a_filter)
 }
 
+/// Chain atempo filters to achieve speeds outside ffmpeg's 0.5-2.0 range.
+/// ffmpeg's atempo only supports 0.5 to 2.0 per filter instance.
+fn chain_atempo_filters(speed: f32) -> String {
+    const ATEMPO_MIN: f32 = 0.5;
+    const ATEMPO_MAX: f32 = 2.0;
+
+    if speed >= ATEMPO_MIN && speed <= ATEMPO_MAX {
+        return format!("atempo={}", speed);
+    }
+
+    let mut filters = Vec::new();
+    let mut remaining = speed;
+
+    if speed > ATEMPO_MAX {
+        // Speed up: chain multiple 2.0x filters
+        while remaining > ATEMPO_MAX {
+            filters.push("atempo=2.0".to_string());
+            remaining /= 2.0;
+        }
+        if remaining > 1.0 {
+            filters.push(format!("atempo={}", remaining));
+        }
+    } else if speed < ATEMPO_MIN {
+        // Slow down: chain multiple 0.5x filters
+        while remaining < ATEMPO_MIN {
+            filters.push("atempo=0.5".to_string());
+            remaining /= 0.5;
+        }
+        if remaining < 1.0 {
+            filters.push(format!("atempo={}", remaining));
+        }
+    }
+
+    filters.join(",")
+}
+
 fn generate_duck_filter(transcript: &[TranscriptSegment], duck_volume: f32) -> String {
+    // Limit transcript to avoid exponentially long ffmpeg expressions
+    // 100 segments is a reasonable upper bound for most videos
+    let max_segments = 100;
+    let effective_transcript: Vec<_> = transcript.iter().take(max_segments).collect();
+
     let mut volume_expr = "1.0".to_string();
 
     // For each speech segment, lower the music volume
-    for seg in transcript {
+    for seg in &effective_transcript {
         volume_expr = format!(
             "if(between(t,{},{}),{},{volume_expr})",
             seg.start, seg.end, duck_volume
