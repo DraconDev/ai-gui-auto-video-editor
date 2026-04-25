@@ -11,6 +11,7 @@ pub mod scene_detection;
 pub mod stt_analyzer;
 pub mod thumbnail;
 pub mod utils;
+pub mod watermark;
 
 pub use analyzer::FfmpegAnalyzer;
 pub use batch_processor::{
