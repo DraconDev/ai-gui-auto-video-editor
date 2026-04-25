@@ -13,7 +13,7 @@ use ai_vid_editor::{
     SilenceMode, WatchFolder, process_single_file_with_intro_outro_progress,
 };
 
-fn spawn_watcher(
+pub(crate) fn spawn_watcher(
     config: Config,
     folders: Vec<FolderState>,
 ) -> (Receiver<WatcherEvent>, Arc<AtomicBool>) {
