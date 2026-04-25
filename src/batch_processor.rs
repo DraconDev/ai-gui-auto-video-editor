@@ -1026,7 +1026,7 @@ where
 
                     // Create fresh instances per worker (they're stateless)
                     let analyzer = crate::analyzer::FfmpegAnalyzer;
-                    let editor = crate::editor::FfmpegEditor;
+                    let editor = crate::editor::FfmpegEditor::new(config.video.hw_accel);
                     let duration_getter = FfmpegDurationGetter;
 
                     match process_single_file(

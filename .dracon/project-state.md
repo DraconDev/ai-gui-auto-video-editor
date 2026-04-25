@@ -1,9 +1,9 @@
 # Project State
 
 ## Current Focus
-Enable hardware acceleration for video editing operations
+Enable hardware acceleration for video editing operations by passing the configuration to FfmpegEditor instances
 
 ## Completed
-- [x] Updated `FfmpegEditor` initialization to include hardware acceleration configuration
-- [x] Applied hardware acceleration parameter across all video processing modes (single, watch, multi-watch)
+- [x] feat(hardware acceleration): Pass hardware acceleration configuration to FfmpegEditor instances in batch processing
+- [x] feat(hardware acceleration): Pass hardware acceleration configuration to FfmpegEditor instances in GUI processing
 ```

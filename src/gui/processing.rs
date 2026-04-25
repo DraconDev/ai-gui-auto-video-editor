@@ -39,7 +39,7 @@ fn watch_folders_loop(
     let intro = config.paths.intro.clone();
     let outro = config.paths.outro.clone();
     let analyzer = FfmpegAnalyzer;
-    let editor = FfmpegEditor;
+    let editor = FfmpegEditor::new(config.video.hw_accel);
     let duration_getter = FfmpegDurationGetter;
 
     if tx
