@@ -1,7 +1,8 @@
 # Project State
 
 ## Current Focus
-Dependency version updates for video processing features
+Refactored float value formatting in configuration handling for cleaner output
 
 ## Completed
-- [x] Updated Cargo.lock with new dependency versions for video processing features
+- [x] Consolidated float value parsing and rounding logic into a single conditional block
+- [x] Maintained same functionality while reducing code duplication in float value formatting
