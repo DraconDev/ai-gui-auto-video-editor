@@ -1,10 +1,12 @@
 # Project State
 
 ## Current Focus
-Added preview generation and batch processing improvements to the video processing pipeline
+Updated documentation to reflect new preview generation and batch processing features
 
 ## Completed
-- [x] Added preview export capability with `--preview` flag, generating 30s/480px low-res previews
-- [x] Implemented batch progress persistence with JSON state tracking for skipped/failed files
-- [x] Refactored GUI module into separate files for better organization (types, processing, tabs)
-- [x] Added parallel batch resume support with mutex-protected progress saving
+- [x] Added documentation for parallel batch processing with worker count
+- [x] Added documentation for auto-resume functionality in batch processing
+- [x] Added documentation for desktop notifications on completion/error
+- [x] Added documentation for preview generation option
+- [x] Updated configuration examples to show new features
+- [x] Removed outdated CLI examples for removed features

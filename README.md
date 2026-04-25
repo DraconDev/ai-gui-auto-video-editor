@@ -72,32 +72,14 @@ The GUI provides a visual interface for managing watch folders and settings.
 ### CLI Mode
 
 ```bash
-# Basic silence removal
-ai-vid-editor -i input.mp4 -o output.mp4
-
-# YouTube preset (cut silences + enhance + chapters)
-ai-vid-editor -i input.mp4 -o output.mp4 --preset youtube
-
-# Full production pipeline
-ai-vid-editor -i input.mp4 -o output.mp4 \
-  --preset youtube \
-  --intro intro.mp4 \
-  --outro outro.mp4 \
-  --music-dir ./music \
-  --stabilize \
-  --color-correct
-
 # Batch process a directory
 ai-vid-editor -I ./raw_videos -O ./edited --preset youtube
 
-# Watch folder (auto-process new videos)
-ai-vid-editor --watch ./incoming -O ./processed --notify
+# Parallel batch processing (4 workers)
+ai-vid-editor -I ./raw_videos -O ./edited --parallel-workers 4
 
-# Watch using config (reads paths.watch_folders, no flags needed)
-ai-vid-editor
-
-# Preview without processing
-ai-vid-editor -i input.mp4 --dry-run
+# Resume an interrupted batch (progress is auto-saved)
+ai-vid-editor -I ./raw_videos -O ./edited
 ```
 
 ### GUI Mode
@@ -153,6 +135,7 @@ The GUI provides a visual interface for managing watch folders and settings.
 | `--multi-format` | Generate multiple resolution outputs simultaneously |
 | `--resolution <RES>` | Target resolution (720p, 1080p, 1440p, 4k, vertical-1080p, vertical-720p) |
 | `--parallel-workers <N>` | Parallel batch processing workers (default: 1) |
+| `--notify` | Send desktop notifications on completion/error |
 
 ### Export Options
 
@@ -164,6 +147,7 @@ The GUI provides a visual interface for managing watch folders and settings.
 | `--export-clips` | Extract highlight clips for Shorts/Reels |
 | `--export-fcpxml` | Generate FCPXML |
 | `--export-thumbnail` | Generate YouTube thumbnail from best frame |
+| `--preview` | Generate a quick low-resolution preview file |
 | `--export-multi-format` | Output multiple resolutions simultaneously |
 
 ## Presets
@@ -238,6 +222,7 @@ thumbnail_width = 1280
 thumbnail_height = 720
 multi_format = false    # Generate multiple resolutions
 extra_resolutions = ["hd720p", "vertical1080p"]  # Additional outputs
+preview = false         # Generate quick low-res preview alongside output
 
 [watch]
 enabled = false
