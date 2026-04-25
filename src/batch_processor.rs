@@ -6,8 +6,8 @@ use tracing::{debug, info, warn};
 use crate::analyzer::ProcessedSegment;
 use crate::analyzer::VideoAnalyzer;
 use crate::config::Config;
-use crate::editor::calculate_keep_segments;
 use crate::editor::VideoEditor;
+use crate::editor::calculate_keep_segments;
 use crate::exporter;
 use crate::stt_analyzer::{CandleSttAnalyzer, TranscriptSegment, VideoSttAnalyzer};
 use crate::utils::find_video_files;
@@ -105,7 +105,12 @@ fn concatenate_videos(
 
     if let Some(intro_path) = intro {
         args.push("-i".to_string());
-        args.push(intro_path.to_str().context("invalid intro path")?.to_string());
+        args.push(
+            intro_path
+                .to_str()
+                .context("invalid intro path")?
+                .to_string(),
+        );
         concat_inputs.push_str(&format!("[{}:v][{}:a]", input_idx, input_idx));
         input_idx += 1;
     }
@@ -117,7 +122,12 @@ fn concatenate_videos(
 
     if let Some(outro_path) = outro {
         args.push("-i".to_string());
-        args.push(outro_path.to_str().context("invalid outro path")?.to_string());
+        args.push(
+            outro_path
+                .to_str()
+                .context("invalid outro path")?
+                .to_string(),
+        );
         concat_inputs.push_str(&format!("[{}:v][{}:a]", input_idx, input_idx));
     }
 
@@ -301,7 +311,13 @@ where
 
         let empty_transcript = vec![];
         editor
-            .mix_with_music(&enhanced_file, music_path, &with_music, &empty_transcript, config.audio.duck_volume)
+            .mix_with_music(
+                &enhanced_file,
+                music_path,
+                &with_music,
+                &empty_transcript,
+                config.audio.duck_volume,
+            )
             .context("Failed to mix music")?;
 
         if enhanced_file != output_file {
@@ -484,27 +500,27 @@ fn export_additional_files(
     if config.export.clips
         && let Some(ref t) = transcript
     {
-            let clips_output_dir = base_path.parent().unwrap_or_else(|| Path::new("."));
-            let clip_pattern = format!(
-                "{}_clip",
-                base_path.file_stem().unwrap_or_default().to_string_lossy()
-            );
-            match extract_highlight_clips(
-                output_file,
-                t,
-                config.export.clip_count,
-                config.export.clip_min_duration,
-                config.export.clip_max_duration,
-                clips_output_dir,
-                &clip_pattern,
-            ) {
-                Ok(clip_paths) => {
-                    info!(count = clip_paths.len(), "Extracted highlight clips");
-                }
-                Err(e) => {
-                    warn!(error = %e, "Failed to extract highlight clips");
-                }
+        let clips_output_dir = base_path.parent().unwrap_or_else(|| Path::new("."));
+        let clip_pattern = format!(
+            "{}_clip",
+            base_path.file_stem().unwrap_or_default().to_string_lossy()
+        );
+        match extract_highlight_clips(
+            output_file,
+            t,
+            config.export.clip_count,
+            config.export.clip_min_duration,
+            config.export.clip_max_duration,
+            clips_output_dir,
+            &clip_pattern,
+        ) {
+            Ok(clip_paths) => {
+                info!(count = clip_paths.len(), "Extracted highlight clips");
             }
+            Err(e) => {
+                warn!(error = %e, "Failed to extract highlight clips");
+            }
+        }
     }
 
     if config.export.fcpxml {
@@ -550,7 +566,10 @@ fn generate_styled_captions(transcript: &[TranscriptSegment], output_path: &Path
         // Escape text for ASS format
         // In ASS, \N is a forced newline. Literal backslashes must be escaped as \\.
         // Order matters: escape backslashes first, then newlines.
-        let escaped = text.replace('\\', "\\\\").replace('\n', "\\N").replace('\r', "");
+        let escaped = text
+            .replace('\\', "\\\\")
+            .replace('\n', "\\N")
+            .replace('\r', "");
         ass.push_str(&format!(
             "Dialogue: 0,{},{},Default,,0,0,0,,{}\n",
             start, end, escaped
@@ -643,9 +662,8 @@ fn extract_highlight_clips(
     segment_energy.sort_by(|a, b| b.2.partial_cmp(&a.2).unwrap_or(std::cmp::Ordering::Equal));
 
     // Get video duration to clamp clips properly
-    let video_duration = crate::ml::FrameExtractor::get_video_duration(video_path).unwrap_or(
-        transcript.last().map(|s| s.end).unwrap_or(60.0)
-    );
+    let video_duration = crate::ml::FrameExtractor::get_video_duration(video_path)
+        .unwrap_or(transcript.last().map(|s| s.end).unwrap_or(60.0));
 
     let mut clip_times: Vec<(f32, f32)> = Vec::new();
     for &(start, end, _) in segment_energy.iter().take(clip_count as usize) {

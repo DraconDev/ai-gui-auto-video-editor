@@ -75,13 +75,20 @@ pub fn export_edl(
     edl.push_str("FCM: NON-DROP FRAME\n\n");
 
     for (i, seg) in segments.iter().enumerate() {
-        let (src_start_h, src_start_m, src_start_s, src_start_f) = seconds_to_timecode(seg.start, fps);
+        let (src_start_h, src_start_m, src_start_s, src_start_f) =
+            seconds_to_timecode(seg.start, fps);
         let (src_end_h, src_end_m, src_end_s, src_end_f) = seconds_to_timecode(seg.end, fps);
         edl.push_str(&format!(
             "{:03}  AX       V     C        {:02}:{:02}:{:02}:{:02} {:02}:{:02}:{:02}:{:02}\n",
             i + 1,
-            src_start_h, src_start_m, src_start_s, src_start_f,
-            src_end_h, src_end_m, src_end_s, src_end_f
+            src_start_h,
+            src_start_m,
+            src_start_s,
+            src_start_f,
+            src_end_h,
+            src_end_m,
+            src_end_s,
+            src_end_f
         ));
         edl.push_str(&format!("* FROM CLIP NAME: {}\n\n", filename));
     }
@@ -294,17 +301,34 @@ mod tests {
         let input_path = dir.path().join("video.mp4");
 
         let segments = vec![
-            ProcessedSegment { start: 0.0, end: 5.5, speed: 1.0 },
-            ProcessedSegment { start: 10.0, end: 20.0, speed: 1.0 },
+            ProcessedSegment {
+                start: 0.0,
+                end: 5.5,
+                speed: 1.0,
+            },
+            ProcessedSegment {
+                start: 10.0,
+                end: 20.0,
+                speed: 1.0,
+            },
         ];
 
         export_edl(&segments, &input_path, &output_edl, 25.0)?;
 
         let content = fs::read_to_string(output_edl)?;
         // Check that timestamps are present, not all zeros
-        assert!(content.contains("00:00:05:12") || content.contains("00:00:05:13"), "EDL should contain non-zero timestamps");
-        assert!(content.contains("00:00:10:00"), "EDL should contain second segment start");
-        assert!(content.contains("00:00:20:00"), "EDL should contain second segment end");
+        assert!(
+            content.contains("00:00:05:12") || content.contains("00:00:05:13"),
+            "EDL should contain non-zero timestamps"
+        );
+        assert!(
+            content.contains("00:00:10:00"),
+            "EDL should contain second segment start"
+        );
+        assert!(
+            content.contains("00:00:20:00"),
+            "EDL should contain second segment end"
+        );
 
         Ok(())
     }

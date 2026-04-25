@@ -147,8 +147,14 @@ impl From<WatchFolder> for FolderState {
 #[derive(Debug)]
 enum WatcherEvent {
     Status(ProcessingStatus),
-    Log { message: String, success: bool },
-    Processing { filename: String, file_size: u64 },
+    Log {
+        message: String,
+        success: bool,
+    },
+    Processing {
+        filename: String,
+        file_size: u64,
+    },
     Progress {
         filename: String,
         progress: f32,
@@ -159,7 +165,10 @@ enum WatcherEvent {
         file_size: u64,
         duration_secs: u64,
     },
-    Failed { filename: String, message: String },
+    Failed {
+        filename: String,
+        message: String,
+    },
 }
 
 impl From<FolderState> for WatchFolder {
@@ -477,7 +486,8 @@ impl AppState {
             match event {
                 WatcherEvent::Status(status) => self.status = status,
                 WatcherEvent::Log { message, success } => {
-                    self.activity_log.push(ActivityEntry::simple(message, success));
+                    self.activity_log
+                        .push(ActivityEntry::simple(message, success));
                 }
                 WatcherEvent::Processing {
                     filename,
@@ -550,7 +560,10 @@ impl Drop for AppState {
     }
 }
 
-fn spawn_watcher(config: Config, folders: Vec<FolderState>) -> (Receiver<WatcherEvent>, Arc<AtomicBool>) {
+fn spawn_watcher(
+    config: Config,
+    folders: Vec<FolderState>,
+) -> (Receiver<WatcherEvent>, Arc<AtomicBool>) {
     let (tx, rx) = mpsc::channel();
     let stop = Arc::new(AtomicBool::new(false));
     let thread_stop = Arc::clone(&stop);
@@ -576,13 +589,19 @@ fn watch_folders_loop(
     let editor = FfmpegEditor;
     let duration_getter = FfmpegDurationGetter;
 
-    if tx.send(WatcherEvent::Log {
-        message: format!("Watching {} folder(s) for new videos", folders.len()),
-        success: true,
-    }).is_err() {
+    if tx
+        .send(WatcherEvent::Log {
+            message: format!("Watching {} folder(s) for new videos", folders.len()),
+            success: true,
+        })
+        .is_err()
+    {
         return;
     }
-    if tx.send(WatcherEvent::Status(ProcessingStatus::Watching)).is_err() {
+    if tx
+        .send(WatcherEvent::Status(ProcessingStatus::Watching))
+        .is_err()
+    {
         return;
     }
 
@@ -593,28 +612,34 @@ fn watch_folders_loop(
             }
 
             if let Err(err) = std::fs::create_dir_all(&folder.input) {
-                if tx.send(WatcherEvent::Log {
-                    message: format!(
-                        "Failed to create input folder {}: {}",
-                        folder.input.display(),
-                        err
-                    ),
-                    success: false,
-                }).is_err() {
+                if tx
+                    .send(WatcherEvent::Log {
+                        message: format!(
+                            "Failed to create input folder {}: {}",
+                            folder.input.display(),
+                            err
+                        ),
+                        success: false,
+                    })
+                    .is_err()
+                {
                     return;
                 }
                 continue;
             }
 
             if let Err(err) = std::fs::create_dir_all(&folder.output) {
-                if tx.send(WatcherEvent::Log {
-                    message: format!(
-                        "Failed to create output folder {}: {}",
-                        folder.output.display(),
-                        err
-                    ),
-                    success: false,
-                }).is_err() {
+                if tx
+                    .send(WatcherEvent::Log {
+                        message: format!(
+                            "Failed to create output folder {}: {}",
+                            folder.output.display(),
+                            err
+                        ),
+                        success: false,
+                    })
+                    .is_err()
+                {
                     return;
                 }
                 continue;
@@ -623,14 +648,17 @@ fn watch_folders_loop(
             let entries = match std::fs::read_dir(&folder.input) {
                 Ok(entries) => entries,
                 Err(err) => {
-                    if tx.send(WatcherEvent::Log {
-                        message: format!(
-                            "Failed to read watch folder {}: {}",
-                            folder.input.display(),
-                            err
-                        ),
-                        success: false,
-                    }).is_err() {
+                    if tx
+                        .send(WatcherEvent::Log {
+                            message: format!(
+                                "Failed to read watch folder {}: {}",
+                                folder.input.display(),
+                                err
+                            ),
+                            success: false,
+                        })
+                        .is_err()
+                    {
                         return;
                     }
                     continue;
@@ -661,10 +689,13 @@ fn watch_folders_loop(
                 let file_size = metadata.as_ref().map_or(0, |m| m.len());
                 let file_label = PathBuf::from(&file_name).display().to_string();
 
-                if tx.send(WatcherEvent::Processing {
-                    filename: file_label.clone(),
-                    file_size,
-                }).is_err() {
+                if tx
+                    .send(WatcherEvent::Processing {
+                        filename: file_label.clone(),
+                        file_size,
+                    })
+                    .is_err()
+                {
                     return;
                 }
 
@@ -692,19 +723,25 @@ fn watch_folders_loop(
 
                 match result {
                     Ok(()) => {
-                        if tx.send(WatcherEvent::Completed {
-                            filename: file_label,
-                            file_size,
-                            duration_secs: started.elapsed().as_secs().max(1),
-                        }).is_err() {
+                        if tx
+                            .send(WatcherEvent::Completed {
+                                filename: file_label,
+                                file_size,
+                                duration_secs: started.elapsed().as_secs().max(1),
+                            })
+                            .is_err()
+                        {
                             return;
                         }
                     }
                     Err(err) => {
-                        if tx.send(WatcherEvent::Failed {
-                            filename: file_label,
-                            message: err.to_string(),
-                        }).is_err() {
+                        if tx
+                            .send(WatcherEvent::Failed {
+                                filename: file_label,
+                                message: err.to_string(),
+                            })
+                            .is_err()
+                        {
                             return;
                         }
                     }
@@ -712,7 +749,10 @@ fn watch_folders_loop(
             }
         }
 
-        if tx.send(WatcherEvent::Status(ProcessingStatus::Watching)).is_err() {
+        if tx
+            .send(WatcherEvent::Status(ProcessingStatus::Watching))
+            .is_err()
+        {
             return;
         }
 
@@ -768,7 +808,12 @@ fn is_video_file(path: &Path) -> bool {
         && path
             .extension()
             .and_then(|ext| ext.to_str())
-            .map(|ext| matches!(ext.to_ascii_lowercase().as_str(), "mp4" | "mov" | "avi" | "mkv" | "webm"))
+            .map(|ext| {
+                matches!(
+                    ext.to_ascii_lowercase().as_str(),
+                    "mp4" | "mov" | "avi" | "mkv" | "webm"
+                )
+            })
             .unwrap_or(false)
 }
 
@@ -1086,11 +1131,8 @@ impl App {
             .order(egui::Order::Background)
             .show(ctx, |ui| {
                 ui.allocate_exact_size(screen_rect.size(), egui::Sense::hover());
-                ui.painter().rect_filled(
-                    screen_rect,
-                    0.0,
-                    egui::Color32::from_rgb(15, 15, 20),
-                );
+                ui.painter()
+                    .rect_filled(screen_rect, 0.0, egui::Color32::from_rgb(15, 15, 20));
             });
 
         // Center the wizard
@@ -1139,11 +1181,23 @@ impl App {
                 .inner_margin(egui::vec2(24.0, 16.0))
                 .show(ui, |ui| {
                     ui.vertical(|ui| {
-                        self.setup_feature_row(ui, "Auto-remove silence", "Cuts dead air automatically");
+                        self.setup_feature_row(
+                            ui,
+                            "Auto-remove silence",
+                            "Cuts dead air automatically",
+                        );
                         ui.add_space(8.0);
-                        self.setup_feature_row(ui, "Audio enhancement", "Makes your voice sound professional");
+                        self.setup_feature_row(
+                            ui,
+                            "Audio enhancement",
+                            "Makes your voice sound professional",
+                        );
                         ui.add_space(8.0);
-                        self.setup_feature_row(ui, "Auto-reframe", "Convert to vertical video for Shorts/Reels");
+                        self.setup_feature_row(
+                            ui,
+                            "Auto-reframe",
+                            "Convert to vertical video for Shorts/Reels",
+                        );
                     });
                 });
 
@@ -1213,7 +1267,12 @@ impl App {
         ui.add_space(24.0);
 
         // Preset selection
-        ui.label(RichText::new("What type of content?").size(16.0).color(TEXT_PRIMARY).strong());
+        ui.label(
+            RichText::new("What type of content?")
+                .size(16.0)
+                .color(TEXT_PRIMARY)
+                .strong(),
+        );
         ui.add_space(12.0);
 
         ui.horizontal_wrapped(|ui| {
@@ -1223,7 +1282,10 @@ impl App {
                 ("podcast", "🎙️", "Podcast/audio focus"),
             ] {
                 let selected = self.state.setup_preset == preset;
-                if self.setup_preset_card(ui, selected, icon, preset, desc).clicked() {
+                if self
+                    .setup_preset_card(ui, selected, icon, preset, desc)
+                    .clicked()
+                {
                     self.state.setup_preset = preset.to_string();
                 }
                 ui.add_space(8.0);
@@ -1253,7 +1315,11 @@ impl App {
         desc: &str,
     ) -> egui::Response {
         let bg_color = if selected { ACCENT_PRIMARY } else { PANEL_BG };
-        let stroke_color = if selected { ACCENT_PRIMARY } else { PANEL_BG_LIGHT };
+        let stroke_color = if selected {
+            ACCENT_PRIMARY
+        } else {
+            PANEL_BG_LIGHT
+        };
 
         egui::Frame::NONE
             .fill(bg_color)
@@ -1265,8 +1331,21 @@ impl App {
                 ui.vertical_centered(|ui| {
                     ui.label(RichText::new(icon).size(28.0));
                     ui.add_space(4.0);
-                    ui.label(RichText::new(name).size(14.0).color(if selected { egui::Color32::WHITE } else { TEXT_PRIMARY }).strong());
-                    ui.label(RichText::new(desc).size(11.0).color(if selected { egui::Color32::WHITE } else { TEXT_SECONDARY }));
+                    ui.label(
+                        RichText::new(name)
+                            .size(14.0)
+                            .color(if selected {
+                                egui::Color32::WHITE
+                            } else {
+                                TEXT_PRIMARY
+                            })
+                            .strong(),
+                    );
+                    ui.label(RichText::new(desc).size(11.0).color(if selected {
+                        egui::Color32::WHITE
+                    } else {
+                        TEXT_SECONDARY
+                    }));
                 });
             })
             .response
@@ -1322,15 +1401,20 @@ impl App {
         settings_toggle_frame(value).show(ui, |ui| {
             ui.horizontal(|ui| {
                 let dot_color = if value { ACCENT_PRIMARY } else { TEXT_MUTED };
-                let (dot_rect, _) = ui.allocate_exact_size(egui::vec2(8.0, 8.0), egui::Sense::hover());
-                ui.painter().circle_filled(dot_rect.center(), 3.5, dot_color);
+                let (dot_rect, _) =
+                    ui.allocate_exact_size(egui::vec2(8.0, 8.0), egui::Sense::hover());
+                ui.painter()
+                    .circle_filled(dot_rect.center(), 3.5, dot_color);
                 ui.add_space(8.0);
                 ui.vertical(|ui| {
                     ui.label(RichText::new(title).size(15.0).color(TEXT_PRIMARY).strong());
                     ui.label(RichText::new(desc).size(12.0).color(TEXT_SECONDARY));
                 });
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                    if ui.add(button_toggle(value, if value { "ON" } else { "OFF" })).clicked() {
+                    if ui
+                        .add(button_toggle(value, if value { "ON" } else { "OFF" }))
+                        .clicked()
+                    {
                         new_value = !value;
                     }
                 });
@@ -1351,9 +1435,11 @@ impl App {
             );
             ui.add_space(16.0);
             ui.label(
-                RichText::new("Drop videos into your folder and they'll be processed automatically.")
-                    .size(14.0)
-                    .color(TEXT_SECONDARY),
+                RichText::new(
+                    "Drop videos into your folder and they'll be processed automatically.",
+                )
+                .size(14.0)
+                .color(TEXT_SECONDARY),
             );
             ui.add_space(24.0);
 
@@ -1364,12 +1450,50 @@ impl App {
                 .inner_margin(egui::vec2(24.0, 16.0))
                 .show(ui, |ui| {
                     ui.vertical(|ui| {
-                        ui.label(RichText::new("Setup Summary").size(14.0).color(TEXT_PRIMARY).strong());
+                        ui.label(
+                            RichText::new("Setup Summary")
+                                .size(14.0)
+                                .color(TEXT_PRIMARY)
+                                .strong(),
+                        );
                         ui.add_space(8.0);
-                        ui.label(RichText::new(format!("📁 Folder: {}", self.state.setup_folder.display())).size(13.0).color(TEXT_SECONDARY));
-                        ui.label(RichText::new(format!("🎬 Preset: {}", self.state.setup_preset)).size(13.0).color(TEXT_SECONDARY));
-                        ui.label(RichText::new(format!("🔧 Enhance: {}", if self.state.setup_enhance { "ON" } else { "OFF" })).size(13.0).color(TEXT_SECONDARY));
-                        ui.label(RichText::new(format!("✂️ Silence removal: {}", if self.state.setup_remove_silence { "ON" } else { "OFF" })).size(13.0).color(TEXT_SECONDARY));
+                        ui.label(
+                            RichText::new(format!(
+                                "📁 Folder: {}",
+                                self.state.setup_folder.display()
+                            ))
+                            .size(13.0)
+                            .color(TEXT_SECONDARY),
+                        );
+                        ui.label(
+                            RichText::new(format!("🎬 Preset: {}", self.state.setup_preset))
+                                .size(13.0)
+                                .color(TEXT_SECONDARY),
+                        );
+                        ui.label(
+                            RichText::new(format!(
+                                "🔧 Enhance: {}",
+                                if self.state.setup_enhance {
+                                    "ON"
+                                } else {
+                                    "OFF"
+                                }
+                            ))
+                            .size(13.0)
+                            .color(TEXT_SECONDARY),
+                        );
+                        ui.label(
+                            RichText::new(format!(
+                                "✂️ Silence removal: {}",
+                                if self.state.setup_remove_silence {
+                                    "ON"
+                                } else {
+                                    "OFF"
+                                }
+                            ))
+                            .size(13.0)
+                            .color(TEXT_SECONDARY),
+                        );
                     });
                 });
 
@@ -1406,7 +1530,10 @@ impl App {
 
         self.state.folders = vec![folder];
         self.state.activity_log.push(ActivityEntry::simple(
-            format!("Setup complete! Watching: {}", self.state.setup_folder.display()),
+            format!(
+                "Setup complete! Watching: {}",
+                self.state.setup_folder.display()
+            ),
             true,
         ));
 
@@ -1596,7 +1723,10 @@ impl App {
                     folder.settings.target_lufs.unwrap_or(-14.0),
                 )
             } else {
-                (true, true, false, false, false, false, false, false, false, false, -30.0, -14.0)
+                (
+                    true, true, false, false, false, false, false, false, false, false, -30.0,
+                    -14.0,
+                )
             }
         };
 

@@ -355,7 +355,8 @@ impl VideoEditor for FfmpegEditor {
 
         let input_str = input.to_str().context("invalid input path")?;
         let output_str = output.to_str().context("invalid output path")?;
-        let trf_file = std::env::temp_dir().join(format!("ai-vid-editor-vidstab-{}.trf", std::process::id()));
+        let trf_file =
+            std::env::temp_dir().join(format!("ai-vid-editor-vidstab-{}.trf", std::process::id()));
         let trf_path = trf_file.to_str().context("invalid temp path")?;
 
         // Pass 1: Detect motion and generate transforms
@@ -452,7 +453,11 @@ impl VideoEditor for FfmpegEditor {
                             Ok(dims) => dims,
                             Err(e) => {
                                 warn!(error = %e, "Failed to get video dimensions, using center crop");
-                                return self.run_reframe_filter(input, output, "crop=ih*9/16:ih,scale=1080:1920");
+                                return self.run_reframe_filter(
+                                    input,
+                                    output,
+                                    "crop=ih*9/16:ih,scale=1080:1920",
+                                );
                             }
                         };
 
@@ -670,8 +675,17 @@ fn parse_loudnorm_stats(stderr: &str) -> Option<LoudnormStats> {
     };
 
     // Validate all fields are valid finite numbers
-    for val in [&stats.i, &stats.tp, &stats.lra, &stats.thresh, &stats.offset] {
-        if val.is_empty() || val.parse::<f64>().ok()?.is_nan() || val.parse::<f64>().ok()?.is_infinite() {
+    for val in [
+        &stats.i,
+        &stats.tp,
+        &stats.lra,
+        &stats.thresh,
+        &stats.offset,
+    ] {
+        if val.is_empty()
+            || val.parse::<f64>().ok()?.is_nan()
+            || val.parse::<f64>().ok()?.is_infinite()
+        {
             return None;
         }
     }
@@ -952,12 +966,7 @@ mod tests {
             },
         ];
 
-        let processed = calculate_keep_segments_from_transcript(
-            &transcript,
-            10.0,
-            &["um"],
-            0.1,
-        );
+        let processed = calculate_keep_segments_from_transcript(&transcript, 10.0, &["um"], 0.1);
 
         // Should have 2 segments: before "um" and after "um"
         assert_eq!(processed.len(), 2);

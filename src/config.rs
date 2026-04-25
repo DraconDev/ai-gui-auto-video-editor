@@ -755,28 +755,52 @@ impl Config {
     /// Returns Ok(()) if valid, or an error describing the first invalid value.
     pub fn validate(&self) -> Result<()> {
         if self.silence.threshold_db > 0.0 {
-            anyhow::bail!("silence.threshold_db must be negative (got {})", self.silence.threshold_db);
+            anyhow::bail!(
+                "silence.threshold_db must be negative (got {})",
+                self.silence.threshold_db
+            );
         }
         if self.silence.min_duration < 0.0 {
-            anyhow::bail!("silence.min_duration must be non-negative (got {})", self.silence.min_duration);
+            anyhow::bail!(
+                "silence.min_duration must be non-negative (got {})",
+                self.silence.min_duration
+            );
         }
         if self.silence.padding < 0.0 {
-            anyhow::bail!("silence.padding must be non-negative (got {})", self.silence.padding);
+            anyhow::bail!(
+                "silence.padding must be non-negative (got {})",
+                self.silence.padding
+            );
         }
         if self.silence.speedup_factor <= 0.0 {
-            anyhow::bail!("silence.speedup_factor must be positive (got {})", self.silence.speedup_factor);
+            anyhow::bail!(
+                "silence.speedup_factor must be positive (got {})",
+                self.silence.speedup_factor
+            );
         }
         if self.silence.min_silence_for_speedup < 0.0 {
-            anyhow::bail!("silence.min_silence_for_speedup must be non-negative (got {})", self.silence.min_silence_for_speedup);
+            anyhow::bail!(
+                "silence.min_silence_for_speedup must be non-negative (got {})",
+                self.silence.min_silence_for_speedup
+            );
         }
         if self.audio.duck_volume < 0.0 || self.audio.duck_volume > 1.0 {
-            anyhow::bail!("audio.duck_volume must be between 0.0 and 1.0 (got {})", self.audio.duck_volume);
+            anyhow::bail!(
+                "audio.duck_volume must be between 0.0 and 1.0 (got {})",
+                self.audio.duck_volume
+            );
         }
         if self.export.clip_min_duration < 0.0 {
-            anyhow::bail!("export.clip_min_duration must be non-negative (got {})", self.export.clip_min_duration);
+            anyhow::bail!(
+                "export.clip_min_duration must be non-negative (got {})",
+                self.export.clip_min_duration
+            );
         }
         if self.export.clip_max_duration < 0.0 {
-            anyhow::bail!("export.clip_max_duration must be non-negative (got {})", self.export.clip_max_duration);
+            anyhow::bail!(
+                "export.clip_max_duration must be non-negative (got {})",
+                self.export.clip_max_duration
+            );
         }
         if self.export.clip_min_duration > self.export.clip_max_duration {
             anyhow::bail!(
@@ -800,9 +824,15 @@ impl Config {
         // This happens because f32 values get serialized as f64
         // Only fix known float fields to avoid corrupting strings/paths
         const FLOAT_KEYS: &[&str] = &[
-            "threshold_db", "min_duration", "padding", "speedup_factor",
-            "min_silence_for_speedup", "target_lufs", "duck_volume",
-            "clip_min_duration", "clip_max_duration",
+            "threshold_db",
+            "min_duration",
+            "padding",
+            "speedup_factor",
+            "min_silence_for_speedup",
+            "target_lufs",
+            "duck_volume",
+            "clip_min_duration",
+            "clip_max_duration",
         ];
         fn fix_floats(s: &str) -> String {
             let mut result = String::new();

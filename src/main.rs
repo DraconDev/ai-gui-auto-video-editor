@@ -225,7 +225,11 @@ fn init_logging(verbose: u8, quiet: bool) {
     tracing_subscriber::fmt()
         .with_env_filter(
             tracing_subscriber::EnvFilter::new(filter)
-                .add_directive("candle=warn".parse().expect("invalid directive candle=warn"))
+                .add_directive(
+                    "candle=warn"
+                        .parse()
+                        .expect("invalid directive candle=warn"),
+                )
                 .add_directive("tract=warn".parse().expect("invalid directive tract=warn")),
         )
         .with_target(false)
@@ -446,9 +450,9 @@ fn main() -> Result<()> {
     if watch_enabled {
         // If CLI --watch flag was used, watch that single directory
         if cli.watch.is_some() {
-            let watch_path = watch_dir.clone().ok_or_else(|| {
-                anyhow::anyhow!("Watch directory required (use --watch <dir>)")
-            })?;
+            let watch_path = watch_dir
+                .clone()
+                .ok_or_else(|| anyhow::anyhow!("Watch directory required (use --watch <dir>)"))?;
             let out_dir = output_dir
                 .clone()
                 .ok_or_else(|| anyhow::anyhow!("Output directory required for watch mode"))?;
@@ -561,16 +565,25 @@ fn run_watch_mode(
         if let Some(ext) = path.extension().and_then(|e| e.to_str())
             && video_extensions.contains(&ext.to_lowercase().as_str())
         {
-            let name = path.file_name().map(|n| n.to_string_lossy()).unwrap_or_default();
+            let name = path
+                .file_name()
+                .map(|n| n.to_string_lossy())
+                .unwrap_or_default();
             println!("  Skipping existing: {}", name);
             processed.insert(path);
         }
     }
 
     if processed.is_empty() {
-        println!("  No existing videos found. Drop a video in {:?} to start processing.", watch_dir);
+        println!(
+            "  No existing videos found. Drop a video in {:?} to start processing.",
+            watch_dir
+        );
     } else {
-        println!("  {} existing file(s) skipped (already present on startup).", processed.len());
+        println!(
+            "  {} existing file(s) skipped (already present on startup).",
+            processed.len()
+        );
     }
 
     let analyzer = FfmpegAnalyzer;
@@ -585,7 +598,11 @@ fn run_watch_mode(
 
         // Print a heartbeat every ~30s so user knows we're still watching
         if heartbeat.is_multiple_of(6) {
-            println!("[{}] Watching {:?} for new files...", timestamp(), watch_dir);
+            println!(
+                "[{}] Watching {:?} for new files...",
+                timestamp(),
+                watch_dir
+            );
         }
 
         // Check for new files
@@ -616,26 +633,27 @@ fn run_watch_mode(
 
                     // Process with intro/outro, showing progress
                     let file_name_for_progress = file_name.clone();
-                    let result = crate::batch_processor::process_single_file_with_intro_outro_progress(
-                        path.clone(),
-                        output_path.clone(),
-                        config,
-                        &analyzer,
-                        &editor,
-                        &duration_getter,
-                        intro.clone(),
-                        outro.clone(),
-                        move |p| {
-                            let now = timestamp();
-                            println!(
-                                "[{}] [{:.0}%] {} - {}",
-                                now,
-                                p.fraction * 100.0,
-                                file_name_for_progress,
-                                p.stage
-                            );
-                        },
-                    );
+                    let result =
+                        crate::batch_processor::process_single_file_with_intro_outro_progress(
+                            path.clone(),
+                            output_path.clone(),
+                            config,
+                            &analyzer,
+                            &editor,
+                            &duration_getter,
+                            intro.clone(),
+                            outro.clone(),
+                            move |p| {
+                                let now = timestamp();
+                                println!(
+                                    "[{}] [{:.0}%] {} - {}",
+                                    now,
+                                    p.fraction * 100.0,
+                                    file_name_for_progress,
+                                    p.stage
+                                );
+                            },
+                        );
 
                     match &result {
                         Ok(_) => {
@@ -694,7 +712,12 @@ fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
     println!("Config: ~/.config/ai-vid-editor/config.toml");
     println!("Watching {} folder(s):", enabled_folders.len());
     for folder in &enabled_folders {
-        println!("  {} -> {} [{}]", folder.input.display(), folder.output.display(), folder.preset);
+        println!(
+            "  {} -> {} [{}]",
+            folder.input.display(),
+            folder.output.display(),
+            folder.preset
+        );
     }
     println!("Polling every {}s", config.watch.interval);
     println!("Press Ctrl+C to stop\n");
@@ -719,7 +742,10 @@ fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
                 if let Some(ext) = path.extension().and_then(|e| e.to_str())
                     && video_extensions.contains(&ext.to_lowercase().as_str())
                 {
-                    let name = path.file_name().map(|n| n.to_string_lossy()).unwrap_or_default();
+                    let name = path
+                        .file_name()
+                        .map(|n| n.to_string_lossy())
+                        .unwrap_or_default();
                     println!("  Skipping existing: {}", name);
                     processed.insert(path);
                 }
@@ -727,9 +753,16 @@ fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
         }
 
         if processed.is_empty() {
-            println!("  {:?}: No videos found. Drop a video here to start processing.", folder.input);
+            println!(
+                "  {:?}: No videos found. Drop a video here to start processing.",
+                folder.input
+            );
         } else {
-            println!("  {:?}: {} existing file(s) skipped.", folder.input, processed.len());
+            println!(
+                "  {:?}: {} existing file(s) skipped.",
+                folder.input,
+                processed.len()
+            );
         }
         processed_sets.push(processed);
     }
@@ -742,7 +775,11 @@ fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
 
         // Print a heartbeat every ~30s so user knows we're still watching
         if heartbeat.is_multiple_of(6) {
-            println!("[{}] Watching {} folder(s) for new files...", timestamp(), enabled_folders.len());
+            println!(
+                "[{}] Watching {} folder(s) for new files...",
+                timestamp(),
+                enabled_folders.len()
+            );
         }
 
         for (idx, folder) in enabled_folders.iter().enumerate() {
@@ -758,40 +795,39 @@ fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
                         println!("\n[{}] [NEW FILE] {:?}", now, path);
 
                         // Build config for this folder's preset
-                        let folder_config = if let Some(preset) =
-                            crate::config::Preset::from_str(&folder.preset)
-                        {
-                            let mut c = preset.to_config();
-                            // Apply folder-level settings overrides
-                            if let Some(enhance) = folder.settings.enhance_audio {
-                                c.audio.enhance = enhance;
-                            }
-                            if let Some(threshold) = folder.settings.silence_threshold_db {
-                                c.silence.threshold_db = threshold;
-                            }
-                            if let Some(lufs) = folder.settings.target_lufs {
-                                c.audio.target_lufs = lufs;
-                            }
-                            if let Some(stabilize) = folder.settings.stabilize {
-                                c.video.stabilize = stabilize;
-                            }
-                            if let Some(color_correct) = folder.settings.color_correct {
-                                c.video.color_correct = color_correct;
-                            }
-                            if let Some(reframe) = folder.settings.reframe {
-                                c.video.reframe = reframe;
-                            }
-                            if let Some(blur) = folder.settings.blur_background {
-                                c.video.blur_background = blur;
-                            }
-                            c
-                        } else {
-                            eprintln!(
-                                "Warning: Unknown preset '{}', using default config",
-                                folder.preset
-                            );
-                            config.clone()
-                        };
+                        let folder_config =
+                            if let Some(preset) = crate::config::Preset::from_str(&folder.preset) {
+                                let mut c = preset.to_config();
+                                // Apply folder-level settings overrides
+                                if let Some(enhance) = folder.settings.enhance_audio {
+                                    c.audio.enhance = enhance;
+                                }
+                                if let Some(threshold) = folder.settings.silence_threshold_db {
+                                    c.silence.threshold_db = threshold;
+                                }
+                                if let Some(lufs) = folder.settings.target_lufs {
+                                    c.audio.target_lufs = lufs;
+                                }
+                                if let Some(stabilize) = folder.settings.stabilize {
+                                    c.video.stabilize = stabilize;
+                                }
+                                if let Some(color_correct) = folder.settings.color_correct {
+                                    c.video.color_correct = color_correct;
+                                }
+                                if let Some(reframe) = folder.settings.reframe {
+                                    c.video.reframe = reframe;
+                                }
+                                if let Some(blur) = folder.settings.blur_background {
+                                    c.video.blur_background = blur;
+                                }
+                                c
+                            } else {
+                                eprintln!(
+                                    "Warning: Unknown preset '{}', using default config",
+                                    folder.preset
+                                );
+                                config.clone()
+                            };
 
                         let file_name = path
                             .file_name()
@@ -807,26 +843,27 @@ fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
 
                         let start_time = std::time::Instant::now();
                         let progress_name = file_name.clone();
-                        let result = crate::batch_processor::process_single_file_with_intro_outro_progress(
-                            path.clone(),
-                            output_path.clone(),
-                            &folder_config,
-                            &analyzer,
-                            &editor,
-                            &duration_getter,
-                            None,
-                            None,
-                            move |p| {
-                                let now = timestamp();
-                                println!(
-                                    "[{}] [{:.0}%] {} - {}",
-                                    now,
-                                    p.fraction * 100.0,
-                                    progress_name,
-                                    p.stage
-                                );
-                            },
-                        );
+                        let result =
+                            crate::batch_processor::process_single_file_with_intro_outro_progress(
+                                path.clone(),
+                                output_path.clone(),
+                                &folder_config,
+                                &analyzer,
+                                &editor,
+                                &duration_getter,
+                                None,
+                                None,
+                                move |p| {
+                                    let now = timestamp();
+                                    println!(
+                                        "[{}] [{:.0}%] {} - {}",
+                                        now,
+                                        p.fraction * 100.0,
+                                        progress_name,
+                                        p.stage
+                                    );
+                                },
+                            );
 
                         match &result {
                             Ok(_) => {

@@ -27,9 +27,11 @@ impl FrameExtractor {
     ) -> Result<Vec<std::path::PathBuf>> {
         std::fs::create_dir_all(output_dir)?;
 
-        let path_str = video_path.to_str()
+        let path_str = video_path
+            .to_str()
             .ok_or_else(|| anyhow::anyhow!("Video path contains invalid UTF-8 characters"))?;
-        let out_dir_str = output_dir.to_str()
+        let out_dir_str = output_dir
+            .to_str()
             .ok_or_else(|| anyhow::anyhow!("Output path contains invalid UTF-8 characters"))?;
 
         // Extract frames at specified rate (e.g., 1 fps = 1 frame per second)
@@ -64,15 +66,20 @@ impl FrameExtractor {
 
     /// Get video dimensions (width, height)
     pub fn get_video_dimensions(video_path: &Path) -> Result<(u32, u32)> {
-        let path_str = video_path.to_str()
+        let path_str = video_path
+            .to_str()
             .ok_or_else(|| anyhow::anyhow!("Video path contains invalid UTF-8 characters"))?;
 
         let output = Command::new("ffprobe")
             .args([
-                "-v", "error",
-                "-select_streams", "v:0",
-                "-show_entries", "stream=width,height",
-                "-of", "csv=p=0",
+                "-v",
+                "error",
+                "-select_streams",
+                "v:0",
+                "-show_entries",
+                "stream=width,height",
+                "-of",
+                "csv=p=0",
                 path_str,
             ])
             .output()?;
@@ -91,14 +98,18 @@ impl FrameExtractor {
 
     /// Get video duration in seconds
     pub fn get_video_duration(video_path: &Path) -> Result<f32> {
-        let path_str = video_path.to_str()
+        let path_str = video_path
+            .to_str()
             .ok_or_else(|| anyhow::anyhow!("Video path contains invalid UTF-8 characters"))?;
 
         let output = Command::new("ffprobe")
             .args([
-                "-v", "error",
-                "-show_entries", "format=duration",
-                "-of", "default=noprint_wrappers=1:nokey=1",
+                "-v",
+                "error",
+                "-show_entries",
+                "format=duration",
+                "-of",
+                "default=noprint_wrappers=1:nokey=1",
                 path_str,
             ])
             .output()?;
@@ -534,7 +545,8 @@ impl AutoReframeProcessor {
         video_path: &Path,
         sample_fps: f32,
     ) -> Result<Vec<(f32, CropRegion)>> {
-        let temp_dir = std::env::temp_dir().join(format!("ai-vid-editor-frames-{}", std::process::id()));
+        let temp_dir =
+            std::env::temp_dir().join(format!("ai-vid-editor-frames-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&temp_dir);
         let frames = FrameExtractor::extract_frames(video_path, &temp_dir, sample_fps)?;
 
