@@ -389,6 +389,9 @@ fn default_thumbnail_width() -> u32 {
 fn default_thumbnail_height() -> u32 {
     720
 }
+fn default_preview_duration() -> f32 {
+    30.0
+}
 
 fn default_clip_count() -> u32 {
     3
