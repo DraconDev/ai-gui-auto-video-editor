@@ -268,6 +268,22 @@ where
 
     report_progress(&mut progress, 0.1, "Planning edits");
 
+    // Generate early preview if requested
+    if config.export.preview {
+        let preview_path = crate::preview::preview_path(&output_file);
+        report_progress(&mut progress, 0.11, "Generating preview");
+        if let Err(e) = crate::preview::generate_preview(
+            &input_file,
+            &preview_path,
+            config.export.preview_duration,
+            480,
+        ) {
+            warn!(error = %e, "Failed to generate preview");
+        } else {
+            info!(path = %preview_path.display(), "Preview generated");
+        }
+    }
+
     let processed_segments = calculate_keep_segments(
         &silences,
         video_duration,
