@@ -490,12 +490,10 @@ fn generate_styled_captions(transcript: &[TranscriptSegment], output_path: &Path
         }
         let start = format_ass_time(seg.start);
         let end = format_ass_time(seg.end);
-        // Escape text for ASS format (replace(['\\', '\n'], "\\N") not available in stable Rust)
-        #[allow(clippy::collapsible_str_replace)]
-        let escaped = text
-            .replace('\\', "\\N")
-            .replace('\n', "\\N")
-            .replace('\r', "");
+        // Escape text for ASS format
+        // In ASS, \N is a forced newline. Literal backslashes must be escaped as \\.
+        // Order matters: escape backslashes first, then newlines.
+        let escaped = text.replace('\\', "\\\\").replace('\n', "\\N").replace('\r', "");
         ass.push_str(&format!(
             "Dialogue: 0,{},{},Default,,0,0,0,,{}\n",
             start, end, escaped
@@ -542,9 +540,10 @@ fn burn_subtitles_into_video(
     }
 
     // Replace original with captioned version
-    if output_path.exists() {
-        fs::rename(output_path, video_path)?;
+    if !output_path.exists() {
+        anyhow::bail!("ffmpeg subtitle burn did not produce output file");
     }
+    fs::rename(output_path, video_path)?;
     Ok(())
 }
 

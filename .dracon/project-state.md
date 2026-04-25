@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Improved cross-filesystem compatibility for single-chunk video concatenation
+Improved ASS subtitle formatting and error handling in video processing
 
 ## Completed
-- [x] Replaced `fs::rename` with `fs::copy` + `fs::remove_file` to handle cross-filesystem operations
-- [x] Maintained same functionality for single-chunk files while improving robustness
+- [x] Fixed ASS subtitle escaping to properly handle backslashes and newlines
+- [x] Added error handling for missing output file in subtitle burning process
