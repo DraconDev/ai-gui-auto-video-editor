@@ -54,7 +54,7 @@ pub fn export_fcpxml(
         let duration = seg.end - seg.start;
         xml.push_str(&format!(
             "            <video name=\"{}\" offset=\"{}s\" ref=\"r1\" start=\"{}s\" duration=\"{}s\" role=\"video\" />\n",
-            filename, start_offset, seg.start, duration
+            filename_escaped, start_offset, seg.start, duration
         ));
         start_offset += duration;
     }
