@@ -1,8 +1,7 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock for video processing features
+Removed `#[must_use]` attribute from `BatchProgress::from_file` method
 
 ## Completed
-- [x] Updated dependency versions in Cargo.lock to ensure compatibility with video processing features
-```
+- [x] Removed `#[must_use]` attribute from `BatchProgress::from_file` method to simplify API usage while maintaining the same functionality
