@@ -1,11 +1,7 @@
 # Project State
 
 ## Current Focus
-Added filename-based preset selection system for automatic video processing configuration
+Dependency version updates in Cargo.toml (binary modification to Cargo.lock)
 
 ## Completed
-- [x] Created new `preset_rules` module with filename pattern matching
-- [x] Implemented case-insensitive substring matching for preset selection
-- [x] Added default rules for common platform naming conventions (Shorts, TikTok, Reels, etc.)
-- [x] Included comprehensive test cases for pattern matching and fallback behavior
-```
+- [x] Updated dependency versions in Cargo.toml, triggering a Cargo.lock regeneration
