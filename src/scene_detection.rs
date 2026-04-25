@@ -37,7 +37,10 @@ fn parse_scene_changes(ffmpeg_output: &str) -> Vec<f32> {
             if let Some(pos) = line.find("pts_time:") {
                 let val_str = &line[pos + "pts_time:".len()..].trim();
                 // Extract just the number (may have trailing text)
-                let num_str: String = val_str.chars().take_while(|c| c.is_ascii_digit() || *c == '.').collect();
+                let num_str: String = val_str
+                    .chars()
+                    .take_while(|c| c.is_ascii_digit() || *c == '.')
+                    .collect();
                 if let Ok(timestamp) = num_str.parse::<f32>() {
                     scenes.push(timestamp);
                 }
@@ -50,7 +53,10 @@ fn parse_scene_changes(ffmpeg_output: &str) -> Vec<f32> {
 
 /// Convert scene changes into segments that can be used for cutting.
 /// Each segment represents a "scene" between two detected changes.
-pub fn scenes_to_segments(scene_changes: &[f32], total_duration: f32) -> Vec<crate::analyzer::Segment> {
+pub fn scenes_to_segments(
+    scene_changes: &[f32],
+    total_duration: f32,
+) -> Vec<crate::analyzer::Segment> {
     if scene_changes.is_empty() {
         return vec![crate::analyzer::Segment {
             start: 0.0,
@@ -90,15 +96,24 @@ mod tests {
     fn create_test_video(path: &std::path::Path, duration_secs: f32) {
         let status = Command::new("ffmpeg")
             .args([
-                "-f", "lavfi",
-                "-i", &format!("testsrc=duration={}:size=320x240:rate=30", duration_secs),
-                "-f", "lavfi",
-                "-i", &format!("sine=frequency=1000:duration={}", duration_secs),
-                "-c:v", "libx264",
-                "-preset", "ultrafast",
-                "-crf", "28",
-                "-c:a", "aac",
-                "-b:a", "32k",
+                "-f",
+                "lavfi",
+                "-i",
+                &format!("testsrc=duration={}:size=320x240:rate=30", duration_secs),
+                "-f",
+                "lavfi",
+                "-i",
+                &format!("sine=frequency=1000:duration={}", duration_secs),
+                "-c:v",
+                "libx264",
+                "-preset",
+                "ultrafast",
+                "-crf",
+                "28",
+                "-c:a",
+                "aac",
+                "-b:a",
+                "32k",
                 "-shortest",
                 "-y",
                 path.to_str().unwrap(),
@@ -117,7 +132,10 @@ mod tests {
         // Test video with testsrc may not have scene changes, but the function should not panic
         let scenes = detect_scene_changes(&video, 0.3).unwrap();
         // testsrc doesn't have scene changes, so we expect 0 or very few
-        assert!(scenes.len() <= 2, "test video should have at most 2 scene changes");
+        assert!(
+            scenes.len() <= 2,
+            "test video should have at most 2 scene changes"
+        );
     }
 
     #[test]

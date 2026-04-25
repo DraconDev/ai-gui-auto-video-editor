@@ -808,15 +808,24 @@ mod tests {
     fn create_test_video(path: &Path, duration_secs: f32) {
         let status = Command::new("ffmpeg")
             .args([
-                "-f", "lavfi",
-                "-i", &format!("testsrc=duration={}:size=320x240:rate=30", duration_secs),
-                "-f", "lavfi",
-                "-i", "sine=frequency=1000:duration=0.1",
-                "-c:v", "libx264",
-                "-preset", "ultrafast",
-                "-crf", "28",
-                "-c:a", "aac",
-                "-b:a", "32k",
+                "-f",
+                "lavfi",
+                "-i",
+                &format!("testsrc=duration={}:size=320x240:rate=30", duration_secs),
+                "-f",
+                "lavfi",
+                "-i",
+                "sine=frequency=1000:duration=0.1",
+                "-c:v",
+                "libx264",
+                "-preset",
+                "ultrafast",
+                "-crf",
+                "28",
+                "-c:a",
+                "aac",
+                "-b:a",
+                "32k",
                 "-shortest",
                 "-y",
                 path.to_str().unwrap(),
@@ -834,9 +843,11 @@ mod tests {
         create_test_video(&input, 3.0);
 
         let editor = FfmpegEditor;
-        let segments = vec![
-            ProcessedSegment { start: 0.5, end: 2.0, speed: 1.0 },
-        ];
+        let segments = vec![ProcessedSegment {
+            start: 0.5,
+            end: 2.0,
+            speed: 1.0,
+        }];
 
         editor.trim_video(&input, &output, &segments).unwrap();
         assert!(output.exists(), "trimmed output should exist");
@@ -851,8 +862,16 @@ mod tests {
 
         let editor = FfmpegEditor;
         let segments = vec![
-            ProcessedSegment { start: 0.0, end: 1.0, speed: 1.0 },
-            ProcessedSegment { start: 2.0, end: 3.0, speed: 1.0 },
+            ProcessedSegment {
+                start: 0.0,
+                end: 1.0,
+                speed: 1.0,
+            },
+            ProcessedSegment {
+                start: 2.0,
+                end: 3.0,
+                speed: 1.0,
+            },
         ];
 
         editor.trim_video(&input, &output, &segments).unwrap();

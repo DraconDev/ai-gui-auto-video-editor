@@ -114,11 +114,7 @@ pub fn add_text_watermark(
 
     let filter = format!(
         "drawtext=text='{}':{}:fontsize={}:fontcolor={}@{}:fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
-        escaped_text,
-        overlay_pos,
-        font_size,
-        color,
-        opacity
+        escaped_text, overlay_pos, font_size, color, opacity
     );
 
     let status = Command::new("ffmpeg")
@@ -151,15 +147,24 @@ mod tests {
     fn create_test_video(path: &Path, duration_secs: f32) {
         let status = Command::new("ffmpeg")
             .args([
-                "-f", "lavfi",
-                "-i", &format!("testsrc=duration={}:size=320x240:rate=30", duration_secs),
-                "-f", "lavfi",
-                "-i", &format!("sine=frequency=1000:duration={}", duration_secs),
-                "-c:v", "libx264",
-                "-preset", "ultrafast",
-                "-crf", "28",
-                "-c:a", "aac",
-                "-b:a", "32k",
+                "-f",
+                "lavfi",
+                "-i",
+                &format!("testsrc=duration={}:size=320x240:rate=30", duration_secs),
+                "-f",
+                "lavfi",
+                "-i",
+                &format!("sine=frequency=1000:duration={}", duration_secs),
+                "-c:v",
+                "libx264",
+                "-preset",
+                "ultrafast",
+                "-crf",
+                "28",
+                "-c:a",
+                "aac",
+                "-b:a",
+                "32k",
                 "-shortest",
                 "-y",
                 path.to_str().unwrap(),
@@ -172,9 +177,12 @@ mod tests {
     fn create_test_image(path: &Path) {
         let status = Command::new("ffmpeg")
             .args([
-                "-f", "lavfi",
-                "-i", "color=c=red:size=50x50",
-                "-frames:v", "1",
+                "-f",
+                "lavfi",
+                "-i",
+                "color=c=red:size=50x50",
+                "-frames:v",
+                "1",
                 "-y",
                 path.to_str().unwrap(),
             ])
@@ -186,7 +194,10 @@ mod tests {
     #[test]
     fn test_watermark_position_coords() {
         assert_eq!(WatermarkPosition::TopLeft.to_ffmpeg_coords(50, 50), "10:10");
-        assert_eq!(WatermarkPosition::Center.to_ffmpeg_coords(50, 50), "(W-w)/2:(H-h)/2");
+        assert_eq!(
+            WatermarkPosition::Center.to_ffmpeg_coords(50, 50),
+            "(W-w)/2:(H-h)/2"
+        );
     }
 
     #[test]
@@ -199,7 +210,14 @@ mod tests {
         create_test_video(&video, 2.0);
         create_test_image(&watermark);
 
-        add_watermark(&video, &watermark, &output, WatermarkPosition::BottomRight, 1.0).unwrap();
+        add_watermark(
+            &video,
+            &watermark,
+            &output,
+            WatermarkPosition::BottomRight,
+            1.0,
+        )
+        .unwrap();
         assert!(output.exists(), "watermarked output should exist");
     }
 

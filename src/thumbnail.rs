@@ -14,10 +14,8 @@ pub fn generate_thumbnail(
     info!("Generating thumbnail...");
 
     // Extract candidate frames at 1-second intervals
-    let temp_dir = std::env::temp_dir().join(format!(
-        "ai-vid-editor-thumbs-{}",
-        std::process::id()
-    ));
+    let temp_dir =
+        std::env::temp_dir().join(format!("ai-vid-editor-thumbs-{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&temp_dir);
     std::fs::create_dir_all(&temp_dir)?;
 
@@ -184,15 +182,24 @@ mod tests {
     fn create_test_video(path: &Path, duration_secs: f32) {
         let status = Command::new("ffmpeg")
             .args([
-                "-f", "lavfi",
-                "-i", &format!("testsrc=duration={}:size=320x240:rate=30", duration_secs),
-                "-f", "lavfi",
-                "-i", &format!("sine=frequency=1000:duration={}", duration_secs),
-                "-c:v", "libx264",
-                "-preset", "ultrafast",
-                "-crf", "28",
-                "-c:a", "aac",
-                "-b:a", "32k",
+                "-f",
+                "lavfi",
+                "-i",
+                &format!("testsrc=duration={}:size=320x240:rate=30", duration_secs),
+                "-f",
+                "lavfi",
+                "-i",
+                &format!("sine=frequency=1000:duration={}", duration_secs),
+                "-c:v",
+                "libx264",
+                "-preset",
+                "ultrafast",
+                "-crf",
+                "28",
+                "-c:a",
+                "aac",
+                "-b:a",
+                "32k",
                 "-shortest",
                 "-y",
                 path.to_str().unwrap(),

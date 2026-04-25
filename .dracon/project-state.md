@@ -1,8 +1,12 @@
 # Project State
 
 ## Current Focus
-Improved watermark positioning and entropy parsing in video processing modules
+Improved video processing with better scene detection and multi-format output generation
 
 ## Completed
-- [x] Refactored watermark position calculation to use `next_back()` for entropy parsing in thumbnail generation
-- [x] Made `to_ffmpeg_coords` public in watermark module for better API consistency
+- [x] Enhanced scene detection with more robust timestamp parsing
+- [x] Added support for generating multi-format outputs with different resolutions
+- [x] Improved test video generation with standardized parameters
+- [x] Refactored segment handling for better readability
+- [x] Added proper error handling for scene change detection
+```

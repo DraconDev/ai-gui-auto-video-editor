@@ -554,8 +554,11 @@ fn export_additional_files(
         debug!("Generating multi-format outputs");
         for resolution in &config.export.extra_resolutions {
             let (w, h) = resolution.dimensions();
-            let ext = output_file.extension().and_then(|e| e.to_str()).unwrap_or("mp4");
-            let multi_path = format!("{}_{}p.{}" , base_path.display(), h, ext);
+            let ext = output_file
+                .extension()
+                .and_then(|e| e.to_str())
+                .unwrap_or("mp4");
+            let multi_path = format!("{}_{}p.{}", base_path.display(), h, ext);
             debug!(path = %multi_path, resolution = ?resolution, "Generating alternate resolution");
 
             let status = std::process::Command::new("ffmpeg")
