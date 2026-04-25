@@ -1,7 +1,9 @@
 # Project State
 
 ## Current Focus
-Dependency version updates for video processing features
+Added `Preset` type and `Instant` import for improved video processing timing
 
 ## Completed
-- [x] Updated dependency versions in Cargo.lock to support recent video processing features
+- [x] Added `Preset` type to `ai_vid_editor` imports for video processing presets
+- [x] Added `Instant` import from `std::time` for precise timing measurements
+- [x] Added `PathBuf` import from `std::path` for path handling improvements

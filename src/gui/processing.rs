@@ -1,15 +1,15 @@
 use std::collections::HashSet;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::sync::{
     Arc,
     atomic::{AtomicBool, Ordering},
     mpsc::{self, Receiver, Sender},
 };
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use super::{FolderState, ProcessingStatus, WatcherEvent};
 use ai_vid_editor::{
-    Config, FfmpegAnalyzer, FfmpegDurationGetter, FfmpegEditor, ProcessingProgress,
+    Config, FfmpegAnalyzer, FfmpegDurationGetter, FfmpegEditor, Preset, ProcessingProgress,
     SilenceMode, WatchFolder, process_single_file_with_intro_outro_progress,
 };
 
