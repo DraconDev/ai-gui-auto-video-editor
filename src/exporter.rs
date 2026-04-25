@@ -22,12 +22,13 @@ pub fn export_fcpxml(
         .file_name()
         .and_then(|s| s.to_str())
         .unwrap_or("video.mp4");
+    let filename_escaped = xml_escape(filename);
 
     // Calculate total duration from segments
     let total_duration: f32 = segments.iter().map(|s| s.end - s.start).sum();
     let duration_str = format!("{:.0}/1s", total_duration.max(1.0));
 
-    let input_path_str = input_path.to_string_lossy();
+    let input_path_str = xml_escape(&input_path.to_string_lossy());
 
     let mut xml = String::new();
     xml.push_str("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
@@ -36,7 +37,7 @@ pub fn export_fcpxml(
     xml.push_str("  <resources>\n");
     xml.push_str(&format!(
         "    <asset id=\"r1\" name=\"{}\" src=\"file://{}\" />\n",
-        filename, input_path_str
+        filename_escaped, input_path_str
     ));
     xml.push_str("  </resources>\n");
     xml.push_str("  <library>\n");
