@@ -1,7 +1,7 @@
 # Project State
 
 ## Current Focus
-Refactored folder watching logic to make it accessible across modules
+Dependency version updates for video processing features
 
 ## Completed
-- [x] Changed `spawn_watcher` from private to `pub(crate)` to allow access from other modules in the crate
+- [x] Updated dependency versions in Cargo.lock to support recent video processing features
