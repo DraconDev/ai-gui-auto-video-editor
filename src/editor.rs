@@ -962,4 +962,58 @@ mod tests {
         assert_eq!(stats.thresh, "-31.05");
         assert_eq!(stats.offset, "0.04");
     }
+
+    #[test]
+    fn test_calculate_keep_segments_from_transcript() {
+        use crate::stt_analyzer::TranscriptSegment;
+
+        let transcript = vec![
+            TranscriptSegment {
+                start: 0.0,
+                end: 2.0,
+                text: "hello world".to_string(),
+                confidence: 1.0,
+            },
+            TranscriptSegment {
+                start: 2.0,
+                end: 3.0,
+                text: "um".to_string(),
+                confidence: 1.0,
+            },
+            TranscriptSegment {
+                start: 3.0,
+                end: 10.0,
+                text: "this is the rest".to_string(),
+                confidence: 1.0,
+            },
+        ];
+
+        let processed = calculate_keep_segments_from_transcript(
+            &transcript,
+            10.0,
+            &["um"],
+            0.1,
+        );
+
+        // Should have 2 segments: before "um" and after "um"
+        assert_eq!(processed.len(), 2);
+        assert_eq!(processed[0].start, 0.0);
+        assert_eq!(processed[0].end, 2.1); // 2.0 + padding
+        assert_eq!(processed[1].start, 2.9); // 3.0 - padding
+        assert_eq!(processed[1].end, 10.0);
+    }
+
+    #[test]
+    fn test_chain_atempo_filters() {
+        // Within range: single filter
+        assert_eq!(chain_atempo_filters(1.5), "atempo=1.5");
+        assert_eq!(chain_atempo_filters(0.75), "atempo=0.75");
+
+        // Speed up beyond 2.0: chain multiple
+        assert_eq!(chain_atempo_filters(4.0), "atempo=2.0,atempo=2.0");
+        assert_eq!(chain_atempo_filters(3.0), "atempo=2.0,atempo=1.5");
+
+        // Slow down below 0.5: chain multiple
+        assert_eq!(chain_atempo_filters(0.25), "atempo=0.5,atempo=0.5");
+    }
 }
