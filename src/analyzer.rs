@@ -83,8 +83,6 @@ fn parse_ffmpeg_silence(output: &str) -> Vec<Segment> {
     segments
 }
 
-use anyhow::Context;
-
 #[cfg(test)]
 mod tests {
     use super::*;
