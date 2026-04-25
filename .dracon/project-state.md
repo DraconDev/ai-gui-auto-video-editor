@@ -1,8 +1,7 @@
 # Project State
 
 ## Current Focus
-Limit video file search depth to 5 levels to prevent excessive directory traversal
+Reduced thumbnail generation frequency from 1 frame per second to 0.2 frames per second to optimize performance.
 
 ## Completed
-- [x] Added `max_depth(5)` to `WalkDir` configuration in video file discovery
-```
+- [x] Modified thumbnail generation to use `fps=0.2` instead of `fps=1` in FFmpeg command

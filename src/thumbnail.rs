@@ -25,7 +25,7 @@ pub fn generate_thumbnail(
             "-i",
             video_path.to_str().context("invalid video path")?,
             "-vf",
-            &format!("fps=1,scale={}:{}", width, height),
+            &format!("fps=0.2,scale={}:{}", width, height),
             "-q:v",
             "2",
             "-y",
