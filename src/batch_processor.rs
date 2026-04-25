@@ -215,6 +215,9 @@ where
     D: DurationGetter,
     F: FnMut(ProcessingProgress),
 {
+    // Guard ensures temp files are cleaned up even on early return
+    let mut guard = TempFileGuard::new(output_file.clone());
+
     report_progress(&mut progress, 0.02, "Analyzing silence");
     info!(file = ?input_file, "Analyzing video");
     debug!(mode = ?config.silence.mode, "Silence mode");
@@ -248,7 +251,9 @@ where
         || intro.is_some()
         || outro.is_some()
     {
-        output_file.with_extension("trimmed.mp4")
+        let path = output_file.with_extension("trimmed.mp4");
+        guard.track(path.clone());
+        path
     } else {
         output_file.clone()
     };
@@ -280,8 +285,10 @@ where
             .context("Failed to enhance audio")?;
 
         if trimmed_file != output_file {
+            guard.untrack(&trimmed_file);
             let _ = fs::remove_file(&trimmed_file);
         }
+        guard.track(enhanced.clone());
         enhanced
     } else {
         trimmed_file
@@ -298,8 +305,10 @@ where
             .context("Failed to mix music")?;
 
         if enhanced_file != output_file {
+            guard.untrack(&enhanced_file);
             let _ = fs::remove_file(&enhanced_file);
         }
+        guard.track(with_music.clone());
         with_music
     } else {
         enhanced_file
@@ -316,11 +325,14 @@ where
         )?;
 
         if with_music_file != output_file {
+            guard.untrack(&with_music_file);
             let _ = fs::remove_file(&with_music_file);
         }
+        guard.track(output_file.clone());
         output_file.clone()
     } else {
         if with_music_file != output_file {
+            guard.untrack(&with_music_file);
             fs::rename(&with_music_file, &output_file)?;
         }
         output_file.clone()
@@ -334,8 +346,10 @@ where
         info!("Stabilizing video");
         editor.stabilize(&current_file, &stabilized)?;
         if current_file != output_file {
+            guard.untrack(&current_file);
             let _ = fs::remove_file(&current_file);
         }
+        guard.track(stabilized.clone());
         current_file = stabilized;
     }
 
@@ -345,8 +359,10 @@ where
         info!("Color correcting");
         editor.color_correct(&current_file, &corrected)?;
         if current_file != output_file {
+            guard.untrack(&current_file);
             let _ = fs::remove_file(&current_file);
         }
+        guard.track(corrected.clone());
         current_file = corrected;
     }
 
@@ -356,12 +372,39 @@ where
         info!("Auto-reframing to vertical (9:16)");
         editor.reframe(&current_file, &reframed)?;
         if current_file != output_file {
+            guard.untrack(&current_file);
             let _ = fs::remove_file(&current_file);
         }
+        guard.track(reframed.clone());
         current_file = reframed;
     }
 
     if config.video.blur_background {
+        let blurred = output_file.with_extension("blurred.mp4");
+        report_progress(&mut progress, 0.97, "Blurring background");
+        info!("Blurring background");
+        editor.blur_background(&current_file, &blurred)?;
+        if current_file != output_file {
+            guard.untrack(&current_file);
+            let _ = fs::remove_file(&current_file);
+        }
+        guard.track(blurred.clone());
+        current_file = blurred;
+    }
+
+    // Move final temp file to output if needed
+    if current_file != output_file {
+        fs::rename(&current_file, &output_file)?;
+    }
+    guard.untrack(&output_file); // Don't delete the final output
+
+    report_progress(&mut progress, 0.99, "Writing exports");
+    export_additional_files(&input_file, &output_file, &processed_segments, config)?;
+
+    report_progress(&mut progress, 1.0, "Done");
+    info!(file = ?output_file, "Successfully saved video");
+    Ok(())
+}
         let blurred = output_file.with_extension("blurred.mp4");
         report_progress(&mut progress, 0.97, "Blurring background");
         info!("Blurring background");
