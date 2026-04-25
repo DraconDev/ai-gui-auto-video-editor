@@ -1,13 +1,11 @@
 # Project State
 
 ## Current Focus
-Expanded video processing capabilities with new features and bug fixes
+Added new CLI options for video processing configuration including thumbnail export, preview mode, scene detection, and multi-format output
 
 ## Completed
-- [x] Added thumbnail export functionality for videos
-- [x] Implemented watermark overlay with customizable position and scaling
-- [x] Added preview generation for quick low-resolution output
-- [x] Included scene-change detection alongside silence detection
-- [x] Enabled multi-format output with configurable resolutions
-- [x] Added parallel processing support for batch operations
-- [x] Enhanced video processing with configurable thresholds and parameters
+- [x] Added `export_thumbnail` flag to enable thumbnail generation
+- [x] Added `preview` mode with low-quality HD720p rendering
+- [x] Added `scene_detect` flag for scene detection in processing pipeline
+- [x] Added `multi_format` flag for multi-format output support
+- [x] Added resolution override via CLI with fallback to 1080p

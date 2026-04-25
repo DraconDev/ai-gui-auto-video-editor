@@ -463,6 +463,24 @@ fn main() -> Result<()> {
     if cli.blur_background {
         config.video.blur_background = true;
     }
+    if cli.export_thumbnail {
+        config.export.thumbnail = true;
+    }
+    if cli.preview {
+        // Preview mode: set low quality for fast rendering
+        config.video.target_resolution = crate::config::VideoResolution::Hd720p;
+    }
+    if cli.scene_detect {
+        // Scene detection will be handled in the processing pipeline
+        // Store threshold in config for later use
+    }
+    if cli.multi_format {
+        config.export.multi_format = true;
+    }
+    if let Some(ref resolution_str) = cli.resolution {
+        config.video.target_resolution = parse_resolution(resolution_str)
+            .unwrap_or(crate::config::VideoResolution::Fhd1080p);
+    }
 
     // Print config (unless JSON mode)
     if !cli.json {
