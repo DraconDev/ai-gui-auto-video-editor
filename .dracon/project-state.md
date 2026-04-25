@@ -1,8 +1,10 @@
 # Project State
 
 ## Current Focus
-Added watermark configuration options for video processing
+Added scene detection integration to batch processing pipeline
 
 ## Completed
-- [x] Added default watermark position ("bottom-right") configuration
-- [x] Added default watermark scale (1.0) configuration
+- [x] Integrated scene detection with silence detection when enabled
+- [x] Added fallback to silence-only processing if scene detection fails
+- [x] Adjusted progress reporting to account for additional processing step
+- [x] Maintained backward compatibility with existing silence-only workflow

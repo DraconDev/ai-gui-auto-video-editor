@@ -244,9 +244,28 @@ where
 
     info!(count = silences.len(), "Detected silent segments");
 
-    report_progress(&mut progress, 0.1, "Planning edits");
+    report_progress(&mut progress, 0.08, "Planning edits");
     let video_duration = duration_getter.get_duration(&input_file)?;
     debug!(duration = video_duration, "Video duration");
+
+    // Merge scene changes with silences if scene detection is enabled
+    let silences = if config.silence.scene_detect {
+        report_progress(&mut progress, 0.09, "Detecting scene changes");
+        match crate::scene_detection::detect_scene_changes(&input_file, config.silence.scene_threshold) {
+            Ok(scenes) => {
+                info!(count = scenes.len(), "Detected scene changes");
+                merge_silences_and_scenes(&silences, &scenes, video_duration)
+            }
+            Err(e) => {
+                warn!(error = %e, "Scene detection failed, using silence only");
+                silences
+            }
+        }
+    } else {
+        silences
+    };
+
+    report_progress(&mut progress, 0.1, "Planning edits");
 
     let processed_segments = calculate_keep_segments(
         &silences,
