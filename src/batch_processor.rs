@@ -57,7 +57,7 @@ pub struct ProcessingProgress {
 }
 
 // Trait for getting video duration
-pub trait DurationGetter {
+pub trait DurationGetter: Send + Sync {
     fn get_duration(&self, path: &Path) -> Result<f32>;
 }
 
