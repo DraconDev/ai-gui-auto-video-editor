@@ -1,9 +1,8 @@
 # Project State
 
 ## Current Focus
-Refactored GUI tab methods to be more modular and accessible across modules
+Dependency version updates for video processing features
 
 ## Completed
-- [x] Made all tab-related methods `pub(crate)` to enable cross-module access
-- [x] Improved code organization by making GUI drawing methods explicitly accessible
+- [x] Updated dependency versions in Cargo.lock for video processing features
 ```
