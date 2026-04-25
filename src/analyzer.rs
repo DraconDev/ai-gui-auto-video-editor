@@ -67,14 +67,14 @@ fn parse_ffmpeg_silence(output: &str) -> Vec<Segment> {
             && let Some(pos) = line.find("silence_end:")
         {
             let part = &line[pos + "silence_end:".len()..];
-            if let Some(pipe_pos) = part.find('|') {
-                let val_str = &part[..pipe_pos].trim();
-                if let Ok(end) = val_str.parse::<f32>() {
-                    segments.push(Segment { start, end });
-                }
+            let val_str = if let Some(pipe_pos) = part.find('|') {
+                &part[..pipe_pos].trim()
             } else {
-                let val_str = part.trim();
-                if let Ok(end) = val_str.parse::<f32>() {
+                part.trim()
+            };
+            if let Ok(end) = val_str.parse::<f32>() {
+                // Validate: end must be strictly greater than start
+                if end > start {
                     segments.push(Segment { start, end });
                 }
             }
