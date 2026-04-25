@@ -212,6 +212,10 @@ pub struct Cli {
     #[arg(long, default_value = "1")]
     pub parallel_workers: usize,
 
+    /// GPU encoding: nvenc, amf, vaapi, videotoolbox, none, auto
+    #[arg(long)]
+    pub gpu: Option<String>,
+
     /// Send desktop notifications on processing events
     #[arg(long)]
     pub notify: bool,
