@@ -549,7 +549,7 @@ fn main() -> Result<()> {
     }
 
     let analyzer = FfmpegAnalyzer;
-    let editor = FfmpegEditor;
+    let editor = FfmpegEditor::new(config.video.hw_accel);
     let duration_getter = FfmpegDurationGetter;
 
     if let Some(input) = input_file {
@@ -674,7 +674,7 @@ fn run_watch_mode(
     }
 
     let analyzer = FfmpegAnalyzer;
-    let editor = FfmpegEditor;
+    let editor = FfmpegEditor::new(config.video.hw_accel);
     let duration_getter = FfmpegDurationGetter;
 
     let mut heartbeat = 0u32;
@@ -810,7 +810,7 @@ fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
     println!("Press Ctrl+C to stop\n");
 
     let analyzer = FfmpegAnalyzer;
-    let editor = FfmpegEditor;
+    let editor = FfmpegEditor::new(config.video.hw_accel);
     let duration_getter = FfmpegDurationGetter;
     let video_extensions = ["mp4", "mov", "avi", "mkv", "webm"];
 

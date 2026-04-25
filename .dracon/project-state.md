@@ -1,8 +1,9 @@
 # Project State
 
 ## Current Focus
-Added hardware-accelerated codec parameter to video trim operations
+Enable hardware acceleration for video editing operations
 
 ## Completed
-- [x] feat(editor): Pass hardware-accelerated video codec to `run_trim_filter_job` for consistent encoding
+- [x] Updated `FfmpegEditor` initialization to include hardware acceleration configuration
+- [x] Applied hardware acceleration parameter across all video processing modes (single, watch, multi-watch)
 ```
