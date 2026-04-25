@@ -764,8 +764,6 @@ fn extract_highlight_clips(
     output_dir: &Path,
     clip_pattern: &str,
 ) -> Result<Vec<PathBuf>> {
-    use std::process::Command as Proc;
-
     // Analyze audio energy per transcript segment using ffprobe
     let mut segment_energy: Vec<(f32, f32, f32)> = Vec::new(); // (start, end, energy)
 
