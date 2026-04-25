@@ -46,6 +46,11 @@ impl VideoSttAnalyzer for CandleSttAnalyzer {
             .map_err(anyhow::Error::msg)
             .context("failed to load tokenizer")?;
 
+        // SAFETY: `from_mmaped_safetensors` is unsafe because it memory-maps the model weights
+        // file, creating a raw pointer to the file data. The file is read-only and the mapping
+        // lives as long as the VarBuilder. We ensure the weights file exists and is valid by
+        // checking the hf-hub download succeeded above. The unsafe block is necessary because
+        // candle_nn's API requires it for zero-copy model loading.
         let vb = unsafe {
             candle_nn::VarBuilder::from_mmaped_safetensors(
                 &[weights_filename],
