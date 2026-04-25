@@ -444,6 +444,48 @@ impl VideoEditor for FfmpegEditor {
             }
         };
 
+        self.run_reframe_filter(input, output, &filter)
+    }
+
+    fn run_reframe_filter(&self, input: &Path, output: &Path, filter: &str) -> Result<()> {
+        info!(filter = %filter, "Applying crop filter");
+
+        let status = Command::new("ffmpeg")
+            .args([
+                "-i",
+                input.to_str().context("invalid input path")?,
+                "-vf",
+                filter,
+                "-c:a",
+                "copy",
+                "-y",
+                output.to_str().context("invalid output path")?,
+            ])
+            .status()
+            .context("failed to execute ffmpeg")?;
+
+        if !status.success() {
+            anyhow::bail!("ffmpeg failed with status: {}", status);
+        }
+
+        Ok(())
+    }
+                        };
+
+                        processor.generate_crop_filter(&crop_regions, w, h)
+                    }
+                    Err(e) => {
+                        warn!(error = %e, "Face detection failed, using center crop");
+                        "crop=ih*9/16:ih,scale=1080:1920".to_string()
+                    }
+                }
+            }
+            Err(e) => {
+                warn!(error = %e, "Could not load face detection model, using center crop");
+                "crop=ih*9/16:ih,scale=1080:1920".to_string()
+            }
+        };
+
         info!(filter = %filter, "Applying crop filter");
 
         let status = Command::new("ffmpeg")
