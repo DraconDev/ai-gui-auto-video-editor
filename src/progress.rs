@@ -16,6 +16,7 @@ pub struct BatchProgress {
 
 impl BatchProgress {
     /// Load progress from a state file
+    #[must_use]
     pub fn from_file(path: &Path) -> Result<Self> {
         let content = std::fs::read_to_string(path)
             .with_context(|| format!("Failed to read progress file: {:?}", path))?;

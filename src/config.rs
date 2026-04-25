@@ -800,6 +800,7 @@ impl Config {
     }
 
     /// Merge another config into this one (other takes precedence)
+    #[must_use]
     pub fn merge(mut self, other: Self) -> Self {
         // Silence config - always take other's value for mode enum
         if other.silence.threshold_db != default_threshold_db() {

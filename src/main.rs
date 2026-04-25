@@ -496,13 +496,14 @@ fn main() -> Result<()> {
             println!("  Background music: {:?}", music);
         }
         println!(
-            "  Export: SRT={} Chapters={} FCPXML={} EDL={} Thumbnail={} MultiFormat={}",
+            "  Export: SRT={} Chapters={} FCPXML={} EDL={} Thumbnail={} MultiFormat={} Preview={}",
             config.export.subtitles,
             config.export.chapters,
             config.export.fcpxml,
             config.export.edl,
             config.export.thumbnail,
-            config.export.multi_format
+            config.export.multi_format,
+            config.export.preview
         );
         println!("  Resolution: {:?}", config.video.target_resolution);
         if cli.parallel_workers > 1 {
