@@ -9,6 +9,7 @@ pub mod exporter;
 pub mod ml;
 pub mod preset_rules;
 pub mod preview;
+pub mod progress;
 pub mod scene_detection;
 pub mod stt_analyzer;
 pub mod thumbnail;
