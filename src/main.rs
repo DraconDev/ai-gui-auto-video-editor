@@ -147,9 +147,6 @@ pub struct Cli {
     #[arg(long, hide = true, default_value = "5")]
     pub watch_interval: u64,
 
-    #[arg(long, hide = true)]
-    pub join: bool,
-
     /// Enable video stabilization (removes camera shake)
     #[arg(long)]
     pub stabilize: bool,
@@ -227,8 +224,8 @@ fn init_logging(verbose: u8, quiet: bool) {
     tracing_subscriber::fmt()
         .with_env_filter(
             tracing_subscriber::EnvFilter::new(filter)
-                .add_directive("candle=warn".parse().unwrap())
-                .add_directive("tract=warn".parse().unwrap()),
+                .add_directive("candle=warn".parse().expect("invalid directive candle=warn"))
+                .add_directive("tract=warn".parse().expect("invalid directive tract=warn")),
         )
         .with_target(false)
         .with_file(verbose >= 2)

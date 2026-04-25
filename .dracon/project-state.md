@@ -1,8 +1,9 @@
 # Project State
 
 ## Current Focus
-Refactored terminal detection to use Rust's standard library instead of libc
+Improved error handling in logging directives and removed hidden CLI option
 
 ## Completed
-- [x] Replaced `libc::isatty` with `std::io::stdout().is_terminal()` for more idiomatic terminal detection
+- [x] Fixed potential panic in logging directives by using `expect` instead of `unwrap`
+- [x] Removed hidden `--join` CLI option
 ```
