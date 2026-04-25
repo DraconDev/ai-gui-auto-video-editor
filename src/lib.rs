@@ -8,6 +8,7 @@ pub mod editor;
 pub mod exporter;
 pub mod ml;
 pub mod stt_analyzer;
+pub mod thumbnail;
 pub mod utils;
 
 pub use analyzer::FfmpegAnalyzer;
