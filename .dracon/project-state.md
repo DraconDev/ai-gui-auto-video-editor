@@ -1,11 +1,11 @@
 # Project State
 
 ## Current Focus
-Added video preview generation and enhanced batch processing with thumbnail and multi-format outputs
+Added filename-based preset selection system for automatic video processing configuration
 
 ## Completed
-- [x] Added video preview generation with configurable duration and resolution
-- [x] Implemented thumbnail generation for batch processing outputs
-- [x] Added multi-format output support with configurable resolutions
-- [x] Created new preview module with ffmpeg-based generation and path handling
+- [x] Created new `preset_rules` module with filename pattern matching
+- [x] Implemented case-insensitive substring matching for preset selection
+- [x] Added default rules for common platform naming conventions (Shorts, TikTok, Reels, etc.)
+- [x] Included comprehensive test cases for pattern matching and fallback behavior
 ```
