@@ -124,9 +124,11 @@ pub fn add_text_watermark(
         WatermarkPosition::Center => "x=(w-text_w)/2:y=(h-text_h)/2",
     };
 
+    let font_path = find_system_font().unwrap_or_else(|| "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf".to_string());
+
     let filter = format!(
-        "drawtext=text='{}':{}:fontsize={}:fontcolor={}@{}:fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
-        escaped_text, overlay_pos, font_size, color, opacity
+        "drawtext=text='{}':{}:fontsize={}:fontcolor={}@{}:fontfile={}",
+        escaped_text, overlay_pos, font_size, color, opacity, font_path
     );
 
     let status = Command::new("ffmpeg")

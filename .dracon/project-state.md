@@ -1,8 +1,9 @@
 # Project State
 
 ## Current Focus
-Added string parsing for watermark position configuration
+Improved font fallback handling in watermark text rendering
 
 ## Completed
-- [x] Implemented `from_str` method to parse position strings into `WatermarkPosition` enum variants
-- [x] Supported multiple string formats (full names, abbreviations, and shorthand) for all position types
+- [x] Added `find_system_font()` fallback for font path resolution
+- [x] Made font path configurable with default fallback to DejaVuSans.ttf
+- [x] Updated FFmpeg drawtext filter to use dynamic font path
