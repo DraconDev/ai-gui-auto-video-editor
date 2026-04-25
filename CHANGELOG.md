@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.68.8] - 2026-04-25
+
+### Fixed (Critical)
+- **Proc::new typo** in `batch_processor.rs:815` — changed to `Command::new` preventing highlight clip extraction crash
+- **Watermark position hardcoded** to `BottomRight` — now correctly parses config/CLI `--watermark-position`
+- **Hardcoded font path** `/usr/share/fonts/...` — now tries 10+ system font paths with recursive fallback
+- **Unicode truncation** in chapter titles — byte slicing `&title[..50]` → character-safe `chars().take(50)`
+- **XML escaping** in FCPXML export — filenames with `&`, `<`, `>`, `"` now produce valid XML
+- **`anyhow::Context` import placement** in `analyzer.rs` — moved from mid-file to module top
+- **`SystemTime::duration_since` silent failure** — `unwrap_or_default()` → `expect()` with clear message
+
+### Fixed (High)
+- **Release build optimization** — `opt-level = "s"` → `opt-level = 2` for better video processing speed
+- **Config::merge() missing fields** — added `scene_detect`, `scene_threshold`, `watermark`, `watermark_scale`, `watermark_position`, `thumbnail`, `multi_format`, `extra_resolutions`
+
+### Fixed (Medium)
+- **WalkDir depth limit** — added `.max_depth(5)` to prevent filesystem traversal
+- **Thumbnail frame sampling** — reduced from 1fps to 0.2fps (1/5th the IO for long videos)
+- **WatermarkPosition::from_str()** — added with tests for position parsing
+
 ## [0.38.0] - 2026-04-25
 
 ### Added
