@@ -1,4 +1,6 @@
 mod theme;
+mod processing;
+mod tabs;
 
 use eframe::egui;
 use egui::RichText;
@@ -466,7 +468,7 @@ impl AppState {
             return;
         }
 
-        let (rx, stop) = spawn_watcher(self.config.clone(), enabled_folders);
+        let (rx, stop) = processing::spawn_watcher(self.config.clone(), enabled_folders);
         self.watcher_rx = Some(rx);
         self.watcher_stop = Some(stop);
         self.status = ProcessingStatus::Watching;
