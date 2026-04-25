@@ -4,5 +4,5 @@
 Updated dependency versions in Cargo.lock for video processing features
 
 ## Completed
-- [x] Updated dependency versions in Cargo.lock to ensure compatibility with video processing features
+- [x] Updated dependency versions in Cargo.lock for video processing features
 ```
