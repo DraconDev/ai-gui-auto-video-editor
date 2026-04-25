@@ -1,11 +1,9 @@
 # Project State
 
 ## Current Focus
-Added safety documentation for unsafe memory-mapped model loading in the STT analyzer
+Added scene detection configuration options for video processing
 
 ## Completed
-- [x] Added safety comment explaining the unsafe block in `VarBuilder::from_mmaped_safetensors` for zero-copy model loading
-- [x] Documented that the unsafe operation is safe because:
-  - The weights file is validated before loading
-  - The memory mapping is read-only
-  - The lifetime is tied to the VarBuilder instance
+- [x] Added `scene_detect` boolean flag to enable/disable scene detection
+- [x] Added `scene_threshold` configuration with default value
+```

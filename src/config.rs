@@ -163,6 +163,14 @@ pub struct SilenceConfig {
     /// Only speedup silences longer than this (seconds)
     #[serde(default = "default_min_silence_for_speedup")]
     pub min_silence_for_speedup: f32,
+
+    /// Enable scene-change detection to augment silence-based cuts
+    #[serde(default)]
+    pub scene_detect: bool,
+
+    /// Scene detection threshold (0.0-1.0, higher = fewer scenes)
+    #[serde(default = "default_scene_threshold")]
+    pub scene_threshold: f32,
 }
 
 fn default_threshold_db() -> f32 {
