@@ -293,6 +293,7 @@ cargo build --features cli,gui
 | Silence trimming | Done |
 | Speedup mode | Done |
 | Batch processing | Done |
+| **Parallel batch processing** | Done |
 | TOML config | Done |
 | Audio enhancement | Done |
 | Noise reduction | Done |
@@ -300,11 +301,17 @@ cargo build --features cli,gui
 | Intro/Outro | Done |
 | Video stabilization | Done |
 | Auto color correction | Done |
+| **Scene-change detection** | Done |
 | Preset profiles | Done |
+| **Social media presets** (TikTok, Reels, Twitter) | Done |
 | Watch mode | Done |
 | Dry run | Done |
 | JSON output | Done |
 | Export formats | Done |
+| **Thumbnail generation** | Done |
+| **Watermark overlay** | Done |
+| **Preview generation** | Done |
+| **Multi-format output** | Done |
 | Whisper STT | Done |
 | Filler word removal | Done |
 | Auto-reframe | Done |

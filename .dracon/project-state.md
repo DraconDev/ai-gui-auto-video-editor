@@ -1,10 +1,13 @@
 # Project State
 
 ## Current Focus
-Added new video processing configuration options for resolution and thumbnail generation
+Updated README.md with new video processing features and enhancements
 
 ## Completed
-- [x] Added target resolution configuration with options for HD, FHD, QHD, UHD, and vertical formats
-- [x] Added thumbnail generation configuration with customizable dimensions
-- [x] Added multi-format output capability with additional resolution options
-- [x] Updated documentation with new video processing configuration parameters
+- [x] Added parallel batch processing capability
+- [x] Added scene-change detection
+- [x] Added social media presets (TikTok, Reels, Twitter)
+- [x] Added thumbnail generation
+- [x] Added watermark overlay
+- [x] Added preview generation
+- [x] Added multi-format output
