@@ -1,8 +1,7 @@
 # Project State
 
 ## Current Focus
-Dependency version updates for video processing features
+Refactored batch processing chunk calculation for more accurate parallel workload distribution
 
 ## Completed
-- [x] Updated Cargo.lock with dependency version changes for video processing features
-```
+- [x] Replaced manual chunk calculation with `div_ceil` for precise batch distribution across workers

@@ -862,7 +862,7 @@ where
 
     // Split files into chunks for each worker
     let chunks: Vec<Vec<PathBuf>> = video_files
-        .chunks((total_files + worker_count - 1) / worker_count)
+        .chunks(total_files.div_ceil(worker_count))
         .map(|c| c.to_vec())
         .collect();
 
