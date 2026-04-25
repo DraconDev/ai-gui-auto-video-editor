@@ -640,7 +640,7 @@ impl Config {
 
     /// Merge another config into this one (other takes precedence)
     pub fn merge(mut self, other: Self) -> Self {
-        // Silence config
+        // Silence config - always take other's value for mode enum
         if other.silence.threshold_db != default_threshold_db() {
             self.silence.threshold_db = other.silence.threshold_db;
         }
@@ -650,9 +650,8 @@ impl Config {
         if other.silence.padding != default_padding() {
             self.silence.padding = other.silence.padding;
         }
-        if other.silence.mode != SilenceMode::Cut {
-            self.silence.mode = other.silence.mode;
-        }
+        // Always take other's mode (allows switching between Cut and Speedup in both directions)
+        self.silence.mode = other.silence.mode;
         if other.silence.speedup_factor != default_speedup_factor() {
             self.silence.speedup_factor = other.silence.speedup_factor;
         }
@@ -660,10 +659,8 @@ impl Config {
             self.silence.min_silence_for_speedup = other.silence.min_silence_for_speedup;
         }
 
-        // Filler words config
-        if !other.filler_words.enabled {
-            self.filler_words.enabled = other.filler_words.enabled;
-        }
+        // Filler words config - always take other's boolean values
+        self.filler_words.enabled = other.filler_words.enabled;
         if !other.filler_words.words.is_empty() {
             self.filler_words.words = other.filler_words.words;
         }
@@ -671,10 +668,9 @@ impl Config {
             self.filler_words.padding = other.filler_words.padding;
         }
 
-        // Audio config
-        if !other.audio.enhance {
-            self.audio.enhance = other.audio.enhance;
-        }
+        // Audio config - always take other's boolean values
+        self.audio.enhance = other.audio.enhance;
+        self.audio.noise_reduction = other.audio.noise_reduction;
         if other.audio.target_lufs != default_target_lufs() {
             self.audio.target_lufs = other.audio.target_lufs;
         }
@@ -685,18 +681,21 @@ impl Config {
             self.audio.duck_volume = other.audio.duck_volume;
         }
 
-        // Export config
-        if other.export.subtitles {
-            self.export.subtitles = true;
+        // Export config - always take other's boolean values
+        self.export.subtitles = other.export.subtitles;
+        self.export.captions = other.export.captions;
+        self.export.chapters = other.export.chapters;
+        self.export.clips = other.export.clips;
+        self.export.fcpxml = other.export.fcpxml;
+        self.export.edl = other.export.edl;
+        if other.export.clip_count != default_clip_count() {
+            self.export.clip_count = other.export.clip_count;
         }
-        if other.export.chapters {
-            self.export.chapters = true;
+        if other.export.clip_min_duration != default_clip_min_duration() {
+            self.export.clip_min_duration = other.export.clip_min_duration;
         }
-        if other.export.fcpxml {
-            self.export.fcpxml = true;
-        }
-        if other.export.edl {
-            self.export.edl = true;
+        if other.export.clip_max_duration != default_clip_max_duration() {
+            self.export.clip_max_duration = other.export.clip_max_duration;
         }
 
         // Paths config
@@ -728,26 +727,25 @@ impl Config {
             self.paths.watch_folders = other.paths.watch_folders;
         }
 
-        // Watch config
-        if other.watch.enabled {
-            self.watch.enabled = true;
-        }
+        // Watch config - always take other's boolean values
+        self.watch.enabled = other.watch.enabled;
         if other.watch.interval != default_watch_interval() {
             self.watch.interval = other.watch.interval;
         }
 
-        // Video config
-        if other.video.stabilize {
-            self.video.stabilize = true;
+        // Video config - always take other's boolean values
+        self.video.stabilize = other.video.stabilize;
+        self.video.color_correct = other.video.color_correct;
+        self.video.reframe = other.video.reframe;
+        self.video.blur_background = other.video.blur_background;
+
+        // Processing config
+        self.processing.join_mode = other.processing.join_mode;
+        if other.processing.join_after_count != default_join_after_count() {
+            self.processing.join_after_count = other.processing.join_after_count;
         }
-        if other.video.color_correct {
-            self.video.color_correct = true;
-        }
-        if other.video.reframe {
-            self.video.reframe = true;
-        }
-        if other.video.blur_background {
-            self.video.blur_background = true;
+        if other.processing.join_output_pattern != default_join_pattern() {
+            self.processing.join_output_pattern = other.processing.join_output_pattern;
         }
 
         self
