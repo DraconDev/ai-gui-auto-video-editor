@@ -1,8 +1,9 @@
 # Project State
 
 ## Current Focus
-Refactored float value formatting in configuration handling for cleaner output
+Refactored scene detection timestamp parsing for cleaner code structure
 
 ## Completed
-- [x] Consolidated float value parsing and rounding logic into a single conditional block
-- [x] Maintained same functionality while reducing code duplication in float value formatting
+- [x] Consolidated timestamp parsing logic into a single conditional block
+- [x] Improved readability by reducing nested if statements
+- [x] Maintained same functionality while reducing code complexity

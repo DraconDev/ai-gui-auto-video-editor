@@ -33,17 +33,15 @@ fn parse_scene_changes(ffmpeg_output: &str) -> Vec<f32> {
 
     for line in ffmpeg_output.lines() {
         // Look for pts_time in showinfo output
-        if line.contains("pts_time:") {
-            if let Some(pos) = line.find("pts_time:") {
-                let val_str = &line[pos + "pts_time:".len()..].trim();
-                // Extract just the number (may have trailing text)
-                let num_str: String = val_str
-                    .chars()
-                    .take_while(|c| c.is_ascii_digit() || *c == '.')
-                    .collect();
-                if let Ok(timestamp) = num_str.parse::<f32>() {
-                    scenes.push(timestamp);
-                }
+        if line.contains("pts_time:") && let Some(pos) = line.find("pts_time:") {
+            let val_str = &line[pos + "pts_time:".len()..].trim();
+            // Extract just the number (may have trailing text)
+            let num_str: String = val_str
+                .chars()
+                .take_while(|c| c.is_ascii_digit() || *c == '.')
+                .collect();
+            if let Ok(timestamp) = num_str.parse::<f32>() {
+                scenes.push(timestamp);
             }
         }
     }
