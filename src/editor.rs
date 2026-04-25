@@ -538,7 +538,7 @@ impl VideoEditor for FfmpegEditor {
     }
 }
 
-fn run_trim_filter_job(input: &Path, output: &Path, segments: &[ProcessedSegment]) -> Result<()> {
+fn run_trim_filter_job(input: &Path, output: &Path, segments: &[ProcessedSegment], codec: &str) -> Result<()> {
     let (v_filter, a_filter) = generate_trim_filters(segments);
 
     let status = Command::new("ffmpeg")
@@ -552,7 +552,7 @@ fn run_trim_filter_job(input: &Path, output: &Path, segments: &[ProcessedSegment
             "-map",
             "[outa]",
             "-c:v",
-            "libx264",
+            codec,
             "-preset",
             "veryfast",
             "-crf",

@@ -1,10 +1,8 @@
 # Project State
 
 ## Current Focus
-Added hardware acceleration configuration to FfmpegEditor for video processing
+Added codec parameter to `run_trim_filter_job` for flexible video encoding
 
 ## Completed
-- [x] Implemented `HwAccel` configuration in `FfmpegEditor` struct
-- [x] Added `Default` implementation with `HwAccel::None` as default
-- [x] Created `new()` constructor for explicit hardware acceleration setup
-- [x] Integrated hardware acceleration support for video processing operations
+- [x] Modified `run_trim_filter_job` to accept a codec parameter instead of hardcoding "libx264"
+- [x] Enabled dynamic codec selection for video processing operations
