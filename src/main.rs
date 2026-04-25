@@ -482,6 +482,9 @@ fn main() -> Result<()> {
         // Also lower target resolution for faster full render
         config.video.target_resolution = crate::config::VideoResolution::Hd720p;
     }
+    if let Some(duration) = cli.preview_duration {
+        config.export.preview_duration = duration;
+    }
     if cli.scene_detect {
         // Scene detection will be handled in the processing pipeline
         // Store threshold in config for later use
