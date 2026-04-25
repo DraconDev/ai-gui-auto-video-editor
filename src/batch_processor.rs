@@ -405,28 +405,6 @@ where
     info!(file = ?output_file, "Successfully saved video");
     Ok(())
 }
-        let blurred = output_file.with_extension("blurred.mp4");
-        report_progress(&mut progress, 0.97, "Blurring background");
-        info!("Blurring background");
-        editor.blur_background(&current_file, &blurred)?;
-        if current_file != output_file {
-            let _ = fs::remove_file(&current_file);
-        }
-        current_file = blurred;
-    }
-
-    let final_file = output_file.clone();
-    if current_file != final_file {
-        fs::rename(&current_file, &final_file)?;
-    }
-
-    report_progress(&mut progress, 0.99, "Writing exports");
-    export_additional_files(&input_file, &final_file, &processed_segments, config)?;
-
-    report_progress(&mut progress, 1.0, "Done");
-    info!(file = ?final_file, "Successfully saved video");
-    Ok(())
-}
 
 fn report_progress<F>(progress: &mut F, fraction: f32, stage: impl Into<String>)
 where
