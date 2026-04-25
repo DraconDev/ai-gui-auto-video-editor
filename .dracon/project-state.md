@@ -1,9 +1,10 @@
 # Project State
 
 ## Current Focus
-Improved floating-point precision handling in configuration serialization
+Improved EDL export with configurable frame rate support
 
 ## Completed
-- [x] Added explicit list of known float configuration keys to prevent accidental rounding of non-float values
-- [x] Modified float serialization to only round values for explicitly defined float fields
-- [x] Maintained original behavior for non-float configuration values
+- [x] Added frame rate parameter to `export_edl` function
+- [x] Updated `seconds_to_timecode` to use configurable FPS instead of hardcoded 25fps
+- [x] Improved timecode calculation with proper rounding of frames
+- [x] Updated documentation to reflect the new parameter

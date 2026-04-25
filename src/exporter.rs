@@ -64,6 +64,7 @@ pub fn export_edl(
     segments: &[ProcessedSegment],
     input_path: &Path,
     output_path: &Path,
+    fps: f32,
 ) -> Result<()> {
     let filename = input_path
         .file_name()
@@ -74,8 +75,8 @@ pub fn export_edl(
     edl.push_str("FCM: NON-DROP FRAME\n\n");
 
     for (i, seg) in segments.iter().enumerate() {
-        let (src_start_h, src_start_m, src_start_s, src_start_f) = seconds_to_timecode(seg.start);
-        let (src_end_h, src_end_m, src_end_s, src_end_f) = seconds_to_timecode(seg.end);
+        let (src_start_h, src_start_m, src_start_s, src_start_f) = seconds_to_timecode(seg.start, fps);
+        let (src_end_h, src_end_m, src_end_s, src_end_f) = seconds_to_timecode(seg.end, fps);
         edl.push_str(&format!(
             "{:03}  AX       V     C        {:02}:{:02}:{:02}:{:02} {:02}:{:02}:{:02}:{:02}\n",
             i + 1,
@@ -89,12 +90,12 @@ pub fn export_edl(
     Ok(())
 }
 
-/// Convert seconds to SMPTE timecode (HH:MM:SS:FF) assuming 25fps
-fn seconds_to_timecode(seconds: f32) -> (u32, u32, u32, u32) {
+/// Convert seconds to SMPTE timecode (HH:MM:SS:FF)
+fn seconds_to_timecode(seconds: f32, fps: f32) -> (u32, u32, u32, u32) {
     let hours = (seconds / 3600.0) as u32;
     let minutes = ((seconds % 3600.0) / 60.0) as u32;
     let secs = (seconds % 60.0) as u32;
-    let frames = ((seconds % 1.0) * 25.0) as u32; // Assume 25fps
+    let frames = ((seconds % 1.0) * fps).round() as u32;
     (hours, minutes, secs, frames)
 }
 
