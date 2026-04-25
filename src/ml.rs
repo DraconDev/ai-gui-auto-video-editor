@@ -468,10 +468,16 @@ pub struct CropRegion {
 }
 
 impl CropRegion {
-    /// Create a center crop for 9:16 aspect ratio from 16:9 video
-    pub fn center_crop_9_16() -> Self {
-        // For 16:9 -> 9:16, we crop to 9/16 of the width
-        let crop_width = 9.0 / 16.0; // ~0.56 of original width
+    /// Create a center crop for 9:16 aspect ratio from any video
+    pub fn center_crop_9_16(video_aspect: f32) -> Self {
+        // Target aspect = 9/16 = 0.5625 (vertical video)
+        // For a video with aspect = w/h, crop width ratio = target_aspect / video_aspect
+        let target_aspect = 9.0 / 16.0;
+        let crop_width = if video_aspect > 0.0 {
+            (target_aspect / video_aspect).min(1.0)
+        } else {
+            target_aspect
+        };
         Self {
             x: (1.0 - crop_width) / 2.0, // Center horizontally
             y: 0.0,
@@ -547,7 +553,7 @@ impl AutoReframeProcessor {
                 CropRegion::from_face(main_face, video_aspect)
             } else {
                 // No face detected, use center crop
-                CropRegion::center_crop_9_16()
+                CropRegion::center_crop_9_16(video_aspect)
             };
 
             crop_regions.push((timestamp, crop));

@@ -1,10 +1,10 @@
 # Project State
 
 ## Current Focus
-Improved error handling for audio extraction in STT analyzer
+Improved center crop functionality to handle variable video aspect ratios
 
 ## Completed
-- [x] Added explicit error handling for ffmpeg failures in audio extraction
-- [x] Added validation for ffmpeg command success status
-- [x] Modified chunk processing to handle short final chunks only when they're not the first chunk
-```
+- [x] Modified `center_crop_9_16()` to accept video aspect ratio parameter
+- [x] Added dynamic calculation of crop width based on input aspect ratio
+- [x] Updated face detection fallback to use the new aspect-aware crop method
+- [x] Added bounds checking to prevent invalid crop calculations
