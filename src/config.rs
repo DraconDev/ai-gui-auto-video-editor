@@ -79,7 +79,7 @@ impl Preset {
                 config.video.reframe = true;
                 config.video.target_resolution = VideoResolution::Vertical1080p;
                 config.export.clips = true;
-                config.export.clip_max_duration = 90;
+                config.export.clip_max_duration = 90.0;
             }
             Preset::Podcast => {
                 // Podcast: cut silences, enhance audio, generate subtitles
@@ -97,7 +97,7 @@ impl Preset {
                 config.audio.enhance = true;
                 config.video.target_resolution = VideoResolution::Fhd1080p;
                 config.export.clips = true;
-                config.export.clip_max_duration = 140; // 2:20
+                config.export.clip_max_duration = 140.0; // 2:20
             }
             Preset::Minimal => {
                 // Just silence detection, nothing else

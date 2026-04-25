@@ -51,9 +51,9 @@ pub fn add_watermark(
         format!("[1:v]format=rgba[wm];[0:v][wm]overlay={}", overlay_pos)
     } else {
         format!(
-            "[1:v]scale=iw*{scale}:ih*{scale},format=rgba[wm];[0:v][wm]overlay={}",
-            scale = scale,
-            overlay_pos = overlay_pos
+            "[1:v]scale=iw*{scale_val}:ih*{scale_val},format=rgba[wm];[0:v][wm]overlay={overlay}",
+            scale_val = scale,
+            overlay = overlay_pos
         )
     };
 
