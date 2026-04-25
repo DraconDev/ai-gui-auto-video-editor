@@ -398,6 +398,9 @@ pub fn settings_value_badge(ui: &mut egui::Ui, value: &str) {
 pub fn truncate_path(path: &str, max_len: usize) -> String {
     if path.len() <= max_len {
         path.to_string()
+    } else if max_len < 7 {
+        // Too short to show anything meaningful, just truncate
+        path.chars().take(max_len).collect()
     } else {
         let start = &path[..max_len / 2 - 2];
         let end = &path[path.len() - max_len / 2 + 2..];
