@@ -1,8 +1,9 @@
 # Project State
 
 ## Current Focus
-Refactored folder watching logic into dedicated modules for better organization
+Removed folder watching and video processing logic from the GUI module
 
 ## Completed
-- [x] Moved watcher functionality to `processing::spawn_watcher` for better separation of concerns
-- [x] Added new modules `processing` and `tabs` to organize related functionality
+- [x] Removed all folder watching functionality including the watcher thread, event handling, and processing pipeline
+- [x] Eliminated video file processing logic that included intro/outro insertion, progress tracking, and status updates
+- [x] Deleted the complete folder monitoring system that previously handled directory scanning and file processing
