@@ -1,9 +1,9 @@
 # Project State
 
 ## Current Focus
-Improved thread safety and error handling in the watcher restart mechanism
+Improved error handling in watcher folder creation and directory reading by checking send results
 
 ## Completed
-- [x] Added 10ms delay between stopping old watcher thread and starting new one to prevent race conditions
-- [x] Enhanced error handling in watcher initialization by checking send() results and exiting early if channel is disconnected
-- [x] Maintained consistent logging and status updates while improving robustness
+- [x] Added explicit error checking for `tx.send()` calls in folder creation and directory reading
+- [x] Changed from silent error handling to explicit return on channel send failures
+- [x] Maintained same error logging behavior while adding thread safety checks

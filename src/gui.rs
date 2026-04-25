@@ -593,40 +593,46 @@ fn watch_folders_loop(
             }
 
             if let Err(err) = std::fs::create_dir_all(&folder.input) {
-                let _ = tx.send(WatcherEvent::Log {
+                if tx.send(WatcherEvent::Log {
                     message: format!(
                         "Failed to create input folder {}: {}",
                         folder.input.display(),
                         err
                     ),
                     success: false,
-                });
+                }).is_err() {
+                    return;
+                }
                 continue;
             }
 
             if let Err(err) = std::fs::create_dir_all(&folder.output) {
-                let _ = tx.send(WatcherEvent::Log {
+                if tx.send(WatcherEvent::Log {
                     message: format!(
                         "Failed to create output folder {}: {}",
                         folder.output.display(),
                         err
                     ),
                     success: false,
-                });
+                }).is_err() {
+                    return;
+                }
                 continue;
             }
 
             let entries = match std::fs::read_dir(&folder.input) {
                 Ok(entries) => entries,
                 Err(err) => {
-                    let _ = tx.send(WatcherEvent::Log {
+                    if tx.send(WatcherEvent::Log {
                         message: format!(
                             "Failed to read watch folder {}: {}",
                             folder.input.display(),
                             err
                         ),
                         success: false,
-                    });
+                    }).is_err() {
+                        return;
+                    }
                     continue;
                 }
             };
