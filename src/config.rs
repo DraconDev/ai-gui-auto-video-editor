@@ -603,6 +603,18 @@ pub struct VideoConfig {
     /// Target output resolution
     #[serde(default)]
     pub target_resolution: VideoResolution,
+
+    /// Path to watermark image (PNG with alpha recommended)
+    #[serde(default)]
+    pub watermark: Option<PathBuf>,
+
+    /// Watermark position
+    #[serde(default = "default_watermark_position")]
+    pub watermark_position: String,
+
+    /// Watermark scale factor
+    #[serde(default = "default_watermark_scale")]
+    pub watermark_scale: f32,
 }
 
 /// Join mode for combining processed videos
