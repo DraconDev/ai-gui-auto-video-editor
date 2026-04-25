@@ -733,7 +733,7 @@ fn chain_atempo_filters(speed: f32) -> String {
     const ATEMPO_MIN: f32 = 0.5;
     const ATEMPO_MAX: f32 = 2.0;
 
-    if speed >= ATEMPO_MIN && speed <= ATEMPO_MAX {
+    if (ATEMPO_MIN..=ATEMPO_MAX).contains(&speed) {
         return format!("atempo={}", speed);
     }
 
