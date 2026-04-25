@@ -439,7 +439,7 @@ impl AppState {
 
     fn restart_watcher(&mut self) {
         if let Some(stop) = self.watcher_stop.take() {
-            stop.store(true, Ordering::Relaxed);
+            stop.store(true, Ordering::SeqCst);
         }
 
         let enabled_folders: Vec<FolderState> =
@@ -543,7 +543,7 @@ impl AppState {
 impl Drop for AppState {
     fn drop(&mut self) {
         if let Some(stop) = self.watcher_stop.take() {
-            stop.store(true, Ordering::Relaxed);
+            stop.store(true, Ordering::SeqCst);
         }
     }
 }
@@ -580,9 +580,9 @@ fn watch_folders_loop(
     });
     let _ = tx.send(WatcherEvent::Status(ProcessingStatus::Watching));
 
-    while !stop.load(Ordering::Relaxed) {
+    while !stop.load(Ordering::SeqCst) {
         for folder in &folders {
-            if stop.load(Ordering::Relaxed) {
+            if stop.load(Ordering::SeqCst) {
                 return;
             }
 
@@ -626,7 +626,7 @@ fn watch_folders_loop(
             };
 
             for entry in entries.flatten() {
-                if stop.load(Ordering::Relaxed) {
+                if stop.load(Ordering::SeqCst) {
                     return;
                 }
 
@@ -697,7 +697,7 @@ fn watch_folders_loop(
         let _ = tx.send(WatcherEvent::Status(ProcessingStatus::Watching));
 
         for _ in 0..poll_interval.as_millis().div_ceil(250) {
-            if stop.load(Ordering::Relaxed) {
+            if stop.load(Ordering::SeqCst) {
                 return;
             }
             std::thread::sleep(Duration::from_millis(250));
