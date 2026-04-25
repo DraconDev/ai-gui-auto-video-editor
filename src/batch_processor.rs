@@ -12,6 +12,42 @@ use crate::exporter;
 use crate::stt_analyzer::{CandleSttAnalyzer, TranscriptSegment, VideoSttAnalyzer};
 use crate::utils::find_video_files;
 
+/// RAII guard for cleaning up temporary video files on drop.
+/// Tracks intermediate files and removes them when the guard goes out of scope.
+struct TempFileGuard<'a> {
+    temps: Vec<&'a Path>,
+    output: &'a Path,
+}
+
+impl<'a> TempFileGuard<'a> {
+    fn new(output: &'a Path) -> Self {
+        Self {
+            temps: Vec::new(),
+            output,
+        }
+    }
+
+    fn track(&mut self, path: &'a Path) {
+        if path != self.output {
+            self.temps.push(path);
+        }
+    }
+
+    fn untrack(&mut self, path: &Path) {
+        self.temps.retain(|p| *p != path);
+    }
+}
+
+impl<'a> Drop for TempFileGuard<'a> {
+    fn drop(&mut self) {
+        for path in &self.temps {
+            if let Err(e) = fs::remove_file(path) {
+                debug!(path = ?path, error = %e, "Failed to remove temp file");
+            }
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct ProcessingProgress {
     pub fraction: f32,
