@@ -1,8 +1,7 @@
 # Project State
 
 ## Current Focus
-Added conditional hardware acceleration configuration merging in video settings
+Updated dependency versions in Cargo.lock for video processing features
 
 ## Completed
-- [x] Implemented selective hardware acceleration configuration updates when merging settings
-- [x] Only applies hardware acceleration settings if they're explicitly set (not default/None)
+- [x] Updated Cargo.lock with new dependency versions for video processing features
