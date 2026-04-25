@@ -1,8 +1,10 @@
 # Project State
 
 ## Current Focus
-Updated video processing presets in CLI documentation to include new platforms (TikTok, Twitter, Reels)
+Updated CLI documentation with new video processing features and parallel batch processing options
 
 ## Completed
-- [x] Added new preset options (`tiktok`, `reels`, `twitter`) to CLI documentation for better platform support
-- [x] Maintained existing presets (`youtube`, `shorts`, `podcast`, `minimal`) while expanding options
+- [x] Added new CLI options for video processing including export thumbnail, watermark controls, and multi-format output
+- [x] Documented parallel batch processing capabilities with worker configuration
+- [x] Included scene detection and resolution options in CLI documentation
+```

@@ -143,7 +143,16 @@ The GUI provides a visual interface for managing watch folders and settings.
 | `--color-correct` | Enable auto color correction |
 | `--reframe` | Auto-reframe to vertical (9:16) |
 | `--blur-background` | Blur background behind speaker |
-| `--remove-fillers` | Remove filler words (um, uh, etc.) |
+| `--export-thumbnail` | Generate thumbnail image for YouTube |
+| `--watermark <FILE>` | Add watermark image overlay |
+| `--watermark-position <POS>` | Watermark position (top-left, top-right, bottom-left, bottom-right, center) |
+| `--watermark-scale <FLOAT>` | Watermark scale factor (default: 1.0) |
+| `--preview` | Generate a quick low-resolution preview |
+| `--scene-detect` | Use scene-change detection in addition to silence |
+| `--scene-threshold <FLOAT>` | Scene detection threshold (default: 0.3) |
+| `--multi-format` | Generate multiple resolution outputs simultaneously |
+| `--resolution <RES>` | Target resolution (720p, 1080p, 1440p, 4k, vertical-1080p, vertical-720p) |
+| `--parallel-workers <N>` | Parallel batch processing workers (default: 1) |
 
 ### Export Options
 
