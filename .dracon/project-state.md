@@ -1,10 +1,10 @@
 # Project State
 
 ## Current Focus
-Added preview mode configuration with lower resolution for faster rendering
+Added preview generation for batch exports when enabled in configuration
 
 ## Completed
-- [x] Added `preview` flag to export configuration in `main.rs`
-- [x] Lowered target resolution to 720p when in preview mode
-- [x] Added `BatchProgress` import to `batch_processor.rs` for progress tracking
+- [x] Added conditional preview generation when `config.export.preview` is true
+- [x] Implemented preview generation with fixed 30.0s duration and 480px width
+- [x] Added error handling for preview generation failures with warning logging
 ```
