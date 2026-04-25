@@ -11,6 +11,7 @@ pub mod batch_processor;
 pub mod config;
 pub mod editor;
 pub mod exporter;
+pub mod hwaccel;
 pub mod ml;
 pub mod preset_rules;
 pub mod preview;

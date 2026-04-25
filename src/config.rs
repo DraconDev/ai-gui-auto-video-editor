@@ -615,6 +615,10 @@ pub struct VideoConfig {
     #[serde(default)]
     pub target_resolution: VideoResolution,
 
+    /// Hardware acceleration for encoding
+    #[serde(default)]
+    pub hw_accel: crate::hwaccel::HwAccel,
+
     /// Path to watermark image (PNG with alpha recommended)
     #[serde(default)]
     pub watermark: Option<PathBuf>,
