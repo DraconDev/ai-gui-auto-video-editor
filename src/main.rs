@@ -1103,6 +1103,23 @@ fn handle_dry_run(cli: &Cli, config: &Config) -> Result<()> {
     Ok(())
 }
 
+/// Parse a resolution string into VideoResolution
+fn parse_resolution(s: &str) -> Option<crate::config::VideoResolution> {
+    match s.to_lowercase().as_str() {
+        "720p" | "hd" | "hd720p" => Some(crate::config::VideoResolution::Hd720p),
+        "1080p" | "fhd" | "fhd1080p" | "fullhd" => Some(crate::config::VideoResolution::Fhd1080p),
+        "1440p" | "qhd" | "qhd1440p" | "2k" => Some(crate::config::VideoResolution::Qhd1440p),
+        "4k" | "uhd" | "uhd4k" | "2160p" => Some(crate::config::VideoResolution::Uhd4k),
+        "vertical-1080p" | "vertical1080p" | "1080x1920" | "shorts" | "reels" | "tiktok" => {
+            Some(crate::config::VideoResolution::Vertical1080p)
+        }
+        "vertical-720p" | "vertical720p" | "720x1280" => {
+            Some(crate::config::VideoResolution::Vertical720p)
+        }
+        _ => None,
+    }
+}
+
 #[cfg(feature = "gui")]
 fn run_gui() -> Result<()> {
     use eframe::egui;
