@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Improved loudness normalization stats parsing with validation for finite numbers
+Refactored terminal detection to use Rust's standard library instead of libc
 
 ## Completed
-- [x] Added validation for finite numbers in loudness normalization stats
-- [x] Improved error handling by rejecting NaN/infinite values in audio processing metrics
+- [x] Replaced `libc::isatty` with `std::io::stdout().is_terminal()` for more idiomatic terminal detection
+```

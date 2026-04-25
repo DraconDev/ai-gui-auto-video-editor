@@ -289,7 +289,7 @@ fn main() -> Result<()> {
         && !has_watch_folders
     {
         // Check if running from terminal (TTY) or launched from desktop
-        let is_tty = unsafe { libc::isatty(libc::STDOUT_FILENO) != 0 };
+        let is_tty = std::io::stdout().is_terminal();
 
         #[cfg(feature = "gui")]
         if !is_tty {
