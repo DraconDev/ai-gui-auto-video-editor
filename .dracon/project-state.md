@@ -1,9 +1,13 @@
 # Project State
 
 ## Current Focus
-Refactored configuration validation to use Result type for error handling
+Added comprehensive configuration validation warnings for video processing features
 
 ## Completed
-- [x] Changed `validate()` method to return `Result<()>` instead of void
-- [x] Removed all validation logic from the method (now handled elsewhere)
-- [x] Kept the method signature but made it return a Result type
+- [x] Added warning when both reframe and blur_background are enabled
+- [x] Added info message for vertical resolutions without reframe
+- [x] Added info message for reframe with landscape resolutions
+- [x] Added info message for captions export without subtitles
+- [x] Added warning for multi-format export without extra resolutions
+- [x] Added info message for noise reduction without audio enhancement
+- [x] Added warning for invalid speedup factor in silence mode

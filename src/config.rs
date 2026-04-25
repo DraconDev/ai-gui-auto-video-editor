@@ -935,6 +935,56 @@ impl Config {
         if self.watch.interval == 0 {
             anyhow::bail!("watch.interval must be > 0 (got 0)");
         }
+
+        // Warn about incompatible feature combinations
+        if self.video.reframe && self.video.blur_background {
+            tracing::warn!(
+                "Both reframe and blur_background are enabled. Blur background will be applied after reframing."
+            );
+        }
+
+        match self.video.target_resolution {
+            VideoResolution::Vertical1080p | VideoResolution::Vertical720p => {
+                if !self.video.reframe {
+                    tracing::info!(
+                        "Vertical resolution selected but reframe is not enabled. Output may have black bars."
+                    );
+                }
+            }
+            _ => {
+                if self.video.reframe {
+                    tracing::info!(
+                        "Reframe is enabled but target resolution is landscape. Consider using a vertical resolution preset."
+                    );
+                }
+            }
+        }
+
+        if self.export.captions && !self.export.subtitles {
+            tracing::info!(
+                "Captions export enabled without subtitles. Transcription will still be performed for captions."
+            );
+        }
+
+        if self.export.multi_format && self.export.extra_resolutions.is_empty() {
+            tracing::warn!(
+                "Multi-format export enabled but no extra resolutions specified. Only the target resolution will be output."
+            );
+        }
+
+        if self.audio.noise_reduction && !self.audio.enhance {
+            tracing::info!(
+                "Noise reduction enabled without audio enhancement. Consider enabling audio.enhance for better results."
+            );
+        }
+
+        if self.silence.mode == SilenceMode::Speedup && self.silence.speedup_factor < 1.0 {
+            tracing::warn!(
+                "Speedup factor {} is less than 1.0. This will slow down silences instead of speeding them up.",
+                self.silence.speedup_factor
+            );
+        }
+
         Ok(())
     }
 
