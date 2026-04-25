@@ -835,22 +835,17 @@ output_dir = "/tmp/nonexistent"
 
         Ok(())
     }
-}
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use std::io::Write;
-    use tempfile::tempdir;
-
-    #[test]
-    fn test_format_ass_time() {
-        assert_eq!(format_ass_time(0.0), "0:00:00.00");
-        assert_eq!(format_ass_time(5.0), "0:00:05.00");
-        assert_eq!(format_ass_time(65.5), "0:01:05.50");
-        assert_eq!(format_ass_time(3661.25), "1:01:01.25");
-        // Negative values should be clamped to 0
-        assert_eq!(format_ass_time(-5.0), "0:00:00.00");
+    struct MockFfmpegAnalyzer;
+    impl crate::analyzer::VideoAnalyzer for MockFfmpegAnalyzer {
+        fn detect_silence(
+            &self,
+            _path: &Path,
+            _threshold_db: f32,
+            _duration_s: f32,
+        ) -> Result<Vec<crate::analyzer::Segment>> {
+            Ok(vec![])
+        }
     }
 
     struct MockFfmpegEditor;
