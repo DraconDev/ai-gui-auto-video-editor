@@ -3,7 +3,7 @@ use egui::RichText;
 use rfd::FileDialog;
 use std::path::PathBuf;
 
-use super::{App, AppState, ActivityEntry, EntryStatus, FolderState, ModalState, ProcessingStatus, Tab};
+use super::{App, AppState, ActivityEntry, EntryStatus, FolderState, ModalState, ProcessingStatus, SetupStep, Tab};
 use ai_vid_editor::{
     Config, FolderSettings, JoinMode, Preset, SilenceMode, WatchFolder,
 };
