@@ -342,6 +342,7 @@ impl AppState {
             setup_remove_silence: true,
             watcher_rx: None,
             watcher_stop: None,
+            toasts: Vec::new(),
         };
 
         if !is_first_run {
