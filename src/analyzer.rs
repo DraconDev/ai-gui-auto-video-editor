@@ -113,4 +113,34 @@ mod tests {
             }
         );
     }
+
+    #[test]
+    fn test_parse_silence_negative_duration_filtered() {
+        // end <= start should be filtered out
+        let output = r#"[silencedetect] silence_start: 5.0
+[silencedetect] silence_end: 5.0 | silence_duration: 0.0
+[silencedetect] silence_start: 10.0
+[silencedetect] silence_end: 9.0 | silence_duration: -1.0"#;
+
+        let segments = parse_ffmpeg_silence(output);
+        assert_eq!(segments.len(), 0);
+    }
+
+    #[test]
+    fn test_parse_silence_missing_start() {
+        // silence_end without matching silence_start should be ignored
+        let output = r#"[silencedetect] silence_end: 4.0 | silence_duration: 3.0"#;
+
+        let segments = parse_ffmpeg_silence(output);
+        assert_eq!(segments.len(), 0);
+    }
+
+    #[test]
+    fn test_parse_silence_unmatched_start() {
+        // silence_start without matching silence_end should be ignored
+        let output = r#"[silencedetect] silence_start: 1.0"#;
+
+        let segments = parse_ffmpeg_silence(output);
+        assert_eq!(segments.len(), 0);
+    }
 }
