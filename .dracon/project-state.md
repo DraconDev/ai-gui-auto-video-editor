@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Updated Cargo.lock with dependency version changes for video processing features
+Updated video processing presets in CLI documentation to include new platforms (TikTok, Twitter, Reels)
 
 ## Completed
-- [x] Updated Cargo.lock to reflect dependency version updates for video processing features
-```
+- [x] Added new preset options (`tiktok`, `reels`, `twitter`) to CLI documentation for better platform support
+- [x] Maintained existing presets (`youtube`, `shorts`, `podcast`, `minimal`) while expanding options

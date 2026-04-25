@@ -116,7 +116,7 @@ The GUI provides a visual interface for managing watch folders and settings.
 | `-I, --input-dir <DIR>` | Input directory (batch mode) |
 | `-o, --output-file <FILE>` | Output video file |
 | `-O, --output-dir <DIR>` | Output directory (batch mode) |
-| `-P, --preset <PRESET>` | Preset: `youtube`, `shorts`, `podcast`, `minimal` |
+| `-P, --preset <PRESET>` | Preset: `youtube`, `shorts`, `tiktok`, `reels`, `podcast`, `twitter`, `minimal` |
 | `-c, --config <FILE>` | Path to TOML config file |
 | `--gui` | Launch graphical interface |
 | `--notify` | Send desktop notifications |
