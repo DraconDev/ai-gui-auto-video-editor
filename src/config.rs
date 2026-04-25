@@ -497,6 +497,45 @@ impl Default for WatchConfig {
     }
 }
 
+/// Target video resolution for output
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, Default)]
+#[serde(rename_all = "lowercase")]
+pub enum VideoResolution {
+    /// 720p HD (1280x720)
+    Hd720p,
+    /// 1080p Full HD (1920x1080)
+    #[default]
+    Fhd1080p,
+    /// 1440p QHD (2560x1440)
+    Qhd1440p,
+    /// 4K UHD (3840x2160)
+    Uhd4k,
+    /// Vertical 1080p (1080x1920) for Shorts/Reels/TikTok
+    Vertical1080p,
+    /// Vertical 720p (720x1280)
+    Vertical720p,
+}
+
+impl VideoResolution {
+    /// Get resolution as (width, height)
+    pub fn dimensions(&self) -> (u32, u32) {
+        match self {
+            VideoResolution::Hd720p => (1280, 720),
+            VideoResolution::Fhd1080p => (1920, 1080),
+            VideoResolution::Qhd1440p => (2560, 1440),
+            VideoResolution::Uhd4k => (3840, 2160),
+            VideoResolution::Vertical1080p => (1080, 1920),
+            VideoResolution::Vertical720p => (720, 1280),
+        }
+    }
+
+    /// Get as ffmpeg scale string
+    pub fn to_ffmpeg_scale(&self) -> String {
+        let (w, h) = self.dimensions();
+        format!("{}:{}", w, h)
+    }
+}
+
 /// Configuration for video processing
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct VideoConfig {
@@ -515,6 +554,10 @@ pub struct VideoConfig {
     /// Enable background blur (person segmentation)
     #[serde(default)]
     pub blur_background: bool,
+
+    /// Target output resolution
+    #[serde(default)]
+    pub target_resolution: VideoResolution,
 }
 
 /// Join mode for combining processed videos

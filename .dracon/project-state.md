@@ -1,11 +1,11 @@
 # Project State
 
 ## Current Focus
-Added new platform-specific video presets for TikTok, Instagram Reels, and Twitter/X with optimized settings
+Added configurable video resolution options for output processing
 
 ## Completed
-- [x] Added TikTok preset with 9:16 vertical format, fast cuts, and mobile-friendly audio levels
-- [x] Added Instagram Reels preset with 9:16 vertical format and 90-second clip limit
-- [x] Added Twitter/X preset with 2:20 maximum duration and landscape 16:9 format
-- [x] Updated preset matching to properly distinguish between platform-specific presets
-- [x] Enhanced video configuration options including target resolutions and reframing for vertical formats
+- [x] Added `VideoResolution` enum with standard and vertical resolutions (720p, 1080p, 1440p, 4K, vertical variants)
+- [x] Implemented resolution dimension lookup via `dimensions()` method
+- [x] Added FFmpeg-compatible scale string generation via `to_ffmpeg_scale()`
+- [x] Integrated resolution setting into `VideoConfig` with default to 1080p FHD
+- [x] Enabled platform-specific resolution presets for social media formats
