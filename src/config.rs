@@ -844,15 +844,16 @@ impl Config {
                         let value = parts[1].trim();
                         // Only round values for known float fields
                         let is_float_key = FLOAT_KEYS.iter().any(|&k| key.ends_with(k));
-                        if is_float_key && value.parse::<f64>().is_ok() {
-                            let float_val = value.parse::<f64>().unwrap();
-                            let rounded = (float_val * 100.0).round() / 100.0;
-                            if rounded == rounded.trunc() {
-                                result.push_str(&format!("{} = {}\n", key, rounded as i64));
-                            } else {
-                                result.push_str(&format!("{} = {}\n", key, rounded));
+                        if is_float_key {
+                            if let Ok(float_val) = value.parse::<f64>() {
+                                let rounded = (float_val * 100.0).round() / 100.0;
+                                if rounded == rounded.trunc() {
+                                    result.push_str(&format!("{} = {}\n", key, rounded as i64));
+                                } else {
+                                    result.push_str(&format!("{} = {}\n", key, rounded));
+                                }
+                                continue;
                             }
-                            continue;
                         }
                     }
                 }
