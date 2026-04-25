@@ -522,6 +522,9 @@ fn main() -> Result<()> {
             config.export.preview
         );
         println!("  Resolution: {:?}", config.video.target_resolution);
+        if config.video.hw_accel != crate::hwaccel::HwAccel::None {
+            println!("  GPU encoding: {:?}", config.video.hw_accel);
+        }
         if cli.parallel_workers > 1 {
             println!("  Parallel workers: {}", cli.parallel_workers);
         }

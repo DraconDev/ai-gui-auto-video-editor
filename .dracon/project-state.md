@@ -1,9 +1,8 @@
 # Project State
 
 ## Current Focus
-Added GPU encoding option to CLI with support for nvenc, amf, vaapi, and auto-detection
+Added GPU encoding status display to CLI output
 
 ## Completed
-- [x] Added CLI option for GPU encoding with 'auto' detection
-- [x] Implemented hardware acceleration configuration based on user input
-- [x] Added fallback to CPU encoding for unknown GPU types with warning
+- [x] Display hardware acceleration status when enabled
+```
