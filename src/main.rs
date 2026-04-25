@@ -22,7 +22,8 @@ pub mod watermark;
 
 use crate::analyzer::FfmpegAnalyzer;
 use crate::batch_processor::{
-    FfmpegDurationGetter, process_batch_dir, process_single_file_with_intro_outro,
+    FfmpegDurationGetter, process_batch_dir, process_batch_dir_parallel,
+    process_single_file_with_intro_outro,
 };
 
 fn timestamp() -> String {
@@ -584,14 +585,27 @@ fn main() -> Result<()> {
         // Batch processing logic
         let out_dir =
             output_dir.ok_or_else(|| anyhow::anyhow!("Output directory must be specified"))?;
-        process_batch_dir(
-            in_dir,
-            out_dir,
-            &config,
-            &analyzer,
-            &editor,
-            &duration_getter,
-        )?;
+
+        if cli.parallel_workers > 1 {
+            process_batch_dir_parallel(
+                in_dir,
+                out_dir,
+                &config,
+                cli.parallel_workers,
+                &analyzer,
+                &editor,
+                &duration_getter,
+            )?;
+        } else {
+            process_batch_dir(
+                in_dir,
+                out_dir,
+                &config,
+                &analyzer,
+                &editor,
+                &duration_getter,
+            )?;
+        }
     } else {
         anyhow::bail!(
             "Either an input file or an input directory must be specified (set in config or CLI)."

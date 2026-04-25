@@ -1,8 +1,9 @@
 # Project State
 
 ## Current Focus
-Added parallel batch processing capability for video directories
+Added parallel batch processing capability for video directories with configurable worker count
 
 ## Completed
-- [x] Added `process_batch_dir_parallel` function to enable thread-safe parallel processing of video directories
-- [x] Updated public API exports to include the new parallel processing function
+- [x] Implemented parallel batch processing with `process_batch_dir_parallel` function
+- [x] Added conditional execution based on worker count (falls back to sequential when workers=1)
+- [x] Maintained backward compatibility with existing sequential processing
