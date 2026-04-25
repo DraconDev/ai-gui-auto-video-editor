@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Dependency version updates for video processing features
+Enhanced watermark positioning configuration with fallback to default
 
 ## Completed
-- [x] Updated Cargo.lock with new dependency versions
-```
+- [x] Made watermark position configurable via config with BottomRight as fallback
+- [x] Updated ffmpeg command construction to use std::process::Command instead of Proc

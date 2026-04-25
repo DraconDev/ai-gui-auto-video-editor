@@ -435,7 +435,8 @@ where
         report_progress(&mut progress, 0.98, "Adding watermark");
         info!(watermark = ?watermark_path, "Adding watermark");
 
-        let position = crate::watermark::WatermarkPosition::BottomRight; // Default
+        let position = crate::watermark::WatermarkPosition::from_str(&config.video.watermark_position)
+            .unwrap_or(crate::watermark::WatermarkPosition::BottomRight);
         let scale = config.video.watermark_scale;
 
         crate::watermark::add_watermark(
@@ -812,7 +813,7 @@ fn extract_highlight_clips(
         let clip_path = output_dir.join(format!("{}_{}.mp4", clip_pattern, i + 1));
 
         let duration = clip_end - clip_start;
-        let status = Proc::new("ffmpeg")
+        let status = std::process::Command::new("ffmpeg")
             .args([
                 "-i",
                 video_path.to_str().context("invalid path")?,
