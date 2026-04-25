@@ -4,6 +4,5 @@
 Added preview generation option to export configuration
 
 ## Completed
-- [x] Added `preview` boolean field to `ExportConfig` to generate low-resolution preview files
-- [x] Updated CHANGELOG.md to reflect version 0.68.8 release
-```
+- [x] Added `preview` field to `ExportConfig` with default value `false`
+- [x] Added `preview` field to `Config` merge logic

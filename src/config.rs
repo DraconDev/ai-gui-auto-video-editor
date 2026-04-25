@@ -373,6 +373,7 @@ impl Default for ExportConfig {
             thumbnail_height: default_thumbnail_height(),
             multi_format: false,
             extra_resolutions: Vec::new(),
+            preview: false,
         }
     }
 }
@@ -854,6 +855,7 @@ impl Config {
         self.export.edl = other.export.edl;
         self.export.thumbnail = other.export.thumbnail;
         self.export.multi_format = other.export.multi_format;
+        self.export.preview = other.export.preview;
         if other.export.thumbnail_width != default_thumbnail_width() {
             self.export.thumbnail_width = other.export.thumbnail_width;
         }
