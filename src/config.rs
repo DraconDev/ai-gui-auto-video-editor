@@ -350,6 +350,10 @@ pub struct ExportConfig {
     /// Additional resolutions to output (when multi_format is true)
     #[serde(default)]
     pub extra_resolutions: Vec<VideoResolution>,
+
+    /// Generate a quick low-resolution preview file alongside the main output
+    #[serde(default)]
+    pub preview: bool,
 }
 
 impl Default for ExportConfig {
