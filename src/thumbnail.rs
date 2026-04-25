@@ -143,18 +143,18 @@ fn parse_entropy(ffmpeg_output: &str) -> Option<f32> {
     None
 }
 
-/// Extract a single frame at a given time position (as fraction of video duration)
+/// Extract a single frame at a given time position (in seconds)
 fn extract_frame_at_time(
     video_path: &Path,
     output_path: &Path,
     width: u32,
     height: u32,
-    time_fraction: f32,
+    time_seconds: f32,
 ) -> Result<()> {
     let status = Command::new("ffmpeg")
         .args([
             "-ss",
-            &format!("{}%", (time_fraction * 100.0) as i32),
+            &format!("{:.2}", time_seconds),
             "-i",
             video_path.to_str().context("invalid video path")?,
             "-vframes",

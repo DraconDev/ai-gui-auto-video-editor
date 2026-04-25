@@ -1,8 +1,10 @@
 # Project State
 
 ## Current Focus
-Added new platform-specific video presets for TikTok, Instagram Reels, and Twitter
+Refactored frame extraction to use absolute time in seconds instead of fractional duration
 
 ## Completed
-- [x] Updated `Preset::from_str()` test cases to include new platform presets (TikTok, Reels, Twitter)
-- [x] Fixed incorrect preset mappings for TikTok and Reels (previously mapped to Shorts)
+- [x] Changed `extract_frame_at_time` to accept time in seconds instead of fractional duration
+- [x] Updated ffmpeg time argument format from percentage to decimal seconds
+- [x] Improved time specification consistency with other video processing functions
+```
