@@ -789,6 +789,8 @@ impl Config {
             config.silence.mode = SilenceMode::Speedup;
         }
 
+        config.validate()?;
+
         Ok(config)
     }
 
