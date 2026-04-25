@@ -823,6 +823,104 @@ where
     Ok(())
 }
 
+/// Process a directory of videos in parallel using multiple worker threads.
+/// Each worker gets its own analyzer/editor instances since they are stateless.
+pub fn process_batch_dir_parallel<A, E, D>(
+    input_dir: PathBuf,
+    output_dir: PathBuf,
+    config: &Config,
+    worker_count: usize,
+    _analyzer: &A,
+    _editor: &E,
+    _duration_getter: &D,
+) -> Result<()>
+where
+    A: VideoAnalyzer + Send + Sync,
+    E: VideoEditor + Send + Sync,
+    D: DurationGetter + Send + Sync,
+{
+    let worker_count = worker_count.max(1);
+    info!(dir = ?input_dir, workers = worker_count, "Processing directory in parallel");
+
+    fs::create_dir_all(&output_dir).context(format!(
+        "Failed to create output directory {:?}",
+        output_dir
+    ))?;
+
+    let video_files = find_video_files(&input_dir)?;
+
+    if video_files.is_empty() {
+        warn!(dir = ?input_dir, "No supported video files found");
+        return Ok(());
+    }
+
+    let total_files = video_files.len();
+    let successful_files = Arc::new(AtomicUsize::new(0));
+    let failed_files = Arc::new(AtomicUsize::new(0));
+    let config = Arc::new(config.clone());
+    let output_dir = Arc::new(output_dir);
+
+    // Split files into chunks for each worker
+    let chunks: Vec<Vec<PathBuf>> = video_files
+        .chunks((total_files + worker_count - 1) / worker_count)
+        .map(|c| c.to_vec())
+        .collect();
+
+    std::thread::scope(|s| {
+        for chunk in chunks {
+            let config = Arc::clone(&config);
+            let output_dir = Arc::clone(&output_dir);
+            let successful = Arc::clone(&successful_files);
+            let failed = Arc::clone(&failed_files);
+
+            s.spawn(move || {
+                for input_file in chunk {
+                    let file_name = match input_file.file_name() {
+                        Some(name) => name.to_os_string(),
+                        None => continue,
+                    };
+                    let output_file = output_dir.join(&file_name);
+
+                    // Create fresh instances per worker (they're stateless)
+                    let analyzer = crate::analyzer::FfmpegAnalyzer;
+                    let editor = crate::editor::FfmpegEditor;
+                    let duration_getter = FfmpegDurationGetter;
+
+                    match process_single_file(
+                        input_file.clone(),
+                        output_file,
+                        &config,
+                        &analyzer,
+                        &editor,
+                        &duration_getter,
+                    ) {
+                        Ok(_) => {
+                            info!(file = ?input_file, "Successfully processed");
+                            successful.fetch_add(1, Ordering::SeqCst);
+                        }
+                        Err(e) => {
+                            warn!(file = ?input_file, error = %e, "Failed to process");
+                            failed.fetch_add(1, Ordering::SeqCst);
+                        }
+                    }
+                }
+            });
+        }
+    });
+
+    let successful = successful_files.load(Ordering::SeqCst);
+    let failed = failed_files.load(Ordering::SeqCst);
+
+    info!(
+        total = total_files,
+        successful,
+        failed,
+        "Parallel batch processing complete"
+    );
+
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
