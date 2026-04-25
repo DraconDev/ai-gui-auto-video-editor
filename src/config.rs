@@ -188,6 +188,9 @@ fn default_speedup_factor() -> f32 {
 fn default_min_silence_for_speedup() -> f32 {
     0.5
 }
+fn default_scene_threshold() -> f32 {
+    0.3
+}
 
 impl Default for SilenceConfig {
     fn default() -> Self {
@@ -198,6 +201,8 @@ impl Default for SilenceConfig {
             mode: SilenceMode::Cut,
             speedup_factor: default_speedup_factor(),
             min_silence_for_speedup: default_min_silence_for_speedup(),
+            scene_detect: false,
+            scene_threshold: default_scene_threshold(),
         }
     }
 }

@@ -4,6 +4,6 @@
 Added scene detection configuration options for video processing
 
 ## Completed
-- [x] Added `scene_detect` boolean flag to enable/disable scene detection
-- [x] Added `scene_threshold` configuration with default value
-```
+- [x] Added `default_scene_threshold()` function with value 0.3
+- [x] Added `scene_detect` field to `SilenceConfig` with default value `false`
+- [x] Added `scene_threshold` field to `SilenceConfig` with default from `default_scene_threshold()`
