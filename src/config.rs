@@ -814,6 +814,10 @@ impl Config {
         if other.silence.min_silence_for_speedup != default_min_silence_for_speedup() {
             self.silence.min_silence_for_speedup = other.silence.min_silence_for_speedup;
         }
+        self.silence.scene_detect = other.silence.scene_detect;
+        if other.silence.scene_threshold != default_scene_threshold() {
+            self.silence.scene_threshold = other.silence.scene_threshold;
+        }
 
         // Filler words config - always take other's boolean values
         self.filler_words.enabled = other.filler_words.enabled;
@@ -844,6 +848,17 @@ impl Config {
         self.export.clips = other.export.clips;
         self.export.fcpxml = other.export.fcpxml;
         self.export.edl = other.export.edl;
+        self.export.thumbnail = other.export.thumbnail;
+        self.export.multi_format = other.export.multi_format;
+        if other.export.thumbnail_width != default_thumbnail_width() {
+            self.export.thumbnail_width = other.export.thumbnail_width;
+        }
+        if other.export.thumbnail_height != default_thumbnail_height() {
+            self.export.thumbnail_height = other.export.thumbnail_height;
+        }
+        if !other.export.extra_resolutions.is_empty() {
+            self.export.extra_resolutions = other.export.extra_resolutions.clone();
+        }
         if other.export.clip_count != default_clip_count() {
             self.export.clip_count = other.export.clip_count;
         }
@@ -900,6 +915,9 @@ impl Config {
         }
         if other.video.watermark_scale != default_watermark_scale() {
             self.video.watermark_scale = other.video.watermark_scale;
+        }
+        if other.video.watermark_position != default_watermark_position() {
+            self.video.watermark_position = other.video.watermark_position.clone();
         }
 
         // Silence config - new fields
