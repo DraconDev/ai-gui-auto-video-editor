@@ -231,6 +231,27 @@ impl ModalState {
     }
 }
 
+#[derive(Debug, Clone)]
+struct Toast {
+    message: String,
+    success: bool,
+    created: std::time::Instant,
+}
+
+impl Toast {
+    fn new(message: impl Into<String>, success: bool) -> Self {
+        Self {
+            message: message.into(),
+            success,
+            created: std::time::Instant::now(),
+        }
+    }
+
+    fn expired(&self) -> bool {
+        self.created.elapsed().as_secs() > 5
+    }
+}
+
 #[derive(Debug)]
 pub struct AppState {
     config: Config,
@@ -250,6 +271,8 @@ pub struct AppState {
     setup_remove_silence: bool,
     watcher_rx: Option<Receiver<WatcherEvent>>,
     watcher_stop: Option<Arc<AtomicBool>>,
+    // Toast notifications
+    toasts: Vec<Toast>,
 }
 
 #[allow(dead_code)]

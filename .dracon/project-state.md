@@ -1,8 +1,9 @@
 # Project State
 
 ## Current Focus
-Refactored batch processor to remove unused index variable in file iteration
+Added toast notification system for user feedback in the GUI
 
 ## Completed
-- [x] Removed unused `index` variable in video file iteration loop
-- [x] Simplified loop by replacing `index` with `_index` to indicate intentional unused variable
+- [x] Implemented `Toast` struct with message, success status, and expiration tracking
+- [x] Added toast expiration logic (5-second duration)
+- [x] Integrated toast storage in `AppState` for GUI notifications
