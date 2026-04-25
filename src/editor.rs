@@ -671,7 +671,9 @@ fn generate_trim_filters(segments: &[ProcessedSegment]) -> (String, String) {
         };
 
         let atempo = if seg.speed != 1.0 {
-            format!("atempo={}", seg.speed)
+            // ffmpeg's atempo only supports 0.5 to 2.0
+            // Chain multiple atempo filters for speeds outside this range
+            chain_atempo_filters(seg.speed)
         } else {
             "asetpts=PTS-STARTPTS".to_string()
         };
