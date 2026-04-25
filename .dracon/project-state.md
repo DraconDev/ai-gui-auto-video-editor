@@ -1,9 +1,9 @@
 # Project State
 
 ## Current Focus
-Changed atomic ordering from Relaxed to SeqCst for thread-safe watcher stop signal
+Improved thread safety and error handling in the watcher restart mechanism
 
 ## Completed
-- [x] Updated all `stop.load()` calls from `Ordering::Relaxed` to `Ordering::SeqCst` for proper synchronization
-- [x] Modified `stop.store()` calls to use `Ordering::SeqCst` for consistent memory ordering
-- [x] Ensured proper thread-safe signaling of watcher termination across all watch loop checks
+- [x] Added 10ms delay between stopping old watcher thread and starting new one to prevent race conditions
+- [x] Enhanced error handling in watcher initialization by checking send() results and exiting early if channel is disconnected
+- [x] Maintained consistent logging and status updates while improving robustness

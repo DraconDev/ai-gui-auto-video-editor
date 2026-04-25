@@ -440,6 +440,8 @@ impl AppState {
     fn restart_watcher(&mut self) {
         if let Some(stop) = self.watcher_stop.take() {
             stop.store(true, Ordering::SeqCst);
+            // Give the old thread time to finish before starting a new one
+            std::thread::sleep(std::time::Duration::from_millis(100));
         }
 
         let enabled_folders: Vec<FolderState> =
@@ -574,11 +576,15 @@ fn watch_folders_loop(
     let editor = FfmpegEditor;
     let duration_getter = FfmpegDurationGetter;
 
-    let _ = tx.send(WatcherEvent::Log {
+    if tx.send(WatcherEvent::Log {
         message: format!("Watching {} folder(s) for new videos", folders.len()),
         success: true,
-    });
-    let _ = tx.send(WatcherEvent::Status(ProcessingStatus::Watching));
+    }).is_err() {
+        return;
+    }
+    if tx.send(WatcherEvent::Status(ProcessingStatus::Watching)).is_err() {
+        return;
+    }
 
     while !stop.load(Ordering::SeqCst) {
         for folder in &folders {
