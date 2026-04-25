@@ -1,9 +1,13 @@
 # Project State
 
 ## Current Focus
-Refactored audio sample parsing to use more robust chunk handling with guaranteed 4-byte chunks
+Added video thumbnail generation with intelligent frame selection based on entropy scoring
 
 ## Completed
-- [x] Replaced manual chunk filtering with `chunks_exact(4)` for guaranteed 4-byte chunks
-- [x] Simplified error handling by removing partial chunk checks
-- [x] Improved safety by using `expect()` with a clear invariant guarantee
+- [x] Implemented thumbnail generation pipeline with ffmpeg integration
+- [x] Added frame extraction at 1-second intervals
+- [x] Implemented frame scoring based on entropy (color variance)
+- [x] Added fallback mechanism for when no good frames are found
+- [x] Included temporary file cleanup for extracted frames
+- [x] Added basic test infrastructure for video generation
+```
