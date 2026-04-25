@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.73.0] - 2026-04-25
+## [0.74.0] - 2026-04-25
 
 ### Added
 - **Preview export wiring**: `--preview` CLI flag now generates a 30s/480px low-res preview file alongside the main output via `preview::generate_preview()`
