@@ -568,7 +568,9 @@ fn concat_chunk_files(chunk_files: &[PathBuf], output: &Path) -> Result<()> {
     }
 
     if chunk_files.len() == 1 {
-        fs::rename(&chunk_files[0], output)?;
+        // Use copy+remove instead of rename to handle cross-filesystem moves
+        std::fs::copy(&chunk_files[0], output)?;
+        let _ = std::fs::remove_file(&chunk_files[0]);
         return Ok(());
     }
 
