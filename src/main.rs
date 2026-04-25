@@ -3,6 +3,7 @@
 
 use anyhow::Result;
 use clap::Parser;
+use std::io::IsTerminal;
 use std::path::PathBuf;
 
 pub mod analyzer;
