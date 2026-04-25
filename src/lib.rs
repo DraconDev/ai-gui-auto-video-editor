@@ -7,6 +7,7 @@ pub mod config;
 pub mod editor;
 pub mod exporter;
 pub mod ml;
+pub mod preview;
 pub mod scene_detection;
 pub mod stt_analyzer;
 pub mod thumbnail;

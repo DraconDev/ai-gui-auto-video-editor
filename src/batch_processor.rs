@@ -535,6 +535,49 @@ fn export_additional_files(
         exporter::export_edl(segments, input_file, Path::new(&edl_path), 25.0)?;
     }
 
+    // Generate thumbnail
+    if config.export.thumbnail {
+        let thumb_path = format!("{}.jpg", base_path.display());
+        debug!(path = %thumb_path, "Generating thumbnail");
+        if let Err(e) = crate::thumbnail::generate_thumbnail(
+            output_file,
+            Path::new(&thumb_path),
+            config.export.thumbnail_width,
+            config.export.thumbnail_height,
+        ) {
+            warn!(error = %e, "Failed to generate thumbnail");
+        }
+    }
+
+    // Multi-format output
+    if config.export.multi_format && !config.export.extra_resolutions.is_empty() {
+        debug!("Generating multi-format outputs");
+        for resolution in &config.export.extra_resolutions {
+            let (w, h) = resolution.dimensions();
+            let ext = output_file.extension().and_then(|e| e.to_str()).unwrap_or("mp4");
+            let multi_path = format!("{}_{}p.{}" , base_path.display(), h, ext);
+            debug!(path = %multi_path, resolution = ?resolution, "Generating alternate resolution");
+
+            let status = std::process::Command::new("ffmpeg")
+                .args([
+                    "-i",
+                    output_file.to_str().context("invalid output path")?,
+                    "-vf",
+                    &format!("scale={}:{}", w, h),
+                    "-c:a",
+                    "copy",
+                    "-y",
+                    &multi_path,
+                ])
+                .status()
+                .context("failed to execute ffmpeg for multi-format")?;
+
+            if !status.success() {
+                warn!(path = %multi_path, "Multi-format ffmpeg failed");
+            }
+        }
+    }
+
     Ok(())
 }
 
