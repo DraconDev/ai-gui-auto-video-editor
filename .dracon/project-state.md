@@ -1,7 +1,10 @@
 # Project State
 
 ## Current Focus
-Added comprehensive configuration validation in the Config builder
+Added comprehensive video and silence configuration options to the Config struct
 
 ## Completed
-- [x] Added `config.validate()` call in `Config::builder()` to ensure all configuration values are valid before returning the config
+- [x] Added video target resolution configuration
+- [x] Added watermark configuration with optional scaling
+- [x] Added scene detection configuration for silence processing
+- [x] Added customizable scene threshold for silence detection

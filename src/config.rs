@@ -894,6 +894,19 @@ impl Config {
         self.video.color_correct = other.video.color_correct;
         self.video.reframe = other.video.reframe;
         self.video.blur_background = other.video.blur_background;
+        self.video.target_resolution = other.video.target_resolution;
+        if other.video.watermark.is_some() {
+            self.video.watermark = other.video.watermark.clone();
+        }
+        if other.video.watermark_scale != default_watermark_scale() {
+            self.video.watermark_scale = other.video.watermark_scale;
+        }
+
+        // Silence config - new fields
+        self.silence.scene_detect = other.silence.scene_detect;
+        if other.silence.scene_threshold != default_scene_threshold() {
+            self.silence.scene_threshold = other.silence.scene_threshold;
+        }
 
         // Processing config
         self.processing.join_mode = other.processing.join_mode;
