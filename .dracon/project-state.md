@@ -1,10 +1,9 @@
 # Project State
 
 ## Current Focus
-Improved error handling for path conversions in frame extraction
+Improved video dimension extraction and duration calculation with better error handling
 
 ## Completed
-- [x] Added explicit UTF-8 validation for video and output paths
-- [x] Removed unsafe unwraps in path conversions
-- [x] Added proper error propagation for invalid path characters
-```
+- [x] Added video dimension extraction using ffprobe with proper error handling for UTF-8 paths
+- [x] Improved error handling for path conversions in video duration calculation
+- [x] Standardized ffprobe command formatting for both dimension extraction and duration calculation

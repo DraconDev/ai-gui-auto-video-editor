@@ -67,6 +67,16 @@ impl FrameExtractor {
         let path_str = video_path.to_str()
             .ok_or_else(|| anyhow::anyhow!("Video path contains invalid UTF-8 characters"))?;
 
+        let output = Command::new("ffprobe")
+            .args([
+                "-v", "error",
+                "-select_streams", "v:0",
+                "-show_entries", "stream=width,height",
+                "-of", "csv=p=0",
+                path_str,
+            ])
+            .output()?;
+
         let dims = String::from_utf8_lossy(&output.stdout);
         let parts: Vec<&str> = dims.trim().split(',').collect();
 
@@ -81,15 +91,15 @@ impl FrameExtractor {
 
     /// Get video duration in seconds
     pub fn get_video_duration(video_path: &Path) -> Result<f32> {
+        let path_str = video_path.to_str()
+            .ok_or_else(|| anyhow::anyhow!("Video path contains invalid UTF-8 characters"))?;
+
         let output = Command::new("ffprobe")
             .args([
-                "-v",
-                "error",
-                "-show_entries",
-                "format=duration",
-                "-of",
-                "default=noprint_wrappers=1:nokey=1",
-                video_path.to_str().unwrap_or(""),
+                "-v", "error",
+                "-show_entries", "format=duration",
+                "-of", "default=noprint_wrappers=1:nokey=1",
+                path_str,
             ])
             .output()?;
 
