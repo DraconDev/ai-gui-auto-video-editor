@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Improved SRT time formatting to prevent truncation artifacts by rounding to nearest millisecond
+Updated Cargo.lock to reflect recent dependency changes from audio processing improvements
 
 ## Completed
-- [x] Refactored `format_srt_time` to use millisecond rounding for more accurate time formatting
-- [x] Updated Cargo.lock to reflect dependency changes from recent audio processing updates
+- [x] Updated Cargo.lock to synchronize with new audio processing dependencies
+```
