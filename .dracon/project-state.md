@@ -1,9 +1,8 @@
 # Project State
 
 ## Current Focus
-Improved Unicode-safe chapter title truncation in YouTube chapter export
+Added XML escaping functionality for FCPXML export
 
 ## Completed
-- [x] Refactored chapter title truncation to use `chars().take(50).collect()` for proper Unicode handling
-- [x] Removed manual string slicing which could break multi-byte characters
-- [x] Maintained existing functionality of trimming to 50 characters while ensuring text integrity
+- [x] Added `xml_escape` function to handle special XML character escaping
+- [x] Implemented escaping for &, <, >, ", and ' characters in FCPXML output

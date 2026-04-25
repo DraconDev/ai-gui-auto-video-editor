@@ -4,6 +4,15 @@ use anyhow::{Context, Result};
 use std::fs;
 use std::path::Path;
 
+/// Escape special XML characters in a string
+fn xml_escape(s: &str) -> String {
+    s.replace('&', "&amp;")
+        .replace('<', "&lt;")
+        .replace('>', "&gt;")
+        .replace('"', "&quot;")
+        .replace('\'', "&apos;")
+}
+
 pub fn export_fcpxml(
     segments: &[ProcessedSegment],
     input_path: &Path,
