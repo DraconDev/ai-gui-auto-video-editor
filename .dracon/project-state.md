@@ -1,9 +1,8 @@
 # Project State
 
 ## Current Focus
-Refactored scene detection timestamp parsing for cleaner code structure
+Refactored entropy parsing in thumbnail generation for cleaner code structure
 
 ## Completed
-- [x] Consolidated timestamp parsing logic into a single conditional block
-- [x] Improved readability by reducing nested if statements
-- [x] Maintained same functionality while reducing code complexity
+- [x] Simplified entropy parsing logic in `parse_entropy` by combining nested conditionals into a single line
+- [x] Maintained same functionality while reducing visual complexity of the code

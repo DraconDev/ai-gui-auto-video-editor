@@ -130,11 +130,9 @@ fn score_single_frame(frame_path: &Path) -> Result<f32> {
 
 fn parse_entropy(ffmpeg_output: &str) -> Option<f32> {
     for line in ffmpeg_output.lines() {
-        if line.contains("entropy") {
-            if let Some(val_str) = line.split(':').next_back() {
-                if let Ok(val) = val_str.trim().parse::<f32>() {
-                    return Some(val);
-                }
+        if line.contains("entropy") && let Some(val_str) = line.split(':').next_back() {
+            if let Ok(val) = val_str.trim().parse::<f32>() {
+                return Some(val);
             }
         }
     }
