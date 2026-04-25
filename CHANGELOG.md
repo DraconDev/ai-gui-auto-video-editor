@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.69.0] - 2026-04-25
+
+### Added
+- **Preview export wiring**: `--preview` CLI flag now generates a 30s/480px low-res preview file alongside the main output via `preview::generate_preview()`
+- **Batch progress persistence**: `BatchProgress` tracks completed/failed files in a JSON state file; batch processing skips already-processed files and resumes from where it left off
+- **Parallel batch resume support**: `process_batch_dir_parallel()` filters out completed files before spawning workers, with mutex-protected progress saves
+
+### Changed
+- **GUI modularization**: Split monolithic `gui.rs` (2149 lines) into `gui.rs` (types + App struct), `gui/processing.rs` (watcher loop + folder config), and `gui/tabs.rs` (all draw methods)
+
 ## [0.68.8] - 2026-04-25
 
 ### Fixed (Critical)
