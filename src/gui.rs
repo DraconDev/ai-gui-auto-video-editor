@@ -530,15 +530,23 @@ impl AppState {
                 } => {
                     self.status = ProcessingStatus::Watching;
                     self.activity_log.push(ActivityEntry::success(
-                        filename,
+                        filename.clone(),
                         file_size,
                         duration_secs,
+                    ));
+                    self.toasts.push(Toast::new(
+                        format!("{} processed", filename),
+                        true,
                     ));
                 }
                 WatcherEvent::Failed { filename, message } => {
                     self.status = ProcessingStatus::Error(message.clone());
                     self.activity_log
-                        .push(ActivityEntry::error(filename, message));
+                        .push(ActivityEntry::error(filename.clone(), message.clone()));
+                    self.toasts.push(Toast::new(
+                        format!("{} failed: {}", filename, message),
+                        false,
+                    ));
                 }
             }
         }

@@ -1,8 +1,10 @@
 # Project State
 
 ## Current Focus
-Initialize toast notification system for user feedback in the GUI
+Integrated toast notifications for user feedback in the GUI
 
 ## Completed
-- [x] Added `toasts` vector to `AppState` for storing notification messages
-```
+- [x] Added toast notifications for successful file processing
+- [x] Added toast notifications for failed file processing
+- [x] Fixed string ownership issues by cloning filenames and messages
+- [x] Implemented visual feedback for both success and error cases
