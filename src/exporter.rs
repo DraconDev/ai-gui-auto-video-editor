@@ -14,6 +14,12 @@ pub fn export_fcpxml(
         .and_then(|s| s.to_str())
         .unwrap_or("video.mp4");
 
+    // Calculate total duration from segments
+    let total_duration: f32 = segments.iter().map(|s| s.end - s.start).sum();
+    let duration_str = format!("{:.0}/1s", total_duration.max(1.0));
+
+    let input_path_str = input_path.to_string_lossy();
+
     let mut xml = String::new();
     xml.push_str("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
     xml.push_str("<!DOCTYPE fcpxml>\n");
@@ -21,14 +27,16 @@ pub fn export_fcpxml(
     xml.push_str("  <resources>\n");
     xml.push_str(&format!(
         "    <asset id=\"r1\" name=\"{}\" src=\"file://{}\" />\n",
-        filename,
-        input_path.to_str().unwrap()
+        filename, input_path_str
     ));
     xml.push_str("  </resources>\n");
     xml.push_str("  <library>\n");
     xml.push_str("    <event name=\"Automated Cuts\">\n");
     xml.push_str("      <project name=\"Edited Timeline\">\n");
-    xml.push_str("        <sequence duration=\"3600/1s\" format=\"r1\">\n");
+    xml.push_str(&format!(
+        "        <sequence duration=\"{}\" format=\"r1\">\n",
+        duration_str
+    ));
     xml.push_str("          <spine>\n");
 
     let mut start_offset = 0.0;
@@ -65,24 +73,29 @@ pub fn export_edl(
     edl.push_str("TITLE: Edited Timeline\n");
     edl.push_str("FCM: NON-DROP FRAME\n\n");
 
-    for (i, _seg) in segments.iter().enumerate() {
+    for (i, seg) in segments.iter().enumerate() {
+        let (src_start_h, src_start_m, src_start_s, src_start_f) = seconds_to_timecode(seg.start);
+        let (src_end_h, src_end_m, src_end_s, src_end_f) = seconds_to_timecode(seg.end);
         edl.push_str(&format!(
             "{:03}  AX       V     C        {:02}:{:02}:{:02}:{:02} {:02}:{:02}:{:02}:{:02}\n",
             i + 1,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0
+            src_start_h, src_start_m, src_start_s, src_start_f,
+            src_end_h, src_end_m, src_end_s, src_end_f
         ));
         edl.push_str(&format!("* FROM CLIP NAME: {}\n\n", filename));
     }
 
     fs::write(output_path, edl).context("failed to write EDL file")?;
     Ok(())
+}
+
+/// Convert seconds to SMPTE timecode (HH:MM:SS:FF) assuming 25fps
+fn seconds_to_timecode(seconds: f32) -> (u32, u32, u32, u32) {
+    let hours = (seconds / 3600.0) as u32;
+    let minutes = ((seconds % 3600.0) / 60.0) as u32;
+    let secs = (seconds % 60.0) as u32;
+    let frames = ((seconds % 1.0) * 25.0) as u32; // Assume 25fps
+    (hours, minutes, secs, frames)
 }
 
 pub fn export_srt(transcript: &[TranscriptSegment], output_path: &Path) -> Result<()> {
@@ -165,7 +178,7 @@ fn format_srt_time(seconds: f32) -> String {
     let hours = (seconds / 3600.0) as u32;
     let minutes = ((seconds % 3600.0) / 60.0) as u32;
     let secs = (seconds % 60.0) as u32;
-    let millis = ((seconds % 1.0) * 1000.0) as u32;
+    let millis = ((seconds % 1.0) * 1000.0).round() as u32;
     format!("{:02}:{:02}:{:02},{:03}", hours, minutes, secs, millis)
 }
 
@@ -266,6 +279,40 @@ mod tests {
         assert!(content.contains("2\n"));
         assert!(content.contains("This is a test"));
         assert!(content.contains("00:00:00,000 --> 00:00:05,000"));
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_export_edl_timestamps() -> Result<()> {
+        let dir = tempdir()?;
+        let output_edl = dir.path().join("test.edl");
+        let input_path = dir.path().join("video.mp4");
+
+        let segments = vec![
+            ProcessedSegment { start: 0.0, end: 5.5, speed: 1.0 },
+            ProcessedSegment { start: 10.0, end: 20.0, speed: 1.0 },
+        ];
+
+        export_edl(&segments, &input_path, &output_edl)?;
+
+        let content = fs::read_to_string(output_edl)?;
+        // Check that timestamps are present, not all zeros
+        assert!(content.contains("00:00:05:12") || content.contains("00:00:05:13"), "EDL should contain non-zero timestamps");
+        assert!(content.contains("00:00:10:00"), "EDL should contain second segment start");
+        assert!(content.contains("00:00:20:00"), "EDL should contain second segment end");
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_format_srt_time_rounding() -> Result<()> {
+        // Test that milliseconds round properly
+        let t1 = format_srt_time(1.999);
+        assert_eq!(t1, "00:00:01,999");
+
+        let t2 = format_srt_time(1.9995);
+        assert_eq!(t2, "00:00:02,000");
 
         Ok(())
     }

@@ -1,9 +1,12 @@
 # Project State
 
 ## Current Focus
-Expanded video file discovery to include additional video formats
+Improved timestamp handling in EDL exports with proper timecode conversion
 
 ## Completed
-- [x] Added support for `.mkv` video files in the video discovery utility
-- [x] Updated test case to verify detection of new video format
-- [x] Maintained existing test assertions for previously supported formats
+- [x] Added dynamic sequence duration calculation based on segment durations
+- [x] Implemented proper timecode conversion (HH:MM:SS:FF) for EDL exports
+- [x] Added test for EDL timestamp formatting
+- [x] Improved SRT time formatting with proper millisecond rounding
+- [x] Added test for SRT time rounding behavior
+```
