@@ -6,7 +6,7 @@ pub fn find_video_files(dir: &Path) -> Result<Vec<PathBuf>> {
     let mut video_files = Vec::new();
     let supported_extensions = ["mp4", "mov", "avi", "mkv", "webm"];
 
-    for entry in WalkDir::new(dir).into_iter().filter_map(|e| e.ok()) {
+    for entry in WalkDir::new(dir).max_depth(5).into_iter().filter_map(|e| e.ok()) {
         let path = entry.path();
         if path.is_file()
             && let Some(extension) = path.extension().and_then(|s| s.to_str())
