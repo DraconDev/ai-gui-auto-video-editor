@@ -1,8 +1,7 @@
 # Project State
 
 ## Current Focus
-Refactored thumbnail fallback to use absolute 1-second mark instead of percentage-based fallback
+Refactored test case to use a 1.5-second timestamp for frame extraction instead of 0.5 seconds.
 
 ## Completed
-- [x] Changed fallback thumbnail extraction from 10% video duration to fixed 1-second mark for more consistent results
-- [x] Updated logging to reflect the new absolute time fallback behavior
+- [x] Updated test case in `thumbnail.rs` to verify frame extraction at 1.5 seconds instead of 0.5 seconds

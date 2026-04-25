@@ -220,7 +220,7 @@ mod tests {
         let frame = temp_dir.path().join("frame.jpg");
         create_test_video(&video, 3.0);
 
-        extract_frame_at_time(&video, &frame, 320, 180, 0.5).unwrap();
+        extract_frame_at_time(&video, &frame, 320, 180, 1.5).unwrap();
         assert!(frame.exists(), "frame should be extracted");
     }
 }
