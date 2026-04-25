@@ -360,7 +360,7 @@ impl Default for WatchFolder {
             input: PathBuf::from("videos"),
             output: PathBuf::from("videos/output"),
             preset: default_preset(),
-            enabled: true,
+            enabled: false, // Default to disabled so watch mode doesn't start unexpectedly
             settings: FolderSettings::default(),
         }
     }
