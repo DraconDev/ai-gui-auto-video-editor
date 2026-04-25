@@ -661,10 +661,12 @@ fn watch_folders_loop(
                 let file_size = metadata.as_ref().map_or(0, |m| m.len());
                 let file_label = PathBuf::from(&file_name).display().to_string();
 
-                let _ = tx.send(WatcherEvent::Processing {
+                if tx.send(WatcherEvent::Processing {
                     filename: file_label.clone(),
                     file_size,
-                });
+                }).is_err() {
+                    return;
+                }
 
                 let started = Instant::now();
                 let folder_config = build_folder_config(&config, folder);
@@ -690,17 +692,21 @@ fn watch_folders_loop(
 
                 match result {
                     Ok(()) => {
-                        let _ = tx.send(WatcherEvent::Completed {
+                        if tx.send(WatcherEvent::Completed {
                             filename: file_label,
                             file_size,
                             duration_secs: started.elapsed().as_secs().max(1),
-                        });
+                        }).is_err() {
+                            return;
+                        }
                     }
                     Err(err) => {
-                        let _ = tx.send(WatcherEvent::Failed {
+                        if tx.send(WatcherEvent::Failed {
                             filename: file_label,
                             message: err.to_string(),
-                        });
+                        }).is_err() {
+                            return;
+                        }
                     }
                 }
             }
