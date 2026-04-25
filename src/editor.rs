@@ -422,8 +422,13 @@ impl VideoEditor for FfmpegEditor {
                 match processor.analyze_video(input, 1.0) {
                     Ok(crop_regions) => {
                         // Get video dimensions
-                        let (w, h) = crate::ml::FrameExtractor::get_video_dimensions(input)
-                            .unwrap_or((1920, 1080));
+                        let (w, h) = match crate::ml::FrameExtractor::get_video_dimensions(input) {
+                            Ok(dims) => dims,
+                            Err(e) => {
+                                warn!(error = %e, "Failed to get video dimensions, using center crop");
+                                return self.run_reframe_filter(input, output, "crop=ih*9/16:ih,scale=1080:1920");
+                            }
+                        };
 
                         processor.generate_crop_filter(&crop_regions, w, h)
                     }

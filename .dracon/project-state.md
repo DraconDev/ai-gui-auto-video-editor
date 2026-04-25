@@ -1,8 +1,10 @@
 # Project State
 
 ## Current Focus
-Improved audio sample loading robustness by handling partial trailing chunks in STT analyzer
+Improved video dimension extraction error handling with fallback to center crop
 
 ## Completed
-- [x] Fixed potential panic on partial audio chunks by ignoring trailing incomplete samples
-- [x] Maintained existing functionality for complete 4-byte chunks while adding safety for malformed data
+- [x] Added proper error handling for video dimension extraction
+- [x] Implemented fallback to center crop when dimension extraction fails
+- [x] Added warning logging for dimension extraction failures
+```
