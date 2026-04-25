@@ -1,9 +1,9 @@
 # Project State
 
 ## Current Focus
-Updated CHANGELOG.md to reflect new preview generation feature (0.72.0)
+Incremented version number in CHANGELOG.md to reflect new preview generation feature
 
 ## Completed
-- [x] Updated version number from 0.69.0 to 0.72.0 in CHANGELOG.md
-- [x] Added documentation for preview generation feature with `--preview` CLI flag
+- [x] Updated CHANGELOG.md to version 0.73.0
+- [x] Updated Cargo.lock with dependency version changes
 ```
