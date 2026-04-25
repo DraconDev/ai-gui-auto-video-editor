@@ -163,7 +163,8 @@ The GUI provides a visual interface for managing watch folders and settings.
 | `--export-chapters` | Generate YouTube chapters (from Whisper) |
 | `--export-clips` | Extract highlight clips for Shorts/Reels |
 | `--export-fcpxml` | Generate FCPXML |
-| `--export-edl` | Generate EDL |
+| `--export-thumbnail` | Generate YouTube thumbnail from best frame |
+| `--export-multi-format` | Output multiple resolutions simultaneously |
 
 ## Presets
 
@@ -171,6 +172,9 @@ The GUI provides a visual interface for managing watch folders and settings.
 |--------|-------------|
 | `youtube` | Cut silences, enhance audio (two-pass loudnorm + gentle EQ), export chapters + FCPXML |
 | `shorts` | Speedup silences (3x), enhance audio, extract highlight clips |
+| `tiktok` | Vertical 9:16, 4x speedup, -12 LUFS, burn captions |
+| `reels` | Vertical 9:16, 3.5x speedup, 90s clips max |
+| `twitter` | Landscape 16:9, 2:20 max clips |
 | `podcast` | Cut silences, enhance audio (-16 LUFS), export SRT + styled captions |
 | `minimal` | Just silence detection, no enhancement |
 
