@@ -1,30 +1,64 @@
 # Changelog
 
-## 0.1.466
+All notable changes to this project will be documented in this file.
 
-### Watch Mode: CLI + GUI Parity
-- CLI now auto-loads `~/.config/ai-vid-editor/config.toml` — no `--config` flag needed
-- CLI reads `[[paths.watch_folders]]` from config, same as GUI
-- Running `ai-vid-editor` with no args starts multi-folder watch mode if configured
-- Per-folder presets and settings overrides work from CLI
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-### Progress Feedback
-- Timestamped output during processing: `[NEW FILE]`, `[START]`, `[XX%]` stage updates, `[DONE]` with elapsed time
-- Heartbeat message every ~30s so users know the watcher is alive
-- Initial scan lists existing files that are skipped
+## [Unreleased]
 
-### Audio Enhancement
-- Replaced single-pass loudnorm with **two-pass** (measures audio first, then applies correction with `linear=true`)
-  - Preserves natural speech dynamics instead of crushing them
-- Removed harsh EQ peaks (1kHz +2dB, 3kHz +3dB narrow bandwidth)
-  - Replaced with gentle wide-band +1.5dB at 1.5kHz for natural presence
-- Added high-pass filter at 80Hz (removes low rumble)
-- Added low-pass filter at 12kHz (removes sibilant hiss)
+## [0.38.0] - 2026-04-25
 
-### Config Merge Fix
-- `Config::merge()` now properly merges `paths.*`, `watch_folders`, `watch`, and `video` fields
-  - Previously these were silently ignored, causing defaults to persist over config values
+### Added
+- **Auto-thumbnail generation**: Extracts and scores candidate frames to generate YouTube-ready thumbnails
+- **Smart scene-change detection**: Uses ffmpeg scene detection for smarter cuts beyond silence
+- **Watermark/logo overlay support**: Image and text watermarks with 5 position options
+- **Quick preview generation**: Low-res preview renders for fast review before full export
+- **Multi-format output**: Simultaneous export to multiple resolutions (720p, 1080p, 4K, vertical)
+- **Social media presets**: TikTok, Instagram Reels, Twitter/X presets with platform-optimized settings
+- **Per-file preset selection**: Filename pattern matching for automatic preset assignment
+- **Video resolution targeting**: Configurable output resolution per preset
+- **Parallel batch processing**: Process multiple videos simultaneously with configurable worker threads
+- **Batch job persistence**: Resume interrupted batch jobs from where they left off
+- **Config validation**: Warns about incompatible feature combinations
+- **58 new tests**: Comprehensive test coverage for all new features
 
-## 0.1.424 (Previous Release)
+### Changed
+- **Major bug fixes**: 32 bugs fixed including loudnorm parsing, ffmpeg arg formatting, race conditions
+- **Performance**: Reduced allocations, optimized ffmpeg commands, chunk-based trimming
+- **Error handling**: Replaced `unwrap()`/`expect()` with proper error propagation throughout
+- **GUI stability**: Fixed atomic ordering, channel disconnect handling, watcher thread races
+- **Safety**: Removed `unsafe { libc::isatty }` in favor of `std::io::IsTerminal`
 
-See `release/0.1.424/docs/` for prior release documentation.
+### Fixed
+- `parse_loudnorm_stats` pattern matching with spaces around colons
+- `concatenate_videos` broken ffmpeg argument formatting
+- `generate_duck_filter` hardcoded volume (now accepts parameter)
+- `stabilize` shared temp file race condition
+- `export_edl` all-zero timestamps
+- `export_fcpxml` hardcoded 1-hour duration
+- `config::merge()` asymmetric boolean propagation
+- `center_crop_9_16` aspect ratio math
+- ASS subtitle backslash escaping
+- `extract_highlight_clips` duration clamping
+- `burn_subtitles_into_video` silent success on missing output
+- `format_srt_time` millisecond carry bug
+- `parse_ffmpeg_silence` negative-duration validation
+- `truncate_path` underflow for small max_len
+- `reframe()` silent fallback to 1920x1080
+
+## [0.21.4] - 2025-06-15
+
+### Added
+- Initial release with core video editing pipeline
+- Silence detection and removal (cut/speedup modes)
+- Audio enhancement (two-pass loudnorm + EQ)
+- Video stabilization, color correction, auto-reframe
+- Batch processing and watch folder mode
+- GUI built with egui
+- Export formats: SRT, FCPXML, EDL, YouTube chapters
+- Preset profiles: YouTube, Shorts, Podcast, Minimal
+- Whisper-based speech-to-text and filler word removal
+
+[Unreleased]: https://github.com/DraconDev/ai-vid-editor/compare/v0.38.0...HEAD
+[0.38.0]: https://github.com/DraconDev/ai-vid-editor/compare/v0.21.4...v0.38.0
