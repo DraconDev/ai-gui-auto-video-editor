@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Updated Cargo.lock to reflect dependency changes from recent audio processing and video concatenation improvements
+Expanded video file format support in the video discovery utility
 
 ## Completed
-- [x] Updated dependency versions for audio ducking and video concatenation functionality
-```
+- [x] Added support for MKV and WebM video formats to the video file discovery utility
+- [x] Updated test case to use OGG format instead of MKV for unsupported video testing

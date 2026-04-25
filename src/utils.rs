@@ -4,7 +4,7 @@ use walkdir::WalkDir;
 
 pub fn find_video_files(dir: &Path) -> Result<Vec<PathBuf>> {
     let mut video_files = Vec::new();
-    let supported_extensions = ["mp4", "mov", "avi"];
+    let supported_extensions = ["mp4", "mov", "avi", "mkv", "webm"];
 
     for entry in WalkDir::new(dir).into_iter().filter_map(|e| e.ok()) {
         let path = entry.path();
@@ -30,7 +30,7 @@ mod tests {
         let video1 = dir.path().join("video1.mp4");
         let video2 = dir.path().join("subdir/video2.mov");
         let text_file = dir.path().join("text.txt");
-        let unsupported_video = dir.path().join("unsupported.mkv");
+        let unsupported_video = dir.path().join("unsupported.ogg");
 
         fs::write(&video1, "dummy video content")?;
         fs::create_dir(dir.path().join("subdir"))?;
