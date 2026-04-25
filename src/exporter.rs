@@ -366,7 +366,7 @@ mod tests {
         assert_eq!(h, 0);
         assert_eq!(m, 0);
         assert_eq!(s, 5);
-        assert_eq!(f, 14); // 0.5 * 25 = 12.5, rounded to 13 (actually 14 due to floating point)
+        assert_eq!(f, 13); // (5.5 % 1.0) * 25 = 0.5 * 25 = 12.5, rounded to 13
 
         let (h, m, s, f) = seconds_to_timecode(3661.04, 25.0);
         assert_eq!(h, 1);
