@@ -1,10 +1,9 @@
 # Project State
 
 ## Current Focus
-Added scene detection integration to batch processing pipeline
+Added silence segment merging with scene-change boundaries for more accurate video trimming
 
 ## Completed
-- [x] Integrated scene detection with silence detection when enabled
-- [x] Added fallback to silence-only processing if scene detection fails
-- [x] Adjusted progress reporting to account for additional processing step
-- [x] Maintained backward compatibility with existing silence-only workflow
+- [x] Implemented `merge_silences_and_scenes` function to combine silence detection with scene detection boundaries
+- [x] Added logic to extend silence segments to nearest scene boundaries within 0.5 seconds
+- [x] Integrated with existing segment processing pipeline for batch video processing

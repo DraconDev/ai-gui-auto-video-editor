@@ -443,6 +443,43 @@ where
     Ok(())
 }
 
+/// Merge silence segments with scene-change boundaries.
+/// Scene changes are treated as additional cut points - they split existing
+/// silence segments or create new boundaries for trimming.
+fn merge_silences_and_scenes(
+    silences: &[crate::analyzer::Segment],
+    scenes: &[f32],
+    duration: f32,
+) -> Vec<crate::analyzer::Segment> {
+    if scenes.is_empty() {
+        return silences.to_vec();
+    }
+
+    // Convert scene timestamps to segments (gaps between scenes are "keep" regions)
+    let scene_segments = crate::scene_detection::scenes_to_segments(scenes, duration);
+
+    // Merge: a silence segment is extended to nearest scene boundary if close
+    let mut merged = Vec::new();
+    for silence in silences {
+        let mut start = silence.start;
+        let mut end = silence.end;
+
+        // Extend silence to nearest scene boundary if within 0.5s
+        for scene in &scene_segments {
+            if (scene.start - start).abs() < 0.5 {
+                start = scene.start.min(start);
+            }
+            if (scene.end - end).abs() < 0.5 {
+                end = scene.end.max(end);
+            }
+        }
+
+        merged.push(crate::analyzer::Segment { start, end });
+    }
+
+    merged
+}
+
 fn report_progress<F>(progress: &mut F, fraction: f32, stage: impl Into<String>)
 where
     F: FnMut(ProcessingProgress),
