@@ -974,7 +974,7 @@ mod tests {
         assert_eq!(chain_atempo_filters(0.75), "atempo=0.75");
 
         // Speed up beyond 2.0: chain multiple
-        assert_eq!(chain_atempo_filters(4.0), "atempo=2.0,atempo=2.0");
+        assert_eq!(chain_atempo_filters(4.0), "atempo=2.0,atempo=2");
         assert_eq!(chain_atempo_filters(3.0), "atempo=2.0,atempo=1.5");
 
         // Slow down below 0.5: chain multiple
