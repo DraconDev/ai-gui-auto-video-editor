@@ -162,9 +162,22 @@ pub trait VideoEditor: Send + Sync {
     fn blur_background(&self, input: &Path, output: &Path) -> Result<()>;
 }
 
-pub struct FfmpegEditor;
+pub struct FfmpegEditor {
+    pub hw_accel: crate::hwaccel::HwAccel,
+}
+
+impl Default for FfmpegEditor {
+    fn default() -> Self {
+        Self {
+            hw_accel: crate::hwaccel::HwAccel::None,
+        }
+    }
+}
 
 impl FfmpegEditor {
+    pub fn new(hw_accel: crate::hwaccel::HwAccel) -> Self {
+        Self { hw_accel }
+    }
     fn run_reframe_filter(&self, input: &Path, output: &Path, filter: &str) -> Result<()> {
         info!(filter = %filter, "Applying crop filter");
 
