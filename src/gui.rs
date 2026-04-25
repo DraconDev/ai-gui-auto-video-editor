@@ -3,22 +3,14 @@ mod processing;
 mod tabs;
 
 use eframe::egui;
-use egui::RichText;
-use rfd::FileDialog;
-use std::collections::HashSet;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::sync::{
-    Arc,
     atomic::{AtomicBool, Ordering},
-    mpsc::{self, Receiver},
+    mpsc::Receiver,
 };
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
-use ai_vid_editor::{
-    Config, FfmpegAnalyzer, FfmpegDurationGetter, FfmpegEditor, FolderSettings, JoinMode, Preset,
-    ProcessingProgress, SilenceMode, WatchFolder, process_single_file_with_intro_outro_progress,
-};
-use theme::*;
+use ai_vid_editor::{Config, FolderSettings, JoinMode, WatchFolder};
 
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
 enum Tab {
