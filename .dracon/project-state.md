@@ -1,7 +1,9 @@
 # Project State
 
 ## Current Focus
-Reduced thumbnail generation frequency from 1 frame per second to 0.2 frames per second to optimize performance.
+Added string parsing for watermark position configuration
 
 ## Completed
-- [x] Modified thumbnail generation to use `fps=0.2` instead of `fps=1` in FFmpeg command
+- [x] Implemented `from_str` parsing for watermark positions with support for full names ("bottom-right") and abbreviations ("br")
+- [x] Added test cases for valid and invalid position strings
+- [x] Updated Cargo.lock with dependency version updates

@@ -313,4 +313,29 @@ mod tests {
         .unwrap();
         assert!(output.exists(), "text watermarked output should exist");
     }
+
+    #[test]
+    fn test_watermark_position_from_str() {
+        assert_eq!(
+            WatermarkPosition::from_str("bottom-right"),
+            Some(WatermarkPosition::BottomRight)
+        );
+        assert_eq!(
+            WatermarkPosition::from_str("top-left"),
+            Some(WatermarkPosition::TopLeft)
+        );
+        assert_eq!(
+            WatermarkPosition::from_str("center"),
+            Some(WatermarkPosition::Center)
+        );
+        assert_eq!(
+            WatermarkPosition::from_str("tl"),
+            Some(WatermarkPosition::TopLeft)
+        );
+        assert_eq!(
+            WatermarkPosition::from_str("BR"),
+            Some(WatermarkPosition::BottomRight)
+        );
+        assert_eq!(WatermarkPosition::from_str("invalid"), None);
+    }
 }
