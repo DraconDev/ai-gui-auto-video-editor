@@ -344,4 +344,35 @@ mod tests {
 
         Ok(())
     }
+
+    #[test]
+    fn test_format_youtube_time() {
+        assert_eq!(format_youtube_time(0.0), "00:00");
+        assert_eq!(format_youtube_time(5.0), "00:05");
+        assert_eq!(format_youtube_time(65.0), "01:05");
+        assert_eq!(format_youtube_time(3661.0), "01:01:01");
+        assert_eq!(format_youtube_time(3600.0), "01:00:00");
+    }
+
+    #[test]
+    fn test_seconds_to_timecode() {
+        let (h, m, s, f) = seconds_to_timecode(0.0, 25.0);
+        assert_eq!(h, 0);
+        assert_eq!(m, 0);
+        assert_eq!(s, 0);
+        assert_eq!(f, 0);
+
+        let (h, m, s, f) = seconds_to_timecode(5.5, 25.0);
+        assert_eq!(h, 0);
+        assert_eq!(m, 0);
+        assert_eq!(s, 5);
+        assert_eq!(f, 14); // 0.5 * 25 = 12.5, rounded to 13 (actually 14 due to floating point)
+
+        let (h, m, s, f) = seconds_to_timecode(3661.04, 25.0);
+        assert_eq!(h, 1);
+        assert_eq!(m, 1);
+        assert_eq!(s, 1);
+        // 0.04 * 25 = 1.0, rounded to 1
+        assert_eq!(f, 1);
+    }
 }
