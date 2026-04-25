@@ -1,7 +1,8 @@
 # Project State
 
 ## Current Focus
-Added thread safety requirements to video processing traits
+Added parallel batch processing capability for video directories
 
 ## Completed
-- [x] Added `Send + Sync` bounds to `DurationGetter` trait to enable thread-safe video duration operations
+- [x] Added `process_batch_dir_parallel` function to enable thread-safe parallel processing of video directories
+- [x] Updated public API exports to include the new parallel processing function

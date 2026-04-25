@@ -17,8 +17,9 @@ pub mod watermark;
 
 pub use analyzer::FfmpegAnalyzer;
 pub use batch_processor::{
-    FfmpegDurationGetter, ProcessingProgress, process_batch_dir, process_single_file,
-    process_single_file_with_intro_outro, process_single_file_with_intro_outro_progress,
+    FfmpegDurationGetter, ProcessingProgress, process_batch_dir, process_batch_dir_parallel,
+    process_single_file, process_single_file_with_intro_outro,
+    process_single_file_with_intro_outro_progress,
 };
 pub use config::{
     Config, FolderSettings, JoinMode, Preset, ProcessingConfig, SilenceMode, WatchFolder,
