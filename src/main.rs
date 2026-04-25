@@ -480,8 +480,8 @@ fn main() -> Result<()> {
         config.export.multi_format = true;
     }
     if let Some(ref resolution_str) = cli.resolution {
-        config.video.target_resolution = parse_resolution(resolution_str)
-            .unwrap_or(crate::config::VideoResolution::Fhd1080p);
+        config.video.target_resolution =
+            parse_resolution(resolution_str).unwrap_or(crate::config::VideoResolution::Fhd1080p);
     }
 
     // Print config (unless JSON mode)

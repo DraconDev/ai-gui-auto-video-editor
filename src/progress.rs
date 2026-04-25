@@ -26,8 +26,7 @@ impl BatchProgress {
 
     /// Save progress to a state file
     pub fn to_file(&self, path: &Path) -> Result<()> {
-        let content = serde_json::to_string_pretty(self)
-            .context("Failed to serialize progress")?;
+        let content = serde_json::to_string_pretty(self).context("Failed to serialize progress")?;
         std::fs::write(path, content)
             .with_context(|| format!("Failed to write progress file: {:?}", path))?;
         Ok(())
@@ -50,12 +49,14 @@ impl BatchProgress {
 
     /// Get the number of remaining files
     pub fn remaining(&self) -> usize {
-        self.total.saturating_sub(self.completed.len() + self.failed.len())
+        self.total
+            .saturating_sub(self.completed.len() + self.failed.len())
     }
 
     /// Get the default progress file path for a given input directory
     pub fn default_path(input_dir: &Path) -> PathBuf {
-        let dir_name = input_dir.file_name()
+        let dir_name = input_dir
+            .file_name()
             .and_then(|n| n.to_str())
             .unwrap_or("default");
         std::env::temp_dir().join(format!("ai-vid-editor-progress-{}.json", dir_name))

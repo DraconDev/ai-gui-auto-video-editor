@@ -1,8 +1,8 @@
 use anyhow::{Context, Result};
 use std::fs;
 use std::path::{Path, PathBuf};
-use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicUsize, Ordering};
 use tracing::{debug, info, warn};
 
 use crate::analyzer::ProcessedSegment;
@@ -913,9 +913,7 @@ where
 
     info!(
         total = total_files,
-        successful,
-        failed,
-        "Parallel batch processing complete"
+        successful, failed, "Parallel batch processing complete"
     );
 
     Ok(())
