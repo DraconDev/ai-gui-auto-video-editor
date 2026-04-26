@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Refactored progress reporting in batch queue processing to use standardized fraction and stage fields
+Updated dependency versions in Cargo.lock for video processing features
 
 ## Completed
-- [x] Updated progress reporting in queue worker loop to use `progress.fraction` instead of `progress.progress`
-- [x] Changed message field to use `progress.stage.clone()` instead of `progress.message.clone()`
+- [x] Updated Cargo.lock with new dependency versions for video processing features
+```
