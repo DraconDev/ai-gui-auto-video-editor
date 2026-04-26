@@ -1196,7 +1196,7 @@ fn parse_resolution(s: &str) -> Option<crate::config::VideoResolution> {
 }
 
 #[cfg(feature = "gui")]
-fn run_gui() -> Result<()> {
+fn run_gui(start_minimized: bool) -> Result<()> {
     use eframe::egui;
 
     let options = eframe::NativeOptions {
@@ -1213,7 +1213,7 @@ fn run_gui() -> Result<()> {
         options,
         Box::new(|cc| {
             configure_dark_theme(&cc.egui_ctx);
-            Ok(Box::new(gui::App::new(cli.start_minimized)))
+            Ok(Box::new(gui::App::new(start_minimized)))
         }),
     )
     .map_err(|e| anyhow::anyhow!("GUI error: {}", e))

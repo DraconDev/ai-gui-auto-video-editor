@@ -1,7 +1,8 @@
 # Project State
 
 ## Current Focus
-Refactored window visibility control in GUI initialization
+Refactored GUI initialization to support configurable window visibility
 
 ## Completed
-- [x] Changed `ctx.set_visible(false)` to `frame.set_window_visible(false)` for more accurate window state management during initialization
+- [x] Modified `run_gui` to accept `start_minimized` parameter
+- [x] Updated GUI app initialization to use the new parameter instead of CLI flag
