@@ -1,7 +1,8 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock for video processing features
+Improved file selection UI in the "Add Files" button by using pattern matching for cleaner code
 
 ## Completed
-- [x] Updated dependency versions in Cargo.lock to ensure compatibility with video processing features
+- [x] Refactored file dialog handling to use `if let` pattern matching for cleaner code
+```
