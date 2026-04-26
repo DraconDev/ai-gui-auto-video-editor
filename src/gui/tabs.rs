@@ -1354,33 +1354,6 @@ impl App {
                 );
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                     if ui.add(button_add("+ Add Files")).clicked() {
-                        if let Some(paths) = FileDialog::new().pick_files() {
-                            for path in paths {
-                                self.state.batch_queue.push(super::QueuedFile {
-                                    path,
-                                    output_dir: self.state.folders.get(self.state.selected_folder_idx)
-                                        .map(|f| f.output.clone())
-                                        .unwrap_or_else(|| PathBuf::from("output")),
-                                    preset: self.state.folders.get(self.state.selected_folder_idx)
-                                        .map(|f| f.preset.clone())
-                                        .unwrap_or_else(|| "youtube".to_string()),
-                                    status: super::QueueStatus::Queued,
-                                    progress: 0.0,
-                });
-        }
-    }
-
-    pub(crate) fn draw_queue_panel(&mut self, ui: &mut egui::Ui) {
-        panel_frame().show(ui, |ui| {
-            ui.horizontal(|ui| {
-                ui.label(
-                    RichText::new("Batch Queue")
-                        .size(18.0)
-                        .color(ACCENT_PRIMARY)
-                        .strong(),
-                );
-                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                    if ui.add(button_add("+ Add Files")).clicked() {
                         if let Some(paths) = rfd::FileDialog::new().pick_files() {
                             for path in paths {
                                 let preset = self
