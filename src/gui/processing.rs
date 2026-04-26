@@ -277,6 +277,24 @@ fn build_folder_config(config: &Config, folder: &FolderState) -> Config {
     if let Some(blur_background) = folder.settings.blur_background {
         merged.video.blur_background = blur_background;
     }
+    if let Some(hw_accel) = folder.settings.hw_accel {
+        merged.video.hw_accel = hw_accel;
+    }
+    if let Some(target_resolution) = folder.settings.target_resolution {
+        merged.video.target_resolution = target_resolution;
+    }
+    if let Some(noise_reduction) = folder.settings.noise_reduction {
+        merged.audio.noise_reduction = noise_reduction;
+    }
+    if let Some(preview) = folder.settings.preview {
+        merged.export.preview = preview;
+    }
+    if let Some(scene_detect) = folder.settings.scene_detect {
+        merged.silence.scene_detect = scene_detect;
+    }
+    if let Some(multi_format) = folder.settings.multi_format {
+        merged.export.multi_format = multi_format;
+    }
 
     merged
 }
