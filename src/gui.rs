@@ -167,6 +167,29 @@ enum WatcherEvent {
     },
 }
 
+#[derive(Debug)]
+pub(crate) enum QueueEvent {
+    Processing {
+        filename: String,
+        path: PathBuf,
+    },
+    Progress {
+        filename: String,
+        progress: f32,
+        message: String,
+    },
+    Completed {
+        filename: String,
+        file_size: u64,
+        output_path: PathBuf,
+    },
+    Failed {
+        filename: String,
+        message: String,
+    },
+    Finished,
+}
+
 impl From<FolderState> for WatchFolder {
     fn from(state: FolderState) -> Self {
         Self {
@@ -295,6 +318,8 @@ pub struct AppState {
     // Batch queue
     batch_queue: Vec<QueuedFile>,
     queue_processing: bool,
+    queue_rx: Option<Receiver<QueueEvent>>,
+    queue_stop: Option<Arc<AtomicBool>>,
 }
 
 #[allow(dead_code)]

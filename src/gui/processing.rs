@@ -7,7 +7,7 @@ use std::sync::{
 };
 use std::time::{Duration, Instant};
 
-use super::{FolderState, ProcessingStatus, WatcherEvent};
+use super::{FolderState, ProcessingStatus, QueueEvent, WatcherEvent};
 use ai_vid_editor::{
     Config, FfmpegAnalyzer, FfmpegDurationGetter, FfmpegEditor, Preset, ProcessingProgress,
     SilenceMode, process_single_file_with_intro_outro_progress,
@@ -268,4 +268,90 @@ fn is_video_file(path: &Path) -> bool {
                 )
             })
             .unwrap_or(false)
+}
+
+pub(crate) fn spawn_queue_worker(
+    config: Config,
+    queue: Vec<super::QueuedFile>,
+    output_dir: PathBuf,
+    tx: mpsc::Sender<QueueEvent>,
+) -> Arc<AtomicBool> {
+    let stop = Arc::new(AtomicBool::new(false));
+    let thread_stop = Arc::clone(&stop);
+
+    std::thread::spawn(move || {
+        queue_worker_loop(config, queue, output_dir, tx, thread_stop);
+    });
+
+    stop
+}
+
+fn queue_worker_loop(
+    config: Config,
+    queue: Vec<super::QueuedFile>,
+    _output_dir: PathBuf,
+    tx: mpsc::Sender<QueueEvent>,
+    stop: Arc<AtomicBool>,
+) {
+    let analyzer = FfmpegAnalyzer;
+    let editor = FfmpegEditor::new(config.video.hw_accel);
+    let duration_getter = FfmpegDurationGetter;
+
+    for file in queue {
+        if stop.load(Ordering::SeqCst) {
+            return;
+        }
+
+        let filename = file.path.file_name()
+            .and_then(|n| n.to_str())
+            .unwrap_or("unknown")
+            .to_string();
+
+        let _ = tx.send(QueueEvent::Processing {
+            filename: filename.clone(),
+            path: file.path.clone(),
+        });
+
+        let output_file = file.output_dir.join(format!(
+            "{}.mp4",
+            file.path.file_stem().and_then(|s| s.to_str()).unwrap_or("output")
+        ));
+
+        let result = process_single_file_with_intro_outro_progress(
+            file.path.clone(),
+            output_file.clone(),
+            &config,
+            &analyzer,
+            &editor,
+            &duration_getter,
+            config.paths.intro.clone(),
+            config.paths.outro.clone(),
+            |progress| {
+                let _ = tx.send(QueueEvent::Progress {
+                    filename: filename.clone(),
+                    progress: progress.progress,
+                    message: progress.message.clone(),
+                });
+            },
+        );
+
+        match result {
+            Ok(_) => {
+                let file_size = output_file.metadata().map(|m| m.len()).unwrap_or(0);
+                let _ = tx.send(QueueEvent::Completed {
+                    filename,
+                    file_size,
+                    output_path: output_file,
+                });
+            }
+            Err(e) => {
+                let _ = tx.send(QueueEvent::Failed {
+                    filename,
+                    message: e.to_string(),
+                });
+            }
+        }
+    }
+
+    let _ = tx.send(QueueEvent::Finished);
 }
