@@ -790,10 +790,12 @@ fn run_watch_mode(
                             if notify {
                                 notify_complete(&path, &output_path);
                             }
+                            last_processed = Some(file_name.clone());
                             processed.insert(path);
                         }
                         Err(e) => {
                             let elapsed = start_time.elapsed().as_secs_f32();
+                            last_processed = Some(format!("{} (error)", file_name));
                             eprintln!(
                                 "[{}] [ERROR] {} failed after {:.1}s: {}",
                                 timestamp(),
