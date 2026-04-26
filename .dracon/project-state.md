@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Added a boolean flag to enable desktop notifications in the queue processing system
+Updated dependency versions in Cargo.lock for video processing features
 
 ## Completed
-- [x] feat(notifications): enabled desktop notifications for batch processing completion by passing `true` as the last parameter in queue initialization
+- [x] Updated Cargo.lock with new dependency versions for video processing features
 ```
