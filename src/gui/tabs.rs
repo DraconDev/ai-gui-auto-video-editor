@@ -5,7 +5,7 @@ use std::path::PathBuf;
 use std::sync::mpsc;
 
 use super::{App, ActivityEntry, EntryStatus, FolderState, ProcessingStatus, SetupStep, Tab};
-use ai_vid_editor::FolderSettings;
+use ai_vid_editor::{FolderSettings, HwAccel, VideoResolution};
 use super::theme::*;
 
 impl App {
