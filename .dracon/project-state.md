@@ -1,10 +1,8 @@
 # Project State
 
 ## Current Focus
-Added desktop notifications for batch processing completion with success/failure summary
+Added a boolean flag to enable desktop notifications in the queue processing system
 
 ## Completed
-- [x] Added `notify` parameter to queue worker to control notification behavior
-- [x] Implemented success/failure counters during batch processing
-- [x] Added desktop notification with summary of processed files (total and failed count)
-- [x] Only show notification if queue isn't empty and notifications are enabled
+- [x] feat(notifications): enabled desktop notifications for batch processing completion by passing `true` as the last parameter in queue initialization
+```

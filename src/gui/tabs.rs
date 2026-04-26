@@ -1511,6 +1511,7 @@ impl App {
             self.state.config.clone(),
             queue,
             tx,
+            true,
         );
 
         self.state.queue_rx = Some(rx);
