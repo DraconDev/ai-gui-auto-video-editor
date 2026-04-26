@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Added dead code allowance for QueueStatus enum in GUI module
+Updated dependency versions in Cargo.lock for video processing features
 
 ## Completed
-- [x] Added `#[allow(dead_code)]` attribute to QueueStatus enum to suppress compiler warnings about unused variants
+- [x] Updated Cargo.lock with new dependency versions for video processing features
 ```
