@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Added path tracking to queue events for improved file management
+Updated dependency versions in Cargo.lock for video processing features
 
 ## Completed
-- [x] Added path field to `QueueEvent::Completed` for tracking processed file paths
-- [x] Added path field to `QueueEvent::Failed` for tracking failed file paths
+- [x] Updated Cargo.lock with latest dependency versions for video processing features
+```
