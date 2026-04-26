@@ -1,8 +1,9 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock for video processing features
+Refactored hardware acceleration detection logic for cleaner conditional checks
 
 ## Completed
-- [x] Updated Cargo.lock with new dependency versions for video processing features
-```
+- [x] Consolidated hardware acceleration checks into single-line conditions
+- [x] Removed redundant nested if statements for each hardware type
+- [x] Maintained same functionality while improving code readability

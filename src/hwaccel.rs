@@ -77,26 +77,17 @@ impl HwAccel {
             Err(_) => return HwAccel::None,
         };
 
-        if output.contains("cuda") || output.contains("nvenc") {
-            // Verify h264_nvenc is actually available
-            if codec_available("h264_nvenc") {
-                return HwAccel::Nvenc;
-            }
+        if (output.contains("cuda") || output.contains("nvenc")) && codec_available("h264_nvenc") {
+            return HwAccel::Nvenc;
         }
-        if output.contains("amf") {
-            if codec_available("h264_amf") {
-                return HwAccel::Amf;
-            }
+        if output.contains("amf") && codec_available("h264_amf") {
+            return HwAccel::Amf;
         }
-        if output.contains("vaapi") {
-            if codec_available("h264_vaapi") {
-                return HwAccel::Vaapi;
-            }
+        if output.contains("vaapi") && codec_available("h264_vaapi") {
+            return HwAccel::Vaapi;
         }
-        if output.contains("videotoolbox") {
-            if codec_available("h264_videotoolbox") {
-                return HwAccel::VideoToolbox;
-            }
+        if output.contains("videotoolbox") && codec_available("h264_videotoolbox") {
+            return HwAccel::VideoToolbox;
         }
 
         HwAccel::None
