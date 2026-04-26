@@ -387,7 +387,7 @@ fn queue_worker_loop(
         }
     }
 
-    if notify && !queue.is_empty() {
+    if notify && queue_len > 0 {
         let total = successful + failed;
         let body = if failed == 0 {
             format!("Processed {} file{} successfully", total, if total == 1 { "" } else { "s" })

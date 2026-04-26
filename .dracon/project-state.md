@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Added queue length tracking for processing worker loop
+Optimized queue processing notification logic by replacing empty check with explicit length comparison
 
 ## Completed
-- [x] Added `queue_len` variable to track queue size during processing
-```
+- [x] Replaced `!queue.is_empty()` with `queue_len > 0` in processing worker loop for better performance and clarity
+- [x] Updated Cargo.lock with latest dependency versions for video processing features
