@@ -242,6 +242,7 @@ struct QueuedFile {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
+#[allow(dead_code)]
 enum QueueStatus {
     Queued,
     Processing,
