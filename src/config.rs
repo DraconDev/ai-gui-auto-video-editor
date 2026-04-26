@@ -422,6 +422,18 @@ pub struct FolderSettings {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub blur_background: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub noise_reduction: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub preview: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub scene_detect: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub multi_format: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub hw_accel: Option<crate::hwaccel::HwAccel>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub target_resolution: Option<VideoResolution>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub subtitles: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub chapters: Option<bool>,
