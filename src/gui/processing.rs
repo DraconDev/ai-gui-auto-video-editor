@@ -327,6 +327,7 @@ fn queue_worker_loop(
             |progress| {
                 let _ = tx.send(QueueEvent::Progress {
                     filename: filename.clone(),
+                    path: file.path.clone(),
                     progress: progress.fraction,
                     message: progress.stage.clone(),
                 });
