@@ -857,7 +857,7 @@ mod tests {
         let output = temp_dir.path().join("output.mp4");
         create_test_video(&input, 3.0);
 
-        let editor = FfmpegEditor;
+        let editor = FfmpegEditor::default();
         let segments = vec![ProcessedSegment {
             start: 0.5,
             end: 2.0,
@@ -875,7 +875,7 @@ mod tests {
         let output = temp_dir.path().join("output.mp4");
         create_test_video(&input, 5.0);
 
-        let editor = FfmpegEditor;
+        let editor = FfmpegEditor::default();
         let segments = vec![
             ProcessedSegment {
                 start: 0.0,
@@ -900,7 +900,7 @@ mod tests {
         let output = temp_dir.path().join("output.mp4");
         create_test_video(&input, 1.0);
 
-        let editor = FfmpegEditor;
+        let editor = FfmpegEditor::default();
         let result = editor.trim_video(&input, &output, &[]);
         assert!(result.is_err(), "trim with empty segments should fail");
     }
@@ -912,7 +912,7 @@ mod tests {
         let output = temp_dir.path().join("output.mp4");
         create_test_video(&input, 2.0);
 
-        let editor = FfmpegEditor;
+        let editor = FfmpegEditor::default();
         editor.enhance_audio(&input, &output, -14.0).unwrap();
         assert!(output.exists(), "enhanced output should exist");
     }
@@ -924,7 +924,7 @@ mod tests {
         let output = temp_dir.path().join("output.mp4");
         create_test_video(&input, 2.0);
 
-        let editor = FfmpegEditor;
+        let editor = FfmpegEditor::default();
         editor.reduce_noise(&input, &output).unwrap();
         assert!(output.exists(), "noise-reduced output should exist");
     }
@@ -936,7 +936,7 @@ mod tests {
         let output = temp_dir.path().join("output.mp4");
         create_test_video(&input, 2.0);
 
-        let editor = FfmpegEditor;
+        let editor = FfmpegEditor::default();
         editor.color_correct(&input, &output).unwrap();
         assert!(output.exists(), "color-corrected output should exist");
     }
