@@ -32,6 +32,7 @@ impl App {
                     let tabs = [
                         (Tab::All, "All"),
                         (Tab::Folders, "Folders"),
+                        (Tab::Queue, "Queue"),
                         (Tab::Settings, "Settings"),
                         (Tab::Activity, "Activity"),
                     ];
