@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock for video processing features
+Standardized `FfmpegEditor` instantiation across test cases
 
 ## Completed
-- [x] Updated Cargo.lock with new dependency versions for video processing features
-```
+- [x] Updated all test cases to use `FfmpegEditor::default()` instead of direct instantiation
+- [x] Maintained consistent initialization pattern across audio enhancement, video stabilization, color correction, and auto-reframe tests

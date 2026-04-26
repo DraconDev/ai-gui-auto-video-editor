@@ -74,7 +74,7 @@ fn test_audio_enhancement() {
     let output_dir = tempdir().unwrap();
     let output_path = output_dir.path().join("enhanced.mp4");
 
-    let editor = FfmpegEditor;
+    let editor = FfmpegEditor::default();
     let result = editor.enhance_audio(&video_path, &output_path, -14.0);
 
     assert!(result.is_ok(), "Audio enhancement should succeed");
@@ -96,7 +96,7 @@ fn test_video_stabilization() {
     let output_dir = tempdir().unwrap();
     let output_path = output_dir.path().join("stabilized.mp4");
 
-    let editor = FfmpegEditor;
+    let editor = FfmpegEditor::default();
     let result = editor.stabilize(&video_path, &output_path);
 
     assert!(result.is_ok(), "Video stabilization should succeed");
@@ -118,7 +118,7 @@ fn test_color_correction() {
     let output_dir = tempdir().unwrap();
     let output_path = output_dir.path().join("corrected.mp4");
 
-    let editor = FfmpegEditor;
+    let editor = FfmpegEditor::default();
     let result = editor.color_correct(&video_path, &output_path);
 
     assert!(result.is_ok(), "Color correction should succeed");
@@ -140,7 +140,7 @@ fn test_auto_reframe() {
     let output_dir = tempdir().unwrap();
     let output_path = output_dir.path().join("reframed.mp4");
 
-    let editor = FfmpegEditor;
+    let editor = FfmpegEditor::default();
     let result = editor.reframe(&video_path, &output_path);
 
     // Note: This will use center crop if ML models fail to load
