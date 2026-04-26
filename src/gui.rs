@@ -603,6 +603,66 @@ impl AppState {
         }
     }
 
+    fn drain_queue_events(&mut self) {
+        let Some(rx) = self.queue_rx.as_ref() else {
+            return;
+        };
+
+        let mut drained = Vec::new();
+        while let Ok(event) = rx.try_recv() {
+            drained.push(event);
+        }
+
+        for event in drained {
+            match event {
+                QueueEvent::Processing { filename, path } => {
+                    for file in &mut self.batch_queue {
+                        if file.path == path {
+                            file.status = QueueStatus::Processing;
+                            file.progress = 0.0;
+                            break;
+                        }
+                    }
+                    self.status = ProcessingStatus::Processing(filename);
+                }
+                QueueEvent::Progress { filename: _, progress, message: _ } => {
+                    for file in &mut self.batch_queue {
+                        if file.status == QueueStatus::Processing {
+                            file.progress = progress;
+                            break;
+                        }
+                    }
+                }
+                QueueEvent::Completed { filename, file_size: _, output_path: _ } => {
+                    for file in &mut self.batch_queue {
+                        if file.status == QueueStatus::Processing {
+                            file.status = QueueStatus::Done;
+                            file.progress = 1.0;
+                            break;
+                        }
+                    }
+                    self.toasts.push(Toast::new(format!("{} processed", filename), true));
+                }
+                QueueEvent::Failed { filename, message } => {
+                    for file in &mut self.batch_queue {
+                        if file.status == QueueStatus::Processing {
+                            file.status = QueueStatus::Error;
+                            break;
+                        }
+                    }
+                    self.toasts.push(Toast::new(
+                        format!("{} failed: {}", filename, message),
+                        false,
+                    ));
+                }
+                QueueEvent::Finished => {
+                    self.queue_processing = false;
+                    self.queue_stop = None;
+                }
+            }
+        }
+    }
+
     fn upsert_processing_entry(
         &mut self,
         filename: &str,
