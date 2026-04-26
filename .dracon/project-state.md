@@ -1,10 +1,8 @@
 # Project State
 
 ## Current Focus
-Integrated toast notifications for user feedback in the GUI
+Added toast notification system for user feedback in the GUI
 
 ## Completed
-- [x] Added toast notifications for successful file processing
-- [x] Added toast notifications for failed file processing
-- [x] Fixed string ownership issues by cloning filenames and messages
-- [x] Implemented visual feedback for both success and error cases
+- [x] Implemented toast notification rendering in the GUI
+- [x] Added cleanup for expired toast notifications

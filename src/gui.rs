@@ -644,6 +644,12 @@ impl eframe::App for App {
         if self.state.modal.delete_confirm_idx.is_some() {
             self.draw_delete_confirm_modal(ctx);
         }
+
+        // Draw toast notifications
+        self.draw_toasts(ctx);
+
+        // Clean up expired toasts
+        self.state.toasts.retain(|t| !t.expired());
     }
 }
 
