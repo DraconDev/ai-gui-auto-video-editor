@@ -2,6 +2,7 @@ use eframe::egui;
 use egui::RichText;
 use rfd::FileDialog;
 use std::path::PathBuf;
+use std::sync::mpsc;
 
 use super::{App, ActivityEntry, EntryStatus, FolderState, ProcessingStatus, SetupStep, Tab};
 use ai_vid_editor::FolderSettings;
@@ -1491,8 +1492,6 @@ impl App {
     }
 
     fn start_queue_processing(&mut self) {
-        // Spawn a background thread to process queued files one by one.
-        // For each file, update status and send progress via the existing watcher channel.
         let queue: Vec<super::QueuedFile> = self
             .state
             .batch_queue
@@ -1506,17 +1505,18 @@ impl App {
             return;
         }
 
-        // Mark first file as processing
-        for file in &mut self.state.batch_queue {
-            if file.path == queue[0].path {
-                file.status = super::QueueStatus::Processing;
-                break;
-            }
-        }
+        let (tx, rx) = mpsc::channel();
+        let stop = super::processing::spawn_queue_worker(
+            self.state.config.clone(),
+            queue,
+            self.state.folders.get(self.state.selected_folder_idx)
+                .map(|f| f.output.clone())
+                .unwrap_or_else(|| PathBuf::from("output")),
+            tx,
+        );
 
-        // Processing happens in the background via the existing watcher loop.
-        // For a full implementation, a dedicated queue worker thread would be added here.
-        // As a placeholder, we reset the flag after a short delay via the next UI frame.
+        self.state.queue_rx = Some(rx);
+        self.state.queue_stop = Some(stop);
         self.state.queue_processing = true;
     }
 }
