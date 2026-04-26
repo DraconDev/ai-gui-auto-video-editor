@@ -1,7 +1,8 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock for video processing features
+Added output path tracking to queued files for improved file management in batch processing
 
 ## Completed
-- [x] Updated dependency versions in Cargo.lock to ensure compatibility with video processing features
+- [x] Added `output_path` field to `QueuedFile` struct to track destination paths for processed files
+```

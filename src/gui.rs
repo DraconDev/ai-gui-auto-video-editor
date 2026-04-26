@@ -264,6 +264,7 @@ struct QueuedFile {
     preset: String,
     status: QueueStatus,
     progress: f32,
+    output_path: Option<PathBuf>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
