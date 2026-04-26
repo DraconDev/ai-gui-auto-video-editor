@@ -182,6 +182,7 @@ pub(crate) enum QueueEvent {
     },
     Completed {
         filename: String,
+        path: PathBuf,
         file_size: u64,
         output_path: PathBuf,
     },
