@@ -1,8 +1,7 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock for video processing features
+Added a new "Queue" tab to the GUI for managing processing tasks
 
 ## Completed
-- [x] Updated dependency versions in Cargo.lock to ensure compatibility with video processing features
-```
+- [x] Added a new "Queue" tab to the GUI to support task management in the video processing workflow

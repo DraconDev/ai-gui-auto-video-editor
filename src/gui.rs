@@ -18,6 +18,7 @@ enum Tab {
     #[default]
     All,
     Folders,
+    Queue,
     Settings,
     Activity,
 }
