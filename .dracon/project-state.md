@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Added support for starting the GUI minimized via CLI flag
+Updated dependency versions in Cargo.lock for video processing features
 
 ## Completed
-- [x] Modified the GUI initialization to accept a `start_minimized` parameter from CLI
+- [x] Updated Cargo.lock with new dependency versions for video processing features
 ```
