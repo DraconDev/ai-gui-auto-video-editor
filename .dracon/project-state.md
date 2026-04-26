@@ -1,8 +1,9 @@
 # Project State
 
 ## Current Focus
-Added queue management system for processing tasks with status tracking
+Added batch queue management system to track processing tasks in the GUI
 
 ## Completed
-- [x] Added `QueuedFile` struct to track file processing state with path, output directory, preset, status, and progress
-- [x] Added `QueueStatus` enum to represent different processing states (Queued, Processing, Done, Error)
+- [x] Added `batch_queue` field to track queued files
+- [x] Added `queue_processing` flag to track processing state
+```

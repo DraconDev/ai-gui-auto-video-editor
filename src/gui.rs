@@ -291,6 +291,9 @@ pub struct AppState {
     watcher_stop: Option<Arc<AtomicBool>>,
     // Toast notifications
     toasts: Vec<Toast>,
+    // Batch queue
+    batch_queue: Vec<QueuedFile>,
+    queue_processing: bool,
 }
 
 #[allow(dead_code)]
