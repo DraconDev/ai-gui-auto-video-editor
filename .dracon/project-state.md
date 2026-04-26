@@ -1,9 +1,8 @@
 # Project State
 
 ## Current Focus
-Added proper background processing for batch queue files with message handling and queue worker cleanup
+Removed hardcoded output path from batch queue processing
 
 ## Completed
-- [x] Added queue worker cleanup in AppState::Drop
-- [x] Removed unused output_dir parameter from queue worker functions
+- [x] Removed hardcoded "output" directory path from queue worker initialization
 ```

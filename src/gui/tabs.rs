@@ -1509,9 +1509,6 @@ impl App {
         let stop = super::processing::spawn_queue_worker(
             self.state.config.clone(),
             queue,
-            self.state.folders.get(self.state.selected_folder_idx)
-                .map(|f| f.output.clone())
-                .unwrap_or_else(|| PathBuf::from("output")),
             tx,
         );
 
