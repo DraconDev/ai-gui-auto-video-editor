@@ -273,14 +273,13 @@ fn is_video_file(path: &Path) -> bool {
 pub(crate) fn spawn_queue_worker(
     config: Config,
     queue: Vec<super::QueuedFile>,
-    output_dir: PathBuf,
     tx: mpsc::Sender<QueueEvent>,
 ) -> Arc<AtomicBool> {
     let stop = Arc::new(AtomicBool::new(false));
     let thread_stop = Arc::clone(&stop);
 
     std::thread::spawn(move || {
-        queue_worker_loop(config, queue, output_dir, tx, thread_stop);
+        queue_worker_loop(config, queue, tx, thread_stop);
     });
 
     stop
@@ -289,7 +288,6 @@ pub(crate) fn spawn_queue_worker(
 fn queue_worker_loop(
     config: Config,
     queue: Vec<super::QueuedFile>,
-    _output_dir: PathBuf,
     tx: mpsc::Sender<QueueEvent>,
     stop: Arc<AtomicBool>,
 ) {

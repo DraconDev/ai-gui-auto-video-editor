@@ -695,6 +695,9 @@ impl Drop for AppState {
         if let Some(stop) = self.watcher_stop.take() {
             stop.store(true, Ordering::SeqCst);
         }
+        if let Some(stop) = self.queue_stop.take() {
+            stop.store(true, Ordering::SeqCst);
+        }
     }
 }
 
