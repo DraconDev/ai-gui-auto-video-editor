@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Refactored hardware acceleration and video resolution imports in GUI tabs
+Updated dependency versions in Cargo.lock for video processing features
 
 ## Completed
-- [x] Removed redundant module prefixes for `HwAccel` and `VideoResolution` in GUI tab configuration
+- [x] Updated Cargo.lock with new dependency versions for video processing features
 ```
