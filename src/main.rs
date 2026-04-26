@@ -1213,7 +1213,7 @@ fn run_gui() -> Result<()> {
         options,
         Box::new(|cc| {
             configure_dark_theme(&cc.egui_ctx);
-            Ok(Box::new(gui::App::new()))
+            Ok(Box::new(gui::App::new(cli.start_minimized)))
         }),
     )
     .map_err(|e| anyhow::anyhow!("GUI error: {}", e))
