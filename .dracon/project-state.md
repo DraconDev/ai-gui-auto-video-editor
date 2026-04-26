@@ -1,7 +1,7 @@
 # Project State
 
 ## Current Focus
-Added output path tracking to queued files for improved file management
+Added path tracking to failed queue events for improved file management
 
 ## Completed
-- [x] Added `output_path: None` to queued file entries in the batch processing system
+- [x] Added `path` field to `Failed` queue event variant to track output paths for failed operations

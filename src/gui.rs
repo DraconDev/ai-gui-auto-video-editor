@@ -187,6 +187,7 @@ pub(crate) enum QueueEvent {
     },
     Failed {
         filename: String,
+        path: PathBuf,
         message: String,
     },
     Finished,
