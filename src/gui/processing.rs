@@ -299,12 +299,13 @@ pub(crate) fn spawn_queue_worker(
     config: Config,
     queue: Vec<super::QueuedFile>,
     tx: mpsc::Sender<QueueEvent>,
+    notify: bool,
 ) -> Arc<AtomicBool> {
     let stop = Arc::new(AtomicBool::new(false));
     let thread_stop = Arc::clone(&stop);
 
     std::thread::spawn(move || {
-        queue_worker_loop(config, queue, tx, thread_stop);
+        queue_worker_loop(config, queue, tx, thread_stop, notify);
     });
 
     stop
@@ -315,10 +316,14 @@ fn queue_worker_loop(
     queue: Vec<super::QueuedFile>,
     tx: mpsc::Sender<QueueEvent>,
     stop: Arc<AtomicBool>,
+    notify: bool,
 ) {
     let analyzer = FfmpegAnalyzer;
     let editor = FfmpegEditor::new(config.video.hw_accel);
     let duration_getter = FfmpegDurationGetter;
+
+    let mut successful = 0;
+    let mut failed = 0;
 
     for file in queue {
         if stop.load(Ordering::SeqCst) {
@@ -368,6 +373,7 @@ fn queue_worker_loop(
                     file_size,
                     output_path: output_file,
                 });
+                successful += 1;
             }
             Err(e) => {
                 let _ = tx.send(QueueEvent::Failed {
@@ -375,8 +381,19 @@ fn queue_worker_loop(
                     path: file.path.clone(),
                     message: e.to_string(),
                 });
+                failed += 1;
             }
         }
+    }
+
+    if notify && !queue.is_empty() {
+        let total = successful + failed;
+        let body = if failed == 0 {
+            format!("Processed {} file{} successfully", total, if total == 1 { "" } else { "s" })
+        } else {
+            format!("Processed {} file{} ({} failed)", total, if total == 1 { "" } else { "s" }, failed)
+        };
+        send_desktop_notification("Batch Complete", &body);
     }
 
     let _ = tx.send(QueueEvent::Finished);

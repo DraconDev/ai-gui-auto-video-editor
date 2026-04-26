@@ -1,11 +1,10 @@
 # Project State
 
 ## Current Focus
-Added desktop notifications for processing completion/failure events
+Added desktop notifications for batch processing completion with success/failure summary
 
 ## Completed
-- [x] Added `notify` parameter to `spawn_watcher` to control notification behavior
-- [x] Implemented desktop notifications for successful processing completions
-- [x] Implemented desktop notifications for failed processing attempts
-- [x] Added conditional compilation for `notify-rust` feature
-- [x] Updated watcher loop to include notification logic in processing results
+- [x] Added `notify` parameter to queue worker to control notification behavior
+- [x] Implemented success/failure counters during batch processing
+- [x] Added desktop notification with summary of processed files (total and failed count)
+- [x] Only show notification if queue isn't empty and notifications are enabled
