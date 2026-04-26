@@ -623,6 +623,23 @@ fn main() -> Result<()> {
         let out_dir =
             output_dir.ok_or_else(|| anyhow::anyhow!("Output directory must be specified"))?;
 
+        use crate::progress::BatchProgress;
+        let progress_path = BatchProgress::default_path(&in_dir);
+
+        if cli.clear_progress {
+            if progress_path.exists() {
+                if let Err(e) = std::fs::remove_file(&progress_path) {
+                    eprintln!("Warning: Failed to clear progress file: {}", e);
+                } else {
+                    println!("Progress file cleared.");
+                }
+            }
+        }
+
+        if cli.resume && !cli.clear_progress && progress_path.exists() {
+            println!("Resuming from previous progress...");
+        }
+
         if cli.parallel_workers > 1 {
             process_batch_dir_parallel(
                 in_dir,

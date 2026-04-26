@@ -1,9 +1,9 @@
 # Project State
 
 ## Current Focus
-Added progress control flags for batch processing (`--resume` and `--clear-progress`)
+Added progress control flags (`--resume` and `--clear-progress`) for batch processing
 
 ## Completed
-- [x] Added `--resume` flag to continue batch processing from saved progress
-- [x] Added `--clear-progress` flag to reset progress and reprocess all files
-- [x] Maintained existing `--notify` flag for completion notifications
+- [x] Added progress file handling with default path generation
+- [x] Implemented progress file clearing when `--clear-progress` flag is used
+- [x] Added resume functionality when `--resume` flag is used with existing progress file
