@@ -1376,6 +1376,7 @@ impl App {
                                     preset,
                                     status: super::QueueStatus::Queued,
                                     progress: 0.0,
+                                    output_path: None,
                                 });
                             }
                         }

@@ -1,8 +1,7 @@
 # Project State
 
 ## Current Focus
-Added output path tracking to queued files for improved file management in batch processing
+Added output path tracking to queued files for improved file management
 
 ## Completed
-- [x] Added `output_path` field to `QueuedFile` struct to track destination paths for processed files
-```
+- [x] Added `output_path: None` to queued file entries in the batch processing system
