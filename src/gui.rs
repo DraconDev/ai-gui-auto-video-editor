@@ -392,6 +392,8 @@ impl AppState {
             toasts: Vec::new(),
             batch_queue: Vec::new(),
             queue_processing: false,
+            queue_rx: None,
+            queue_stop: None,
         };
 
         if !is_first_run {
