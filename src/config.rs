@@ -869,6 +869,7 @@ impl Config {
         self.export.thumbnail = other.export.thumbnail;
         self.export.multi_format = other.export.multi_format;
         self.export.preview = other.export.preview;
+        self.export.preview_duration = other.export.preview_duration;
         if other.export.thumbnail_width != default_thumbnail_width() {
             self.export.thumbnail_width = other.export.thumbnail_width;
         }
