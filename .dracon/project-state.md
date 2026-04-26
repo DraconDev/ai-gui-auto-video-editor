@@ -1,7 +1,8 @@
 # Project State
 
 ## Current Focus
-Added hardware acceleration support by exposing the `HwAccel` type in the public API.
+Updated dependency versions in Cargo.lock for video processing features
 
 ## Completed
-- [x] Exposed `HwAccel` type in the public API to enable hardware acceleration features across the application.
+- [x] chore(docs): Updated dependency versions in Cargo.lock for video processing features
+```
