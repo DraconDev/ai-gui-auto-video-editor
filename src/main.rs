@@ -626,13 +626,11 @@ fn main() -> Result<()> {
         use crate::progress::BatchProgress;
         let progress_path = BatchProgress::default_path(&in_dir);
 
-        if cli.clear_progress {
-            if progress_path.exists() {
-                if let Err(e) = std::fs::remove_file(&progress_path) {
-                    eprintln!("Warning: Failed to clear progress file: {}", e);
-                } else {
-                    println!("Progress file cleared.");
-                }
+        if cli.clear_progress && progress_path.exists() {
+            if let Err(e) = std::fs::remove_file(&progress_path) {
+                eprintln!("Warning: Failed to clear progress file: {}", e);
+            } else {
+                println!("Progress file cleared.");
             }
         }
 
