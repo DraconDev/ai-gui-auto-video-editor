@@ -713,18 +713,29 @@ impl Drop for AppState {
 
 pub struct App {
     state: AppState,
+    start_minimized: bool,
+    first_frame: bool,
 }
 
 impl App {
-    pub fn new() -> Self {
+    pub fn new(start_minimized: bool) -> Self {
         Self {
             state: AppState::new(),
+            start_minimized,
+            first_frame: true,
         }
     }
 }
 
 impl eframe::App for App {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        if self.first_frame {
+            self.first_frame = false;
+            if self.start_minimized {
+                ctx.set_visible(false);
+            }
+        }
+
         self.state.drain_watcher_events();
         self.state.drain_queue_events();
         ctx.request_repaint_after(Duration::from_millis(250));
