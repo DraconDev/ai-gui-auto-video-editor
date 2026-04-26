@@ -910,7 +910,7 @@ where
 
     let preset_rules = crate::preset_rules::default_preset_rules();
 
-    for (_index, input_file) in video_files.iter().enumerate() {
+    for input_file in &video_files {
         if progress.is_completed(input_file) {
             info!(file = ?input_file, "Skipping already processed file");
             skipped_files += 1;
