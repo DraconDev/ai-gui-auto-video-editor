@@ -1,9 +1,8 @@
 # Project State
 
 ## Current Focus
-Added human-readable display names for hardware acceleration options in the UI
+Added human-readable display names for video resolutions to improve UI dropdown presentation
 
 ## Completed
-- [x] Added `display_name()` method to `HwAccel` enum for UI dropdown labels
-- [x] Implemented consistent naming for all hardware acceleration options
-- [x] Added specific platform identifiers (e.g., "macOS" for VideoToolbox)
+- [x] Added `display_name()` method to `VideoResolution` enum with clear labels for each resolution variant
+- [x] Implemented consistent naming convention for all resolution options (e.g., "720p HD" instead of raw enum variants)

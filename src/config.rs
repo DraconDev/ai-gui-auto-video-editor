@@ -616,6 +616,18 @@ impl VideoResolution {
         let (w, h) = self.dimensions();
         format!("{}:{}", w, h)
     }
+
+    /// Human-readable label for UI dropdowns.
+    pub fn display_name(&self) -> &'static str {
+        match self {
+            VideoResolution::Hd720p => "720p HD",
+            VideoResolution::Fhd1080p => "1080p Full HD",
+            VideoResolution::Qhd1440p => "1440p QHD",
+            VideoResolution::Uhd4k => "4K UHD",
+            VideoResolution::Vertical1080p => "1080p Vertical",
+            VideoResolution::Vertical720p => "720p Vertical",
+        }
+    }
 }
 
 /// Configuration for video processing
