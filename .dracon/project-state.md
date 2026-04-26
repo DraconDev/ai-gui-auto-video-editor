@@ -1,8 +1,9 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock for video processing features
+Simplified progress control flags by removing `--resume` in favor of `--clear-progress`
 
 ## Completed
-- [x] Updated Cargo.lock with new dependency versions for video processing features
-```
+- [x] Removed redundant `--resume` flag (progress auto-resumes by default)
+- [x] Updated `--clear-progress` documentation to clarify default behavior
+- [x] Cleaned up related progress file handling code

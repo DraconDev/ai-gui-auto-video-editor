@@ -224,11 +224,8 @@ pub struct Cli {
     #[arg(long)]
     pub notify: bool,
 
-    /// Resume batch processing from previous progress (default: auto-loads progress)
-    #[arg(long)]
-    pub resume: bool,
-
     /// Clear progress file and re-process all files from scratch
+    /// (Progress auto-resumes by default; use this to start fresh)
     #[arg(long)]
     pub clear_progress: bool,
 
@@ -632,10 +629,6 @@ fn main() -> Result<()> {
             } else {
                 println!("Progress file cleared.");
             }
-        }
-
-        if cli.resume && !cli.clear_progress && progress_path.exists() {
-            println!("Resuming from previous progress...");
         }
 
         if cli.parallel_workers > 1 {
