@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Standardized `FfmpegEditor` instantiation across test cases
+Updated dependency versions in Cargo.lock for video processing features
 
 ## Completed
-- [x] Updated all test cases to use `FfmpegEditor::default()` instead of direct struct instantiation
-- [x] Maintained consistent initialization pattern across all video processing test scenarios
+- [x] Updated Cargo.lock with new dependency versions for video processing features
+```
