@@ -703,6 +703,7 @@ fn run_watch_mode(
     let duration_getter = FfmpegDurationGetter;
 
     let mut heartbeat = 0u32;
+    let mut last_processed: Option<String> = None;
 
     loop {
         std::thread::sleep(Duration::from_secs(config.watch.interval));
@@ -710,11 +711,20 @@ fn run_watch_mode(
 
         // Print a heartbeat every ~30s so user knows we're still watching
         if heartbeat.is_multiple_of(6) {
-            println!(
-                "[{}] Watching {:?} for new files...",
-                timestamp(),
-                watch_dir
-            );
+            if let Some(ref last) = last_processed {
+                println!(
+                    "[{}] Watching {:?} for new files... (last: {})",
+                    timestamp(),
+                    watch_dir,
+                    last
+                );
+            } else {
+                println!(
+                    "[{}] Watching {:?} for new files...",
+                    timestamp(),
+                    watch_dir
+                );
+            }
         }
 
         // Check for new files
