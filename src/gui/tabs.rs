@@ -1342,4 +1342,122 @@ impl App {
                 });
         }
     }
+
+    pub(crate) fn draw_queue_panel(&mut self, ui: &mut egui::Ui) {
+        panel_frame().show(ui, |ui| {
+            ui.horizontal(|ui| {
+                ui.label(
+                    RichText::new("Batch Queue")
+                        .size(18.0)
+                        .color(ACCENT_PRIMARY)
+                        .strong(),
+                );
+                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                    if ui.add(button_add("+ Add Files")).clicked() {
+                        if let Some(paths) = FileDialog::new().pick_files() {
+                            for path in paths {
+                                self.state.batch_queue.push(super::QueuedFile {
+                                    path,
+                                    output_dir: self.state.folders.get(self.state.selected_folder_idx)
+                                        .map(|f| f.output.clone())
+                                        .unwrap_or_else(|| PathBuf::from("output")),
+                                    preset: self.state.folders.get(self.state.selected_folder_idx)
+                                        .map(|f| f.preset.clone())
+                                        .unwrap_or_else(|| "youtube".to_string()),
+                                    status: super::QueueStatus::Queued,
+                                    progress: 0.0,
+                                });
+                            }
+                        }
+                    }
+                });
+            });
+
+            ui.add_space(12.0);
+
+            if self.state.batch_queue.is_empty() {
+                inner_panel().show(ui, |ui| {
+                    ui.add_space(24.0);
+                    ui.vertical_centered(|ui| {
+                        ui.label(label_muted("No files in queue"));
+                        ui.add_space(8.0);
+                        ui.label(label_muted("Click \"+ Add Files\" to get started"));
+                    });
+                    ui.add_space(24.0);
+                });
+            } else {
+                // Queue controls
+                ui.horizontal(|ui| {
+                    if ui.add(button_primary("Process All")).clicked() && !self.state.queue_processing {
+                        self.start_queue_processing();
+                    }
+                    if ui.add(button_small("Clear Completed")).clicked() {
+                        self.state.batch_queue.retain(|f| !matches!(f.status, super::QueueStatus::Done));
+                    }
+                    if ui.add(button_danger("Clear All")).clicked() {
+                        self.state.batch_queue.clear();
+                    }
+                });
+
+                ui.add_space(12.0);
+
+                for (idx, file) in self.state.batch_queue.iter_mut().enumerate() {
+                    let (status_color, status_text) = match file.status {
+                        super::QueueStatus::Queued => (TEXT_MUTED, "Queued"),
+                        super::QueueStatus::Processing => (PROCESSING, "Processing..."),
+                        super::QueueStatus::Done => (SUCCESS, "Done"),
+                        super::QueueStatus::Error => (ERROR, "Error"),
+                    };
+
+                    folder_card_compact(true).show(ui, |ui| {
+                        ui.horizontal(|ui| {
+                            ui.label(
+                                RichText::new(file.path.file_name()
+                                    .map(|n| n.to_string_lossy().to_string())
+                                    .unwrap_or_else(|| "Unknown".to_string()))
+                                    .color(TEXT_PRIMARY)
+                                    .size(14.0)
+                                    .strong(),
+                            );
+                            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                                ui.label(RichText::new(status_text).color(status_color).size(12.0).strong());
+                            });
+                        });
+
+                        if file.status == super::QueueStatus::Processing {
+                            ui.add_space(4.0);
+                            ui.add(
+                                egui::ProgressBar::new(file.progress)
+                                    .fill(PROCESSING)
+                                    .corner_radius(4.0)
+                                    .desired_width(ui.available_width()),
+                            );
+                        }
+
+                        ui.horizontal(|ui| {
+                            ui.label(label_muted(&format!("Preset: {}", file.preset)));
+                            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                                if ui.add(button_small("Remove")).clicked() {
+                                    self.state.batch_queue.remove(idx);
+                                }
+                            });
+                        });
+                    });
+                    ui.add_space(6.0);
+                }
+            }
+        });
+    }
+
+    fn start_queue_processing(&mut self) {
+        // TODO: spawn processing thread
+        // For now, mark as processing to show UI state
+        self.state.queue_processing = true;
+        for file in &mut self.state.batch_queue {
+            if matches!(file.status, super::QueueStatus::Queued) {
+                file.status = super::QueueStatus::Processing;
+                break;
+            }
+        }
+    }
 }
