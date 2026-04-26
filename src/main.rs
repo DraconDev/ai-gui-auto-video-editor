@@ -1204,7 +1204,8 @@ fn run_gui(start_minimized: bool) -> Result<()> {
             .with_inner_size([1150.0, 820.0])
             .with_min_inner_size([1000.0, 700.0])
             .with_title("AI Video Editor")
-            .with_app_id("ai-vid-editor"),
+            .with_app_id("ai-vid-editor")
+            .with_visible(!start_minimized),
         ..Default::default()
     };
 
