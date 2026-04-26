@@ -1,9 +1,7 @@
 # Project State
 
 ## Current Focus
-Added progress control flags (`--resume` and `--clear-progress`) for batch processing
+Added hardware acceleration support by exposing the `HwAccel` type in the public API.
 
 ## Completed
-- [x] Added progress file handling with default path generation
-- [x] Implemented progress file clearing when `--clear-progress` flag is used
-- [x] Added resume functionality when `--resume` flag is used with existing progress file
+- [x] Exposed `HwAccel` type in the public API to enable hardware acceleration features across the application.
