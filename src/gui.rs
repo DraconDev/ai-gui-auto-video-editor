@@ -233,6 +233,23 @@ impl ModalState {
 }
 
 #[derive(Debug, Clone)]
+struct QueuedFile {
+    path: PathBuf,
+    output_dir: PathBuf,
+    preset: String,
+    status: QueueStatus,
+    progress: f32,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+enum QueueStatus {
+    Queued,
+    Processing,
+    Done,
+    Error,
+}
+
+#[derive(Debug, Clone)]
 struct Toast {
     message: String,
     success: bool,
