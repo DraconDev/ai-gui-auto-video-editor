@@ -1251,6 +1251,67 @@ impl App {
         });
     }
 
+    pub(crate) fn draw_summary_card(&mut self, ui: &mut egui::Ui) {
+        let new_entries = self.state.activity_log.len().saturating_sub(self.state.last_seen_activity_len);
+        if new_entries == 0 {
+            return;
+        }
+
+        let success_count = self.state.activity_log
+            .iter()
+            .rev()
+            .take(new_entries)
+            .filter(|e| e.status == EntryStatus::Success)
+            .count();
+        let error_count = new_entries.saturating_sub(success_count);
+
+        let (bg, border) = if error_count > 0 {
+            (super::theme::WARNING, super::theme::WARNING)
+        } else {
+            (super::theme::SUCCESS_BG, super::theme::SUCCESS)
+        };
+
+        egui::Frame::NONE
+            .fill(bg)
+            .corner_radius(10.0)
+            .stroke(egui::Stroke::new(1.0, border))
+            .inner_margin(14.0)
+            .show(ui, |ui| {
+                ui.horizontal(|ui| {
+                    let icon = if error_count > 0 { "⚠" } else { "✓" };
+                    ui.label(
+                        egui::RichText::new(icon)
+                            .size(20.0)
+                            .color(border),
+                    );
+                    ui.add_space(8.0);
+                    ui.vertical(|ui| {
+                        ui.label(
+                            egui::RichText::new(format!(
+                                "{} new {} — {} done, {} failed",
+                                new_entries,
+                                if new_entries == 1 { "file" } else { "files" },
+                                success_count,
+                                error_count
+                            ))
+                            .size(15.0)
+                            .color(super::theme::TEXT_PRIMARY)
+                            .strong(),
+                        );
+                        if let Some(last) = self.state.activity_log.iter().rev().find(|e| !e.filename.is_empty()) {
+                            ui.label(
+                                egui::RichText::new(format!("Last: {}", last.filename))
+                                    .size(13.0)
+                                    .color(super::theme::TEXT_SECONDARY),
+                            );
+                        }
+                    });
+                });
+            });
+
+        self.state.last_seen_activity_len = self.state.activity_log.len();
+    }
+
     #[allow(dead_code)]
     pub(crate) fn draw_settings_metric(ui: &mut egui::Ui, label: &str, value: &str, color: egui::Color32) {
         let bg = egui::Color32::from_rgba_unmultiplied(color.r(), color.g(), color.b(), 24);

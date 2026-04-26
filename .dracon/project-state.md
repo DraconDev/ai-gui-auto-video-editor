@@ -1,7 +1,11 @@
 # Project State
 
 ## Current Focus
-Added activity summary tracking to GUI state for monitoring queue processing
+Added an activity summary card to display processing results in the GUI
 
 ## Completed
-- [x] Added `last_seen_activity_len` field to `AppState` to track queue processing activity length
+- [x] Added a summary card that shows new file processing results (success/failure counts)
+- [x] Implemented visual indicators (✓/⚠) based on processing outcomes
+- [x] Included the last processed filename in the summary
+- [x] Updated the GUI layout to include the summary card above folders panel
+- [x] Added tracking of last seen activity length to avoid duplicate notifications
