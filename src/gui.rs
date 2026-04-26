@@ -650,6 +650,9 @@ impl eframe::App for App {
                     Tab::Folders => {
                         self.draw_folders_panel(ui);
                     }
+                    Tab::Queue => {
+                        self.draw_queue_panel(ui);
+                    }
                     Tab::Settings => {
                         self.draw_settings_panel(ui);
                     }
