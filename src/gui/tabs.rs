@@ -1120,6 +1120,32 @@ impl App {
                 folder.settings.clips = Some(clips);
                 needs_save = true;
             }
+            ui.add_space(6.0);
+
+            let mut preview = preview_val;
+            if Self::draw_settings_toggle(
+                ui,
+                "Preview File",
+                "Generate a short preview alongside the output.",
+                &mut preview,
+            ) && let Some(folder) = self.state.folders.get_mut(folder_idx)
+            {
+                folder.settings.preview = Some(preview);
+                needs_save = true;
+            }
+            ui.add_space(6.0);
+
+            let mut multi_format = multi_format_val;
+            if Self::draw_settings_toggle(
+                ui,
+                "Multi-Format Export",
+                "Generate outputs at multiple resolutions.",
+                &mut multi_format,
+            ) && let Some(folder) = self.state.folders.get_mut(folder_idx)
+            {
+                folder.settings.multi_format = Some(multi_format);
+                needs_save = true;
+            }
 
             ui.add_space(12.0);
 
