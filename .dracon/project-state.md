@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock for video processing features
+Added queue length tracking for processing worker loop
 
 ## Completed
-- [x] Updated Cargo.lock with new dependency versions for video processing features
+- [x] Added `queue_len` variable to track queue size during processing
 ```

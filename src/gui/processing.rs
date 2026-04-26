@@ -324,6 +324,7 @@ fn queue_worker_loop(
 
     let mut successful = 0;
     let mut failed = 0;
+    let queue_len = queue.len();
 
     for file in queue {
         if stop.load(Ordering::SeqCst) {
