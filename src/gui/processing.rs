@@ -339,6 +339,7 @@ fn queue_worker_loop(
                 let file_size = output_file.metadata().map(|m| m.len()).unwrap_or(0);
                 let _ = tx.send(QueueEvent::Completed {
                     filename,
+                    path: file.path.clone(),
                     file_size,
                     output_path: output_file,
                 });
@@ -346,6 +347,7 @@ fn queue_worker_loop(
             Err(e) => {
                 let _ = tx.send(QueueEvent::Failed {
                     filename,
+                    path: file.path.clone(),
                     message: e.to_string(),
                 });
             }
