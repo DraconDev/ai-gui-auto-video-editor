@@ -1,8 +1,9 @@
 # Project State
 
 ## Current Focus
-Added `VideoResolution` and `HwAccel` to GUI tab imports for new video processing configuration options
+Updated default values for hardware acceleration and video resolution settings in the GUI tab
 
 ## Completed
-- [x] Added `VideoResolution` and `HwAccel` to GUI tab imports to support new video processing features
+- [x] Changed default hardware acceleration from `unwrap_or_default()` to explicit `HwAccel::None`
+- [x] Changed default video resolution from `unwrap_or_default()` to explicit `VideoResolution::Fhd1080p`
 ```
