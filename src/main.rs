@@ -224,6 +224,14 @@ pub struct Cli {
     #[arg(long)]
     pub notify: bool,
 
+    /// Resume batch processing from previous progress (default: auto-loads progress)
+    #[arg(long)]
+    pub resume: bool,
+
+    /// Clear progress file and re-process all files from scratch
+    #[arg(long)]
+    pub clear_progress: bool,
+
     /// Launch graphical interface
     #[arg(long)]
     pub gui: bool,

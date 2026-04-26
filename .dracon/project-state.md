@@ -1,8 +1,9 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock for video processing features
+Added progress control flags for batch processing (`--resume` and `--clear-progress`)
 
 ## Completed
-- [x] Updated Cargo.lock with new dependency versions for video processing features
-```
+- [x] Added `--resume` flag to continue batch processing from saved progress
+- [x] Added `--clear-progress` flag to reset progress and reprocess all files
+- [x] Maintained existing `--notify` flag for completion notifications
