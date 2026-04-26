@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Added path information to progress events for improved file tracking in batch queue processing
+Updated dependency versions in Cargo.lock for video processing features
 
 ## Completed
-- [x] Added file path to progress events in queue_worker_loop for better file tracking
+- [x] Updated Cargo.lock with new dependency versions for video processing features
 ```
