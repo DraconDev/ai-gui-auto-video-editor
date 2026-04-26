@@ -985,6 +985,80 @@ impl App {
                 folder.settings.blur_background = Some(blur);
                 needs_save = true;
             }
+            ui.add_space(6.0);
+
+            let mut noise_reduction = noise_reduction_val;
+            if Self::draw_settings_toggle(
+                ui,
+                "Noise Reduction",
+                "Remove background noise from audio.",
+                &mut noise_reduction,
+            ) && let Some(folder) = self.state.folders.get_mut(folder_idx)
+            {
+                folder.settings.noise_reduction = Some(noise_reduction);
+                needs_save = true;
+            }
+            ui.add_space(6.0);
+
+            let mut scene_detect = scene_detect_val;
+            if Self::draw_settings_toggle(
+                ui,
+                "Scene Detection",
+                "Use scene changes to refine cuts.",
+                &mut scene_detect,
+            ) && let Some(folder) = self.state.folders.get_mut(folder_idx)
+            {
+                folder.settings.scene_detect = Some(scene_detect);
+                needs_save = true;
+            }
+            ui.add_space(6.0);
+
+            ui.label(label_secondary("GPU Encoding"));
+            ui.add_space(4.0);
+            let hw_accel_options = [
+                ("None (CPU)", HwAccel::None),
+                ("NVIDIA NVENC", HwAccel::Nvenc),
+                ("AMD AMF", HwAccel::Amf),
+                ("VAAPI", HwAccel::Vaapi),
+                ("VideoToolbox (macOS)", HwAccel::VideoToolbox),
+            ];
+            let mut selected_hw = hw_accel_val;
+            egui::ComboBox::from_id_salt("hw_accel_selector")
+                .selected_text(selected_hw.display_name())
+                .show_ui(ui, |ui| {
+                    for (label, value) in &hw_accel_options {
+                        ui.selectable_value(&mut selected_hw, *value, *label);
+                    }
+                });
+            if selected_hw != hw_accel_val && let Some(folder) = self.state.folders.get_mut(folder_idx) {
+                folder.settings.hw_accel = Some(selected_hw);
+                needs_save = true;
+            }
+
+            ui.add_space(6.0);
+
+            ui.label(label_secondary("Target Resolution"));
+            ui.add_space(4.0);
+            let resolution_options = [
+                ("720p HD", VideoResolution::Hd720p),
+                ("1080p Full HD", VideoResolution::Fhd1080p),
+                ("1440p QHD", VideoResolution::Qhd1440p),
+                ("4K UHD", VideoResolution::Uhd4k),
+                ("1080p Vertical", VideoResolution::Vertical1080p),
+                ("720p Vertical", VideoResolution::Vertical720p),
+            ];
+            let mut selected_res = target_resolution_val;
+            egui::ComboBox::from_id_salt("resolution_selector")
+                .selected_text(selected_res.display_name())
+                .show_ui(ui, |ui| {
+                    for (label, value) in &resolution_options {
+                        ui.selectable_value(&mut selected_res, *value, *label);
+                    }
+                });
+            if selected_res != target_resolution_val && let Some(folder) = self.state.folders.get_mut(folder_idx) {
+                folder.settings.target_resolution = Some(selected_res);
+                needs_save = true;
+            }
 
             ui.add_space(12.0);
 

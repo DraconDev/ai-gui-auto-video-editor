@@ -1,8 +1,11 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock for video processing features
+Added new video processing configuration options to the GUI tab
 
 ## Completed
-- [x] Updated Cargo.lock with new dependency versions for video processing features
-```
+- [x] Added noise reduction toggle to video processing settings
+- [x] Added scene detection toggle to video processing settings
+- [x] Implemented GPU encoding selection with hardware acceleration options
+- [x] Added target resolution selection with multiple video resolution options
+- [x] Integrated all new settings with folder configuration persistence
