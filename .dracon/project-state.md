@@ -1,8 +1,9 @@
 # Project State
 
 ## Current Focus
-Added human-readable display names for video resolutions to improve UI dropdown presentation
+Added new video processing configuration options to the GUI tab implementation
 
 ## Completed
-- [x] Added `display_name()` method to `VideoResolution` enum with clear labels for each resolution variant
-- [x] Implemented consistent naming convention for all resolution options (e.g., "720p HD" instead of raw enum variants)
+- [x] Added new video processing options to the GUI tab: noise reduction, scene detection, hardware acceleration, target resolution, preview, and multi-format
+- [x] Updated default values for new video processing options
+- [x] Integrated new folder settings with the existing GUI tab structure

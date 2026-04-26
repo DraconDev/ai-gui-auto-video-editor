@@ -833,6 +833,12 @@ impl App {
             color_correct_val,
             reframe_val,
             blur_val,
+            noise_reduction_val,
+            scene_detect_val,
+            hw_accel_val,
+            target_resolution_val,
+            preview_val,
+            multi_format_val,
             subtitles_val,
             chapters_val,
             captions_val,
@@ -848,6 +854,12 @@ impl App {
                     folder.settings.color_correct.unwrap_or(false),
                     folder.settings.reframe.unwrap_or(false),
                     folder.settings.blur_background.unwrap_or(false),
+                    folder.settings.noise_reduction.unwrap_or(false),
+                    folder.settings.scene_detect.unwrap_or(false),
+                    folder.settings.hw_accel.unwrap_or_default(),
+                    folder.settings.target_resolution.unwrap_or(config::VideoResolution::Fhd1080p),
+                    folder.settings.preview.unwrap_or(false),
+                    folder.settings.multi_format.unwrap_or(false),
                     folder.settings.subtitles.unwrap_or(false),
                     folder.settings.chapters.unwrap_or(false),
                     folder.settings.captions.unwrap_or(false),
@@ -857,8 +869,12 @@ impl App {
                 )
             } else {
                 (
-                    true, true, false, false, false, false, false, false, false, false, -30.0,
-                    -14.0,
+                    true, true, false, false, false, false, false, false,
+                    ai_vid_editor::HwAccel::None,
+                    config::VideoResolution::Fhd1080p,
+                    false, false,
+                    false, false, false, false,
+                    -30.0, -14.0,
                 )
             }
         };
