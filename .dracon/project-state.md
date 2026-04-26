@@ -1,7 +1,10 @@
 # Project State
 
 ## Current Focus
-Added path tracking to completed queue events for improved file management
+Improved file tracking in batch queue processing by adding path matching for completed events
 
 ## Completed
-- [x] Added `path` field to `Completed` queue event variant to track input file paths alongside output information
+- [x] Added path matching to identify completed files in batch queue
+- [x] Updated queue status to "Done" when processing completes for matched path
+- [x] Set progress to 1.0 for completed files
+- [x] Store output path for completed files
