@@ -627,9 +627,9 @@ impl AppState {
                     }
                     self.status = ProcessingStatus::Processing(filename);
                 }
-                QueueEvent::Progress { filename: _, progress, message: _ } => {
+                QueueEvent::Progress { filename: _, path, progress, message: _ } => {
                     for file in &mut self.batch_queue {
-                        if file.status == QueueStatus::Processing {
+                        if file.path == path {
                             file.progress = progress;
                             break;
                         }

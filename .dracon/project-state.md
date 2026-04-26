@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Added path information to progress events for better file tracking in batch processing
+Improved file tracking in batch queue processing by adding path information to progress events
 
 ## Completed
-- [x] Added `path` field to `Progress` variant in `QueueEvent` enum to track file paths during processing
-```
+- [x] Added path field to progress events to uniquely identify files in the batch queue
+- [x] Updated progress tracking logic to match files by path rather than status
