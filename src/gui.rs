@@ -714,6 +714,7 @@ impl App {
 impl eframe::App for App {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         self.state.drain_watcher_events();
+        self.state.drain_queue_events();
         ctx.request_repaint_after(Duration::from_millis(250));
 
         // Show setup wizard for first-run
