@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Removed the batch queue panel UI implementation from the tabs module
+Updated dependency versions in Cargo.lock for video processing features
 
 ## Completed
-- [x] Removed the `draw_queue_panel` method implementation that was handling the batch queue UI rendering
-- [x] Cleaned up the tabs module by removing the now-unused queue panel code
+- [x] Updated Cargo.lock with new dependency versions for video processing features
+```
