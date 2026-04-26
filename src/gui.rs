@@ -176,6 +176,7 @@ pub(crate) enum QueueEvent {
     },
     Progress {
         filename: String,
+        path: PathBuf,
         progress: f32,
         message: String,
     },
