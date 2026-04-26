@@ -870,8 +870,8 @@ impl App {
             } else {
                 (
                     true, true, false, false, false, false, false, false,
-                    ai_vid_editor::HwAccel::None,
-                    config::VideoResolution::Fhd1080p,
+                    HwAccel::None,
+                    VideoResolution::Fhd1080p,
                     false, false,
                     false, false, false, false,
                     -30.0, -14.0,
