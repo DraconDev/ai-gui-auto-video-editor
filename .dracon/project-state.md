@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock for video processing features
+Added activity summary tracking to GUI state for monitoring queue processing
 
 ## Completed
-- [x] Updated Cargo.lock to reflect latest dependency versions for video processing features
+- [x] Added `last_seen_activity_len` field to track queue activity length
 ```

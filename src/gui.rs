@@ -325,6 +325,8 @@ pub struct AppState {
     queue_processing: bool,
     queue_rx: Option<Receiver<QueueEvent>>,
     queue_stop: Option<Arc<AtomicBool>>,
+    // Activity summary tracking
+    last_seen_activity_len: usize,
 }
 
 #[allow(dead_code)]
