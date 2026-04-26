@@ -1277,4 +1277,68 @@ impl App {
             }
         });
     }
+
+    pub(crate) fn draw_toasts(&mut self, ctx: &egui::Context) {
+        if self.state.toasts.is_empty() {
+            return;
+        }
+
+        let screen_rect = ctx.screen_rect();
+        let toast_width = 280.0;
+        let toast_height = 48.0;
+        let margin = 16.0;
+        let spacing = 8.0;
+
+        let start_x = screen_rect.right() - toast_width - margin;
+        let start_y = screen_rect.top() + margin;
+
+        for (idx, toast) in self.state.toasts.iter().enumerate() {
+            let y = start_y + idx as f32 * (toast_height + spacing);
+            let rect = egui::Rect::from_min_size(
+                egui::pos2(start_x, y),
+                egui::vec2(toast_width, toast_height),
+            );
+
+            let (bg, border) = if toast.success {
+                (super::theme::SUCCESS_BG, super::theme::SUCCESS)
+            } else {
+                (super::theme::ERROR_BG, super::theme::ERROR)
+            };
+
+            egui::Area::new(egui::Id::new(format!("toast_{}", idx)))
+                .fixed_pos(rect.min)
+                .order(egui::Order::Foreground)
+                .show(ctx, |ui| {
+                    egui::Frame::NONE
+                        .fill(bg)
+                        .corner_radius(super::theme::CORNER_RADIUS_SMALL)
+                        .stroke(egui::Stroke::new(1.0, border))
+                        .inner_margin(egui::vec2(12.0, 10.0))
+                        .shadow(egui::epaint::Shadow {
+                            offset: [0, 4],
+                            blur: 12,
+                            spread: 0,
+                            color: egui::Color32::from_black_alpha(100),
+                        })
+                        .show(ui, |ui| {
+                            ui.set_min_width(toast_width - 24.0);
+                            ui.horizontal(|ui| {
+                                let dot = if toast.success { "✓" } else { "✗" };
+                                ui.label(
+                                    egui::RichText::new(dot)
+                                        .size(16.0)
+                                        .color(border)
+                                        .strong(),
+                                );
+                                ui.add_space(8.0);
+                                ui.label(
+                                    egui::RichText::new(&toast.message)
+                                        .size(13.0)
+                                        .color(super::theme::TEXT_PRIMARY),
+                                );
+                            });
+                        });
+                });
+        }
+    }
 }
