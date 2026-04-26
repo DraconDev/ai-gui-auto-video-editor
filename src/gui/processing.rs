@@ -13,16 +13,28 @@ use ai_vid_editor::{
     SilenceMode, process_single_file_with_intro_outro_progress,
 };
 
+#[cfg(feature = "notify-rust")]
+fn send_desktop_notification(title: &str, body: &str) {
+    let _ = notify_rust::Notification::new()
+        .summary(title)
+        .body(body)
+        .show();
+}
+
+#[cfg(not(feature = "notify-rust"))]
+fn send_desktop_notification(_title: &str, _body: &str) {}
+
 pub(crate) fn spawn_watcher(
     config: Config,
     folders: Vec<FolderState>,
+    notify: bool,
 ) -> (Receiver<WatcherEvent>, Arc<AtomicBool>) {
     let (tx, rx) = mpsc::channel();
     let stop = Arc::new(AtomicBool::new(false));
     let thread_stop = Arc::clone(&stop);
 
     std::thread::spawn(move || {
-        watch_folders_loop(config, folders, tx, thread_stop);
+        watch_folders_loop(config, folders, tx, thread_stop, notify);
     });
 
     (rx, stop)
@@ -33,6 +45,7 @@ fn watch_folders_loop(
     folders: Vec<FolderState>,
     tx: mpsc::Sender<WatcherEvent>,
     stop: Arc<AtomicBool>,
+    notify: bool,
 ) {
     let poll_interval = Duration::from_secs(config.watch.interval.max(1));
     let mut attempted = HashSet::new();
@@ -176,6 +189,12 @@ fn watch_folders_loop(
 
                 match result {
                     Ok(()) => {
+                        if notify {
+                            send_desktop_notification(
+                                "Processing Complete",
+                                &format!("{} is ready", file_label),
+                            );
+                        }
                         if tx
                             .send(WatcherEvent::Completed {
                                 filename: file_label,
@@ -188,6 +207,12 @@ fn watch_folders_loop(
                         }
                     }
                     Err(err) => {
+                        if notify {
+                            send_desktop_notification(
+                                "Processing Failed",
+                                &format!("{}: {}", file_label, err),
+                            );
+                        }
                         if tx
                             .send(WatcherEvent::Failed {
                                 filename: file_label,
