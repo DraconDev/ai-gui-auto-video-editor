@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Added new video processing configuration options to the GUI tab
+Updated dependency versions in Cargo.lock for video processing features
 
 ## Completed
-- [x] Added "Preview File" toggle to generate short previews alongside outputs
-- [x] Added "Multi-Format Export" toggle to generate outputs at multiple resolutions
+- [x] Updated Cargo.lock to reflect latest dependency versions for video processing features
+```
