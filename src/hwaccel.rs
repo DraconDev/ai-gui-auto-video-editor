@@ -30,6 +30,17 @@ impl HwAccel {
         }
     }
 
+    /// Human-readable label for UI dropdowns.
+    pub fn display_name(&self) -> &'static str {
+        match self {
+            HwAccel::None => "None (CPU)",
+            HwAccel::Nvenc => "NVIDIA NVENC",
+            HwAccel::Amf => "AMD AMF",
+            HwAccel::Vaapi => "VAAPI (Linux)",
+            HwAccel::VideoToolbox => "VideoToolbox (macOS)",
+        }
+    }
+
     /// Parse from string (case-insensitive).
     pub fn from_str(s: &str) -> Option<Self> {
         match s.to_lowercase().as_str() {

@@ -1,12 +1,9 @@
 # Project State
 
 ## Current Focus
-Added new video processing configuration options to the folder configuration builder
+Added human-readable display names for hardware acceleration options in the UI
 
 ## Completed
-- [x] Added hardware acceleration support to video processing
-- [x] Added target resolution configuration for video processing
-- [x] Added noise reduction configuration for audio processing
-- [x] Added preview generation configuration for export
-- [x] Added scene detection configuration for silence processing
-- [x] Added multi-format export configuration for output
+- [x] Added `display_name()` method to `HwAccel` enum for UI dropdown labels
+- [x] Implemented consistent naming for all hardware acceleration options
+- [x] Added specific platform identifiers (e.g., "macOS" for VideoToolbox)
