@@ -1353,10 +1353,10 @@ impl App {
                         .strong(),
                 );
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                    if ui.add(button_add("+ Add Files")).clicked()
-                        && let Some(paths) = rfd::FileDialog::new().pick_files()
-                    {
-                        for path in paths {
+                    #[allow(clippy::collapsible_if)]
+                    if ui.add(button_add("+ Add Files")).clicked() {
+                        if let Some(paths) = rfd::FileDialog::new().pick_files() {
+                            for path in paths {
                                 let preset = self
                                     .state
                                     .folders

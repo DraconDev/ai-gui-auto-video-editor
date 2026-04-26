@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock for video processing features
+Refactored file selection UI in the "Add Files" button to improve readability and maintainability
 
 ## Completed
-- [x] Updated dependency versions in Cargo.lock to ensure compatibility with video processing features
-```
+- [x] Added `#[allow(clippy::collapsible_if)]` to prevent Clippy warning about collapsible if-statement
+- [x] Restructured nested if-let pattern for better code clarity in file selection logic
