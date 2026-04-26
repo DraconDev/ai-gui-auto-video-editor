@@ -315,7 +315,7 @@ fn main() -> Result<()> {
     if cli.gui {
         #[cfg(feature = "gui")]
         {
-            return run_gui();
+            return run_gui(cli.start_minimized);
         }
         #[cfg(not(feature = "gui"))]
         {
@@ -360,7 +360,7 @@ fn main() -> Result<()> {
 
         #[cfg(feature = "gui")]
         if !is_tty {
-            return run_gui();
+            return run_gui(cli.start_minimized);
         }
 
         // Show help and exit
