@@ -24,7 +24,8 @@ pub use batch_processor::{
     process_single_file_with_intro_outro_progress,
 };
 pub use config::{
-    Config, FolderSettings, JoinMode, Preset, ProcessingConfig, SilenceMode, WatchFolder,
+    Config, FolderSettings, JoinMode, Preset, ProcessingConfig, SilenceMode, VideoResolution,
+    WatchFolder,
 };
 pub use editor::FfmpegEditor;
 pub use hwaccel::HwAccel;
