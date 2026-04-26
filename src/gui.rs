@@ -401,6 +401,7 @@ impl AppState {
             queue_processing: false,
             queue_rx: None,
             queue_stop: None,
+            last_seen_activity_len: 0,
         };
 
         if !is_first_run {
