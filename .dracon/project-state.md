@@ -1,8 +1,7 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock for video processing features
+Refactored window visibility control in GUI initialization
 
 ## Completed
-- [x] Updated Cargo.lock with new dependency versions for video processing features
-```
+- [x] Changed `ctx.set_visible(false)` to `frame.set_window_visible(false)` for more accurate window state management during initialization

@@ -728,11 +728,11 @@ impl App {
 }
 
 impl eframe::App for App {
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+    fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
         if self.first_frame {
             self.first_frame = false;
             if self.start_minimized {
-                ctx.set_visible(false);
+                frame.set_window_visible(false);
             }
         }
 
