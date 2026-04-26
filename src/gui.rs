@@ -637,19 +637,20 @@ impl AppState {
                         }
                     }
                 }
-                QueueEvent::Completed { filename, file_size: _, output_path: _ } => {
+                QueueEvent::Completed { filename, file_size: _, output_path } => {
                     for file in &mut self.batch_queue {
                         if file.status == QueueStatus::Processing {
                             file.status = QueueStatus::Done;
                             file.progress = 1.0;
+                            file.output_path = Some(output_path);
                             break;
                         }
                     }
                     self.toasts.push(Toast::new(format!("{} processed", filename), true));
                 }
-                QueueEvent::Failed { filename, message } => {
+                QueueEvent::Failed { filename, path, message } => {
                     for file in &mut self.batch_queue {
-                        if file.status == QueueStatus::Processing {
+                        if file.path == path {
                             file.status = QueueStatus::Error;
                             break;
                         }
