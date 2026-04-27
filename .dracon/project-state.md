@@ -1,8 +1,7 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock for video processing features
+Removed duplicate GUI flag in CLI arguments
 
 ## Completed
-- [x] Updated Cargo.lock with new dependency versions for video processing features
-```
+- [x] Removed redundant `gui` flag declaration in `Cli` struct to eliminate duplicate argument

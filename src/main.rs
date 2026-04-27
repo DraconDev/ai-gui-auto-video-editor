@@ -233,10 +233,6 @@ pub struct Cli {
     #[arg(long)]
     pub gui: bool,
 
-    /// Start the GUI
-    #[arg(long)]
-    pub gui: bool,
-
     /// Start the GUI minimized (no window, keeps watching in background)
     #[arg(long)]
     pub start_minimized: bool,
