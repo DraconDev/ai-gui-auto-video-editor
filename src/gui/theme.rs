@@ -291,7 +291,7 @@ pub fn dropdown_selector<T: PartialEq + Copy>(
     current_label: &str,
 ) {
     let popup_id = egui::Id::new(format!("{}_popup", id));
-    let is_popup_open = ui.data(|d| d.get::<bool>(popup_id).unwrap_or(false));
+    let is_popup_open = ui.data(|d| d.get_temp::<bool>(&popup_id).copied().unwrap_or(false));
 
     let chevron = if is_popup_open { "▲" } else { "▼" };
     let desired_width = 220.0_f32;
@@ -318,7 +318,7 @@ pub fn dropdown_selector<T: PartialEq + Copy>(
 
     if response.clicked() {
         let new_state = !is_popup_open;
-        ui.data_mut(|d| d.insert::<bool>(popup_id, new_state));
+        ui.data_mut(|d| d.insert_temp(popup_id, new_state));
     }
 
     if is_popup_open {
@@ -376,14 +376,14 @@ pub fn dropdown_selector<T: PartialEq + Copy>(
 
                             if item_response.inner.clicked() {
                                 *selected = *value;
-                                ui.data_mut(|d| d.insert::<bool>(popup_id, false));
+                                ui.data_mut(|d| d.insert_temp(popup_id, false));
                             }
                         }
                     });
             });
 
         if ui.input(|i| i.pointer.any_pressed()) && !response.rect.contains(response.inner.pos()) {
-            ui.data_mut(|d| d.insert::<bool>(popup_id, false));
+            ui.data_mut(|d| d.insert_temp(popup_id, false));
         }
     }
 }

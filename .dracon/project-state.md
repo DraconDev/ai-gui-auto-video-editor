@@ -1,12 +1,8 @@
 # Project State
 
 ## Current Focus
-Refactored dropdown component implementation for better consistency and reduced code duplication
+Refactored dropdown component to use temporary storage for popup state management
 
 ## Completed
-- [x] Consolidated dropdown styling into a single reusable function
-- [x] Removed redundant dropdown frame and item styling functions
-- [x] Improved dropdown visual feedback with state-based styling
-- [x] Added proper popup positioning and sizing logic
-- [x] Enhanced dropdown interaction with hover and selection states
-- [x] Standardized dropdown appearance with consistent colors and margins
+- [x] Changed popup state storage from persistent to temporary using `insert_temp` instead of `insert`
+- [x] Updated all state management calls to use temporary storage for dropdown popup state
