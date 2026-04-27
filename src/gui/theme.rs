@@ -8,7 +8,7 @@ pub const PANEL_BG_LIGHTER: egui::Color32 = egui::Color32::from_rgb(32, 32, 38);
 
 pub const ACCENT_PRIMARY: egui::Color32 = egui::Color32::from_rgb(230, 57, 70);
 pub const ACCENT_DARK: egui::Color32 = egui::Color32::from_rgb(180, 45, 55);
-pub const ACCENT_GLOW: egui::Color32 = egui::Color32::from_rgba_unmultiplied(230, 57, 70, 40);
+pub const ACCENT_GLOW: egui::Color32 = egui::Color32::from_rgba_premultiplied(230, 57, 70, 40);
 
 pub const TEXT_PRIMARY: egui::Color32 = egui::Color32::from_rgb(250, 250, 252);
 pub const TEXT_SECONDARY: egui::Color32 = egui::Color32::from_rgb(165, 165, 172);
