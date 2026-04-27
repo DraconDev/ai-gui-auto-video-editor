@@ -1,10 +1,8 @@
 # Project State
 
 ## Current Focus
-Refactored GUI initialization to use conditional start_minimized flag
+Updated dependency versions in Cargo.lock for video processing features
 
 ## Completed
-- [x] Removed redundant `start_minimized` parameter in GUI calls
-- [x] Added conditional compilation for GUI feature
-- [x] Standardized GUI initialization across all entry points
+- [x] Updated Cargo.lock with new dependency versions for video processing features
 ```
