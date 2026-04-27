@@ -67,6 +67,12 @@ ai-vid-editor
 ai-vid-editor --gui    # Explicit
 ```
 
+**Configure once, walk away:**
+```bash
+ai-vid-editor --gui --start-minimized
+```
+Starts watching configured folders with no window visible. Desktop notifications are sent when files complete. Configure folders via GUI when needed.
+
 The GUI provides a visual interface for managing watch folders and settings.
 
 ### CLI Mode
@@ -81,14 +87,6 @@ ai-vid-editor -I ./raw_videos -O ./edited --parallel-workers 4
 # Resume an interrupted batch (progress is auto-saved)
 ai-vid-editor -I ./raw_videos -O ./edited
 ```
-
-### GUI Mode
-
-```bash
-ai-vid-editor --gui
-```
-
-The GUI provides a visual interface for managing watch folders and settings.
 
 ## CLI Options
 
@@ -138,6 +136,7 @@ The GUI provides a visual interface for managing watch folders and settings.
 | `--resolution <RES>` | Target resolution (720p, 1080p, 1440p, 4k, vertical-1080p, vertical-720p) |
 | `--parallel-workers <N>` | Parallel batch processing workers (default: 1) |
 | `--notify` | Send desktop notifications on completion/error |
+| `--gpu <TYPE>` | Hardware acceleration: `auto`, `nvenc`, `amf`, `vaapi`, `videotoolbox`, `none` |
 
 ### Export Options
 
@@ -150,6 +149,7 @@ The GUI provides a visual interface for managing watch folders and settings.
 | `--export-fcpxml` | Generate FCPXML |
 | `--export-thumbnail` | Generate YouTube thumbnail from best frame |
 | `--preview` | Generate a quick low-resolution preview file |
+| `--preview-duration <SEC>` | Preview duration in seconds (default: 30.0) |
 | `--export-multi-format` | Output multiple resolutions simultaneously |
 
 ## Presets
