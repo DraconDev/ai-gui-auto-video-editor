@@ -304,7 +304,7 @@ pub fn slider_glow(
 
     let painter = ui.painter();
 
-    painter.rect_filled(track_rect, 2.0, egui::Color32::from_rgb(40, 40, 40));
+    painter.rect_filled(track_rect, 2.0, egui::Color32::from_rgb(50, 50, 60));
 
     if fraction > 0.0 {
         let filled_width = (handle_x - rect.left()).max(0.0);
@@ -317,7 +317,7 @@ pub fn slider_glow(
     painter.circle_filled(
         handle_center,
         handle_radius - 2.5,
-        egui::Color32::from_rgb(255, 120, 130),
+        egui::Color32::from_rgb(255, 110, 125),
     );
 
     if response.clicked() || response.dragged() {
