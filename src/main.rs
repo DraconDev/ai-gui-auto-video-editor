@@ -359,8 +359,11 @@ fn main() -> Result<()> {
         && !cli.dry_run
     {
         #[cfg(feature = "gui")]
+        let start_minimized = cli.start_minimized;
+
+        #[cfg(feature = "gui")]
         if cli.gui {
-            return run_gui(cli.start_minimized);
+            return run_gui(start_minimized);
         }
 
         // Check if running from terminal (TTY) or launched from desktop
@@ -369,7 +372,7 @@ fn main() -> Result<()> {
         #[cfg(feature = "gui")]
         if !is_tty {
             // Always launch GUI when launched from desktop, even with watch folders configured
-            return run_gui(cli.start_minimized);
+            return run_gui(start_minimized);
         }
 
         // From terminal: if watch folders are configured, go to watch mode
