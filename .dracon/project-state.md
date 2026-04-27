@@ -1,9 +1,15 @@
 # Project State
 
 ## Current Focus
-Removed unused glow color constants from GUI theme
+Improved GUI status visualization with enhanced visual hierarchy and error handling
 
 ## Completed
-- [x] Removed unused `glow_color()` function
-- [x] Removed unused `ACCENT_GLOW` constant
-- [x] Cleaned up theme.rs by removing dead code
+- [x] Added visual status indicator in header showing processing state (idle, watching, processing, error)
+- [x] Enhanced processing summary panel with:
+  - Color-coded status indicators
+  - Clear success/error counts
+  - Truncated file path display
+  - Contextual status messages
+- [x] Improved visual hierarchy with consistent spacing and typography
+- [x] Added error state highlighting with warning colors
+- [x] Enhanced layout with wrapped horizontal containers for better responsiveness

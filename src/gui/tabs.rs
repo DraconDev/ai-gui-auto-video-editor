@@ -11,15 +11,33 @@ use super::theme::*;
 impl App {
     pub(crate) fn draw_header(&mut self, ui: &mut egui::Ui) {
         accent_bar().show(ui, |_ui| {});
-        ui.add_space(10.0);
+        ui.add_space(12.0);
 
-        ui.horizontal(|ui| {
+        ui.horizontal_wrapped(|ui| {
             ui.label(
                 RichText::new("AI Video Processor")
-                    .size(20.0)
+                    .size(22.0)
                     .color(ACCENT_PRIMARY)
                     .strong(),
             );
+
+            let status_text = match &self.state.status {
+                ProcessingStatus::Idle => ("Idle", TEXT_MUTED),
+                ProcessingStatus::Watching => ("Watching", SUCCESS_DIM),
+                ProcessingStatus::Processing(stage) => (stage.as_str(), PROCESSING),
+                ProcessingStatus::Error(err) => (err.as_str(), ERROR),
+            };
+            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                let (rect, _) = ui.allocate_exact_size(egui::vec2(8.0, 8.0), egui::Sense::hover());
+                let dot_color = status_text.1;
+                ui.painter().circle_filled(rect.center(), 3.5, dot_color);
+                ui.add_space(6.0);
+                ui.label(
+                    egui::RichText::new(status_text.0)
+                        .size(13.0)
+                        .color(status_text.1),
+                );
+            });
         });
 
         ui.add_space(10.0);
@@ -1264,48 +1282,67 @@ impl App {
             .filter(|e| e.status == EntryStatus::Success)
             .count();
         let error_count = new_entries.saturating_sub(success_count);
+        let has_errors = error_count > 0;
 
-        let (bg, border) = if error_count > 0 {
-            (super::theme::WARNING, super::theme::WARNING)
-        } else {
-            (super::theme::SUCCESS_BG, super::theme::SUCCESS)
-        };
+        let bg = if has_errors { WARNING_BG } else { SUCCESS_BG };
+        let accent = if has_errors { WARNING } else { SUCCESS };
+        let dim = if has_errors { WARNING } else { SUCCESS_DIM };
 
         egui::Frame::NONE
             .fill(bg)
             .corner_radius(10.0)
-            .stroke(egui::Stroke::new(1.0, border))
+            .stroke(egui::Stroke::new(1.0, accent))
             .inner_margin(14.0)
             .show(ui, |ui| {
-                ui.horizontal(|ui| {
-                    let icon = if error_count > 0 { "⚠" } else { "✓" };
+                ui.horizontal_wrapped(|ui| {
+                    ui.set_width(ui.available_width());
+                    let dot_size = 10.0;
+                    let (rect, _) = ui.allocate_exact_size(egui::vec2(dot_size, dot_size), egui::Sense::hover());
+                    ui.painter().circle_filled(rect.center(), 4.5, accent);
+
+                    ui.add_space(10.0);
+
+                    let label = if has_errors {
+                        format!("{} new — {} done, {} failed", new_entries, success_count, error_count)
+                    } else {
+                        format!("{} new — {} completed", new_entries, success_count)
+                    };
                     ui.label(
-                        egui::RichText::new(icon)
-                            .size(20.0)
-                            .color(border),
-                    );
-                    ui.add_space(8.0);
-                    ui.vertical(|ui| {
-                        ui.label(
-                            egui::RichText::new(format!(
-                                "{} new {} — {} done, {} failed",
-                                new_entries,
-                                if new_entries == 1 { "file" } else { "files" },
-                                success_count,
-                                error_count
-                            ))
-                            .size(15.0)
-                            .color(super::theme::TEXT_PRIMARY)
+                        egui::RichText::new(label)
+                            .size(14.0)
+                            .color(TEXT_PRIMARY)
                             .strong(),
-                        );
+                    );
+
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                         if let Some(last) = self.state.activity_log.iter().rev().find(|e| !e.filename.is_empty()) {
                             ui.label(
-                                egui::RichText::new(format!("Last: {}", last.filename))
-                                    .size(13.0)
-                                    .color(super::theme::TEXT_SECONDARY),
+                                egui::RichText::new(truncate_path(&last.filename, 36))
+                                    .size(12.0)
+                                    .color(TEXT_MUTED),
                             );
                         }
                     });
+                });
+
+                ui.add_space(4.0);
+
+                ui.horizontal_wrapped(|ui| {
+                    ui.set_width(ui.available_width());
+                    ui.add_space(14.0);
+                    if has_errors {
+                        ui.label(
+                            egui::RichText::new("Some files failed — check the Activity tab for details")
+                                .size(12.0)
+                                .color(WARNING),
+                        );
+                    } else {
+                        ui.label(
+                            egui::RichText::new("All files processed successfully")
+                                .size(12.0)
+                                .color(dim),
+                        );
+                    }
                 });
             });
 
