@@ -283,6 +283,35 @@ pub fn button_add(text: impl Into<String>) -> egui::Button<'static> {
         .min_size(egui::vec2(65.0, 32.0))
 }
 
+pub fn dropdown_frame() -> egui::Frame {
+    egui::Frame::popup(&egui::Style::default())
+        .fill(PANEL_BG_LIGHTER)
+        .corner_radius(CORNER_RADIUS_SMALL)
+        .stroke(egui::Stroke::new(1.0, BORDER_LIGHT))
+}
+
+pub fn dropdown_item(selected: bool) -> egui::Frame {
+    if selected {
+        egui::Frame::NONE
+            .fill(egui::Color32::from_rgb(50, 22, 30))
+            .inner_margin(egui::vec2(10.0, 8.0))
+    } else {
+        egui::Frame::NONE
+            .fill(PANEL_BG_LIGHT)
+            .inner_margin(egui::vec2(10.0, 8.0))
+    }
+}
+
+pub fn dropdown_button_text(selected_text: &str, is_open: bool) -> egui::RichText {
+    let text = if selected_text.is_empty() { "Select..." } else { selected_text };
+    let base = egui::RichText::new(text).size(14.0);
+    if is_open {
+        base.color(TEXT_PRIMARY).strong()
+    } else {
+        base.color(TEXT_SECONDARY)
+    }
+}
+
 pub fn slider_glow(
     value: &mut f32,
     range: std::ops::RangeInclusive<f32>,
