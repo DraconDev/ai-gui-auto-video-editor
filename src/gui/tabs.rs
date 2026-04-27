@@ -1063,22 +1063,22 @@ impl App {
 
             ui.label(label_secondary("Target Resolution"));
             ui.add_space(4.0);
-            let resolution_options = [
-                ("720p HD", VideoResolution::Hd720p),
-                ("1080p Full HD", VideoResolution::Fhd1080p),
-                ("1440p QHD", VideoResolution::Qhd1440p),
-                ("4K UHD", VideoResolution::Uhd4k),
-                ("1080p Vertical", VideoResolution::Vertical1080p),
-                ("720p Vertical", VideoResolution::Vertical720p),
+            let resolution_options: [(String, VideoResolution); 6] = [
+                (String::from("720p HD"), VideoResolution::Hd720p),
+                (String::from("1080p Full HD"), VideoResolution::Fhd1080p),
+                (String::from("1440p QHD"), VideoResolution::Qhd1440p),
+                (String::from("4K UHD"), VideoResolution::Uhd4k),
+                (String::from("1080p Vertical"), VideoResolution::Vertical1080p),
+                (String::from("720p Vertical"), VideoResolution::Vertical720p),
             ];
             let mut selected_res = target_resolution_val;
-            egui::ComboBox::from_id_salt("resolution_selector")
-                .selected_text(selected_res.display_name())
-                .show_ui(ui, |ui| {
-                    for (label, value) in &resolution_options {
-                        ui.selectable_value(&mut selected_res, *value, *label);
-                    }
-                });
+            dropdown_selector(
+                ui,
+                format!("resolution_{}", folder_idx),
+                &mut selected_res,
+                &resolution_options,
+                selected_res.display_name(),
+            );
             if selected_res != target_resolution_val && let Some(folder) = self.state.folders.get_mut(folder_idx) {
                 folder.settings.target_resolution = Some(selected_res);
                 needs_save = true;

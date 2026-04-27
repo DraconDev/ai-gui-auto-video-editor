@@ -1,10 +1,10 @@
 # Project State
 
 ## Current Focus
-Refactored hardware acceleration dropdown component to use a reusable dropdown implementation
+Refactored video resolution dropdown to use a reusable component pattern
 
 ## Completed
-- [x] Replaced inline hardware acceleration options with a reusable dropdown component
-- [x] Improved type safety by using a consistent dropdown pattern
-- [x] Added folder-specific ID generation for dropdown uniqueness
-- [x] Maintained existing hardware acceleration options while using the new component structure
+- [x] Refactored resolution dropdown to use the new `dropdown_selector` component
+- [x] Updated resolution options to use `String` instead of string literals for consistency
+- [x] Added unique ID generation for dropdown instances using folder index
+- [x] Maintained same functionality while improving code organization
