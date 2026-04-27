@@ -1,7 +1,8 @@
 # Project State
 
 ## Current Focus
-Refactored dropdown components to use temporary storage for display names
+Updated dependency versions in Cargo.lock for video processing features
 
 ## Completed
-- [x] Extracted display names into temporary variables (`hw_label` and `res_label`) for hardware acceleration and video resolution dropdowns to improve code readability and maintain consistency with reusable dropdown component pattern
+- [x] Updated Cargo.lock with new dependency versions for video processing features
+```
