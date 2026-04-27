@@ -291,7 +291,7 @@ pub fn dropdown_selector<T: PartialEq + Copy>(
     current_label: &str,
 ) {
     let popup_id = egui::Id::new(format!("{}_popup", id));
-    let is_popup_open = ui.data(|d| d.get_temp::<bool>(&popup_id).copied().unwrap_or(false));
+    let is_popup_open = ui.data(|d| d.get_temp::<bool>(popup_id).unwrap_or(false));
 
     let chevron = if is_popup_open { "▲" } else { "▼" };
     let desired_width = 220.0_f32;
@@ -311,7 +311,6 @@ pub fn dropdown_selector<T: PartialEq + Copy>(
         1.0,
         if is_popup_open { ACCENT_PRIMARY } else { BORDER_LIGHT },
     ))
-    .inner_margin(egui::vec2(12.0, 10.0))
     .desired_size(egui::vec2(desired_width, 36.0));
 
     let response = ui.add(button);
@@ -329,7 +328,6 @@ pub fn dropdown_selector<T: PartialEq + Copy>(
         egui::Area::new(popup_id)
             .order(egui::Order::Foreground)
             .fixed_pos(egui::pos2(response.rect.min.x, button_bottom))
-            .allow_oversize(true)
             .show(ui.ctx(), |ui| {
                 let popup_rect = egui::Rect::from_min_size(
                     egui::pos2(response.rect.min.x, button_bottom),
@@ -337,42 +335,44 @@ pub fn dropdown_selector<T: PartialEq + Copy>(
                 );
                 ui.set_clip_rect(popup_rect);
 
-                egui::Frame::popup(&Default::default())
+                egui::Frame::none()
                     .fill(PANEL_BG_LIGHTER)
                     .corner_radius(CORNER_RADIUS_SMALL)
                     .stroke(egui::Stroke::new(1.0, BORDER_LIGHT))
+                    .inner_margin(egui::vec2(4.0, 4.0))
                     .show(ui, |ui| {
                         ui.set_min_size(popup_rect.size());
                         for (label, value) in options {
                             let is_selected = **value == *selected;
                             let item_bg = if is_selected {
                                 egui::Color32::from_rgb(42, 18, 26)
-                            } else if response.inner.is_pointer_button_down_on() {
+                            } else if ui.input(|i| i.pointer.is_down()) {
                                 egui::Color32::from_rgb(38, 38, 46)
                             } else {
                                 PANEL_BG_LIGHTER
                             };
 
-                            let item_frame = egui::Frame::NONE
+                            let item_response = egui::Frame::none()
                                 .fill(item_bg)
-                                .inner_margin(egui::vec2(12.0, 10.0));
-
-                            let item_response = item_frame.show(ui, |ui| {
-                                ui.set_width(ui.available_width());
-                                ui.horizontal_wrapped(|ui| {
+                                .corner_radius(CORNER_RADIUS_SMALL)
+                                .inner_margin(egui::vec2(12.0, 10.0))
+                                .show(ui, |ui| {
                                     ui.set_width(ui.available_width());
-                                    ui.label(
-                                        egui::RichText::new(label.as_str())
-                                            .size(14.0)
-                                            .color(if is_selected { ACCENT_PRIMARY } else { TEXT_PRIMARY }),
-                                    );
-                                    if is_selected {
-                                        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                                            ui.label(egui::RichText::new("✓").size(13.0).color(ACCENT_PRIMARY));
-                                        });
-                                    }
+                                    ui.horizontal_wrapped(|ui| {
+                                        ui.set_width(ui.available_width());
+                                        ui.label(
+                                            egui::RichText::new(label.as_str())
+                                                .size(14.0)
+                                                .color(if is_selected { ACCENT_PRIMARY } else { TEXT_PRIMARY }),
+                                        );
+                                        if is_selected {
+                                            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                                                ui.label(egui::RichText::new("✓").size(13.0).color(ACCENT_PRIMARY));
+                                            });
+                                        }
+                                    });
+                                    ui.response()
                                 });
-                            });
 
                             if item_response.inner.clicked() {
                                 *selected = *value;
@@ -382,7 +382,7 @@ pub fn dropdown_selector<T: PartialEq + Copy>(
                     });
             });
 
-        if ui.input(|i| i.pointer.any_pressed()) && !response.rect.contains(response.inner.pos()) {
+        if ui.input(|i| i.pointer.any_pressed()) && !response.rect.contains(response.rect.min) {
             ui.data_mut(|d| d.insert_temp(popup_id, false));
         }
     }
