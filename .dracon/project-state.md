@@ -1,7 +1,7 @@
 # Project State
 
 ## Current Focus
-Refactored dropdown component selection logic for better type safety
+Refactored dropdown component pointer interaction detection for better visual feedback
 
 ## Completed
-- [x] Updated dropdown selector to use direct dereferencing for value comparison instead of double dereferencing
+- [x] Changed dropdown item hover/click detection from `pointer.is_down()` to `pointer.any_down()` for more responsive visual feedback during interactions

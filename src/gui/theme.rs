@@ -346,7 +346,7 @@ pub fn dropdown_selector<T: PartialEq + Copy>(
                             let is_selected = *value == *selected;
                             let item_bg = if is_selected {
                                 egui::Color32::from_rgb(42, 18, 26)
-                            } else if ui.input(|i| i.pointer.is_down()) {
+                            } else if ui.input(|i| i.pointer.any_down()) {
                                 egui::Color32::from_rgb(38, 38, 46)
                             } else {
                                 PANEL_BG_LIGHTER
