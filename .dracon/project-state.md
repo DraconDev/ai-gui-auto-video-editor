@@ -1,10 +1,8 @@
 # Project State
 
 ## Current Focus
-Added new CLI options for GUI behavior and progress management
+Updated dependency versions in Cargo.lock for video processing features
 
 ## Completed
-- [x] Added `--start-minimized` flag to run GUI in background with desktop notifications
-- [x] Added `--gpu` option to specify hardware acceleration type
-- [x] Added `--preview-duration` option to configure preview generation length
+- [x] Updated Cargo.lock with new dependency versions for video processing features
 ```
