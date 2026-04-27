@@ -1049,7 +1049,7 @@ impl App {
             let mut selected_hw = hw_accel_val;
             dropdown_selector(
                 ui,
-                format!("hw_accel_{}", folder_idx),
+                &format!("hw_accel_{}", folder_idx),
                 &mut selected_hw,
                 &hw_accel_options,
                 selected_hw.display_name(),
