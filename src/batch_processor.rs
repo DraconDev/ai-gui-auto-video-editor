@@ -732,7 +732,7 @@ fn export_additional_files(
     if config.export.preview {
         let preview_path = crate::preview::preview_path(output_file);
         debug!(path = %preview_path.display(), "Generating preview");
-        if let Err(e) = crate::preview::generate_preview(output_file, &preview_path, 30.0, 480) {
+        if let Err(e) = crate::preview::generate_preview(output_file, &preview_path, config.export.preview_duration, 480) {
             warn!(error = %e, "Failed to generate preview");
         }
     }
