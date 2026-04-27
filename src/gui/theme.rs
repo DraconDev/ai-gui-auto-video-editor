@@ -132,14 +132,6 @@ pub fn folder_card_compact(enabled: bool) -> egui::Frame {
         .stroke(egui::Stroke::new(1.0, border))
 }
 
-pub fn folder_card_enabled() -> egui::Frame {
-    egui::Frame::NONE
-        .fill(PANEL_BG_LIGHTER)
-        .corner_radius(CORNER_RADIUS_SMALL)
-        .inner_margin(egui::vec2(14.0, 10.0))
-        .stroke(egui::Stroke::new(1.5, ACCENT_DARK))
-}
-
 #[allow(dead_code)]
 pub fn section_header(text: &str) -> egui::RichText {
     egui::RichText::new(text)

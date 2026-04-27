@@ -1,7 +1,7 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock for video processing features
+Removed unused folder card styling function from GUI theme
 
 ## Completed
-- [x] Updated Cargo.lock to reflect new dependency versions required for video processing features
+- [x] Removed `folder_card_enabled()` function as it was unused in the codebase
