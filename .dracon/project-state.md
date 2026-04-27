@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock for video processing features
+Enabled GUI feature in the build process
 
 ## Completed
-- [x] Updated Cargo.lock with new dependency versions for video processing features
+- [x] Modified build command to include GUI feature flag
 ```
