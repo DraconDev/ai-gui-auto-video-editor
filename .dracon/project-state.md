@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Added scene detection configuration with threshold support
+Removed early preview generation feature from batch processing
 
 ## Completed
-- [x] Enabled scene detection in config
-- [x] Added scene threshold configuration from CLI
+- [x] Removed preview generation code from batch processor
+- [x] Updated Cargo.lock for dependency changes
