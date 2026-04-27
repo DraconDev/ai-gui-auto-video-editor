@@ -1,7 +1,8 @@
 # Project State
 
 ## Current Focus
-Removed silence detection configuration options from the video processing pipeline
+Updated dependency versions in Cargo.lock for video processing features
 
 ## Completed
-- [x] Removed unused silence detection configuration fields (`scene_detect` and `scene_threshold`) from the configuration system
+- [x] Updated Cargo.lock with new dependency versions for video processing features
+```
