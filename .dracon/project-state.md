@@ -1,8 +1,7 @@
 # Project State
 
 ## Current Focus
-Added conditional GUI entry point when `gui` flag is enabled
+Removed the `requires = "gui"` constraint from the `start_minimized` CLI argument
 
 ## Completed
-- [x] Added feature-gated GUI entry point in main.rs
-- [x] GUI execution now occurs when `gui` flag is set and other conflicting flags are absent
+- [x] Made `start_minimized` flag independent of `gui` flag, allowing it to be used without GUI mode

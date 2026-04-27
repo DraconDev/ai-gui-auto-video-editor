@@ -238,7 +238,7 @@ pub struct Cli {
     pub gui: bool,
 
     /// Start the GUI minimized (no window, keeps watching in background)
-    #[arg(long, requires = "gui")]
+    #[arg(long)]
     pub start_minimized: bool,
 
     /// Verbose output (-v, -vv, -vvv)
