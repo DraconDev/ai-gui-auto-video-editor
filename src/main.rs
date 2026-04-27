@@ -353,14 +353,19 @@ fn main() -> Result<()> {
         && cli.watch.is_none()
         && !cli.generate_config
         && !cli.dry_run
-        && !has_watch_folders
     {
         // Check if running from terminal (TTY) or launched from desktop
         let is_tty = std::io::stdout().is_terminal();
 
         #[cfg(feature = "gui")]
         if !is_tty {
+            // Always launch GUI when launched from desktop, even with watch folders configured
             return run_gui(cli.start_minimized);
+        }
+
+        // From terminal: if watch folders are configured, go to watch mode
+        if has_watch_folders {
+            return run_multi_watch_mode(&preloaded_config);
         }
 
         // Show help and exit
