@@ -312,6 +312,132 @@ pub fn dropdown_button_text(selected_text: &str, is_open: bool) -> egui::RichTex
     }
 }
 
+pub struct Dropdown<'a, T> {
+    id: &'static str,
+    selected: &'a mut T,
+    options: &'a [(String, T)],
+}
+
+impl<'a, T: PartialEq + Copy + 'a> Dropdown<'a, T> {
+    pub fn new(id: &'static str, selected: &'a mut T, options: &'a [(String, T)]) -> Self {
+        Self { id, selected, options }
+    }
+
+    pub fn ui(self, ui: &mut egui::Ui) -> egui::Response {
+        let mut open = false;
+        let id = egui::Id::new(self.id);
+        let is_open = ui
+            .data(|d| d.get::<bool>(id).unwrap_or(false));
+
+        let current_label = self
+            .options
+            .iter()
+            .find(|(_, v)| **v == *self.selected)
+            .map(|(l, _)| l.as_str())
+            .unwrap_or("Select...");
+
+        let button_text = dropdown_button_text(current_label, is_open);
+        let chevron = if is_open { "▲" } else { "▼" };
+
+        let desired_width = ui.available_width().min(240.0);
+
+        let button = egui::Button::new(
+            egui::RichText::new(format!("{}  {}", current_label, chevron))
+                .size(14.0)
+                .color(if is_open {
+                    TEXT_PRIMARY
+                } else {
+                    TEXT_SECONDARY
+                }),
+        )
+        .fill(if is_open {
+            PANEL_BG_LIGHTER
+        } else {
+            PANEL_BG_LIGHT
+        })
+        .corner_radius(CORNER_RADIUS_SMALL)
+        .stroke(egui::Stroke::new(
+            1.0,
+            if is_open { ACCENT_PRIMARY } else { BORDER_LIGHT },
+        ))
+        .inner_margin(egui::vec2(12.0, 10.0))
+        .min_size(egui::vec2(desired_width, 0.0))
+        .desired_size(egui::vec2(desired_width, 36.0));
+
+        let mut response = ui.add(button);
+        if response.clicked() {
+            open = !is_open;
+        }
+        ui.data_mut(|d| d.insert(id, open));
+
+        if is_open {
+            let popup_id = egui::Id::new(format!("{}_popup", self.id));
+            let screen_rect = response.rect.expand(4.0);
+            let popup_rect = egui::Rect::from_min_size(
+                screen_rect.left_top(),
+                egui::vec2(screen_rect.width(), (self.options.len() as f32 * 34.0).min(220.0)),
+            );
+
+            let layer_id = egui::LayerId::new(egui::Order::Foreground, popup_id);
+            let paint_eq = ui.ctx().frame_state(|fs| fs.egui_input.states.contains_key(&layer_id));
+
+            let sense = if !paint_eq {
+                egui::Sense::click()
+            } else {
+                egui::Sense::hover()
+            };
+
+            let area_response = egui::Area::new(popup_id)
+                .order(egui::Order::Foreground)
+                .fixed_pos(screen_rect.left_top())
+                .allow_oversize(true)
+                .show(ui.ctx(), |ui| {
+                    ui.set_clip_rect(popup_rect);
+                    dropdown_frame().show(ui, |ui| {
+                        ui.set_min_size(popup_rect.size());
+                        for (label, value) in self.options {
+                            let is_selected = **value == *self.selected;
+                            let item_response = dropdown_item(is_selected).show(ui, |ui| {
+                                ui.set_width(ui.available_width());
+                                ui.horizontal_wrapped(|ui| {
+                                    ui.set_width(ui.available_width());
+                                    ui.label(
+                                        egui::RichText::new(label.as_str())
+                                            .size(14.0)
+                                            .color(if is_selected {
+                                                ACCENT_PRIMARY
+                                            } else {
+                                                TEXT_PRIMARY
+                                            }),
+                                    );
+                                    if is_selected {
+                                        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                                            ui.label(egui::RichText::new("✓").size(13.0).color(ACCENT_PRIMARY));
+                                        });
+                                    }
+                                });
+                            });
+                            if item_response.inner.clicked() {
+                                *self.selected = *value;
+                                ui.data_mut(|d| d.insert::<bool>(id, false));
+                            }
+                        }
+                    });
+                });
+
+            if let Some(area_response) = area_response.inner {
+                if !response.rect.contains(response.inner.pos()) && area_response.rect.contains(area_response.pos()) == false {
+                    if ui.input(|i| i.pointer.any_pressed()) {
+                        ui.data_mut(|d| d.insert::<bool>(id, false));
+                    }
+                }
+            }
+        }
+
+        response
+    }
+}
+
 pub fn slider_glow(
     value: &mut f32,
     range: std::ops::RangeInclusive<f32>,
