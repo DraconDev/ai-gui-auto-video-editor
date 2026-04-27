@@ -1,10 +1,8 @@
 # Project State
 
 ## Current Focus
-Added configurable target resolution support to video reframing
+Added configurable target resolution parameter to video reframing function
 
 ## Completed
-- [x] Modified `batch_processor.rs` to pass target resolution to reframe operation
-- [x] Updated `editor.rs` to accept target resolution parameter in reframe function
-- [x] Enhanced fallback cropping to use configurable target resolution dimensions
-- [x] Improved error handling to maintain consistent output dimensions
+- [x] Modified `reframe` method in `MockFfmpegEditor` to accept a `VideoResolution` parameter
+- [x] Updated video processing to support configurable target resolutions

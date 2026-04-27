@@ -1149,7 +1149,7 @@ mod tests {
 
     struct MockFfmpegEditor;
     impl VideoEditor for MockFfmpegEditor {
-        fn reframe(&self, _input: &Path, _output: &Path) -> Result<()> {
+        fn reframe(&self, _input: &Path, _output: &Path, _target_resolution: crate::config::VideoResolution) -> Result<()> {
             Ok(())
         }
 
