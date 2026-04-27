@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Made preview generation duration configurable through the export configuration
+Improved error handling and logging for video duration fallback in batch processing
 
 ## Completed
-- [x] Changed hardcoded preview duration (30.0) to use configurable value from `config.export.preview_duration`
-```
+- [x] Enhanced fallback duration handling with explicit logging when video duration cannot be determined
+- [x] Added warning log for video duration fallback cases to help with debugging

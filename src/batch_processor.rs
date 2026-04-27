@@ -863,7 +863,12 @@ fn extract_highlight_clips(
 
     // Get video duration to clamp clips properly
     let video_duration = crate::ml::FrameExtractor::get_video_duration(video_path)
-        .unwrap_or(transcript.last().map(|s| s.end).unwrap_or(60.0));
+        .unwrap_or_else(|| {
+            transcript.last().map(|s| s.end).unwrap_or_else(|| {
+                warn!(video = %video_path.display(), "Could not determine video duration for clip extraction; using 60.0 as fallback");
+                60.0
+            })
+        });
 
     let mut clip_times: Vec<(f32, f32)> = Vec::new();
     for &(start, end, _) in segment_energy.iter().take(clip_count as usize) {
