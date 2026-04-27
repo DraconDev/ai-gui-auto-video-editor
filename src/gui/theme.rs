@@ -87,11 +87,10 @@ pub fn settings_section_frame(highlight: bool) -> egui::Frame {
 }
 
 pub fn settings_toggle_frame(enabled: bool) -> egui::Frame {
-    let border = if enabled { ACCENT_DARK } else { BORDER_LIGHT };
-    let bg = if enabled {
-        egui::Color32::from_rgb(43, 29, 36)
+    let (border, bg) = if enabled {
+        (ACCENT_DARK, egui::Color32::from_rgb(40, 26, 32))
     } else {
-        egui::Color32::from_rgb(23, 28, 38)
+        (BORDER_LIGHT, egui::Color32::from_rgb(22, 26, 36))
     };
     egui::Frame::NONE
         .fill(bg)
