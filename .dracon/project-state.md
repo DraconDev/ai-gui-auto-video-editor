@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Improved error handling for video duration fallback in batch processing
+Updated dependency versions in Cargo.lock for video processing features
 
 ## Completed
-- [x] Enhanced error handling in `extract_highlight_clips` by properly propagating errors from `get_video_duration`
+- [x] Updated Cargo.lock with new dependency versions for video processing features
 ```
