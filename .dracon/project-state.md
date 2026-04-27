@@ -1,9 +1,8 @@
 # Project State
 
 ## Current Focus
-Improved terminal/GUI launch behavior based on watch folders configuration
+Updated dependency versions in Cargo.lock for video processing features
 
 ## Completed
-- [x] Added terminal launch path: if watch folders are configured, automatically enter watch mode
-- [x] Modified GUI launch behavior: now always launches GUI when not in terminal, regardless of watch folder configuration
-- [x] Maintained existing help display when neither watch mode nor GUI is applicable
+- [x] Updated Cargo.lock with new dependency versions for video processing features
+```
