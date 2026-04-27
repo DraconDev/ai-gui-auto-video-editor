@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock for video processing features
+Added new CLI options for GUI behavior and progress management
 
 ## Completed
-- [x] Updated Cargo.lock to reflect latest dependency versions for video processing features
-```
+- [x] Added `--start-minimized` flag to launch GUI without showing window
+- [x] Added `--clear-progress` flag to reset batch processing state before execution

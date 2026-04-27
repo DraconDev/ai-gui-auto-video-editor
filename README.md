@@ -101,6 +101,8 @@ The GUI provides a visual interface for managing watch folders and settings.
 | `-P, --preset <PRESET>` | Preset: `youtube`, `shorts`, `tiktok`, `reels`, `podcast`, `twitter`, `minimal` |
 | `-c, --config <FILE>` | Path to TOML config file |
 | `--gui` | Launch graphical interface |
+| `--start-minimized` | Start GUI minimized (no window, keeps watching in background) |
+| `--clear-progress` | Clear batch progress before processing |
 | `--notify` | Send desktop notifications |
 | `-w, --watch <DIR>` | Watch folder for new videos |
 | `-n, --dry-run` | Preview without processing |
