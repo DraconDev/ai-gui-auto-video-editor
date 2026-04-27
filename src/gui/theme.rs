@@ -352,7 +352,7 @@ egui::Frame::NONE
                                 PANEL_BG_LIGHTER
                             };
 
-                            let item_response = egui::Frame::none()
+                            let item_response = egui::Frame::NONE
                                 .fill(item_bg)
                                 .corner_radius(CORNER_RADIUS_SMALL)
                                 .inner_margin(egui::vec2(12.0, 10.0))

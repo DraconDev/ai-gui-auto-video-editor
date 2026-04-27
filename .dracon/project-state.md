@@ -1,7 +1,8 @@
 # Project State
 
 ## Current Focus
-Refactored dropdown component styling to use `egui::Frame::NONE` instead of `egui::Frame::none()`
+Refactored dropdown component styling to use `egui::Frame::NONE` for consistent behavior
 
 ## Completed
-- [x] Updated dropdown styling to use the more idiomatic `egui::Frame::NONE` constant instead of the function call `egui::Frame::none()` for consistency with egui's API conventions
+- [x] Changed dropdown component styling from `egui::Frame::none()` to `egui::Frame::NONE` for consistency with other frame usage
+```
