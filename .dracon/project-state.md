@@ -1,7 +1,7 @@
 # Project State
 
 ## Current Focus
-Refactored video resolution dropdown to use string reference for consistent styling and behavior
+Updated dependency versions in Cargo.lock for video processing features
 
 ## Completed
-- [x] Changed resolution dropdown ID from owned String to borrowed &str reference to maintain consistency with other dropdown components
+- [x] Updated Cargo.lock with new dependency versions for video processing features
