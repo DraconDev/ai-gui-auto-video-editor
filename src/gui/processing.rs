@@ -295,6 +295,18 @@ fn build_folder_config(config: &Config, folder: &FolderState) -> Config {
     if let Some(multi_format) = folder.settings.multi_format {
         merged.export.multi_format = multi_format;
     }
+    if let Some(subtitles) = folder.settings.subtitles {
+        merged.export.subtitles = subtitles;
+    }
+    if let Some(chapters) = folder.settings.chapters {
+        merged.export.chapters = chapters;
+    }
+    if let Some(captions) = folder.settings.captions {
+        merged.export.captions = captions;
+    }
+    if let Some(clips) = folder.settings.clips {
+        merged.export.clips = clips;
+    }
 
     merged
 }
