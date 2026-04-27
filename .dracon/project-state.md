@@ -1,7 +1,8 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock for video processing features
+Added scene detection configuration with threshold support
 
 ## Completed
-- [x] Updated Cargo.lock with new dependency versions for video processing features
+- [x] Enabled scene detection in config
+- [x] Added scene threshold configuration from CLI

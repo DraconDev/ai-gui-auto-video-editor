@@ -508,8 +508,8 @@ fn main() -> Result<()> {
         config.export.preview_duration = duration;
     }
     if cli.scene_detect {
-        // Scene detection will be handled in the processing pipeline
-        // Store threshold in config for later use
+        config.silence.scene_detect = true;
+        config.silence.scene_threshold = cli.scene_threshold;
     }
     if cli.multi_format {
         config.export.multi_format = true;
