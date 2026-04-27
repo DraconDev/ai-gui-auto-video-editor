@@ -1047,12 +1047,13 @@ impl App {
                 (String::from("VideoToolbox (macOS)"), HwAccel::VideoToolbox),
             ];
             let mut selected_hw = hw_accel_val;
+            let hw_label = selected_hw.display_name();
             dropdown_selector(
                 ui,
                 &format!("hw_accel_{}", folder_idx),
                 &mut selected_hw,
                 &hw_accel_options,
-                selected_hw.display_name(),
+                hw_label,
             );
             if selected_hw != hw_accel_val && let Some(folder) = self.state.folders.get_mut(folder_idx) {
                 folder.settings.hw_accel = Some(selected_hw);
@@ -1072,12 +1073,13 @@ impl App {
                 (String::from("720p Vertical"), VideoResolution::Vertical720p),
             ];
             let mut selected_res = target_resolution_val;
+            let res_label = selected_res.display_name();
             dropdown_selector(
                 ui,
                 &format!("resolution_{}", folder_idx),
                 &mut selected_res,
                 &resolution_options,
-                selected_res.display_name(),
+                res_label,
             );
             if selected_res != target_resolution_val && let Some(folder) = self.state.folders.get_mut(folder_idx) {
                 folder.settings.target_resolution = Some(selected_res);
