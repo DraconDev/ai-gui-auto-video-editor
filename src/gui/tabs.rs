@@ -1077,13 +1077,8 @@ impl App {
 
             ui.add_space(12.0);
 
-            ui.label(
-                RichText::new("Exports")
-                    .size(16.0)
-                    .color(ACCENT_PRIMARY)
-                    .strong(),
-            );
-            ui.add_space(10.0);
+            ui.label(section_title("Exports"));
+            ui.add_space(8.0);
 
             let mut subtitles = subtitles_val;
             if Self::draw_settings_toggle(

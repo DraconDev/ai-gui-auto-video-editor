@@ -1,9 +1,8 @@
 # Project State
 
 ## Current Focus
-Refactored processing section styling for improved visual hierarchy and spacing
+Refactored the "Exports" section styling for improved visual hierarchy
 
 ## Completed
-- [x] Replaced hardcoded rich text styling with `section_title()` helper function
-- [x] Reduced vertical spacing from 10px to 8px for more compact layout
-- [x] Maintained consistent visual hierarchy through standardized styling
+- [x] Replaced hardcoded `RichText` styling with a reusable `section_title` helper function
+- [x] Reduced spacing between title and content from 10px to 8px for tighter visual hierarchy
