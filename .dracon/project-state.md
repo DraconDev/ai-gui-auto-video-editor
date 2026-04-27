@@ -1,7 +1,8 @@
 # Project State
 
 ## Current Focus
-Removed the `requires = "gui"` constraint from the `start_minimized` CLI argument
+Updated dependency versions in Cargo.lock for video processing features
 
 ## Completed
-- [x] Made `start_minimized` flag independent of `gui` flag, allowing it to be used without GUI mode
+- [x] Updated Cargo.lock with new dependency versions for video processing features
+```
