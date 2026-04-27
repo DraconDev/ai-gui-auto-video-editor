@@ -365,7 +365,7 @@ fn main() -> Result<()> {
 
         // From terminal: if watch folders are configured, go to watch mode
         if has_watch_folders {
-            return run_multi_watch_mode(&preloaded_config);
+            return run_multi_watch_mode(&preloaded_config, &cli);
         }
 
         // Show help and exit
