@@ -1,8 +1,7 @@
 # Project State
 
 ## Current Focus
-Pass CLI arguments to multi-watch mode for GUI behavior and progress management
+Updated dependency versions in Cargo.lock for video processing features
 
 ## Completed
-- [x] Updated `run_multi_watch_mode` call to include CLI arguments
-```
+- [x] Updated dependency versions in Cargo.lock to ensure compatibility with video processing features
