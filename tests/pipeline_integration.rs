@@ -141,7 +141,7 @@ fn test_auto_reframe() {
     let output_path = output_dir.path().join("reframed.mp4");
 
     let editor = FfmpegEditor::default();
-    let result = editor.reframe(&video_path, &output_path, crate::config::VideoResolution::Vertical1080p);
+    let result = editor.reframe(&video_path, &output_path, ai_vid_editor::config::VideoResolution::Vertical1080p);
 
     // Note: This will use center crop if ML models fail to load
     assert!(
