@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock for video processing features
+Added configurable target resolution parameter to video reframing function
 
 ## Completed
-- [x] Updated Cargo.lock with new dependency versions for video processing features
-```
+- [x] Updated `FfmpegEditor::reframe` to accept `VideoResolution::Vertical1080p` as parameter
+- [x] Maintained existing center crop fallback behavior when ML models fail to load
