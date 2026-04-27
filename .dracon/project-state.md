@@ -1,7 +1,7 @@
 # Project State
 
 ## Current Focus
-Refactored hardware acceleration dropdown to use string reference for consistent styling
+Refactored video resolution dropdown to use string reference for consistent styling and behavior
 
 ## Completed
-- [x] Changed dropdown ID from owned `String` to borrowed `&str` for better performance and consistency with reusable dropdown component pattern
+- [x] Changed resolution dropdown ID from owned String to borrowed &str reference to maintain consistency with other dropdown components

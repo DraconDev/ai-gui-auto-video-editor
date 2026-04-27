@@ -1074,7 +1074,7 @@ impl App {
             let mut selected_res = target_resolution_val;
             dropdown_selector(
                 ui,
-                format!("resolution_{}", folder_idx),
+                &format!("resolution_{}", folder_idx),
                 &mut selected_res,
                 &resolution_options,
                 selected_res.display_name(),
