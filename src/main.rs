@@ -358,6 +358,11 @@ fn main() -> Result<()> {
         && !cli.generate_config
         && !cli.dry_run
     {
+        #[cfg(feature = "gui")]
+        if cli.gui {
+            return run_gui(cli.start_minimized);
+        }
+
         // Check if running from terminal (TTY) or launched from desktop
         let is_tty = std::io::stdout().is_terminal();
 

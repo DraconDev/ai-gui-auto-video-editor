@@ -1,7 +1,8 @@
 # Project State
 
 ## Current Focus
-Added duplicate GUI flag in CLI arguments
+Added conditional GUI entry point when `gui` flag is enabled
 
 ## Completed
-- [x] Added duplicate `gui` flag in CLI arguments (likely a bug fix for accidental removal)
+- [x] Added feature-gated GUI entry point in main.rs
+- [x] GUI execution now occurs when `gui` flag is set and other conflicting flags are absent
