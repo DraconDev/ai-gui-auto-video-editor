@@ -1039,21 +1039,21 @@ impl App {
 
             ui.label(label_secondary("GPU Encoding"));
             ui.add_space(4.0);
-            let hw_accel_options = [
-                ("None (CPU)", HwAccel::None),
-                ("NVIDIA NVENC", HwAccel::Nvenc),
-                ("AMD AMF", HwAccel::Amf),
-                ("VAAPI", HwAccel::Vaapi),
-                ("VideoToolbox (macOS)", HwAccel::VideoToolbox),
+            let hw_accel_options: [(String, HwAccel); 5] = [
+                (String::from("None (CPU)"), HwAccel::None),
+                (String::from("NVIDIA NVENC"), HwAccel::Nvenc),
+                (String::from("AMD AMF"), HwAccel::Amf),
+                (String::from("VAAPI"), HwAccel::Vaapi),
+                (String::from("VideoToolbox (macOS)"), HwAccel::VideoToolbox),
             ];
             let mut selected_hw = hw_accel_val;
-            egui::ComboBox::from_id_salt("hw_accel_selector")
-                .selected_text(selected_hw.display_name())
-                .show_ui(ui, |ui| {
-                    for (label, value) in &hw_accel_options {
-                        ui.selectable_value(&mut selected_hw, *value, *label);
-                    }
-                });
+            dropdown_selector(
+                ui,
+                format!("hw_accel_{}", folder_idx),
+                &mut selected_hw,
+                &hw_accel_options,
+                selected_hw.display_name(),
+            );
             if selected_hw != hw_accel_val && let Some(folder) = self.state.folders.get_mut(folder_idx) {
                 folder.settings.hw_accel = Some(selected_hw);
                 needs_save = true;
