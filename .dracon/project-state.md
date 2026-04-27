@@ -1,8 +1,11 @@
 # Project State
 
 ## Current Focus
-Added configurable target resolution parameter to video reframing function
+Added target resolution scaling to video processing pipeline
 
 ## Completed
-- [x] Modified `reframe` method in `MockFfmpegEditor` to accept a `VideoResolution` parameter
-- [x] Updated video processing to support configurable target resolutions
+- [x] Added conditional target resolution scaling when not reframing
+- [x] Implemented ffmpeg scaling with configurable dimensions
+- [x] Added progress reporting for scaling operation
+- [x] Maintained proper file cleanup and tracking
+- [x] Preserved audio stream during scaling operation
