@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Updated video reframing test to use fully qualified path for VideoResolution enum
+Updated dependency versions in Cargo.lock for video processing features
 
 ## Completed
-- [x] Fixed test case to use `ai_vid_editor::config::VideoResolution` instead of local import
+- [x] Updated Cargo.lock to reflect latest dependency versions for video processing features
 ```
