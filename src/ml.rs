@@ -584,20 +584,20 @@ impl AutoReframeProcessor {
         Ok(crop_regions)
     }
 
-    /// Generate ffmpeg filter for smooth crop following faces
+    /// Generate ffmpeg filter for smooth crop following faces.
+    /// `target_resolution` controls the output scale dimensions.
     pub fn generate_crop_filter(
         &self,
         crop_regions: &[(f32, CropRegion)],
         video_width: u32,
         video_height: u32,
+        target_resolution: crate::config::VideoResolution,
     ) -> String {
+        let (scale_w, scale_h) = target_resolution.dimensions();
         if crop_regions.is_empty() {
-            // Fallback to center crop
-            return "crop=ih*9/16:ih,scale=1080:1920".to_string();
+            return format!("crop=ih*9/16:ih,scale={}:{}", scale_w, scale_h);
         }
 
-        // For simplicity, use the first detected crop region
-        // Full implementation would interpolate between regions
         let region = &crop_regions[0].1;
 
         let crop_w = (region.width * video_width as f32) as u32;
@@ -606,8 +606,8 @@ impl AutoReframeProcessor {
         let crop_y = 0u32;
 
         format!(
-            "crop={}:{}:{}:{},scale=1080:1920",
-            crop_w, crop_h, crop_x, crop_y
+            "crop={}:{}:{}:{},scale={}:{}",
+            crop_w, crop_h, crop_x, crop_y, scale_w, scale_h
         )
     }
 }

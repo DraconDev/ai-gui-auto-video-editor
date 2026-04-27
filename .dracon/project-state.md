@@ -1,9 +1,10 @@
 # Project State
 
 ## Current Focus
-Added noise reduction to video processing pipeline
+Refactored video cropping to support configurable target resolutions
 
 ## Completed
-- [x] Added audio noise reduction step before audio enhancement
-- [x] Improved file handling by properly tracking and cleaning up intermediate files
-- [x] Maintained backward compatibility with existing audio processing flow
+- [x] Updated `generate_crop_filter` to accept `target_resolution` parameter
+- [x] Removed hardcoded 1080x1920 scale values
+- [x] Improved documentation for the cropping function
+- [x] Maintained fallback behavior for empty crop regions
