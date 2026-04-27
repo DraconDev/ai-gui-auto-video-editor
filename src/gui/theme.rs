@@ -2,33 +2,37 @@
 
 use eframe::egui;
 
-pub const PANEL_BG: egui::Color32 = egui::Color32::from_rgb(16, 16, 16);
-pub const PANEL_BG_LIGHT: egui::Color32 = egui::Color32::from_rgb(24, 24, 24);
-pub const PANEL_BG_LIGHTER: egui::Color32 = egui::Color32::from_rgb(34, 34, 34);
+pub const PANEL_BG: egui::Color32 = egui::Color32::from_rgb(14, 14, 16);
+pub const PANEL_BG_LIGHT: egui::Color32 = egui::Color32::from_rgb(22, 22, 26);
+pub const PANEL_BG_LIGHTER: egui::Color32 = egui::Color32::from_rgb(32, 32, 38);
 
 pub const ACCENT_PRIMARY: egui::Color32 = egui::Color32::from_rgb(230, 57, 70);
 pub const ACCENT_DARK: egui::Color32 = egui::Color32::from_rgb(180, 45, 55);
+pub const ACCENT_GLOW: egui::Color32 = egui::Color32::from_rgba_unmultiplied(230, 57, 70, 40);
 
-pub const TEXT_PRIMARY: egui::Color32 = egui::Color32::from_rgb(250, 250, 250);
-pub const TEXT_SECONDARY: egui::Color32 = egui::Color32::from_rgb(170, 170, 170);
-pub const TEXT_MUTED: egui::Color32 = egui::Color32::from_rgb(100, 100, 100);
+pub const TEXT_PRIMARY: egui::Color32 = egui::Color32::from_rgb(250, 250, 252);
+pub const TEXT_SECONDARY: egui::Color32 = egui::Color32::from_rgb(165, 165, 172);
+pub const TEXT_MUTED: egui::Color32 = egui::Color32::from_rgb(90, 90, 100);
 
-pub const BORDER: egui::Color32 = egui::Color32::from_rgb(36, 36, 36);
-pub const BORDER_LIGHT: egui::Color32 = egui::Color32::from_rgb(50, 50, 50);
+pub const BORDER: egui::Color32 = egui::Color32::from_rgb(32, 32, 38);
+pub const BORDER_LIGHT: egui::Color32 = egui::Color32::from_rgb(48, 48, 56);
 
-pub const SUCCESS: egui::Color32 = egui::Color32::from_rgb(180, 90, 95);
-pub const SUCCESS_BG: egui::Color32 = egui::Color32::from_rgb(50, 25, 27);
-pub const ERROR: egui::Color32 = egui::Color32::from_rgb(255, 68, 68);
-pub const ERROR_BG: egui::Color32 = egui::Color32::from_rgb(55, 20, 20);
+pub const SUCCESS: egui::Color32 = egui::Color32::from_rgb(72, 200, 120);
+pub const SUCCESS_BG: egui::Color32 = egui::Color32::from_rgb(18, 40, 26);
+pub const SUCCESS_DIM: egui::Color32 = egui::Color32::from_rgb(40, 140, 80);
+pub const ERROR: egui::Color32 = egui::Color32::from_rgb(255, 75, 75);
+pub const ERROR_BG: egui::Color32 = egui::Color32::from_rgb(45, 16, 16);
 pub const WARNING: egui::Color32 = egui::Color32::from_rgb(255, 193, 7);
-pub const PROCESSING: egui::Color32 = egui::Color32::from_rgb(100, 149, 237);
-pub const PROCESSING_BG: egui::Color32 = egui::Color32::from_rgb(25, 40, 60);
-pub const SETTINGS_PANEL_BG: egui::Color32 = egui::Color32::from_rgb(14, 17, 23);
-pub const SETTINGS_SECTION_BG: egui::Color32 = egui::Color32::from_rgb(20, 24, 33);
-pub const SETTINGS_SECTION_BG_HIGHLIGHT: egui::Color32 = egui::Color32::from_rgb(35, 24, 31);
-pub const SETTINGS_SECTION_BORDER_HIGHLIGHT: egui::Color32 = egui::Color32::from_rgb(112, 54, 66);
+pub const WARNING_BG: egui::Color32 = egui::Color32::from_rgb(50, 40, 10);
+pub const PROCESSING: egui::Color32 = egui::Color32::from_rgb(86, 160, 255);
+pub const PROCESSING_BG: egui::Color32 = egui::Color32::from_rgb(20, 36, 60);
+pub const PROCESSING_DIM: egui::Color32 = egui::Color32::from_rgb(60, 120, 200);
+pub const SETTINGS_PANEL_BG: egui::Color32 = egui::Color32::from_rgb(12, 14, 18);
+pub const SETTINGS_SECTION_BG: egui::Color32 = egui::Color32::from_rgb(18, 21, 28);
+pub const SETTINGS_SECTION_BG_HIGHLIGHT: egui::Color32 = egui::Color32::from_rgb(30, 20, 26);
+pub const SETTINGS_SECTION_BORDER_HIGHLIGHT: egui::Color32 = egui::Color32::from_rgb(100, 50, 60);
 
-pub const CORNER_RADIUS: f32 = 12.0;
+pub const CORNER_RADIUS: f32 = 14.0;
 pub const CORNER_RADIUS_SMALL: f32 = 8.0;
 #[allow(dead_code)]
 pub const CORNER_RADIUS_PILL: f32 = 24.0;
