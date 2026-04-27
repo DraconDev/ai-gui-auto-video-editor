@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Improved error handling and logging for video duration fallback in batch processing
+Improved error handling for progress file saving in batch processing
 
 ## Completed
-- [x] Enhanced fallback duration handling with explicit logging when video duration cannot be determined
-- [x] Added warning log for video duration fallback cases to help with debugging
+- [x] Added proper error handling for progress file saving with logging
+- [x] Replaced silent failure with explicit error logging when progress file cannot be saved

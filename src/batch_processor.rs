@@ -1129,14 +1129,18 @@ where
                             successful.fetch_add(1, Ordering::SeqCst);
                             let mut p = progress.lock().unwrap();
                             p.mark_completed(&input_file);
-                            let _ = p.to_file(&progress_path);
+                            if let Err(e) = p.to_file(&progress_path) {
+                                warn!(error = %e, "Failed to save progress file");
+                            }
                         }
                         Err(e) => {
                             warn!(file = ?input_file, error = %e, "Failed to process");
                             failed.fetch_add(1, Ordering::SeqCst);
                             let mut p = progress.lock().unwrap();
                             p.mark_failed(&input_file);
-                            let _ = p.to_file(&progress_path);
+                            if let Err(e) = p.to_file(&progress_path) {
+                                warn!(error = %e, "Failed to save progress file");
+                            }
                         }
                     }
                 }
