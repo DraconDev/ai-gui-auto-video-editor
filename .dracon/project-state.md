@@ -1,8 +1,9 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock for video processing features
+Added noise reduction to video processing pipeline
 
 ## Completed
-- [x] Updated Cargo.lock with new dependency versions for video processing features
-```
+- [x] Added audio noise reduction step before audio enhancement
+- [x] Improved file handling by properly tracking and cleaning up intermediate files
+- [x] Maintained backward compatibility with existing audio processing flow

@@ -325,22 +325,37 @@ where
         .context("Failed to trim video")?;
     debug!(file = ?trimmed_file, "Trimmed video saved");
 
+    let audio_file = if config.audio.noise_reduction {
+        let denoised = output_file.with_extension("denoised.mp4");
+        report_progress(&mut progress, 0.74, "Reducing noise");
+        info!("Reducing audio noise");
+        editor.reduce_noise(&trimmed_file, &denoised)?;
+        if trimmed_file != output_file {
+            guard.untrack(&trimmed_file);
+            let _ = fs::remove_file(&trimmed_file);
+        }
+        guard.track(denoised.clone());
+        denoised
+    } else {
+        trimmed_file
+    };
+
     let enhanced_file = if config.audio.enhance {
         let enhanced = output_file.with_extension("enhanced.mp4");
         report_progress(&mut progress, 0.78, "Enhancing audio");
         info!("Enhancing audio");
         editor
-            .enhance_audio(&trimmed_file, &enhanced, config.audio.target_lufs)
+            .enhance_audio(&audio_file, &enhanced, config.audio.target_lufs)
             .context("Failed to enhance audio")?;
 
-        if trimmed_file != output_file {
-            guard.untrack(&trimmed_file);
-            let _ = fs::remove_file(&trimmed_file);
+        if audio_file != output_file {
+            guard.untrack(&audio_file);
+            let _ = fs::remove_file(&audio_file);
         }
         guard.track(enhanced.clone());
         enhanced
     } else {
-        trimmed_file
+        audio_file
     };
 
     let with_music_file = if let Some(ref music_path) = config.audio.music_file {
