@@ -1,8 +1,7 @@
 # Project State
 
 ## Current Focus
-Improved error handling for progress file saving in batch processing
+Removed silence detection configuration options from the video processing pipeline
 
 ## Completed
-- [x] Added proper error handling for progress file saving with logging
-- [x] Replaced silent failure with explicit error logging when progress file cannot be saved
+- [x] Removed unused silence detection configuration fields (`scene_detect` and `scene_threshold`) from the configuration system

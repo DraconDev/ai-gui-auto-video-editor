@@ -973,12 +973,6 @@ impl Config {
             self.video.watermark_position = other.video.watermark_position.clone();
         }
 
-        // Silence config - new fields
-        self.silence.scene_detect = other.silence.scene_detect;
-        if other.silence.scene_threshold != default_scene_threshold() {
-            self.silence.scene_threshold = other.silence.scene_threshold;
-        }
-
         // Processing config
         self.processing.join_mode = other.processing.join_mode;
         if other.processing.join_after_count != default_join_after_count() {
