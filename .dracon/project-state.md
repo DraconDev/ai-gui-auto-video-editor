@@ -1,8 +1,7 @@
 # Project State
 
 ## Current Focus
-Refactored dropdown component styling to use `egui::Frame::NONE` for consistent behavior
+Updated dependency versions in Cargo.lock for video processing features
 
 ## Completed
-- [x] Changed dropdown component styling from `egui::Frame::none()` to `egui::Frame::NONE` for consistency with other frame usage
-```
+- [x] Updated dependency versions in Cargo.lock to ensure compatibility with video processing features
