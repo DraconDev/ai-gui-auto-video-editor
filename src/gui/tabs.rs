@@ -365,14 +365,24 @@ impl App {
     }
 
     pub(crate) fn setup_feature_row(&self, ui: &mut egui::Ui, title: &str, desc: &str) {
-        ui.horizontal(|ui| {
-            ui.label(RichText::new("✓").size(18.0).color(SUCCESS));
-            ui.add_space(12.0);
-            ui.vertical(|ui| {
-                ui.label(RichText::new(title).size(15.0).color(TEXT_PRIMARY).strong());
-                ui.label(RichText::new(desc).size(13.0).color(TEXT_SECONDARY));
+        egui::Frame::NONE
+            .fill(PANEL_BG)
+            .corner_radius(8.0)
+            .inner_margin(egui::vec2(12.0, 10.0))
+            .show(ui, |ui| {
+                ui.horizontal_wrapped(|ui| {
+                    ui.set_width(ui.available_width());
+                    let dot_size = 8.0;
+                    let (rect, _) = ui.allocate_exact_size(egui::vec2(dot_size, dot_size), egui::Sense::hover());
+                    ui.painter().circle_filled(rect.center(), 3.5, SUCCESS);
+                    ui.add_space(10.0);
+                    ui.vertical_wrapped(|ui| {
+                        ui.set_width(300.0);
+                        ui.label(RichText::new(title).size(14.0).color(TEXT_PRIMARY).strong());
+                        ui.label(RichText::new(desc).size(12.0).color(TEXT_MUTED));
+                    });
+                });
             });
-        });
     }
 
     pub(crate) fn draw_setup_folder(&mut self, ui: &mut egui::Ui) {
