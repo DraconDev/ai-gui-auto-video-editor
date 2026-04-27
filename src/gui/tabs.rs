@@ -920,12 +920,9 @@ impl App {
             let folder_idx = self.state.selected_folder_idx;
 
             ui.label(
-                RichText::new("Processing")
-                    .size(16.0)
-                    .color(ACCENT_PRIMARY)
-                    .strong(),
+                section_title("Processing"),
             );
-            ui.add_space(10.0);
+            ui.add_space(8.0);
 
             let mut enhance = enhance_val;
             if Self::draw_settings_toggle(
