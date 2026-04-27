@@ -1,7 +1,7 @@
 # Project State
 
 ## Current Focus
-Refactored dropdown component pointer interaction detection for better visual feedback
+Refactored dropdown component styling to use `egui::Frame::NONE` instead of `egui::Frame::none()`
 
 ## Completed
-- [x] Changed dropdown item hover/click detection from `pointer.is_down()` to `pointer.any_down()` for more responsive visual feedback during interactions
+- [x] Updated dropdown styling to use the more idiomatic `egui::Frame::NONE` constant instead of the function call `egui::Frame::none()` for consistency with egui's API conventions

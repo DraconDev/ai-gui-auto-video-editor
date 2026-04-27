@@ -335,7 +335,7 @@ pub fn dropdown_selector<T: PartialEq + Copy>(
                 );
                 ui.set_clip_rect(popup_rect);
 
-                egui::Frame::none()
+egui::Frame::NONE
                     .fill(PANEL_BG_LIGHTER)
                     .corner_radius(CORNER_RADIUS_SMALL)
                     .stroke(egui::Stroke::new(1.0, BORDER_LIGHT))
