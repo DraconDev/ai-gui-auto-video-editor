@@ -1,10 +1,8 @@
 # Project State
 
 ## Current Focus
-Refactored video cropping to support configurable target resolutions
+Added configurable target resolution support to video reframing
 
 ## Completed
-- [x] Updated `generate_crop_filter` to accept `target_resolution` parameter
-- [x] Removed hardcoded 1080x1920 scale values
-- [x] Improved documentation for the cropping function
-- [x] Maintained fallback behavior for empty crop regions
+- [x] Modified `VideoEditor` trait to include `target_resolution` parameter in `reframe` method
+- [x] Updated video cropping functionality to support configurable target resolutions

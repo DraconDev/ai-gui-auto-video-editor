@@ -158,7 +158,7 @@ pub trait VideoEditor: Send + Sync {
     fn reduce_noise(&self, input: &Path, output: &Path) -> Result<()>;
     fn stabilize(&self, input: &Path, output: &Path) -> Result<()>;
     fn color_correct(&self, input: &Path, output: &Path) -> Result<()>;
-    fn reframe(&self, input: &Path, output: &Path) -> Result<()>;
+    fn reframe(&self, input: &Path, output: &Path, target_resolution: crate::config::VideoResolution) -> Result<()>;
     fn blur_background(&self, input: &Path, output: &Path) -> Result<()>;
 }
 
