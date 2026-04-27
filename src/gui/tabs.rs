@@ -1160,13 +1160,8 @@ impl App {
             ui.add_space(12.0);
 
             settings_section_frame(false).show(ui, |ui| {
-                ui.label(
-                    RichText::new("Advanced")
-                        .size(16.0)
-                        .color(ACCENT_PRIMARY)
-                        .strong(),
-                );
-                ui.add_space(10.0);
+                ui.label(section_title("Advanced"));
+                ui.add_space(8.0);
 
                 if ui.available_width() > 620.0 {
                     ui.columns(2, |cols| {
