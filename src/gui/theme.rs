@@ -283,132 +283,88 @@ pub fn button_add(text: impl Into<String>) -> egui::Button<'static> {
         .min_size(egui::vec2(65.0, 32.0))
 }
 
-pub fn dropdown_frame() -> egui::Frame {
-    egui::Frame::popup(&egui::Style::default())
-        .fill(PANEL_BG_LIGHTER)
-        .corner_radius(CORNER_RADIUS_SMALL)
-        .stroke(egui::Stroke::new(1.0, BORDER_LIGHT))
-}
+pub fn dropdown_selector<T: PartialEq + Copy>(
+    ui: &mut egui::Ui,
+    id: &str,
+    selected: &mut T,
+    options: &[(String, T)],
+    current_label: &str,
+) {
+    let popup_id = egui::Id::new(format!("{}_popup", id));
+    let is_popup_open = ui.data(|d| d.get::<bool>(popup_id).unwrap_or(false));
 
-pub fn dropdown_item(selected: bool) -> egui::Frame {
-    if selected {
-        egui::Frame::NONE
-            .fill(egui::Color32::from_rgb(50, 22, 30))
-            .inner_margin(egui::vec2(10.0, 8.0))
+    let chevron = if is_popup_open { "▲" } else { "▼" };
+    let desired_width = 220.0_f32;
+
+    let button = egui::Button::new(
+        egui::RichText::new(format!("{}  {}", current_label, chevron))
+            .size(14.0)
+            .color(if is_popup_open { TEXT_PRIMARY } else { TEXT_SECONDARY }),
+    )
+    .fill(if is_popup_open {
+        PANEL_BG_LIGHTER
     } else {
-        egui::Frame::NONE
-            .fill(PANEL_BG_LIGHT)
-            .inner_margin(egui::vec2(10.0, 8.0))
-    }
-}
+        PANEL_BG_LIGHT
+    })
+    .corner_radius(CORNER_RADIUS_SMALL)
+    .stroke(egui::Stroke::new(
+        1.0,
+        if is_popup_open { ACCENT_PRIMARY } else { BORDER_LIGHT },
+    ))
+    .inner_margin(egui::vec2(12.0, 10.0))
+    .desired_size(egui::vec2(desired_width, 36.0));
 
-pub fn dropdown_button_text(selected_text: &str, is_open: bool) -> egui::RichText {
-    let text = if selected_text.is_empty() { "Select..." } else { selected_text };
-    let base = egui::RichText::new(text).size(14.0);
-    if is_open {
-        base.color(TEXT_PRIMARY).strong()
-    } else {
-        base.color(TEXT_SECONDARY)
-    }
-}
+    let response = ui.add(button);
 
-pub struct Dropdown<'a, T> {
-    id: &'static str,
-    selected: &'a mut T,
-    options: &'a [(String, T)],
-}
-
-impl<'a, T: PartialEq + Copy + 'a> Dropdown<'a, T> {
-    pub fn new(id: &'static str, selected: &'a mut T, options: &'a [(String, T)]) -> Self {
-        Self { id, selected, options }
+    if response.clicked() {
+        let new_state = !is_popup_open;
+        ui.data_mut(|d| d.insert::<bool>(popup_id, new_state));
     }
 
-    pub fn ui(self, ui: &mut egui::Ui) -> egui::Response {
-        let mut open = false;
-        let id = egui::Id::new(self.id);
-        let is_open = ui
-            .data(|d| d.get::<bool>(id).unwrap_or(false));
+    if is_popup_open {
+        let button_bottom = response.rect.max.y + 4.0;
+        let popup_height = (options.len() as f32 * 36.0).min(200.0);
+        let popup_width = desired_width;
 
-        let current_label = self
-            .options
-            .iter()
-            .find(|(_, v)| **v == *self.selected)
-            .map(|(l, _)| l.as_str())
-            .unwrap_or("Select...");
+        egui::Area::new(popup_id)
+            .order(egui::Order::Foreground)
+            .fixed_pos(egui::pos2(response.rect.min.x, button_bottom))
+            .allow_oversize(true)
+            .show(ui.ctx(), |ui| {
+                let popup_rect = egui::Rect::from_min_size(
+                    egui::pos2(response.rect.min.x, button_bottom),
+                    egui::vec2(popup_width, popup_height),
+                );
+                ui.set_clip_rect(popup_rect);
 
-        let button_text = dropdown_button_text(current_label, is_open);
-        let chevron = if is_open { "▲" } else { "▼" };
-
-        let desired_width = ui.available_width().min(240.0);
-
-        let button = egui::Button::new(
-            egui::RichText::new(format!("{}  {}", current_label, chevron))
-                .size(14.0)
-                .color(if is_open {
-                    TEXT_PRIMARY
-                } else {
-                    TEXT_SECONDARY
-                }),
-        )
-        .fill(if is_open {
-            PANEL_BG_LIGHTER
-        } else {
-            PANEL_BG_LIGHT
-        })
-        .corner_radius(CORNER_RADIUS_SMALL)
-        .stroke(egui::Stroke::new(
-            1.0,
-            if is_open { ACCENT_PRIMARY } else { BORDER_LIGHT },
-        ))
-        .inner_margin(egui::vec2(12.0, 10.0))
-        .min_size(egui::vec2(desired_width, 0.0))
-        .desired_size(egui::vec2(desired_width, 36.0));
-
-        let mut response = ui.add(button);
-        if response.clicked() {
-            open = !is_open;
-        }
-        ui.data_mut(|d| d.insert(id, open));
-
-        if is_open {
-            let popup_id = egui::Id::new(format!("{}_popup", self.id));
-            let screen_rect = response.rect.expand(4.0);
-            let popup_rect = egui::Rect::from_min_size(
-                screen_rect.left_top(),
-                egui::vec2(screen_rect.width(), (self.options.len() as f32 * 34.0).min(220.0)),
-            );
-
-            let layer_id = egui::LayerId::new(egui::Order::Foreground, popup_id);
-            let paint_eq = ui.ctx().frame_state(|fs| fs.egui_input.states.contains_key(&layer_id));
-
-            let sense = if !paint_eq {
-                egui::Sense::click()
-            } else {
-                egui::Sense::hover()
-            };
-
-            let area_response = egui::Area::new(popup_id)
-                .order(egui::Order::Foreground)
-                .fixed_pos(screen_rect.left_top())
-                .allow_oversize(true)
-                .show(ui.ctx(), |ui| {
-                    ui.set_clip_rect(popup_rect);
-                    dropdown_frame().show(ui, |ui| {
+                egui::Frame::popup(&Default::default())
+                    .fill(PANEL_BG_LIGHTER)
+                    .corner_radius(CORNER_RADIUS_SMALL)
+                    .stroke(egui::Stroke::new(1.0, BORDER_LIGHT))
+                    .show(ui, |ui| {
                         ui.set_min_size(popup_rect.size());
-                        for (label, value) in self.options {
-                            let is_selected = **value == *self.selected;
-                            let item_response = dropdown_item(is_selected).show(ui, |ui| {
+                        for (label, value) in options {
+                            let is_selected = **value == *selected;
+                            let item_bg = if is_selected {
+                                egui::Color32::from_rgb(42, 18, 26)
+                            } else if response.inner.is_pointer_button_down_on() {
+                                egui::Color32::from_rgb(38, 38, 46)
+                            } else {
+                                PANEL_BG_LIGHTER
+                            };
+
+                            let item_frame = egui::Frame::NONE
+                                .fill(item_bg)
+                                .inner_margin(egui::vec2(12.0, 10.0));
+
+                            let item_response = item_frame.show(ui, |ui| {
                                 ui.set_width(ui.available_width());
                                 ui.horizontal_wrapped(|ui| {
                                     ui.set_width(ui.available_width());
                                     ui.label(
                                         egui::RichText::new(label.as_str())
                                             .size(14.0)
-                                            .color(if is_selected {
-                                                ACCENT_PRIMARY
-                                            } else {
-                                                TEXT_PRIMARY
-                                            }),
+                                            .color(if is_selected { ACCENT_PRIMARY } else { TEXT_PRIMARY }),
                                     );
                                     if is_selected {
                                         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
@@ -417,24 +373,18 @@ impl<'a, T: PartialEq + Copy + 'a> Dropdown<'a, T> {
                                     }
                                 });
                             });
+
                             if item_response.inner.clicked() {
-                                *self.selected = *value;
-                                ui.data_mut(|d| d.insert::<bool>(id, false));
+                                *selected = *value;
+                                ui.data_mut(|d| d.insert::<bool>(popup_id, false));
                             }
                         }
                     });
-                });
+            });
 
-            if let Some(area_response) = area_response.inner {
-                if !response.rect.contains(response.inner.pos()) && area_response.rect.contains(area_response.pos()) == false {
-                    if ui.input(|i| i.pointer.any_pressed()) {
-                        ui.data_mut(|d| d.insert::<bool>(id, false));
-                    }
-                }
-            }
+        if ui.input(|i| i.pointer.any_pressed()) && !response.rect.contains(response.inner.pos()) {
+            ui.data_mut(|d| d.insert::<bool>(popup_id, false));
         }
-
-        response
     }
 }
 
