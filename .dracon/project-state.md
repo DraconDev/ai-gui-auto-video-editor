@@ -1,8 +1,7 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock for video processing features
+Refactored dropdown component to use min_size instead of desired_size for better layout control
 
 ## Completed
-- [x] Updated dependency versions in Cargo.lock for video processing features
-```
+- [x] Changed dropdown component from using `desired_size` to `min_size` to ensure consistent minimum dimensions

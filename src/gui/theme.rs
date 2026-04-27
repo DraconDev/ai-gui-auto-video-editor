@@ -311,7 +311,7 @@ pub fn dropdown_selector<T: PartialEq + Copy>(
         1.0,
         if is_popup_open { ACCENT_PRIMARY } else { BORDER_LIGHT },
     ))
-    .desired_size(egui::vec2(desired_width, 36.0));
+    .min_size(egui::vec2(desired_width, 36.0));
 
     let response = ui.add(button);
 
