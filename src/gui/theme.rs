@@ -153,13 +153,6 @@ pub fn section_title(text: &str) -> egui::RichText {
         .strong()
 }
 
-#[allow(dead_code)]
-pub fn glow_color() -> egui::Color32 {
-    egui::Color32::from_rgba_unmultiplied(230, 57, 70, 80)
-}
-
-pub const ACCENT_GLOW: egui::Color32 = egui::Color32::from_rgba_unmultiplied(230, 57, 70, 40);
-
 pub fn label_primary(text: &str) -> egui::RichText {
     egui::RichText::new(text).color(TEXT_PRIMARY).size(16.0)
 }
