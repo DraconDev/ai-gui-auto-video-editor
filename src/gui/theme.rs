@@ -129,13 +129,36 @@ pub fn folder_card_compact(enabled: bool) -> egui::Frame {
         .stroke(egui::Stroke::new(1.0, border))
 }
 
+pub fn folder_card_enabled() -> egui::Frame {
+    egui::Frame::NONE
+        .fill(PANEL_BG_LIGHTER)
+        .corner_radius(CORNER_RADIUS_SMALL)
+        .inner_margin(egui::vec2(14.0, 10.0))
+        .stroke(egui::Stroke::new(1.5, ACCENT_DARK))
+}
+
 #[allow(dead_code)]
 pub fn section_header(text: &str) -> egui::RichText {
     egui::RichText::new(text)
-        .size(17.0)
-        .color(ACCENT_PRIMARY)
+        .size(13.0)
+        .color(TEXT_SECONDARY)
         .strong()
 }
+
+#[allow(dead_code)]
+pub fn section_title(text: &str) -> egui::RichText {
+    egui::RichText::new(text)
+        .size(16.0)
+        .color(TEXT_PRIMARY)
+        .strong()
+}
+
+#[allow(dead_code)]
+pub fn glow_color() -> egui::Color32 {
+    egui::Color32::from_rgba_unmultiplied(230, 57, 70, 80)
+}
+
+pub const ACCENT_GLOW: egui::Color32 = egui::Color32::from_rgba_unmultiplied(230, 57, 70, 40);
 
 pub fn label_primary(text: &str) -> egui::RichText {
     egui::RichText::new(text).color(TEXT_PRIMARY).size(16.0)
@@ -384,7 +407,7 @@ pub fn preset_badge(preset: &str, ui: &mut egui::Ui) {
 
 pub fn settings_value_badge(ui: &mut egui::Ui, value: &str) {
     egui::Frame::NONE
-        .fill(egui::Color32::from_rgb(46, 24, 28))
+        .fill(egui::Color32::from_rgb(42, 22, 28))
         .corner_radius(4.0)
         .inner_margin(egui::vec2(10.0, 5.0))
         .stroke(egui::Stroke::new(1.0, ACCENT_DARK))
@@ -445,15 +468,16 @@ pub fn log_entry_success(
     duration: &str,
 ) {
     card_frame(SUCCESS_BG).show(ui, |ui| {
-        ui.horizontal(|ui| {
+        ui.horizontal_wrapped(|ui| {
+            ui.set_width(ui.available_width());
             let (rect, _) = ui.allocate_exact_size(egui::vec2(10.0, 10.0), egui::Sense::hover());
-            ui.painter().circle_filled(rect.center(), 4.0, SUCCESS);
-            ui.add_space(6.0);
+            ui.painter().circle_filled(rect.center(), 4.5, SUCCESS);
+            ui.add_space(8.0);
             ui.label(label_muted(timestamp));
-            ui.add_space(6.0);
+            ui.add_space(8.0);
             ui.label(label_primary(filename));
             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                ui.label(label_muted(&format!("{} - {}", size, duration)));
+                ui.label(label_muted(&format!("{} · {}", size, duration)));
             });
         });
     });
@@ -467,28 +491,31 @@ pub fn log_entry_processing(
     progress: f32,
 ) {
     card_frame(PROCESSING_BG).show(ui, |ui| {
-        ui.horizontal(|ui| {
+        ui.horizontal_wrapped(|ui| {
+            ui.set_width(ui.available_width());
             let (rect, _) = ui.allocate_exact_size(egui::vec2(10.0, 10.0), egui::Sense::hover());
-            ui.painter().circle_filled(rect.center(), 4.0, PROCESSING);
-            ui.add_space(6.0);
+            ui.painter().circle_filled(rect.center(), 4.5, PROCESSING);
+            ui.add_space(8.0);
             ui.label(label_muted(timestamp));
-            ui.add_space(6.0);
+            ui.add_space(8.0);
             ui.label(label_primary(filename));
         });
         ui.add_space(2.0);
-        ui.horizontal(|ui| {
-            ui.add_space(16.0);
+        ui.horizontal_wrapped(|ui| {
+            ui.set_width(ui.available_width());
+            ui.add_space(18.0);
             ui.label(label_muted(message));
         });
         ui.add_space(4.0);
         ui.horizontal(|ui| {
-            ui.add_space(16.0);
+            ui.add_space(18.0);
             ui.add(
                 egui::ProgressBar::new(progress)
                     .text(format!("{:.0}%", progress * 100.0))
-                    .fill(PROCESSING)
+                    .fill(PROCESSING_DIM)
+                    .track_color(egui::Color32::from_rgb(35, 55, 90))
                     .corner_radius(4.0)
-                    .desired_width(180.0),
+                    .desired_width(200.0),
             );
         });
     });
@@ -496,17 +523,19 @@ pub fn log_entry_processing(
 
 pub fn log_entry_error(ui: &mut egui::Ui, timestamp: &str, filename: &str, message: &str) {
     card_frame(ERROR_BG).show(ui, |ui| {
-        ui.horizontal(|ui| {
+        ui.horizontal_wrapped(|ui| {
+            ui.set_width(ui.available_width());
             let (rect, _) = ui.allocate_exact_size(egui::vec2(10.0, 10.0), egui::Sense::hover());
-            ui.painter().circle_filled(rect.center(), 4.0, ERROR);
-            ui.add_space(6.0);
+            ui.painter().circle_filled(rect.center(), 4.5, ERROR);
+            ui.add_space(8.0);
             ui.label(label_muted(timestamp));
-            ui.add_space(6.0);
+            ui.add_space(8.0);
             ui.label(label_primary(filename));
         });
         ui.add_space(2.0);
-        ui.horizontal(|ui| {
-            ui.add_space(16.0);
+        ui.horizontal_wrapped(|ui| {
+            ui.set_width(ui.available_width());
+            ui.add_space(18.0);
             ui.label(egui::RichText::new(message).color(ERROR).size(13.0));
         });
     });
@@ -514,7 +543,7 @@ pub fn log_entry_error(ui: &mut egui::Ui, timestamp: &str, filename: &str, messa
 
 pub fn log_entry_simple(ui: &mut egui::Ui, timestamp: &str, message: &str, success: bool) {
     let (color, bg) = if success {
-        (SUCCESS, SUCCESS_BG)
+        (SUCCESS_DIM, SUCCESS_BG)
     } else {
         (ERROR, ERROR_BG)
     };
