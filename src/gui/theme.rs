@@ -8,7 +8,10 @@ pub const PANEL_BG_LIGHTER: egui::Color32 = egui::Color32::from_rgb(32, 32, 38);
 
 pub const ACCENT_PRIMARY: egui::Color32 = egui::Color32::from_rgb(230, 57, 70);
 pub const ACCENT_DARK: egui::Color32 = egui::Color32::from_rgb(180, 45, 55);
-pub const ACCENT_GLOW: egui::Color32 = egui::Color32::from_rgba_premultiplied(230, 57, 70, 40);
+#[allow(dead_code)]
+pub fn accent_glow() -> egui::Color32 {
+    egui::Color32::from_rgba_premultiplied(230, 57, 70, 40)
+}
 
 pub const TEXT_PRIMARY: egui::Color32 = egui::Color32::from_rgb(250, 250, 252);
 pub const TEXT_SECONDARY: egui::Color32 = egui::Color32::from_rgb(165, 165, 172);
@@ -506,7 +509,6 @@ pub fn log_entry_processing(
                 egui::ProgressBar::new(progress)
                     .text(format!("{:.0}%", progress * 100.0))
                     .fill(PROCESSING_DIM)
-                    .track_color(egui::Color32::from_rgb(35, 55, 90))
                     .corner_radius(4.0)
                     .desired_width(200.0),
             );

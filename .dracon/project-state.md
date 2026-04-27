@@ -1,7 +1,9 @@
 # Project State
 
 ## Current Focus
-Refactored theme glow color to use premultiplied alpha for proper blending
+Refactored theme glow color to use a function with premultiplied alpha for proper blending
 
 ## Completed
-- [x] Changed `ACCENT_GLOW` from `from_rgba_unmultiplied` to `from_rgba_premultiplied` for correct alpha blending in the GUI theme
+- [x] Changed `ACCENT_GLOW` constant to a function `accent_glow()` for dynamic color calculation
+- [x] Added `#[allow(dead_code)]` attribute to mark the function as potentially unused
+- [x] Removed hardcoded track color from processing progress bar
