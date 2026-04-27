@@ -376,8 +376,7 @@ impl App {
                     let (rect, _) = ui.allocate_exact_size(egui::vec2(dot_size, dot_size), egui::Sense::hover());
                     ui.painter().circle_filled(rect.center(), 3.5, SUCCESS);
                     ui.add_space(10.0);
-                    ui.vertical_wrapped(|ui| {
-                        ui.set_width(300.0);
+                    ui.vertical(|ui| {
                         ui.label(RichText::new(title).size(14.0).color(TEXT_PRIMARY).strong());
                         ui.label(RichText::new(desc).size(12.0).color(TEXT_MUTED));
                     });
