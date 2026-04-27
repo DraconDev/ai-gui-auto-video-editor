@@ -343,7 +343,7 @@ pub fn dropdown_selector<T: PartialEq + Copy>(
                     .show(ui, |ui| {
                         ui.set_min_size(popup_rect.size());
                         for (label, value) in options {
-                            let is_selected = **value == *selected;
+                            let is_selected = *value == *selected;
                             let item_bg = if is_selected {
                                 egui::Color32::from_rgb(42, 18, 26)
                             } else if ui.input(|i| i.pointer.is_down()) {

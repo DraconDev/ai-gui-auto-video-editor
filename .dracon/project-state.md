@@ -1,7 +1,7 @@
 # Project State
 
 ## Current Focus
-Refactored dropdown component to use min_size instead of desired_size for better layout control
+Refactored dropdown component selection logic for better type safety
 
 ## Completed
-- [x] Changed dropdown component from using `desired_size` to `min_size` to ensure consistent minimum dimensions
+- [x] Updated dropdown selector to use direct dereferencing for value comparison instead of double dereferencing
