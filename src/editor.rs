@@ -451,42 +451,39 @@ impl VideoEditor for FfmpegEditor {
         Ok(())
     }
 
-    fn reframe(&self, input: &Path, output: &Path) -> Result<()> {
-        // Auto-reframe: Convert horizontal (16:9) to vertical (9:16)
-        // Uses ML face detection to follow the speaker
-
+    fn reframe(&self, input: &Path, output: &Path, target_resolution: crate::config::VideoResolution) -> Result<()> {
         info!("Auto-reframe: Analyzing video for face tracking...");
 
-        // Try to use ML-powered reframe
         let filter = match crate::ml::AutoReframeProcessor::new() {
             Ok(processor) => {
-                // Sample at 1 fps for face detection
                 match processor.analyze_video(input, 1.0) {
                     Ok(crop_regions) => {
-                        // Get video dimensions
                         let (w, h) = match crate::ml::FrameExtractor::get_video_dimensions(input) {
                             Ok(dims) => dims,
                             Err(e) => {
                                 warn!(error = %e, "Failed to get video dimensions, using center crop");
+                                let (sw, sh) = target_resolution.dimensions();
                                 return self.run_reframe_filter(
                                     input,
                                     output,
-                                    "crop=ih*9/16:ih,scale=1080:1920",
+                                    &format!("crop=ih*9/16:ih,scale={}:{}", sw, sh),
                                 );
                             }
                         };
 
-                        processor.generate_crop_filter(&crop_regions, w, h)
+                        processor.generate_crop_filter(&crop_regions, w, h, target_resolution)
                     }
                     Err(e) => {
                         warn!(error = %e, "Face detection failed, using center crop");
-                        "crop=ih*9/16:ih,scale=1080:1920".to_string()
+                        let (sw, sh) = target_resolution.dimensions();
+                        format!("crop=ih*9/16:ih,scale={}:{}", sw, sh)
                     }
                 }
             }
             Err(e) => {
                 warn!(error = %e, "Could not load face detection model, using center crop");
-                "crop=ih*9/16:ih,scale=1080:1920".to_string()
+                let (sw, sh) = target_resolution.dimensions();
+                format!("crop=ih*9/16:ih,scale={}:{}", sw, sh)
             }
         };
 

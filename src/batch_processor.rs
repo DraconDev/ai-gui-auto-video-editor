@@ -440,7 +440,7 @@ where
         let reframed = output_file.with_extension("reframed.mp4");
         report_progress(&mut progress, 0.95, "Auto-reframing");
         info!("Auto-reframing to vertical (9:16)");
-        editor.reframe(&current_file, &reframed)?;
+        editor.reframe(&current_file, &reframed, config.video.target_resolution)?;
         if current_file != output_file {
             guard.untrack(&current_file);
             let _ = fs::remove_file(&current_file);
