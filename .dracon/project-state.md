@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Refactored the "Advanced" section styling in the GUI tabs for improved visual hierarchy
+Refactored tab panel background color to use theme constant for consistency
 
 ## Completed
-- [x] Replaced hardcoded rich text styling with a reusable `section_title` function
-- [x] Reduced vertical spacing from 10px to 8px for tighter visual hierarchy
+- [x] Changed hardcoded RGB color to use `PANEL_BG_LIGHT` constant for theme consistency
+- [x] Maintained same visual appearance while improving maintainability

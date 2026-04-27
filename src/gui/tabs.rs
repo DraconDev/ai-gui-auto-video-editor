@@ -292,7 +292,7 @@ impl App {
             .order(egui::Order::Foreground)
             .show(ctx, |ui| {
                 egui::Frame::NONE
-                    .fill(egui::Color32::from_rgb(30, 30, 35))
+                    .fill(PANEL_BG_LIGHT)
                     .corner_radius(16.0)
                     .inner_margin(egui::vec2(48.0, 40.0))
                     .show(ui, |ui| {
