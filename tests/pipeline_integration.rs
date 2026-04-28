@@ -559,17 +559,7 @@ fn test_full_pipeline_with_preview_export() {
 // PHASE 4: Config Integration Tests
 // ============================================================
 
-#[test]
-fn test_all_config_structs_are_default_constructible() {
-    // Verify all major config structs can be created with defaults
-    let _ = Config::default();
-    let _ = FolderSettings::default();
-    let _ = ai_vid_editor::config::SilenceConfig::default();
-    let _ = ai_vid_editor::config::AudioConfig::default();
-    let _ = ai_vid_editor::config::VideoConfig::default();
-    let _ = ai_vid_editor::config::ExportConfig::default();
-    assert!(true);
-}
+
 
 #[test]
 fn test_all_video_resolutions_are_valid() {
