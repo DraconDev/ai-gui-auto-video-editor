@@ -673,14 +673,13 @@ pub fn format_file_size(bytes: u64) -> String {
     }
 }
 
-    pub fn format_duration(seconds: u64) -> String {
-        let mins = seconds / 60;
-        let secs = seconds % 60;
-        if mins > 0 {
-            format!("{}m {}s", mins, secs)
-        } else {
-            format!("{}s", secs)
-        }
+pub fn format_duration(seconds: u64) -> String {
+    let mins = seconds / 60;
+    let secs = seconds % 60;
+    if mins > 0 {
+        format!("{}m {}s", mins, secs)
+    } else {
+        format!("{}s", secs)
     }
 }
 

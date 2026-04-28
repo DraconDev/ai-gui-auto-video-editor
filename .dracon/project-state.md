@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock for video processing features
+Refactored duration formatting in the GUI theme module to improve code consistency
 
 ## Completed
-- [x] Updated dependency versions in Cargo.lock to ensure compatibility with video processing features
-```
+- [x] Refactored `format_duration` function to remove unnecessary indentation and maintain consistent formatting
+- [x] Preserved the same functionality while improving code readability
