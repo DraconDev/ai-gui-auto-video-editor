@@ -255,7 +255,7 @@ pub fn build_folder_config(config: &Config, folder: &FolderState) -> Config {
     };
 
     if let Some(remove_silence) = folder.settings.remove_silence
-        && !remove_silence
+        && remove_silence
     {
         merged.silence.mode = SilenceMode::Cut;
         merged.silence.min_duration = f32::MAX;

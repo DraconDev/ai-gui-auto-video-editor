@@ -1,8 +1,7 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock for video processing features
+Fixes silence removal logic in folder configuration by inverting the condition check
 
 ## Completed
-- [x] Updated dependency versions in Cargo.lock to ensure compatibility with video processing features
-```
+- [x] Fixed `build_folder_config` to properly apply `SilenceMode::Cut` when `remove_silence` is enabled (previously was checking for disabled state)
