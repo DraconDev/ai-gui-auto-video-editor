@@ -617,6 +617,7 @@ impl AutoReframeProcessor {
     }
 
     /// Generate ffmpeg filter for smooth crop following faces.
+    /// Uses piecewise linear interpolation between detected keyframes.
     /// `target_resolution` controls the output scale dimensions.
     pub fn generate_crop_filter(
         &self,
@@ -630,17 +631,64 @@ impl AutoReframeProcessor {
             return format!("crop=ih*9/16:ih,scale={}:{}", scale_w, scale_h);
         }
 
-        let region = &crop_regions[0].1;
+        if crop_regions.len() == 1 {
+            let region = &crop_regions[0].1;
+            let crop_w = region.width;
+            let crop_x = region.x;
+            return format!(
+                "crop=iw*{}:ih:iw*{}:0,scale={}:{}",
+                crop_w, crop_x, scale_w, scale_h
+            );
+        }
 
-        let crop_w = (region.width * video_width as f32) as u32;
-        let crop_h = video_height;
-        let crop_x = (region.x * video_width as f32) as u32;
-        let crop_y = 0u32;
+        let mut filter_parts = Vec::new();
+        let num_segments = crop_regions.len() - 1;
 
-        format!(
-            "crop={}:{}:{}:{},scale={}:{}",
-            crop_w, crop_h, crop_x, crop_y, scale_w, scale_h
-        )
+        for i in 0..num_segments {
+            let (t_start, start_crop) = crop_regions[i];
+            let (t_end, end_crop) = crop_regions[i + 1];
+            let duration = t_end - t_start;
+
+            if duration <= 0.0 {
+                continue;
+            }
+
+            let w_start = start_crop.width;
+            let w_end = end_crop.width;
+            let x_start = start_crop.x;
+            let x_end = end_crop.x;
+
+            let segment_filter = format!(
+                "crop=iw*({w_start}+(({w_end}-{w_start})*((t-{t_start})/{duration}))):ih:iw*({x_start}+(({x_end}-{x_start})*((t-{t_start})/{duration}))):0,scale={scale_w}:{scale_h},trim=start={t_start}:end={t_end},setpts=PTS-STARTPTS",
+            );
+
+            filter_parts.push((t_start, t_end, segment_filter));
+        }
+
+        if filter_parts.is_empty() {
+            let region = &crop_regions[0].1;
+            let crop_w = region.width;
+            let crop_x = region.x;
+            return format!(
+                "crop=iw*{}:ih:iw*{}:0,scale={}:{}",
+                crop_w, crop_x, scale_w, scale_h
+            );
+        }
+
+        let mut final_filter = String::new();
+        for (i, (t_start, t_end, seg)) in filter_parts.iter().enumerate() {
+            if i > 0 {
+                final_filter.push_str(&format!(
+                    "[v{}];[v{}]", i - 1, i - 1
+                ));
+            }
+            final_filter.push_str(&format!(
+                "color=c=black:s={}x{}[bg{}];[in]{}[vout];[bg{}][vout]overlay=shortest=1:eof_action=pass",
+                scale_w, scale_h, i, seg, i
+            ));
+        }
+
+        final_filter
     }
 }
 
