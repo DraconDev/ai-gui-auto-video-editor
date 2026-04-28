@@ -569,7 +569,7 @@ fn merge_silences_and_scenes(
 
     merged.sort_by(|a, b| a.start.partial_cmp(&b.start).unwrap_or(std::cmp::Ordering::Equal));
 
-    let mut deduplicated = Vec::new();
+    let mut deduplicated: Vec<crate::analyzer::Segment> = Vec::new();
     for seg in merged {
         if let Some(last) = deduplicated.last_mut() {
             if seg.start <= last.end {
