@@ -1,11 +1,9 @@
 # Project State
 
 ## Current Focus
-Improved file path handling in batch processing by using Path::with_extension() instead of string formatting
+Improved file path handling in batch processing by using PathBuf for safer path construction
 
 ## Completed
-- [x] Refactored FCPXML export to use Path::with_extension() for consistent path construction
-- [x] Refactored EDL export to use Path::with_extension() for consistent path construction
-- [x] Refactored thumbnail generation to use Path::with_extension() for consistent path construction
-- [x] Added display() calls to path logging for consistent output formatting
-```
+- [x] Refactored path construction in `export_additional_files` to use `PathBuf` for safer path handling
+- [x] Updated debug and warning messages to properly display paths using `.display()`
+- [x] Added error handling for invalid path conversions in multi-format processing

@@ -711,8 +711,12 @@ fn export_additional_files(
                 .extension()
                 .and_then(|e| e.to_str())
                 .unwrap_or("mp4");
-            let multi_path = format!("{}_{}p.{}", base_path.display(), h, ext);
-            debug!(path = %multi_path, resolution = ?resolution, "Generating alternate resolution");
+            let multi_path = {
+                let mut p = base_path.as_os_str().to_os_string();
+                p.push(&format!("_{}p.{}", h, ext));
+                PathBuf::from(p)
+            };
+            debug!(path = %multi_path.display(), resolution = ?resolution, "Generating alternate resolution");
 
             let status = std::process::Command::new("ffmpeg")
                 .args([
@@ -723,13 +727,13 @@ fn export_additional_files(
                     "-c:a",
                     "copy",
                     "-y",
-                    &multi_path,
+                    multi_path.to_str().context("invalid multi-format path")?,
                 ])
                 .status()
                 .context("failed to execute ffmpeg for multi-format")?;
 
             if !status.success() {
-                warn!(path = %multi_path, "Multi-format ffmpeg failed");
+                warn!(path = %multi_path.display(), "Multi-format ffmpeg failed");
             }
         }
     }
