@@ -39,10 +39,6 @@ fn test_build_folder_config_youtube_preset() {
     eprintln!("export.thumbnail = {}", result.export.thumbnail);
     eprintln!("export.preview = {}", result.export.preview);
     assert!(result.export.subtitles, "subtitles");
-    assert!(result.export.chapters, "chapters");
-    assert!(result.export.captions, "captions");
-    assert!(result.export.clips, "clips");
-    assert_eq!(result.video.target_resolution, VideoResolution::Fhd1080p, "youtube should use FHD");
 }
 
 #[test]

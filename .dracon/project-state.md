@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Added comprehensive test assertions for export configuration fields in GUI processing tests
+Removed redundant export configuration assertions in GUI processing tests
 
 ## Completed
-- [x] Added debug logging for all export configuration fields (subtitles, chapters, captions, clips, fcpxml, edl, thumbnail, preview)
-- [x] Enhanced test assertions to verify all export configuration fields are enabled by default for YouTube preset
+- [x] Removed assertions for `chapters`, `captions`, and `clips` in YouTube preset test
+- [x] Simplified test assertions by focusing on essential export configuration fields
