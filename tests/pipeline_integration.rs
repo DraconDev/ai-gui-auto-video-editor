@@ -376,7 +376,7 @@ fn test_generate_preview() {
     let preview_path = preview::preview_path(output_dir.path());
 
     let result = preview::generate_preview(&video_path, &preview_path, 5.0, 480);
-    if let Err(e) = result {
+    if let Err(ref e) = result {
         eprintln!("Preview generation failed: {}", e);
     }
     assert!(result.is_ok(), "Preview generation should succeed");

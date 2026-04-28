@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Added error handling for preview generation in integration tests
+Improved error handling in preview generation integration test
 
 ## Completed
-- [x] Added error logging for preview generation failures in `test_generate_preview`
-- [x] Updated Cargo.lock with dependency version changes
+- [x] Changed error handling in `test_generate_preview()` to use `ref e` instead of direct `e` to avoid ownership issues while maintaining error reporting
+- [x] Updated Cargo.lock with dependency version changes (binary file modification)
