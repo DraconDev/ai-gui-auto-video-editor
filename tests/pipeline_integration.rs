@@ -2,14 +2,14 @@ mod common;
 
 use ai_vid_editor::FfmpegAnalyzer;
 use ai_vid_editor::FfmpegEditor;
+use ai_vid_editor::analyzer::ProcessedSegment;
 use ai_vid_editor::analyzer::VideoAnalyzer;
-use ai_vid_editor::editor::VideoEditor;
 use ai_vid_editor::config::{Config, FolderSettings, VideoResolution};
+use ai_vid_editor::editor::VideoEditor;
 use ai_vid_editor::exporter;
 use ai_vid_editor::preview;
-use ai_vid_editor::thumbnail;
-use ai_vid_editor::analyzer::ProcessedSegment;
 use ai_vid_editor::stt_analyzer::TranscriptSegment;
+use ai_vid_editor::thumbnail;
 use common::*;
 
 fn check_ffmpeg() {
@@ -147,7 +147,11 @@ fn test_auto_reframe() {
     let output_path = output_dir.path().join("reframed.mp4");
 
     let editor = FfmpegEditor::default();
-    let result = editor.reframe(&video_path, &output_path, ai_vid_editor::config::VideoResolution::Vertical1080p);
+    let result = editor.reframe(
+        &video_path,
+        &output_path,
+        ai_vid_editor::config::VideoResolution::Vertical1080p,
+    );
 
     // Note: This will use center crop if ML models fail to load
     assert!(
@@ -279,8 +283,16 @@ fn test_export_fcpxml() {
     let input_path = dir.path().join("input.mp4");
 
     let segments = vec![
-        ProcessedSegment { start: 0.0, end: 5.0, speed: 1.0 },
-        ProcessedSegment { start: 10.0, end: 20.0, speed: 1.0 },
+        ProcessedSegment {
+            start: 0.0,
+            end: 5.0,
+            speed: 1.0,
+        },
+        ProcessedSegment {
+            start: 10.0,
+            end: 20.0,
+            speed: 1.0,
+        },
     ];
 
     let result = exporter::export_fcpxml(&segments, &input_path, &output_path);
@@ -288,9 +300,18 @@ fn test_export_fcpxml() {
     assert!(output_path.exists(), "FCPXML output file should exist");
 
     let content = std::fs::read_to_string(&output_path).unwrap();
-    assert!(content.contains("fcpxml version=\"1.8\""), "FCPXML should have version");
-    assert!(content.contains("<spine>"), "FCPXML should have spine element");
-    assert!(content.contains("<video name="), "FCPXML should have video elements");
+    assert!(
+        content.contains("fcpxml version=\"1.8\""),
+        "FCPXML should have version"
+    );
+    assert!(
+        content.contains("<spine>"),
+        "FCPXML should have spine element"
+    );
+    assert!(
+        content.contains("<video name="),
+        "FCPXML should have video elements"
+    );
 }
 
 #[test]
@@ -302,8 +323,16 @@ fn test_export_edl() {
     let input_path = dir.path().join("input.mp4");
 
     let segments = vec![
-        ProcessedSegment { start: 0.0, end: 5.5, speed: 1.0 },
-        ProcessedSegment { start: 10.0, end: 20.0, speed: 1.0 },
+        ProcessedSegment {
+            start: 0.0,
+            end: 5.5,
+            speed: 1.0,
+        },
+        ProcessedSegment {
+            start: 10.0,
+            end: 20.0,
+            speed: 1.0,
+        },
     ];
 
     let result = exporter::export_edl(&segments, &input_path, &output_path, 25.0);
@@ -312,8 +341,14 @@ fn test_export_edl() {
 
     let content = std::fs::read_to_string(&output_path).unwrap();
     assert!(content.contains("TITLE:"), "EDL should have title");
-    assert!(content.contains("FCM: NON-DROP FRAME"), "EDL should have frame code mode");
-    assert!(content.contains("AX       V     C"), "EDL should have source track entry");
+    assert!(
+        content.contains("FCM: NON-DROP FRAME"),
+        "EDL should have frame code mode"
+    );
+    assert!(
+        content.contains("AX       V     C"),
+        "EDL should have source track entry"
+    );
 }
 
 #[test]
@@ -324,8 +359,18 @@ fn test_export_srt() {
     let output_path = dir.path().join("subtitles.srt");
 
     let transcript = vec![
-        TranscriptSegment { start: 0.0, end: 5.0, text: "Hello world".to_string(), confidence: 1.0 },
-        TranscriptSegment { start: 5.0, end: 10.0, text: "This is a test".to_string(), confidence: 1.0 },
+        TranscriptSegment {
+            start: 0.0,
+            end: 5.0,
+            text: "Hello world".to_string(),
+            confidence: 1.0,
+        },
+        TranscriptSegment {
+            start: 5.0,
+            end: 10.0,
+            text: "This is a test".to_string(),
+            confidence: 1.0,
+        },
     ];
 
     let result = exporter::export_srt(&transcript, &output_path);
@@ -334,8 +379,14 @@ fn test_export_srt() {
 
     let content = std::fs::read_to_string(&output_path).unwrap();
     assert!(content.contains("1\n"), "SRT should have first index");
-    assert!(content.contains("00:00:00,000 --> 00:00:05,000"), "SRT should have first timestamp");
-    assert!(content.contains("Hello world"), "SRT should contain first text");
+    assert!(
+        content.contains("00:00:00,000 --> 00:00:05,000"),
+        "SRT should have first timestamp"
+    );
+    assert!(
+        content.contains("Hello world"),
+        "SRT should contain first text"
+    );
 }
 
 #[test]
@@ -346,9 +397,24 @@ fn test_export_youtube_chapters() {
     let output_path = dir.path().join("chapters.txt");
 
     let transcript = vec![
-        TranscriptSegment { start: 0.0, end: 30.0, text: "Welcome".to_string(), confidence: 1.0 },
-        TranscriptSegment { start: 30.0, end: 60.0, text: "Introduction".to_string(), confidence: 1.0 },
-        TranscriptSegment { start: 200.0, end: 230.0, text: "Advanced features".to_string(), confidence: 1.0 },
+        TranscriptSegment {
+            start: 0.0,
+            end: 30.0,
+            text: "Welcome".to_string(),
+            confidence: 1.0,
+        },
+        TranscriptSegment {
+            start: 30.0,
+            end: 60.0,
+            text: "Introduction".to_string(),
+            confidence: 1.0,
+        },
+        TranscriptSegment {
+            start: 200.0,
+            end: 230.0,
+            text: "Advanced features".to_string(),
+            confidence: 1.0,
+        },
     ];
 
     let result = exporter::export_youtube_chapters(&transcript, &output_path);
@@ -356,8 +422,14 @@ fn test_export_youtube_chapters() {
     assert!(output_path.exists(), "Chapters output file should exist");
 
     let content = std::fs::read_to_string(&output_path).unwrap();
-    assert!(content.contains("00:00 Intro"), "Chapters should start with intro at 00:00");
-    assert!(content.contains("00:00"), "Chapters should have timestamp for first chapter");
+    assert!(
+        content.contains("00:00 Intro"),
+        "Chapters should start with intro at 00:00"
+    );
+    assert!(
+        content.contains("00:00"),
+        "Chapters should have timestamp for first chapter"
+    );
 }
 
 #[test]
@@ -408,8 +480,6 @@ fn test_generate_thumbnail() {
     assert!(bytes.len() > 2, "Thumbnail should have some data");
 }
 
-
-
 #[test]
 fn test_full_pipeline_all_features_disabled() {
     check_ffmpeg();
@@ -440,7 +510,10 @@ fn test_full_pipeline_all_features_disabled() {
         &duration_getter,
     );
 
-    assert!(result.is_ok(), "Pipeline with all features disabled should succeed");
+    assert!(
+        result.is_ok(),
+        "Pipeline with all features disabled should succeed"
+    );
     assert!(output_path.exists(), "Output file should exist");
 }
 
@@ -477,7 +550,10 @@ fn test_full_pipeline_noise_reduction_and_enhance() {
         &duration_getter,
     );
 
-    assert!(result.is_ok(), "Pipeline with noise reduction and audio enhance should succeed");
+    assert!(
+        result.is_ok(),
+        "Pipeline with noise reduction and audio enhance should succeed"
+    );
     assert!(output_path.exists(), "Output file should exist");
 }
 
@@ -513,7 +589,10 @@ fn test_full_pipeline_reframe_and_scale() {
         &duration_getter,
     );
 
-    assert!(result.is_ok(), "Pipeline with reframe enabled should succeed");
+    assert!(
+        result.is_ok(),
+        "Pipeline with reframe enabled should succeed"
+    );
 }
 
 #[test]
@@ -549,7 +628,10 @@ fn test_full_pipeline_with_preview_export() {
         &duration_getter,
     );
 
-    assert!(result.is_ok(), "Pipeline with preview export should succeed");
+    assert!(
+        result.is_ok(),
+        "Pipeline with preview export should succeed"
+    );
     assert!(output_path.exists(), "Output file should exist");
     // Note: preview file path depends on final output path - may not exist if
     // pipeline generates intermediate files before producing final output
@@ -558,8 +640,6 @@ fn test_full_pipeline_with_preview_export() {
 // ============================================================
 // PHASE 4: Config Integration Tests
 // ============================================================
-
-
 
 #[test]
 fn test_all_video_resolutions_are_valid() {
@@ -576,11 +656,23 @@ fn test_all_video_resolutions_are_valid() {
 
     for res in resolutions {
         let dims = res.dimensions();
-        assert!(dims.0 > 0 && dims.1 > 0, "Resolution {:?} should have valid dimensions", res);
+        assert!(
+            dims.0 > 0 && dims.1 > 0,
+            "Resolution {:?} should have valid dimensions",
+            res
+        );
         let scale_str = res.to_ffmpeg_scale();
-        assert!(!scale_str.is_empty(), "Resolution {:?} should produce valid scale string", res);
+        assert!(
+            !scale_str.is_empty(),
+            "Resolution {:?} should produce valid scale string",
+            res
+        );
         let name = res.display_name();
-        assert!(!name.is_empty(), "Resolution {:?} should have display name", res);
+        assert!(
+            !name.is_empty(),
+            "Resolution {:?} should have display name",
+            res
+        );
     }
 }
 
@@ -598,9 +690,17 @@ fn test_hwaccel_all_variants() {
 
     for hw in variants {
         let as_str = hw.as_str();
-        assert!(!as_str.is_empty(), "HwAccel {:?} should have string representation", hw);
+        assert!(
+            !as_str.is_empty(),
+            "HwAccel {:?} should have string representation",
+            hw
+        );
         let display = hw.display_name();
-        assert!(!display.is_empty(), "HwAccel {:?} should have display name", hw);
+        assert!(
+            !display.is_empty(),
+            "HwAccel {:?} should have display name",
+            hw
+        );
         let from_str = HwAccel::from_str(as_str);
         assert_eq!(from_str, Some(hw), "Round-trip for {:?} should succeed", hw);
     }
@@ -632,5 +732,8 @@ fn test_folder_settings_silences_config_structure() {
         config2.silence.mode = ai_vid_editor::config::SilenceMode::Cut;
     }
     // false means don't cut, so mode stays as default (Cut)
-    assert_eq!(config2.silence.mode, ai_vid_editor::config::SilenceMode::Cut);
+    assert_eq!(
+        config2.silence.mode,
+        ai_vid_editor::config::SilenceMode::Cut
+    );
 }

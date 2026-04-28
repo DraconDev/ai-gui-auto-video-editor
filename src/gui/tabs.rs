@@ -4,10 +4,10 @@ use rfd::FileDialog;
 use std::path::PathBuf;
 use std::sync::mpsc;
 
-use super::{App, ActivityEntry, EntryStatus, FolderState, ProcessingStatus, SetupStep, Tab};
+use super::theme::*;
+use super::{ActivityEntry, App, EntryStatus, FolderState, ProcessingStatus, SetupStep, Tab};
 use crate::config::{FolderSettings, VideoResolution};
 use crate::hwaccel::HwAccel;
-use super::theme::*;
 
 impl App {
     pub(crate) fn draw_header(&mut self, ui: &mut egui::Ui) {
@@ -374,7 +374,8 @@ impl App {
                 ui.horizontal_wrapped(|ui| {
                     ui.set_width(ui.available_width());
                     let dot_size = 8.0;
-                    let (rect, _) = ui.allocate_exact_size(egui::vec2(dot_size, dot_size), egui::Sense::hover());
+                    let (rect, _) = ui
+                        .allocate_exact_size(egui::vec2(dot_size, dot_size), egui::Sense::hover());
                     ui.painter().circle_filled(rect.center(), 3.5, SUCCESS);
                     ui.add_space(10.0);
                     ui.vertical(|ui| {
@@ -557,7 +558,13 @@ impl App {
         });
     }
 
-    pub(crate) fn setup_toggle(&self, ui: &mut egui::Ui, title: &str, desc: &str, value: bool) -> bool {
+    pub(crate) fn setup_toggle(
+        &self,
+        ui: &mut egui::Ui,
+        title: &str,
+        desc: &str,
+        value: bool,
+    ) -> bool {
         let mut new_value = value;
         settings_toggle_frame(value).show(ui, |ui| {
             ui.horizontal(|ui| {
@@ -885,7 +892,10 @@ impl App {
                     folder.settings.noise_reduction.unwrap_or(false),
                     folder.settings.scene_detect.unwrap_or(false),
                     folder.settings.hw_accel.unwrap_or(HwAccel::None),
-                    folder.settings.target_resolution.unwrap_or(VideoResolution::Fhd1080p),
+                    folder
+                        .settings
+                        .target_resolution
+                        .unwrap_or(VideoResolution::Fhd1080p),
                     folder.settings.preview.unwrap_or(false),
                     folder.settings.multi_format.unwrap_or(false),
                     folder.settings.subtitles.unwrap_or(false),
@@ -897,12 +907,24 @@ impl App {
                 )
             } else {
                 (
-                    true, true, false, false, false, false, false, false,
+                    true,
+                    true,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
                     HwAccel::None,
                     VideoResolution::Fhd1080p,
-                    false, false,
-                    false, false, false, false,
-                    -30.0, -14.0,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    -30.0,
+                    -14.0,
                 )
             }
         };
@@ -929,9 +951,7 @@ impl App {
             let mut needs_save = false;
             let folder_idx = self.state.selected_folder_idx;
 
-            ui.label(
-                section_title("Processing"),
-            );
+            ui.label(section_title("Processing"));
             ui.add_space(8.0);
 
             let mut enhance = enhance_val;
@@ -1056,7 +1076,9 @@ impl App {
                 &hw_accel_options,
                 hw_label,
             );
-            if selected_hw != hw_accel_val && let Some(folder) = self.state.folders.get_mut(folder_idx) {
+            if selected_hw != hw_accel_val
+                && let Some(folder) = self.state.folders.get_mut(folder_idx)
+            {
                 folder.settings.hw_accel = Some(selected_hw);
                 needs_save = true;
             }
@@ -1070,7 +1092,10 @@ impl App {
                 (String::from("1080p Full HD"), VideoResolution::Fhd1080p),
                 (String::from("1440p QHD"), VideoResolution::Qhd1440p),
                 (String::from("4K UHD"), VideoResolution::Uhd4k),
-                (String::from("1080p Vertical"), VideoResolution::Vertical1080p),
+                (
+                    String::from("1080p Vertical"),
+                    VideoResolution::Vertical1080p,
+                ),
                 (String::from("720p Vertical"), VideoResolution::Vertical720p),
             ];
             let mut selected_res = target_resolution_val;
@@ -1082,7 +1107,9 @@ impl App {
                 &resolution_options,
                 res_label,
             );
-            if selected_res != target_resolution_val && let Some(folder) = self.state.folders.get_mut(folder_idx) {
+            if selected_res != target_resolution_val
+                && let Some(folder) = self.state.folders.get_mut(folder_idx)
+            {
                 folder.settings.target_resolution = Some(selected_res);
                 needs_save = true;
             }
@@ -1269,12 +1296,18 @@ impl App {
     }
 
     pub(crate) fn draw_summary_card(&mut self, ui: &mut egui::Ui) {
-        let new_entries = self.state.activity_log.len().saturating_sub(self.state.last_seen_activity_len);
+        let new_entries = self
+            .state
+            .activity_log
+            .len()
+            .saturating_sub(self.state.last_seen_activity_len);
         if new_entries == 0 {
             return;
         }
 
-        let success_count = self.state.activity_log
+        let success_count = self
+            .state
+            .activity_log
             .iter()
             .rev()
             .take(new_entries)
@@ -1296,13 +1329,17 @@ impl App {
                 ui.horizontal_wrapped(|ui| {
                     ui.set_width(ui.available_width());
                     let dot_size = 10.0;
-                    let (rect, _) = ui.allocate_exact_size(egui::vec2(dot_size, dot_size), egui::Sense::hover());
+                    let (rect, _) = ui
+                        .allocate_exact_size(egui::vec2(dot_size, dot_size), egui::Sense::hover());
                     ui.painter().circle_filled(rect.center(), 4.5, accent);
 
                     ui.add_space(10.0);
 
                     let label = if has_errors {
-                        format!("{} new — {} done, {} failed", new_entries, success_count, error_count)
+                        format!(
+                            "{} new — {} done, {} failed",
+                            new_entries, success_count, error_count
+                        )
                     } else {
                         format!("{} new — {} completed", new_entries, success_count)
                     };
@@ -1314,7 +1351,13 @@ impl App {
                     );
 
                     ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                        if let Some(last) = self.state.activity_log.iter().rev().find(|e| !e.filename.is_empty()) {
+                        if let Some(last) = self
+                            .state
+                            .activity_log
+                            .iter()
+                            .rev()
+                            .find(|e| !e.filename.is_empty())
+                        {
                             ui.label(
                                 egui::RichText::new(truncate_path(&last.filename, 36))
                                     .size(12.0)
@@ -1331,9 +1374,11 @@ impl App {
                     ui.add_space(14.0);
                     if has_errors {
                         ui.label(
-                            egui::RichText::new("Some files failed — check the Activity tab for details")
-                                .size(12.0)
-                                .color(WARNING),
+                            egui::RichText::new(
+                                "Some files failed — check the Activity tab for details",
+                            )
+                            .size(12.0)
+                            .color(WARNING),
                         );
                     } else {
                         ui.label(
@@ -1349,7 +1394,12 @@ impl App {
     }
 
     #[allow(dead_code)]
-    pub(crate) fn draw_settings_metric(ui: &mut egui::Ui, label: &str, value: &str, color: egui::Color32) {
+    pub(crate) fn draw_settings_metric(
+        ui: &mut egui::Ui,
+        label: &str,
+        value: &str,
+        color: egui::Color32,
+    ) {
         let bg = egui::Color32::from_rgba_unmultiplied(color.r(), color.g(), color.b(), 24);
         egui::Frame::NONE
             .fill(bg)
@@ -1540,10 +1590,7 @@ impl App {
                             ui.horizontal(|ui| {
                                 let dot = if toast.success { "✓" } else { "✗" };
                                 ui.label(
-                                    egui::RichText::new(dot)
-                                        .size(16.0)
-                                        .color(border)
-                                        .strong(),
+                                    egui::RichText::new(dot).size(16.0).color(border).strong(),
                                 );
                                 ui.add_space(8.0);
                                 ui.label(
@@ -1595,9 +1642,7 @@ impl App {
                         }
                     }
                     ui.add_space(8.0);
-                    if ui
-                        .add(button_primary("Process All"))
-                        .clicked()
+                    if ui.add(button_primary("Process All")).clicked()
                         && !self.state.batch_queue.is_empty()
                         && !self.state.queue_processing
                     {
@@ -1632,10 +1677,15 @@ impl App {
                     folder_card_compact(true).show(ui, |ui| {
                         ui.horizontal(|ui| {
                             ui.label(
-                                RichText::new(file.path.file_name().map(|n| n.to_string_lossy().to_string()).unwrap_or_default())
-                                    .color(TEXT_PRIMARY)
-                                    .size(14.0)
-                                    .strong(),
+                                RichText::new(
+                                    file.path
+                                        .file_name()
+                                        .map(|n| n.to_string_lossy().to_string())
+                                        .unwrap_or_default(),
+                                )
+                                .color(TEXT_PRIMARY)
+                                .size(14.0)
+                                .strong(),
                             );
                             ui.with_layout(
                                 egui::Layout::right_to_left(egui::Align::Center),
@@ -1671,9 +1721,10 @@ impl App {
                             ui.label(label_secondary(&file.preset));
                             ui.add_space(8.0);
                             ui.label(label_muted("Output:"));
-                            ui.label(
-                                label_secondary(&truncate_path(&file.output_dir.to_string_lossy(), 30)),
-                            );
+                            ui.label(label_secondary(&truncate_path(
+                                &file.output_dir.to_string_lossy(),
+                                30,
+                            )));
                         });
                     });
                     ui.add_space(6.0);
@@ -1720,12 +1771,8 @@ impl App {
         }
 
         let (tx, rx) = mpsc::channel();
-        let stop = super::processing::spawn_queue_worker(
-            self.state.config.clone(),
-            queue,
-            tx,
-            true,
-        );
+        let stop =
+            super::processing::spawn_queue_worker(self.state.config.clone(), queue, tx, true);
 
         self.state.queue_rx = Some(rx);
         self.state.queue_stop = Some(stop);

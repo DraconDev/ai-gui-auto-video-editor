@@ -1388,7 +1388,12 @@ enhance = false
         config.export.clip_max_duration = 10.0;
         let result = config.validate();
         assert!(result.is_err());
-        assert!(result.unwrap_err().to_string().contains("clip_min_duration"));
+        assert!(
+            result
+                .unwrap_err()
+                .to_string()
+                .contains("clip_min_duration")
+        );
     }
 
     #[test]
@@ -1439,7 +1444,12 @@ enhance = false
         config.silence.min_silence_for_speedup = -0.1;
         let result = config.validate();
         assert!(result.is_err());
-        assert!(result.unwrap_err().to_string().contains("min_silence_for_speedup"));
+        assert!(
+            result
+                .unwrap_err()
+                .to_string()
+                .contains("min_silence_for_speedup")
+        );
     }
 
     #[test]
@@ -1448,7 +1458,12 @@ enhance = false
         config.export.clip_min_duration = -1.0;
         let result = config.validate();
         assert!(result.is_err());
-        assert!(result.unwrap_err().to_string().contains("clip_min_duration"));
+        assert!(
+            result
+                .unwrap_err()
+                .to_string()
+                .contains("clip_min_duration")
+        );
     }
 
     #[test]
@@ -1457,7 +1472,12 @@ enhance = false
         config.export.clip_max_duration = -1.0;
         let result = config.validate();
         assert!(result.is_err());
-        assert!(result.unwrap_err().to_string().contains("clip_max_duration"));
+        assert!(
+            result
+                .unwrap_err()
+                .to_string()
+                .contains("clip_max_duration")
+        );
     }
 
     #[test]

@@ -394,7 +394,7 @@ fn main() -> Result<()> {
     }
 
     // Apply config: use preloaded config if no CLI preset was specified
-    let mut config =     if let Some(ref preset_str) = cli.preset {
+    let mut config = if let Some(ref preset_str) = cli.preset {
         let preset = Preset::parse_name(preset_str).ok_or_else(|| {
             anyhow::anyhow!(
                 "Unknown preset: {}. Valid presets: youtube, shorts, podcast, minimal",
@@ -520,11 +520,13 @@ fn main() -> Result<()> {
         config.video.hw_accel = if gpu_str == "auto" {
             crate::hwaccel::HwAccel::detect()
         } else {
-            crate::hwaccel::HwAccel::parse_name(gpu_str)
-                .unwrap_or_else(|| {
-                    eprintln!("Warning: unknown GPU type '{}', using CPU encoding", gpu_str);
-                    crate::hwaccel::HwAccel::None
-                })
+            crate::hwaccel::HwAccel::parse_name(gpu_str).unwrap_or_else(|| {
+                eprintln!(
+                    "Warning: unknown GPU type '{}', using CPU encoding",
+                    gpu_str
+                );
+                crate::hwaccel::HwAccel::None
+            })
         };
     }
 
@@ -950,39 +952,40 @@ fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
                         println!("\n[{}] [NEW FILE] {:?}", now, path);
 
                         // Build config for this folder's preset
-                        let folder_config =
-                            if let Some(preset) = crate::config::Preset::parse_name(&folder.preset) {
-                                let mut c = preset.to_config();
-                                // Apply folder-level settings overrides
-                                if let Some(enhance) = folder.settings.enhance_audio {
-                                    c.audio.enhance = enhance;
-                                }
-                                if let Some(threshold) = folder.settings.silence_threshold_db {
-                                    c.silence.threshold_db = threshold;
-                                }
-                                if let Some(lufs) = folder.settings.target_lufs {
-                                    c.audio.target_lufs = lufs;
-                                }
-                                if let Some(stabilize) = folder.settings.stabilize {
-                                    c.video.stabilize = stabilize;
-                                }
-                                if let Some(color_correct) = folder.settings.color_correct {
-                                    c.video.color_correct = color_correct;
-                                }
-                                if let Some(reframe) = folder.settings.reframe {
-                                    c.video.reframe = reframe;
-                                }
-                                if let Some(blur) = folder.settings.blur_background {
-                                    c.video.blur_background = blur;
-                                }
-                                c
-                            } else {
-                                eprintln!(
-                                    "Warning: Unknown preset '{}', using default config",
-                                    folder.preset
-                                );
-                                config.clone()
-                            };
+                        let folder_config = if let Some(preset) =
+                            crate::config::Preset::parse_name(&folder.preset)
+                        {
+                            let mut c = preset.to_config();
+                            // Apply folder-level settings overrides
+                            if let Some(enhance) = folder.settings.enhance_audio {
+                                c.audio.enhance = enhance;
+                            }
+                            if let Some(threshold) = folder.settings.silence_threshold_db {
+                                c.silence.threshold_db = threshold;
+                            }
+                            if let Some(lufs) = folder.settings.target_lufs {
+                                c.audio.target_lufs = lufs;
+                            }
+                            if let Some(stabilize) = folder.settings.stabilize {
+                                c.video.stabilize = stabilize;
+                            }
+                            if let Some(color_correct) = folder.settings.color_correct {
+                                c.video.color_correct = color_correct;
+                            }
+                            if let Some(reframe) = folder.settings.reframe {
+                                c.video.reframe = reframe;
+                            }
+                            if let Some(blur) = folder.settings.blur_background {
+                                c.video.blur_background = blur;
+                            }
+                            c
+                        } else {
+                            eprintln!(
+                                "Warning: Unknown preset '{}', using default config",
+                                folder.preset
+                            );
+                            config.clone()
+                        };
 
                         let file_name = path
                             .file_name()
@@ -1270,35 +1273,98 @@ mod tests {
 
     #[test]
     fn test_parse_resolution_all_variants() {
-        assert_eq!(parse_resolution("720p"), Some(crate::config::VideoResolution::Hd720p));
-        assert_eq!(parse_resolution("hd"), Some(crate::config::VideoResolution::Hd720p));
-        assert_eq!(parse_resolution("HD720p"), Some(crate::config::VideoResolution::Hd720p));
+        assert_eq!(
+            parse_resolution("720p"),
+            Some(crate::config::VideoResolution::Hd720p)
+        );
+        assert_eq!(
+            parse_resolution("hd"),
+            Some(crate::config::VideoResolution::Hd720p)
+        );
+        assert_eq!(
+            parse_resolution("HD720p"),
+            Some(crate::config::VideoResolution::Hd720p)
+        );
 
-        assert_eq!(parse_resolution("1080p"), Some(crate::config::VideoResolution::Fhd1080p));
-        assert_eq!(parse_resolution("fhd"), Some(crate::config::VideoResolution::Fhd1080p));
-        assert_eq!(parse_resolution("FHD1080p"), Some(crate::config::VideoResolution::Fhd1080p));
-        assert_eq!(parse_resolution("fullhd"), Some(crate::config::VideoResolution::Fhd1080p));
+        assert_eq!(
+            parse_resolution("1080p"),
+            Some(crate::config::VideoResolution::Fhd1080p)
+        );
+        assert_eq!(
+            parse_resolution("fhd"),
+            Some(crate::config::VideoResolution::Fhd1080p)
+        );
+        assert_eq!(
+            parse_resolution("FHD1080p"),
+            Some(crate::config::VideoResolution::Fhd1080p)
+        );
+        assert_eq!(
+            parse_resolution("fullhd"),
+            Some(crate::config::VideoResolution::Fhd1080p)
+        );
 
-        assert_eq!(parse_resolution("1440p"), Some(crate::config::VideoResolution::Qhd1440p));
-        assert_eq!(parse_resolution("qhd"), Some(crate::config::VideoResolution::Qhd1440p));
-        assert_eq!(parse_resolution("2k"), Some(crate::config::VideoResolution::Qhd1440p));
+        assert_eq!(
+            parse_resolution("1440p"),
+            Some(crate::config::VideoResolution::Qhd1440p)
+        );
+        assert_eq!(
+            parse_resolution("qhd"),
+            Some(crate::config::VideoResolution::Qhd1440p)
+        );
+        assert_eq!(
+            parse_resolution("2k"),
+            Some(crate::config::VideoResolution::Qhd1440p)
+        );
 
-        assert_eq!(parse_resolution("4k"), Some(crate::config::VideoResolution::Uhd4k));
-        assert_eq!(parse_resolution("uhd"), Some(crate::config::VideoResolution::Uhd4k));
-        assert_eq!(parse_resolution("UHD4k"), Some(crate::config::VideoResolution::Uhd4k));
-        assert_eq!(parse_resolution("2160p"), Some(crate::config::VideoResolution::Uhd4k));
+        assert_eq!(
+            parse_resolution("4k"),
+            Some(crate::config::VideoResolution::Uhd4k)
+        );
+        assert_eq!(
+            parse_resolution("uhd"),
+            Some(crate::config::VideoResolution::Uhd4k)
+        );
+        assert_eq!(
+            parse_resolution("UHD4k"),
+            Some(crate::config::VideoResolution::Uhd4k)
+        );
+        assert_eq!(
+            parse_resolution("2160p"),
+            Some(crate::config::VideoResolution::Uhd4k)
+        );
     }
 
     #[test]
     fn test_parse_resolution_vertical() {
-        assert_eq!(parse_resolution("vertical-1080p"), Some(crate::config::VideoResolution::Vertical1080p));
-        assert_eq!(parse_resolution("1080x1920"), Some(crate::config::VideoResolution::Vertical1080p));
-        assert_eq!(parse_resolution("shorts"), Some(crate::config::VideoResolution::Vertical1080p));
-        assert_eq!(parse_resolution("reels"), Some(crate::config::VideoResolution::Vertical1080p));
-        assert_eq!(parse_resolution("tiktok"), Some(crate::config::VideoResolution::Vertical1080p));
+        assert_eq!(
+            parse_resolution("vertical-1080p"),
+            Some(crate::config::VideoResolution::Vertical1080p)
+        );
+        assert_eq!(
+            parse_resolution("1080x1920"),
+            Some(crate::config::VideoResolution::Vertical1080p)
+        );
+        assert_eq!(
+            parse_resolution("shorts"),
+            Some(crate::config::VideoResolution::Vertical1080p)
+        );
+        assert_eq!(
+            parse_resolution("reels"),
+            Some(crate::config::VideoResolution::Vertical1080p)
+        );
+        assert_eq!(
+            parse_resolution("tiktok"),
+            Some(crate::config::VideoResolution::Vertical1080p)
+        );
 
-        assert_eq!(parse_resolution("vertical-720p"), Some(crate::config::VideoResolution::Vertical720p));
-        assert_eq!(parse_resolution("720x1280"), Some(crate::config::VideoResolution::Vertical720p));
+        assert_eq!(
+            parse_resolution("vertical-720p"),
+            Some(crate::config::VideoResolution::Vertical720p)
+        );
+        assert_eq!(
+            parse_resolution("720x1280"),
+            Some(crate::config::VideoResolution::Vertical720p)
+        );
     }
 
     #[test]
@@ -1312,10 +1378,22 @@ mod tests {
 
     #[test]
     fn test_parse_resolution_case_insensitive() {
-        assert_eq!(parse_resolution("FHD"), Some(crate::config::VideoResolution::Fhd1080p));
-        assert_eq!(parse_resolution("QHD"), Some(crate::config::VideoResolution::Qhd1440p));
-        assert_eq!(parse_resolution("UHD"), Some(crate::config::VideoResolution::Uhd4k));
-        assert_eq!(parse_resolution("SHORTS"), Some(crate::config::VideoResolution::Vertical1080p));
+        assert_eq!(
+            parse_resolution("FHD"),
+            Some(crate::config::VideoResolution::Fhd1080p)
+        );
+        assert_eq!(
+            parse_resolution("QHD"),
+            Some(crate::config::VideoResolution::Qhd1440p)
+        );
+        assert_eq!(
+            parse_resolution("UHD"),
+            Some(crate::config::VideoResolution::Uhd4k)
+        );
+        assert_eq!(
+            parse_resolution("SHORTS"),
+            Some(crate::config::VideoResolution::Vertical1080p)
+        );
     }
 }
 

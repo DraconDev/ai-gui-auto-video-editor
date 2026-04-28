@@ -158,7 +158,12 @@ pub trait VideoEditor: Send + Sync {
     fn reduce_noise(&self, input: &Path, output: &Path) -> Result<()>;
     fn stabilize(&self, input: &Path, output: &Path) -> Result<()>;
     fn color_correct(&self, input: &Path, output: &Path) -> Result<()>;
-    fn reframe(&self, input: &Path, output: &Path, target_resolution: crate::config::VideoResolution) -> Result<()>;
+    fn reframe(
+        &self,
+        input: &Path,
+        output: &Path,
+        target_resolution: crate::config::VideoResolution,
+    ) -> Result<()>;
     fn blur_background(&self, input: &Path, output: &Path) -> Result<()>;
 }
 
@@ -451,35 +456,38 @@ impl VideoEditor for FfmpegEditor {
         Ok(())
     }
 
-    fn reframe(&self, input: &Path, output: &Path, target_resolution: crate::config::VideoResolution) -> Result<()> {
+    fn reframe(
+        &self,
+        input: &Path,
+        output: &Path,
+        target_resolution: crate::config::VideoResolution,
+    ) -> Result<()> {
         info!("Auto-reframe: Analyzing video for face tracking...");
 
         let filter = match crate::ml::AutoReframeProcessor::new() {
-            Ok(processor) => {
-                match processor.analyze_video(input, 1.0) {
-                    Ok(crop_regions) => {
-                        let (w, h) = match crate::ml::FrameExtractor::get_video_dimensions(input) {
-                            Ok(dims) => dims,
-                            Err(e) => {
-                                warn!(error = %e, "Failed to get video dimensions, using center crop");
-                                let (sw, sh) = target_resolution.dimensions();
-                                return self.run_reframe_filter(
-                                    input,
-                                    output,
-                                    &format!("crop=ih*9/16:ih,scale={}:{}", sw, sh),
-                                );
-                            }
-                        };
+            Ok(processor) => match processor.analyze_video(input, 1.0) {
+                Ok(crop_regions) => {
+                    let (w, h) = match crate::ml::FrameExtractor::get_video_dimensions(input) {
+                        Ok(dims) => dims,
+                        Err(e) => {
+                            warn!(error = %e, "Failed to get video dimensions, using center crop");
+                            let (sw, sh) = target_resolution.dimensions();
+                            return self.run_reframe_filter(
+                                input,
+                                output,
+                                &format!("crop=ih*9/16:ih,scale={}:{}", sw, sh),
+                            );
+                        }
+                    };
 
-                        processor.generate_crop_filter(&crop_regions, w, h, target_resolution)
-                    }
-                    Err(e) => {
-                        warn!(error = %e, "Face detection failed, using center crop");
-                        let (sw, sh) = target_resolution.dimensions();
-                        format!("crop=ih*9/16:ih,scale={}:{}", sw, sh)
-                    }
+                    processor.generate_crop_filter(&crop_regions, w, h, target_resolution)
                 }
-            }
+                Err(e) => {
+                    warn!(error = %e, "Face detection failed, using center crop");
+                    let (sw, sh) = target_resolution.dimensions();
+                    format!("crop=ih*9/16:ih,scale={}:{}", sw, sh)
+                }
+            },
             Err(e) => {
                 warn!(error = %e, "Could not load face detection model, using center crop");
                 let (sw, sh) = target_resolution.dimensions();
@@ -517,7 +525,12 @@ impl VideoEditor for FfmpegEditor {
     }
 }
 
-fn run_trim_filter_job(input: &Path, output: &Path, segments: &[ProcessedSegment], codec: &str) -> Result<()> {
+fn run_trim_filter_job(
+    input: &Path,
+    output: &Path,
+    segments: &[ProcessedSegment],
+    codec: &str,
+) -> Result<()> {
     let (v_filter, a_filter) = generate_trim_filters(segments);
 
     let status = Command::new("ffmpeg")
@@ -1135,12 +1148,10 @@ mod tests {
     #[test]
     fn test_calculate_keep_segments_boundary_at_min_silence() {
         // Silence exactly at min_silence_for_speedup should be sped up
-        let silences = vec![
-            Segment {
-                start: 2.0,
-                end: 2.5, // exactly 0.5s silence
-            },
-        ];
+        let silences = vec![Segment {
+            start: 2.0,
+            end: 2.5, // exactly 0.5s silence
+        }];
         let duration = 10.0;
         let padding = 0.0;
         let min_silence = 0.5;
@@ -1170,12 +1181,10 @@ mod tests {
     #[test]
     fn test_calculate_keep_segments_just_below_min_silence() {
         // Silence just below min_silence_for_speedup should be cut (skipped)
-        let silences = vec![
-            Segment {
-                start: 2.0,
-                end: 2.49, // just below 0.5s
-            },
-        ];
+        let silences = vec![Segment {
+            start: 2.0,
+            end: 2.49, // just below 0.5s
+        }];
         let duration = 10.0;
         let padding = 0.0;
         let min_silence = 0.5;
@@ -1204,12 +1213,10 @@ mod tests {
     fn test_calculate_keep_segments_simple() {
         use crate::analyzer::Segment;
 
-        let silences = vec![
-            Segment {
-                start: 2.0,
-                end: 3.0,
-            },
-        ];
+        let silences = vec![Segment {
+            start: 2.0,
+            end: 3.0,
+        }];
         let duration = 10.0;
         let padding = 0.1;
 

@@ -34,7 +34,9 @@ fn find_system_font() -> Option<String> {
     if let Ok(entries) = std::fs::read_dir("/usr/share/fonts") {
         for entry in entries.flatten() {
             let path = entry.path();
-            if path.is_dir() && let Some(font) = find_first_ttf(&path) {
+            if path.is_dir()
+                && let Some(font) = find_first_ttf(&path)
+            {
                 return Some(font);
             }
         }
@@ -49,7 +51,9 @@ fn find_first_ttf(dir: &std::path::Path) -> Option<String> {
             if path.extension().and_then(|e| e.to_str()) == Some("ttf") {
                 return path.to_str().map(|s| s.to_string());
             }
-            if path.is_dir() && let Some(font) = find_first_ttf(&path) {
+            if path.is_dir()
+                && let Some(font) = find_first_ttf(&path)
+            {
                 return Some(font);
             }
         }
@@ -178,7 +182,8 @@ pub fn add_text_watermark(
         WatermarkPosition::Center => "x=(w-text_w)/2:y=(h-text_h)/2",
     };
 
-    let font_path = find_system_font().unwrap_or_else(|| "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf".to_string());
+    let font_path = find_system_font()
+        .unwrap_or_else(|| "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf".to_string());
 
     let filter = format!(
         "drawtext=text='{}':{}:fontsize={}:fontcolor={}@{}:fontfile={}",

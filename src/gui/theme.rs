@@ -299,7 +299,11 @@ pub fn dropdown_selector<T: PartialEq + Copy>(
     let button = egui::Button::new(
         egui::RichText::new(format!("{}  {}", current_label, chevron))
             .size(14.0)
-            .color(if is_popup_open { TEXT_PRIMARY } else { TEXT_SECONDARY }),
+            .color(if is_popup_open {
+                TEXT_PRIMARY
+            } else {
+                TEXT_SECONDARY
+            }),
     )
     .fill(if is_popup_open {
         PANEL_BG_LIGHTER
@@ -309,7 +313,11 @@ pub fn dropdown_selector<T: PartialEq + Copy>(
     .corner_radius(CORNER_RADIUS_SMALL)
     .stroke(egui::Stroke::new(
         1.0,
-        if is_popup_open { ACCENT_PRIMARY } else { BORDER_LIGHT },
+        if is_popup_open {
+            ACCENT_PRIMARY
+        } else {
+            BORDER_LIGHT
+        },
     ))
     .min_size(egui::vec2(desired_width, 36.0));
 
@@ -335,7 +343,7 @@ pub fn dropdown_selector<T: PartialEq + Copy>(
                 );
                 ui.set_clip_rect(popup_rect);
 
-egui::Frame::NONE
+                egui::Frame::NONE
                     .fill(PANEL_BG_LIGHTER)
                     .corner_radius(CORNER_RADIUS_SMALL)
                     .stroke(egui::Stroke::new(1.0, BORDER_LIGHT))
@@ -361,14 +369,25 @@ egui::Frame::NONE
                                     ui.horizontal_wrapped(|ui| {
                                         ui.set_width(ui.available_width());
                                         ui.label(
-                                            egui::RichText::new(label.as_str())
-                                                .size(14.0)
-                                                .color(if is_selected { ACCENT_PRIMARY } else { TEXT_PRIMARY }),
+                                            egui::RichText::new(label.as_str()).size(14.0).color(
+                                                if is_selected {
+                                                    ACCENT_PRIMARY
+                                                } else {
+                                                    TEXT_PRIMARY
+                                                },
+                                            ),
                                         );
                                         if is_selected {
-                                            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                                                ui.label(egui::RichText::new("✓").size(13.0).color(ACCENT_PRIMARY));
-                                            });
+                                            ui.with_layout(
+                                                egui::Layout::right_to_left(egui::Align::Center),
+                                                |ui| {
+                                                    ui.label(
+                                                        egui::RichText::new("✓")
+                                                            .size(13.0)
+                                                            .color(ACCENT_PRIMARY),
+                                                    );
+                                                },
+                                            );
                                         }
                                     });
                                     ui.response()
@@ -702,7 +721,8 @@ mod tests {
 
     #[test]
     fn test_truncate_path_long() {
-        let path = "/very/long/path/that/needs/truncating/especially/when/it/is/really/very/long/file.txt";
+        let path =
+            "/very/long/path/that/needs/truncating/especially/when/it/is/really/very/long/file.txt";
         let result = truncate_path(path, 20);
         assert!(result.len() <= 20);
         assert!(result.contains("..."));

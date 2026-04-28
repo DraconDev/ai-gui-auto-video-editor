@@ -2,7 +2,7 @@ use anyhow::{Context, Result};
 use candle_core::{DType, Device, Tensor};
 use candle_transformers::models::whisper::{Config, model::Whisper};
 use hf_hub::{Repo, RepoType, api::sync::Api};
-use rustfft::{num_complex::Complex, FftPlanner};
+use rustfft::{FftPlanner, num_complex::Complex};
 use std::path::Path;
 use tokenizers::Tokenizer;
 use tracing::info;
@@ -24,7 +24,8 @@ pub trait VideoSttAnalyzer {
 pub struct CandleSttAnalyzer;
 
 impl CandleSttAnalyzer {
-    fn ensure_model_cached() -> Result<(std::path::PathBuf, std::path::PathBuf, std::path::PathBuf)> {
+    fn ensure_model_cached() -> Result<(std::path::PathBuf, std::path::PathBuf, std::path::PathBuf)>
+    {
         let cache_dir = directories::ProjectDirs::from("com", "ai-vid-editor", "ai-vid-editor")
             .map(|d| d.cache_dir().to_path_buf())
             .unwrap_or_else(std::env::temp_dir);
@@ -43,7 +44,8 @@ impl CandleSttAnalyzer {
             let config_file = repo.get("config.json")?;
             std::fs::copy(&config_file, &config_path).context("failed to cache config.json")?;
             let tokenizer_file = repo.get("tokenizer.json")?;
-            std::fs::copy(&tokenizer_file, &tokenizer_path).context("failed to cache tokenizer.json")?;
+            std::fs::copy(&tokenizer_file, &tokenizer_path)
+                .context("failed to cache tokenizer.json")?;
             let weights_file = repo.get("model.safetensors")?;
             std::fs::copy(&weights_file, &weights_path).context("failed to cache model weights")?;
             info!("Whisper model cached successfully");
@@ -73,7 +75,8 @@ impl VideoSttAnalyzer for CandleSttAnalyzer {
         let mut model = Whisper::load(&vb, config.clone()).context("failed to load model")?;
 
         let audio_data = load_audio_as_f32(audio_path)?;
-        let mel = pcm_to_mel(&config, &audio_data, &device).context("failed to compute mel spectrogram")?;
+        let mel = pcm_to_mel(&config, &audio_data, &device)
+            .context("failed to compute mel spectrogram")?;
         let mel_len = mel.dims()[2];
 
         let segments = decode_greedy(&mut model, &tokenizer, &mel, &config, mel_len)?;
@@ -165,13 +168,17 @@ fn pcm_to_mel(config: &Config, pcm: &[f32], device: &Device) -> Result<Tensor> {
 
     let mut mel_spec = vec![0.0f32; n_mels * n_frames];
 
-        for frame_idx in 0..n_frames {
+    for frame_idx in 0..n_frames {
         let start = frame_idx * hop_length;
 
         let mut windowed = vec![Complex::new(0.0, 0.0); n_fft];
         for (i, w) in windowed.iter_mut().enumerate() {
             let sample_idx = start + i;
-            let sample = if sample_idx < pcm.len() { pcm[sample_idx] } else { 0.0 };
+            let sample = if sample_idx < pcm.len() {
+                pcm[sample_idx]
+            } else {
+                0.0
+            };
             let hann = 0.5 * (1.0 - (2.0 * std::f32::consts::PI * i as f32 / n_fft as f32).cos());
             *w = Complex::new(sample * hann, 0.0);
         }

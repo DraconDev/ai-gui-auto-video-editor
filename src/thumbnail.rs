@@ -233,7 +233,8 @@ mod tests {
     #[test]
     fn test_parse_entropy() {
         // Standard ffmpeg entropy output - entropy is the LAST field on its line
-        let output = "[Parsed_showinfo_0] n:0.123456 q:0.123456\n[Parsed_showinfo_0] entropy:7.23456";
+        let output =
+            "[Parsed_showinfo_0] n:0.123456 q:0.123456\n[Parsed_showinfo_0] entropy:7.23456";
         assert_eq!(parse_entropy(output), Some(7.23456));
 
         // Returns the FIRST line containing "entropy" followed by a valid float

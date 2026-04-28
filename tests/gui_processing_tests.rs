@@ -1,9 +1,9 @@
 mod common;
 
 use ai_vid_editor::config::{Config, Preset, SilenceMode, VideoResolution};
+use ai_vid_editor::gui::FolderState;
 use ai_vid_editor::gui::processing::build_folder_config;
 use ai_vid_editor::gui::processing::make_test_folder_state;
-use ai_vid_editor::gui::FolderState;
 
 fn make_folder_state() -> FolderState {
     make_test_folder_state()
@@ -23,15 +23,27 @@ fn test_build_folder_config_no_overrides() {
 #[test]
 fn test_build_folder_config_youtube_preset() {
     let config = Config::default();
-    eprintln!("default config.export.chapters = {}", config.export.chapters);
+    eprintln!(
+        "default config.export.chapters = {}",
+        config.export.chapters
+    );
 
     // Check if Preset::from_str works
-    eprintln!("Preset::from_str(\"youtube\") = {:?}", Preset::from_str("youtube"));
-    eprintln!("Preset::from_str(\"Youtube\") = {:?}", Preset::from_str("Youtube"));
+    eprintln!(
+        "Preset::from_str(\"youtube\") = {:?}",
+        Preset::from_str("youtube")
+    );
+    eprintln!(
+        "Preset::from_str(\"Youtube\") = {:?}",
+        Preset::from_str("Youtube")
+    );
 
     let preset = Preset::from_str("youtube").unwrap();
     let preset_config = preset.to_config();
-    eprintln!("youtube preset export.chapters = {}", preset_config.export.chapters);
+    eprintln!(
+        "youtube preset export.chapters = {}",
+        preset_config.export.chapters
+    );
 
     let merged = preset_config.clone().merge(config.clone());
     eprintln!("direct merge.export.chapters = {}", merged.export.chapters);
@@ -41,7 +53,10 @@ fn test_build_folder_config_youtube_preset() {
     eprintln!("folder.preset = {:?}", folder.preset);
 
     let result = build_folder_config(&config, &folder);
-    eprintln!("build_folder_config result.export.chapters = {}", result.export.chapters);
+    eprintln!(
+        "build_folder_config result.export.chapters = {}",
+        result.export.chapters
+    );
     assert!(result.export.chapters, "chapters");
 }
 
@@ -55,7 +70,10 @@ fn test_build_folder_config_shorts_preset() {
     assert_eq!(result.silence.mode, SilenceMode::Speedup);
     assert_eq!(result.silence.speedup_factor, 3.0);
     assert_eq!(result.video.reframe, true);
-    assert_eq!(result.video.target_resolution, VideoResolution::Vertical1080p);
+    assert_eq!(
+        result.video.target_resolution,
+        VideoResolution::Vertical1080p
+    );
     assert_eq!(result.export.clips, true);
 }
 

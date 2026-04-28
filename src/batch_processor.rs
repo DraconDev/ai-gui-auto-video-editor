@@ -255,7 +255,10 @@ where
     // Merge scene changes with silences if scene detection is enabled
     let silences = if config.silence.scene_detect {
         report_progress(&mut progress, 0.09, "Detecting scene changes");
-        match crate::scene_detection::detect_scene_changes(&input_file, config.silence.scene_threshold) {
+        match crate::scene_detection::detect_scene_changes(
+            &input_file,
+            config.silence.scene_threshold,
+        ) {
             Ok(scenes) => {
                 info!(count = scenes.len(), "Detected scene changes");
                 merge_silences_and_scenes(&silences, &scenes, video_duration)
@@ -454,8 +457,9 @@ where
         report_progress(&mut progress, 0.98, "Adding watermark");
         info!(watermark = ?watermark_path, "Adding watermark");
 
-        let position = crate::watermark::WatermarkPosition::parse_name(&config.video.watermark_position)
-            .unwrap_or(crate::watermark::WatermarkPosition::BottomRight);
+        let position =
+            crate::watermark::WatermarkPosition::parse_name(&config.video.watermark_position)
+                .unwrap_or(crate::watermark::WatermarkPosition::BottomRight);
         let scale = config.video.watermark_scale;
 
         crate::watermark::add_watermark(
@@ -475,7 +479,9 @@ where
     }
 
     // Apply target resolution scaling if configured and not already reframed
-    if !config.video.reframe && config.video.target_resolution != crate::config::VideoResolution::default() {
+    if !config.video.reframe
+        && config.video.target_resolution != crate::config::VideoResolution::default()
+    {
         let (target_w, target_h) = config.video.target_resolution.dimensions();
         let scaled = output_file.with_extension("scaled.mp4");
         report_progress(&mut progress, 0.985, "Scaling to target resolution");
@@ -665,8 +671,7 @@ fn export_additional_files(
     if config.export.edl {
         let edl_path = format!("{}.edl", base_path.display());
         debug!(path = %edl_path, "Exporting EDL");
-        let fps = crate::ml::FrameExtractor::get_video_fps(output_file)
-            .unwrap_or(25.0);
+        let fps = crate::ml::FrameExtractor::get_video_fps(output_file).unwrap_or(25.0);
         exporter::export_edl(segments, input_file, Path::new(&edl_path), fps)?;
     }
 
@@ -720,7 +725,12 @@ fn export_additional_files(
     if config.export.preview {
         let preview_path = crate::preview::preview_path(output_file);
         debug!(path = %preview_path.display(), "Generating preview");
-        if let Err(e) = crate::preview::generate_preview(output_file, &preview_path, config.export.preview_duration, 480) {
+        if let Err(e) = crate::preview::generate_preview(
+            output_file,
+            &preview_path,
+            config.export.preview_duration,
+            480,
+        ) {
             warn!(error = %e, "Failed to generate preview");
         }
     }
@@ -1176,7 +1186,12 @@ mod tests {
 
     struct MockFfmpegEditor;
     impl VideoEditor for MockFfmpegEditor {
-        fn reframe(&self, _input: &Path, _output: &Path, _target_resolution: crate::config::VideoResolution) -> Result<()> {
+        fn reframe(
+            &self,
+            _input: &Path,
+            _output: &Path,
+            _target_resolution: crate::config::VideoResolution,
+        ) -> Result<()> {
             Ok(())
         }
 

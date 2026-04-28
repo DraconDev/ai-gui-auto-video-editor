@@ -8,15 +8,15 @@ use std::sync::{
 use std::time::{Duration, Instant};
 
 use super::{FolderState, ProcessingStatus, QueueEvent, WatcherEvent};
-use crate::config::FolderSettings;
 use crate::Config;
 use crate::FfmpegAnalyzer;
 use crate::FfmpegDurationGetter;
 use crate::FfmpegEditor;
 use crate::Preset;
 use crate::batch_processor::ProcessingProgress;
-use crate::config::SilenceMode;
 use crate::batch_processor::process_single_file_with_intro_outro_progress;
+use crate::config::FolderSettings;
+use crate::config::SilenceMode;
 
 #[cfg(feature = "notify-rust")]
 fn send_desktop_notification(title: &str, body: &str) {
@@ -377,7 +377,9 @@ fn queue_worker_loop(
             return;
         }
 
-        let filename = file.path.file_name()
+        let filename = file
+            .path
+            .file_name()
             .and_then(|n| n.to_str())
             .unwrap_or("unknown")
             .to_string();
@@ -389,7 +391,10 @@ fn queue_worker_loop(
 
         let output_file = file.output_dir.join(format!(
             "{}.mp4",
-            file.path.file_stem().and_then(|s| s.to_str()).unwrap_or("output")
+            file.path
+                .file_stem()
+                .and_then(|s| s.to_str())
+                .unwrap_or("output")
         ));
 
         let result = process_single_file_with_intro_outro_progress(
@@ -436,9 +441,18 @@ fn queue_worker_loop(
     if notify && queue_len > 0 {
         let total = successful + failed;
         let body = if failed == 0 {
-            format!("Processed {} file{} successfully", total, if total == 1 { "" } else { "s" })
+            format!(
+                "Processed {} file{} successfully",
+                total,
+                if total == 1 { "" } else { "s" }
+            )
         } else {
-            format!("Processed {} file{} ({} failed)", total, if total == 1 { "" } else { "s" }, failed)
+            format!(
+                "Processed {} file{} ({} failed)",
+                total,
+                if total == 1 { "" } else { "s" },
+                failed
+            )
         };
         send_desktop_notification("Batch Complete", &body);
     }

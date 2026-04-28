@@ -1,6 +1,6 @@
-mod theme;
 pub mod processing;
 mod tabs;
+mod theme;
 
 use eframe::egui;
 use std::path::PathBuf;
@@ -453,10 +453,14 @@ impl AppState {
     }
 
     fn auto_save_config(&mut self) {
-        self.config.paths.watch_folders = self.folders.iter().map(|f| {
-            let st: FolderState = f.clone();
-            WatchFolder::from(st)
-        }).collect();
+        self.config.paths.watch_folders = self
+            .folders
+            .iter()
+            .map(|f| {
+                let st: FolderState = f.clone();
+                WatchFolder::from(st)
+            })
+            .collect();
 
         let path = if let Some(ref p) = self.config_path {
             Some(p.clone())
@@ -596,10 +600,8 @@ impl AppState {
                         file_size,
                         duration_secs,
                     ));
-                    self.toasts.push(Toast::new(
-                        format!("{} processed", filename),
-                        true,
-                    ));
+                    self.toasts
+                        .push(Toast::new(format!("{} processed", filename), true));
                 }
                 WatcherEvent::Failed { filename, message } => {
                     self.status = ProcessingStatus::Error(message.clone());
@@ -636,7 +638,12 @@ impl AppState {
                     }
                     self.status = ProcessingStatus::Processing(filename);
                 }
-                QueueEvent::Progress { filename: _, path, progress, message: _ } => {
+                QueueEvent::Progress {
+                    filename: _,
+                    path,
+                    progress,
+                    message: _,
+                } => {
                     for file in &mut self.batch_queue {
                         if file.path == path {
                             file.progress = progress;
@@ -644,7 +651,12 @@ impl AppState {
                         }
                     }
                 }
-                QueueEvent::Completed { filename, path, file_size: _, output_path } => {
+                QueueEvent::Completed {
+                    filename,
+                    path,
+                    file_size: _,
+                    output_path,
+                } => {
                     for file in &mut self.batch_queue {
                         if file.path == path {
                             file.status = QueueStatus::Done;
@@ -653,9 +665,14 @@ impl AppState {
                             break;
                         }
                     }
-                    self.toasts.push(Toast::new(format!("{} processed", filename), true));
+                    self.toasts
+                        .push(Toast::new(format!("{} processed", filename), true));
                 }
-                QueueEvent::Failed { filename, path, message } => {
+                QueueEvent::Failed {
+                    filename,
+                    path,
+                    message,
+                } => {
                     for file in &mut self.batch_queue {
                         if file.path == path {
                             file.status = QueueStatus::Error;
@@ -712,7 +729,6 @@ impl Drop for AppState {
         }
     }
 }
-
 
 pub struct App {
     state: AppState,
@@ -784,4 +800,3 @@ impl eframe::App for App {
         self.state.toasts.retain(|t| !t.expired());
     }
 }
-

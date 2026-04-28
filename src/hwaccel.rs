@@ -67,7 +67,12 @@ impl HwAccel {
     /// Extra ffmpeg args needed before `-i` for some hwaccels.
     pub fn input_args(&self) -> Vec<&'static str> {
         match self {
-            HwAccel::Vaapi => vec!["-hwaccel", "vaapi", "-hwaccel_device", "/dev/dri/renderD128"],
+            HwAccel::Vaapi => vec![
+                "-hwaccel",
+                "vaapi",
+                "-hwaccel_device",
+                "/dev/dri/renderD128",
+            ],
             HwAccel::VideoToolbox => vec!["-hwaccel", "videotoolbox"],
             _ => vec![],
         }
@@ -80,10 +85,7 @@ impl HwAccel {
 
     /// Auto-detect best available GPU encoder by probing ffmpeg.
     pub fn detect() -> Self {
-        let output = match Command::new("ffmpeg")
-            .args(["-hwaccels"])
-            .output()
-        {
+        let output = match Command::new("ffmpeg").args(["-hwaccels"]).output() {
             Ok(o) => String::from_utf8_lossy(&o.stdout).to_lowercase(),
             Err(_) => return HwAccel::None,
         };
@@ -107,10 +109,7 @@ impl HwAccel {
 
 /// Check if a codec is available in ffmpeg.
 fn codec_available(codec: &str) -> bool {
-    match Command::new("ffmpeg")
-        .args(["-encoders"])
-        .output()
-    {
+    match Command::new("ffmpeg").args(["-encoders"]).output() {
         Ok(o) => String::from_utf8_lossy(&o.stdout).contains(codec),
         Err(_) => false,
     }
@@ -128,7 +127,10 @@ mod tests {
         assert_eq!(HwAccel::parse_name("amf"), Some(HwAccel::Amf));
         assert_eq!(HwAccel::parse_name("amd"), Some(HwAccel::Amf));
         assert_eq!(HwAccel::parse_name("vaapi"), Some(HwAccel::Vaapi));
-        assert_eq!(HwAccel::parse_name("videotoolbox"), Some(HwAccel::VideoToolbox));
+        assert_eq!(
+            HwAccel::parse_name("videotoolbox"),
+            Some(HwAccel::VideoToolbox)
+        );
         assert_eq!(HwAccel::parse_name("mac"), Some(HwAccel::VideoToolbox));
         assert_eq!(HwAccel::parse_name("unknown"), None);
     }
