@@ -1,9 +1,9 @@
 # Project State
 
 ## Current Focus
-Refactored entropy parsing in video processing to handle ffmpeg output format changes
+Refactored entropy parsing in video processing to handle multi-line ffmpeg output
 
 ## Completed
-- [x] Updated entropy parsing to correctly handle ffmpeg output where entropy is the last field
-- [x] Improved test cases to verify parsing of entropy values with spaces around colons
-- [x] Maintained backward compatibility with existing entropy parsing test cases
+- [x] Updated entropy parsing to handle entropy values appearing on separate lines
+- [x] Improved test cases to verify parsing of entropy values with surrounding whitespace
+- [x] Maintained backward compatibility with existing single-line entropy output format

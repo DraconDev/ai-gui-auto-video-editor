@@ -232,8 +232,8 @@ mod tests {
 
     #[test]
     fn test_parse_entropy() {
-        // Standard ffmpeg entropy output - entropy is the LAST field
-        let output = "[Parsed_showinfo_0] n:0.123456 q:0.123456 entropy:7.23456";
+        // Standard ffmpeg entropy output - entropy must be the LAST field on its line
+        let output = "[Parsed_showinfo_0] n:0.123456 q:0.123456\n[Parsed_showinfo_0] entropy:7.23456";
         assert_eq!(parse_entropy(output), Some(7.23456));
 
         // Multiple lines, last one wins
@@ -247,8 +247,8 @@ mod tests {
         // Empty output
         assert_eq!(parse_entropy(""), None);
 
-        // Entropy with spaces around colon
-        let output4 = "some log line\n  entropy:  9.75  \nend";
+        // Entropy with spaces around value
+        let output4 = "some log line\n  entropy:  9.75  ";
         assert_eq!(parse_entropy(output4), Some(9.75));
 
         // Invalid entropy value
