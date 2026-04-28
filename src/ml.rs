@@ -617,7 +617,7 @@ impl AutoReframeProcessor {
     }
 
     /// Generate ffmpeg filter for smooth crop following faces.
-    /// Uses smoothed piecewise linear interpolation between detected keyframes.
+    /// Uses temporally smoothed crop values with linear interpolation.
     /// `target_resolution` controls the output scale dimensions.
     pub fn generate_crop_filter(
         &self,
@@ -652,46 +652,17 @@ impl AutoReframeProcessor {
             );
         }
 
-        let segments: Vec<String> = smoothed
-            .windows(2)
-            .enumerate()
-            .map(|(i, window)| {
-                let (t0, crop0) = (window[0].0, &window[0].1);
-                let (t1, crop1) = (window[1].0, &window[1].1);
-                let seg_duration = t1 - t0;
-                if seg_duration <= 0.0 {
-                    return format!(
-                        "crop=iw*{}:ih:iw*{}:0,scale={}:{}",
-                        crop0.width, crop0.x, scale_w, scale_h
-                    );
-                }
-                let x0 = crop0.x;
-                let x1 = crop1.x;
-                let w0 = crop0.width;
-                let w1 = crop1.width;
-                format!(
-                    "crop=iw*({w0}+({w1}-{w0})*((t-{t0})/{seg_duration})):ih:iw*({x0}+({x1}-{x0})*((t-{t0})/{seg_duration})):0,scale={scale_w}:{scale_h},trim=start={t0}:end={t1},setpts=PTS-STARTPTS"
-                )
-            })
-            .collect();
+        let first = &smoothed[0].1;
+        let last = &smoothed[smoothed.len() - 1].1;
+        let x0 = first.x;
+        let x1 = last.x;
+        let w0 = first.width;
+        let w1 = last.width;
 
-        if segments.len() == 1 {
-            return segments[0].clone();
-        }
-
-        let mut filter = String::new();
-        for (i, seg) in segments.iter().enumerate() {
-            if i > 0 {
-                filter.push_str(&format!("[v{}][v{}]", i - 1, i));
-            }
-            filter.push_str(&format!(
-                "color=c=black:s={}x{}[bg{}];[in]{}[vout{}];[bg{}][vout{}]overlay=shortest=1:eof_action=pass",
-                scale_w, scale_h,
-                i, seg, i, i, i
-            ));
-        }
-
-        filter
+        format!(
+            "crop=iw*({w0}+({w1}-{w0})*t/{duration}):ih:iw*({x0}+({x1}-{x0})*t/{duration}):0,scale={}:{}",
+            scale_w, scale_h
+        )
     }
 
     fn smooth_crop_regions(regions: &[(f32, CropRegion)], window: usize) -> Vec<(f32, CropRegion)> {

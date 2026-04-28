@@ -1,11 +1,10 @@
 # Project State
 
 ## Current Focus
-Improved video cropping with smoothed piecewise linear interpolation for more stable face tracking
+Refactored crop filter generation to use simpler linear interpolation between first and last crop regions
 
 ## Completed
-- [x] Added smoothing algorithm to average crop regions over a 5-frame window
-- [x] Implemented piecewise linear interpolation between keyframes for smoother transitions
-- [x] Enhanced crop filter generation with proper segment handling and overlay transitions
-- [x] Added special case handling for single-frame crops and zero-duration sequences
-- [x] Improved multi-segment crop filter with proper background handling and overlay transitions
+- [x] Simplified crop filter generation by using linear interpolation between first and last crop regions instead of piecewise segments
+- [x] Removed complex segment concatenation logic
+- [x] Updated Cargo.lock to resolve dependency versions
+```
