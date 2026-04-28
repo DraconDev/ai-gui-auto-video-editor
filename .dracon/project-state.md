@@ -1,8 +1,9 @@
 # Project State
 
 ## Current Focus
-Improved FFmpeg path handling to prevent command injection in video stabilization
+Improved text watermark handling in FFmpeg commands to prevent command injection
 
 ## Completed
-- [x] Added path escaping for FFmpeg filter inputs to prevent command injection
-- [x] Updated video stabilization pipeline to use properly escaped paths in FFmpeg commands
+- [x] Added shell escaping for single quotes in watermark text
+- [x] Added proper path escaping for font file paths in FFmpeg filters
+- [x] Enhanced security by preventing command injection in text watermark processing

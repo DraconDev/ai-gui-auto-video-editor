@@ -172,7 +172,10 @@ pub fn add_text_watermark(
 ) -> Result<()> {
     info!(text, ?position, "Adding text watermark to video");
 
-    let escaped_text = text.replace(':', "\\:").replace('\\', "\\\\");
+    let escaped_text = text
+        .replace('\'', "'\\''")
+        .replace(':', "\\:")
+        .replace('\\', "\\\\");
 
     let overlay_pos = match position {
         WatermarkPosition::TopLeft => "x=10:y=10",
@@ -185,9 +188,11 @@ pub fn add_text_watermark(
     let font_path = find_system_font()
         .unwrap_or_else(|| "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf".to_string());
 
+    let escaped_font_path = crate::utils::escape_ffmpeg_filter_path(Path::new(&font_path));
+
     let filter = format!(
-        "drawtext=text='{}':{}:fontsize={}:fontcolor={}@{}:fontfile={}",
-        escaped_text, overlay_pos, font_size, color, opacity, font_path
+        "drawtext=text='{}':{}:fontsize={}:fontcolor={}@{}:fontfile='{}'",
+        escaped_text, overlay_pos, font_size, color, opacity, escaped_font_path
     );
 
     let status = Command::new("ffmpeg")
