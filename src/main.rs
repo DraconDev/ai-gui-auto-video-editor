@@ -309,6 +309,16 @@ fn main() -> Result<()> {
         init_logging(cli.verbose, cli.quiet);
     }
 
+    // Check FFmpeg availability early
+    if let Err(e) = crate::utils::check_ffmpeg() {
+        if cli.json {
+            println!("{{\"error\": \"{}\"}}", e);
+        } else {
+            eprintln!("Error: {}", e);
+        }
+        std::process::exit(1);
+    }
+
     // Handle --gui flag
     if cli.gui {
         #[cfg(feature = "gui")]
