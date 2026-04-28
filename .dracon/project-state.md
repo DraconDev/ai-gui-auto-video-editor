@@ -1,8 +1,7 @@
 # Project State
 
 ## Current Focus
-Added public exports for configuration-related types to the library API
+Updated dependency versions in Cargo.lock for video processing features
 
 ## Completed
-- [x] Exposed configuration-related types (`Config`, `FolderSettings`, `JoinMode`, `Preset`, `ProcessingConfig`, `SilenceMode`, `VideoResolution`, `WatchFolder`) through the public API
-- [x] Maintained consistent module structure while adding new public exports
+- [x] Updated Cargo.lock with new dependency versions for video processing features
