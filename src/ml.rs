@@ -622,8 +622,8 @@ impl AutoReframeProcessor {
     pub fn generate_crop_filter(
         &self,
         crop_regions: &[(f32, CropRegion)],
-        video_width: u32,
-        video_height: u32,
+        _video_width: u32,
+        _video_height: u32,
         target_resolution: crate::config::VideoResolution,
     ) -> String {
         let (scale_w, scale_h) = target_resolution.dimensions();
