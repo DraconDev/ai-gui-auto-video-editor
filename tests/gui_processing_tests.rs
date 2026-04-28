@@ -27,10 +27,10 @@ fn test_build_folder_config_youtube_preset() {
     folder.preset = "youtube".to_string();
 
     let result = build_folder_config(&config, &folder);
-    assert_eq!(result.silence.mode, SilenceMode::Cut);
-    assert_eq!(result.audio.enhance, true);
-    assert_eq!(result.export.chapters, true);
-    assert_eq!(result.video.target_resolution, VideoResolution::Fhd1080p);
+    assert_eq!(result.silence.mode, SilenceMode::Cut, "youtube should use Cut mode");
+    assert_eq!(result.audio.enhance, true, "youtube should enable audio enhance");
+    assert_eq!(result.export.chapters, true, "youtube should enable chapters");
+    assert_eq!(result.video.target_resolution, VideoResolution::Fhd1080p, "youtube should use FHD");
 }
 
 #[test]

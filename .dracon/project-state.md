@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock for video processing features
+Improved test assertions in GUI processing tests with more descriptive messages
 
 ## Completed
-- [x] Updated dependency versions in Cargo.lock for video processing features
-```
+- [x] Added descriptive messages to test assertions for better debugging
+- [x] Maintained same test behavior while improving clarity
