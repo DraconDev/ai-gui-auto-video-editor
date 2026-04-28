@@ -70,6 +70,72 @@ pub fn escape_ffmpeg_filter_path(path: &Path) -> String {
         .replace('\'', "'\\''")
 }
 
+pub struct TempDir {
+    path: PathBuf,
+    keep: bool,
+}
+
+impl TempDir {
+    pub fn new(prefix: &str) -> std::io::Result<Self> {
+        let path = std::env::temp_dir().join(format!("{}-{}", prefix, std::process::id()));
+        let _ = std::fs::remove_dir_all(&path);
+        std::fs::create_dir_all(&path)?;
+        Ok(Self { path, keep: false })
+    }
+
+    pub fn path(&self) -> &Path {
+        &self.path
+    }
+
+    pub fn into_path(self) -> PathBuf {
+        self.path
+    }
+
+    pub fn keep(mut self) {
+        self.keep = true;
+    }
+}
+
+impl Drop for TempDir {
+    fn drop(&mut self) {
+        if !self.keep {
+            let _ = std::fs::remove_dir_all(&self.path);
+        }
+    }
+}
+
+pub struct TempFile {
+    path: PathBuf,
+}
+
+impl TempFile {
+    pub fn new(prefix: &str, ext: &str) -> std::io::Result<Self> {
+        let path = std::env::temp_dir().join(format!("{}-{}.{}", prefix, std::process::id(), ext));
+        Ok(Self { path })
+    }
+
+    pub fn path(&self) -> &Path {
+        &self.path
+    }
+
+    pub fn into_path(self) -> PathBuf {
+        self.path
+    }
+
+    pub fn with_tmp<F: FnOnce(&Path) -> std::io::Result<()>>(path: &Path, f: F) -> std::io::Result<PathBuf> {
+        let tmp = path.with_extension("tmp");
+        f(&tmp)?;
+        std::fs::rename(&tmp, path)?;
+        Ok(path.to_path_buf())
+    }
+}
+
+impl Drop for TempFile {
+    fn drop(&mut self) {
+        let _ = std::fs::remove_file(&self.path);
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

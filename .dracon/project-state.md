@@ -1,10 +1,11 @@
 # Project State
 
 ## Current Focus
-Improved code formatting and reliability in batch processing, ML region calculations, and STT model caching
+Added temporary file/directory management utilities for safer file operations
 
 ## Completed
-- [x] Refactored silence merging logic in batch processor for better readability
-- [x] Improved ML region calculations with consistent formatting
-- [x] Enhanced STT model caching with more robust error handling
-- [x] Updated Cargo.lock to resolve dependency versions
+- [x] Added `TempDir` struct for creating and managing temporary directories with automatic cleanup
+- [x] Added `TempFile` struct for creating and managing temporary files with automatic cleanup
+- [x] Implemented `keep()` method to prevent automatic cleanup of temporary directories
+- [x] Added atomic file operation helper `with_tmp()` for safe temporary file operations
+- [x] Ensured proper cleanup of temporary resources through `Drop` implementations
