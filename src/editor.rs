@@ -1180,11 +1180,17 @@ mod tests {
         );
 
         // Silence at boundary should be included (>= not >)
-        assert_eq!(processed.len(), 2);
+        // 3 segments: before silence (0.0-2.0), sped-up silence (2.0-2.5), after silence (2.5-10.0)
+        assert_eq!(processed.len(), 3);
         assert_eq!(processed[0].speed, 1.0);
+        assert_eq!(processed[0].start, 0.0);
+        assert_eq!(processed[0].end, 2.0);
         assert_eq!(processed[1].speed, 4.0);
         assert_eq!(processed[1].start, 2.0);
         assert_eq!(processed[1].end, 2.5);
+        assert_eq!(processed[2].speed, 1.0);
+        assert_eq!(processed[2].start, 2.5);
+        assert_eq!(processed[2].end, 10.0);
     }
 
     #[test]
