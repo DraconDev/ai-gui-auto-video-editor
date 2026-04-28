@@ -13,7 +13,7 @@ use crate::FfmpegAnalyzer;
 use crate::FfmpegDurationGetter;
 use crate::FfmpegEditor;
 use crate::Preset;
-use crate::ProcessingProgress;
+use crate::batch_processor::ProcessingProgress;
 use crate::config::SilenceMode;
 use crate::batch_processor::process_single_file_with_intro_outro_progress;
 

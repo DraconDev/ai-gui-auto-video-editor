@@ -1,7 +1,8 @@
 # Project State
 
 ## Current Focus
-Refactored `SilenceMode` import path in GUI processing module
+Refactored `ProcessingProgress` import path in GUI processing module
 
 ## Completed
-- [x] Updated `SilenceMode` import to use `crate::config::SilenceMode` path for better module organization
+- [x] Updated `ProcessingProgress` import to use `crate::batch_processor::ProcessingProgress` path
+```
