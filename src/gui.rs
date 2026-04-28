@@ -11,7 +11,7 @@ use std::sync::{
 };
 use std::time::Duration;
 
-use crate::{Config, FolderSettings, JoinMode, WatchFolder};
+use crate::config::{Config, FolderSettings, JoinMode, WatchFolder};
 
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
 enum Tab {
