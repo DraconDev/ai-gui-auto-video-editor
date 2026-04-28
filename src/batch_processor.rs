@@ -212,8 +212,8 @@ where
     )
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn process_single_file_with_intro_outro_progress<A, E, D, F>(
-    #[allow(clippy::too_many_arguments)]
     input_file: PathBuf,
     output_file: PathBuf,
     config: &Config,
