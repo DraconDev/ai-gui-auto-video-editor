@@ -1,8 +1,9 @@
 # Project State
 
 ## Current Focus
-Dependency version updates in Cargo.lock for video processing features
+Added NixOS owner public key and updated gitignore to track encrypted secrets
 
 ## Completed
-- [x] Updated dependency versions in Cargo.lock to ensure compatibility with video processing features
+- [x] Added NixOS owner public key for secure deployment
+- [x] Updated .gitignore to explicitly track encrypted secrets files
 ```
