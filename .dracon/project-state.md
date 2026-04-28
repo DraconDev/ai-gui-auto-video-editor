@@ -1,9 +1,9 @@
 # Project State
 
 ## Current Focus
-Enhanced GUI processing test assertions with direct preset configuration verification
+Enhanced GUI processing test assertions with direct preset configuration validation
 
 ## Completed
-- [x] Added direct preset configuration merge test in `test_build_folder_config_youtube_preset`
-- [x] Improved debug output clarity with more specific variable names in test assertions
-- [x] Updated Cargo.lock with dependency version updates
+- [x] Added debug logging for preset parsing (`Preset::from_str`) to verify case sensitivity
+- [x] Improved test clarity by separating preset configuration steps from folder state setup
+- [x] Maintained assertion that chapter export is enabled for YouTube preset

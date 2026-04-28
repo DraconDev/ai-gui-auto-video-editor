@@ -25,15 +25,20 @@ fn test_build_folder_config_youtube_preset() {
     let config = Config::default();
     eprintln!("default config.export.chapters = {}", config.export.chapters);
 
-    let mut folder = make_folder_state();
-    folder.preset = "youtube".to_string();
+    // Check if Preset::from_str works
+    eprintln!("Preset::from_str(\"youtube\") = {:?}", Preset::from_str("youtube"));
+    eprintln!("Preset::from_str(\"Youtube\") = {:?}", Preset::from_str("Youtube"));
 
-    // Test the merge directly
-    let preset_config = Preset::from_str("youtube").unwrap().to_config();
+    let preset = Preset::from_str("youtube").unwrap();
+    let preset_config = preset.to_config();
     eprintln!("youtube preset export.chapters = {}", preset_config.export.chapters);
 
     let merged = preset_config.clone().merge(config.clone());
     eprintln!("direct merge.export.chapters = {}", merged.export.chapters);
+
+    let mut folder = make_folder_state();
+    folder.preset = "youtube".to_string();
+    eprintln!("folder.preset = {:?}", folder.preset);
 
     let result = build_folder_config(&config, &folder);
     eprintln!("build_folder_config result.export.chapters = {}", result.export.chapters);
