@@ -1195,7 +1195,7 @@ mod tests {
 
     #[test]
     fn test_calculate_keep_segments_just_below_min_silence() {
-        // Silence just below min_silence_for_speedup should be cut
+        // Silence just below min_silence_for_speedup should be cut (skipped)
         let silences = vec![
             Segment {
                 start: 2.0,
@@ -1215,9 +1215,15 @@ mod tests {
         );
 
         // Short silence should be cut (skipped in speedup mode)
+        // But the segments before and after silence should still exist
+        // 2 segments: before (0.0-2.0) and after (2.49-10.0)
         assert_eq!(processed.len(), 2);
         assert_eq!(processed[0].speed, 1.0);
+        assert_eq!(processed[0].start, 0.0);
+        assert_eq!(processed[0].end, 2.0);
         assert_eq!(processed[1].speed, 1.0);
+        assert_eq!(processed[1].start, 2.49);
+        assert_eq!(processed[1].end, 10.0);
     }
 
     #[test]
