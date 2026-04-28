@@ -617,7 +617,7 @@ impl AutoReframeProcessor {
     }
 
     /// Generate ffmpeg filter for smooth crop following faces.
-    /// Uses linear interpolation between first and last detected crop regions.
+    /// Uses smoothed piecewise linear interpolation between detected keyframes.
     /// `target_resolution` controls the output scale dimensions.
     pub fn generate_crop_filter(
         &self,
@@ -631,33 +631,85 @@ impl AutoReframeProcessor {
             return format!("crop=ih*9/16:ih,scale={}:{}", scale_w, scale_h);
         }
 
-        let first_time = crop_regions[0].0;
-        let last_time = crop_regions[crop_regions.len() - 1].0;
-        let first_crop = &crop_regions[0].1;
-        let last_crop = if crop_regions.len() > 1 {
-            &crop_regions[crop_regions.len() - 1].1
-        } else {
-            first_crop
-        };
-
-        let duration = last_time - first_time;
-
-        if crop_regions.len() == 1 || duration == 0.0 {
+        if crop_regions.len() == 1 {
+            let region = &crop_regions[0].1;
             return format!(
                 "crop=iw*{}:ih:iw*{}:0,scale={}:{}",
-                first_crop.width, first_crop.x, scale_w, scale_h
+                region.width, region.x, scale_w, scale_h
             );
         }
 
-        let x0 = first_crop.x;
-        let x1 = last_crop.x;
-        let w0 = first_crop.width;
-        let w1 = last_crop.width;
+        let smoothed = Self::smooth_crop_regions(crop_regions, 5);
+        let first_time = smoothed[0].0;
+        let last_time = smoothed[smoothed.len() - 1].0;
+        let duration = last_time - first_time;
 
-        format!(
-            "crop=iw*({w0}+({w1}-{w0})*t/{duration}):ih:iw*({x0}+({x1}-{x0})*t/{duration}):0,scale={}:{}",
-            scale_w, scale_h
-        )
+        if duration == 0.0 {
+            let region = &smoothed[0].1;
+            return format!(
+                "crop=iw*{}:ih:iw*{}:0,scale={}:{}",
+                region.width, region.x, scale_w, scale_h
+            );
+        }
+
+        let segments: Vec<String> = smoothed
+            .windows(2)
+            .enumerate()
+            .map(|(i, window)| {
+                let (t0, crop0) = (window[0].0, &window[0].1);
+                let (t1, crop1) = (window[1].0, &window[1].1);
+                let seg_duration = t1 - t0;
+                if seg_duration <= 0.0 {
+                    return format!(
+                        "crop=iw*{}:ih:iw*{}:0,scale={}:{}",
+                        crop0.width, crop0.x, scale_w, scale_h
+                    );
+                }
+                let x0 = crop0.x;
+                let x1 = crop1.x;
+                let w0 = crop0.width;
+                let w1 = crop1.width;
+                format!(
+                    "crop=iw*({w0}+({w1}-{w0})*((t-{t0})/{seg_duration})):ih:iw*({x0}+({x1}-{x0})*((t-{t0})/{seg_duration})):0,scale={scale_w}:{scale_h},trim=start={t0}:end={t1},setpts=PTS-STARTPTS"
+                )
+            })
+            .collect();
+
+        if segments.len() == 1 {
+            return segments[0].clone();
+        }
+
+        let mut filter = String::new();
+        for (i, seg) in segments.iter().enumerate() {
+            if i > 0 {
+                filter.push_str(&format!("[v{}][v{}]", i - 1, i));
+            }
+            filter.push_str(&format!(
+                "color=c=black:s={}x{}[bg{}];[in]{}[vout{}];[bg{}][vout{}]overlay=shortest=1:eof_action=pass",
+                scale_w, scale_h,
+                i, seg, i, i, i
+            ));
+        }
+
+        filter
+    }
+
+    fn smooth_crop_regions(regions: &[(f32, CropRegion)], window: usize) -> Vec<(f32, CropRegion)> {
+        if regions.len() <= window {
+            return regions.to_vec();
+        }
+        let half = window / 2;
+        let mut result = Vec::with_capacity(regions.len());
+        for i in 0..regions.len() {
+            let start = i.saturating_sub(half);
+            let end = (i + half + 1).min(regions.len());
+            let slice = &regions[start..end];
+            let avg_x: f32 = slice.iter().map(|(_, r)| r.x).sum::<f32>() / slice.len() as f32;
+            let avg_width: f32 = slice.iter().map(|(_, r)| r.width).sum::<f32>() / slice.len() as f32;
+            let (t, first) = regions[i];
+            result.push((t, CropRegion { x: avg_x, y: first.y, width: avg_width, height: first.height }));
+        }
+        result
     }
 }
 
