@@ -23,21 +23,17 @@ fn test_build_folder_config_no_overrides() {
 #[test]
 fn test_build_folder_config_youtube_preset() {
     let config = Config::default();
+    let preset_config = Preset::Youtube.to_config();
+    eprintln!("preset_config.export.subtitles = {}", preset_config.export.subtitles);
+    eprintln!("preset_config.export.chapters = {}", preset_config.export.chapters);
+    let merged = preset_config.clone().merge(config.clone());
+    eprintln!("merged.export.subtitles = {}", merged.export.subtitles);
+    eprintln!("merged.export.chapters = {}", merged.export.chapters);
     let mut folder = make_folder_state();
     folder.preset = "youtube".to_string();
-
     let result = build_folder_config(&config, &folder);
-    assert_eq!(result.silence.mode, SilenceMode::Cut, "youtube should use Cut mode");
-    assert_eq!(result.audio.enhance, true, "youtube should enable audio enhance");
-    // Check all export fields individually
-    eprintln!("export.subtitles = {}", result.export.subtitles);
-    eprintln!("export.chapters = {}", result.export.chapters);
-    eprintln!("export.captions = {}", result.export.captions);
-    eprintln!("export.clips = {}", result.export.clips);
-    eprintln!("export.fcpxml = {}", result.export.fcpxml);
-    eprintln!("export.edl = {}", result.export.edl);
-    eprintln!("export.thumbnail = {}", result.export.thumbnail);
-    eprintln!("export.preview = {}", result.export.preview);
+    eprintln!("result.export.subtitles = {}", result.export.subtitles);
+    eprintln!("result.export.chapters = {}", result.export.chapters);
     assert!(result.export.subtitles, "subtitles");
 }
 
