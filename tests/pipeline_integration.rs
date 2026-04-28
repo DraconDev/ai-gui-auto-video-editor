@@ -411,7 +411,7 @@ fn test_generate_thumbnail() {
     let output_dir = tempdir().unwrap();
     let output_path = output_dir.path().join("thumb.jpg");
 
-    let result = thumbnail::generate_thumbnail(&video_path, &output_path, 1.0, 320, 180);
+    let result = thumbnail::generate_thumbnail(&video_path, &output_path, 320, 180);
     assert!(result.is_ok(), "Thumbnail generation should succeed");
     assert!(output_path.exists(), "Thumbnail file should exist");
 
