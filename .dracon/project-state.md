@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock to resolve version conflicts
+Improved temporary file handling and case-insensitive font file detection
 
 ## Completed
-- [x] Updated Cargo.lock to resolve version conflicts in project dependencies
-```
+- [x] Refactored temporary file handling in `utils.rs` to improve readability with proper line breaks
+- [x] Made font file detection in `watermark.rs` case-insensitive for TTF files

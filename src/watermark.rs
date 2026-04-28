@@ -48,7 +48,12 @@ fn find_first_ttf(dir: &std::path::Path) -> Option<String> {
     if let Ok(entries) = std::fs::read_dir(dir) {
         for entry in entries.flatten() {
             let path = entry.path();
-            if path.extension().and_then(|e| e.to_str()).map(|e| e.to_ascii_lowercase()) == Some("ttf".to_string()) {
+            if path
+                .extension()
+                .and_then(|e| e.to_str())
+                .map(|e| e.to_ascii_lowercase())
+                == Some("ttf".to_string())
+            {
                 return path.to_str().map(|s| s.to_string());
             }
             if path.is_dir()

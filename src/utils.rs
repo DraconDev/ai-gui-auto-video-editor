@@ -126,7 +126,10 @@ impl TempFile {
         path
     }
 
-    pub fn with_tmp<F: FnOnce(&Path) -> std::io::Result<()>>(path: &Path, f: F) -> std::io::Result<PathBuf> {
+    pub fn with_tmp<F: FnOnce(&Path) -> std::io::Result<()>>(
+        path: &Path,
+        f: F,
+    ) -> std::io::Result<PathBuf> {
         let tmp = path.with_extension("tmp");
         f(&tmp)?;
         std::fs::rename(&tmp, path)?;
