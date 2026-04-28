@@ -17,28 +17,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Install Rust
         uses: dtolnay/rust-action@stable
-        
+
       - name: Cache cargo registry
         uses: actions/cache@v4
         with:
           path: ~/.cargo/registry
           key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
-          
-      - name: Cache cargo index
-        uses: actions/cache@v4
-        with:
-          path: ~/.cargo/git
-          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
-          
+
       - name: Cache target directory
         uses: actions/cache@v4
         with:
           path: target
-          key: ${{ runner.os }}-target-${{ hashFiles('**/Cargo.lock') }}
-      
+          key: ${{ runner.os }}-check-target-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-check-target-
+
       - name: Check compilation
         run: cargo check --all-features
 
@@ -47,25 +43,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Install Rust
         uses: dtolnay/rust-action@stable
-      
+
       - name: Install FFmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
-      
+
       - name: Cache cargo registry
         uses: actions/cache@v4
         with:
           path: ~/.cargo/registry
           key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
-          
+
       - name: Cache target directory
         uses: actions/cache@v4
         with:
           path: target
-          key: ${{ runner.os }}-target-${{ hashFiles('**/Cargo.lock') }}
-      
+          key: ${{ runner.os }}-test-target-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-test-target-
+
       - name: Run tests
         run: cargo test --lib
 
@@ -74,24 +72,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Install Rust
         uses: dtolnay/rust-action@stable
         with:
           components: clippy
-      
+
       - name: Cache cargo registry
         uses: actions/cache@v4
         with:
           path: ~/.cargo/registry
           key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
-          
+
       - name: Cache target directory
         uses: actions/cache@v4
         with:
           path: target
-          key: ${{ runner.os }}-target-${{ hashFiles('**/Cargo.lock') }}
-      
+          key: ${{ runner.os }}-clippy-target-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-clippy-target-
+
       - name: Run clippy
         run: cargo clippy --all-features -- -D warnings
 
@@ -100,12 +100,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Install Rust
         uses: dtolnay/rust-action@stable
         with:
           components: rustfmt
-      
+
       - name: Check formatting
         run: cargo fmt --all -- --check
 
@@ -114,9 +114,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Install Rust
         uses: dtolnay/rust-action@stable
-      
+
       - name: Build documentation
         run: cargo doc --no-deps --all-features
