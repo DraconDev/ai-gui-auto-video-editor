@@ -8,7 +8,14 @@ use std::sync::{
 use std::time::{Duration, Instant};
 
 use super::{FolderState, ProcessingStatus, QueueEvent, WatcherEvent};
-use crate::{Config, FfmpegAnalyzer, FfmpegDurationGetter, FfmpegEditor, Preset, ProcessingProgress, SilenceMode, process_single_file_with_intro_outro_progress};
+use crate::Config;
+use crate::FfmpegAnalyzer;
+use crate::FfmpegDurationGetter;
+use crate::FfmpegEditor;
+use crate::Preset;
+use crate::ProcessingProgress;
+use crate::SilenceMode;
+use crate::process_single_file_with_intro_outro_progress;
 
 #[cfg(feature = "notify-rust")]
 fn send_desktop_notification(title: &str, body: &str) {
