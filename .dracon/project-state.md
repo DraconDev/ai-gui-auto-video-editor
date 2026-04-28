@@ -1,9 +1,8 @@
 # Project State
 
 ## Current Focus
-Added test utility for folder state creation in GUI processing module
+Changed `build_folder_config` visibility from public to crate-private to restrict its usage within the module
 
 ## Completed
-- [x] Added `make_test_folder_state()` helper function for test setup in `processing.rs`
-- [x] Implemented test folder state with default paths and empty preset
-- [x] Included default enabled state and empty settings for comprehensive test coverage
+- [x] Refactored `build_folder_config` to `pub(crate)` to limit its scope to the current crate
+- [x] Maintained existing functionality while improving encapsulation
