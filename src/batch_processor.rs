@@ -676,25 +676,25 @@ fn export_additional_files(
     }
 
     if config.export.fcpxml {
-        let fcpxml_path = format!("{}.fcpxml", base_path.display());
-        debug!(path = %fcpxml_path, "Exporting FCPXML");
-        exporter::export_fcpxml(segments, input_file, Path::new(&fcpxml_path))?;
+        let fcpxml_path = base_path.with_extension("fcpxml");
+        debug!(path = %fcpxml_path.display(), "Exporting FCPXML");
+        exporter::export_fcpxml(segments, input_file, &fcpxml_path)?;
     }
 
     if config.export.edl {
-        let edl_path = format!("{}.edl", base_path.display());
-        debug!(path = %edl_path, "Exporting EDL");
+        let edl_path = base_path.with_extension("edl");
+        debug!(path = %edl_path.display(), "Exporting EDL");
         let fps = crate::ml::FrameExtractor::get_video_fps(output_file).unwrap_or(25.0);
-        exporter::export_edl(segments, input_file, Path::new(&edl_path), fps)?;
+        exporter::export_edl(segments, input_file, &edl_path, fps)?;
     }
 
     // Generate thumbnail
     if config.export.thumbnail {
-        let thumb_path = format!("{}.jpg", base_path.display());
-        debug!(path = %thumb_path, "Generating thumbnail");
+        let thumb_path = base_path.with_extension("jpg");
+        debug!(path = %thumb_path.display(), "Generating thumbnail");
         if let Err(e) = crate::thumbnail::generate_thumbnail(
             output_file,
-            Path::new(&thumb_path),
+            &thumb_path,
             config.export.thumbnail_width,
             config.export.thumbnail_height,
         ) {

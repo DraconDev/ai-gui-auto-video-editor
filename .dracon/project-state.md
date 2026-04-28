@@ -1,10 +1,11 @@
 # Project State
 
 ## Current Focus
-Improved file path handling and atomic file operations in batch processing
+Improved file path handling in batch processing by using Path::with_extension() instead of string formatting
 
 ## Completed
-- [x] Refactored file path construction to use `with_extension()` for consistency
-- [x] Updated SRT and chapters file exports to use proper path handling
-- [x] Replaced direct file rename with atomic replacement for cross-platform safety
-- [x] Improved error handling for caption generation and burning processes
+- [x] Refactored FCPXML export to use Path::with_extension() for consistent path construction
+- [x] Refactored EDL export to use Path::with_extension() for consistent path construction
+- [x] Refactored thumbnail generation to use Path::with_extension() for consistent path construction
+- [x] Added display() calls to path logging for consistent output formatting
+```
