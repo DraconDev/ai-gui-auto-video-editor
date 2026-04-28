@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock for video processing features
+Added dependency on `FolderSettings` in GUI processing module
 
 ## Completed
-- [x] Updated dependency versions in Cargo.lock to ensure compatibility with video processing features
+- [x] Added `use crate::config::FolderSettings` to enable folder configuration access in processing logic
 ```
