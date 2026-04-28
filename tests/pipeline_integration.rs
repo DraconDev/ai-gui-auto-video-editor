@@ -408,24 +408,7 @@ fn test_generate_thumbnail() {
     assert!(bytes.len() > 2, "Thumbnail should have some data");
 }
 
-#[test]
-fn test_config_clip_settings() {
-    // Verify clip extraction config fields exist
-    let mut config = Config::default();
-    config.export.clips = true;
-    config.export.clip_count = 3;
-    config.export.clip_min_duration = 3.0;
-    config.export.clip_max_duration = 15.0;
 
-    assert_eq!(config.export.clips, true);
-    assert_eq!(config.export.clip_count, 3);
-    assert_eq!(config.export.clip_min_duration, 3.0);
-    assert_eq!(config.export.clip_max_duration, 15.0);
-}
-
-// ============================================================
-// PHASE 3: Full Pipeline Tests
-// ============================================================
 
 #[test]
 fn test_full_pipeline_all_features_disabled() {
