@@ -141,7 +141,7 @@ dependencies = [
 
 [[package]]
 name = "ai-vid-editor"
-version = "1.8.58"
+version = "1.12.4"
 dependencies = [
  "anyhow",
  "candle-core",
@@ -158,6 +158,7 @@ dependencies = [
  "notify-rust",
  "rand 0.10.0",
  "rfd",
+ "rustfft",
  "serde",
  "serde_json",
  "tempfile",

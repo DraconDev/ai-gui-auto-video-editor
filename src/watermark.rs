@@ -311,27 +311,27 @@ mod tests {
     }
 
     #[test]
-    fn test_watermark_position_from_str() {
+    fn test_watermark_position_parse_name() {
         assert_eq!(
-            WatermarkPosition::from_str("bottom-right"),
+            WatermarkPosition::parse_name("bottom-right"),
             Some(WatermarkPosition::BottomRight)
         );
         assert_eq!(
-            WatermarkPosition::from_str("top-left"),
+            WatermarkPosition::parse_name("top-left"),
             Some(WatermarkPosition::TopLeft)
         );
         assert_eq!(
-            WatermarkPosition::from_str("center"),
+            WatermarkPosition::parse_name("center"),
             Some(WatermarkPosition::Center)
         );
         assert_eq!(
-            WatermarkPosition::from_str("tl"),
+            WatermarkPosition::parse_name("tl"),
             Some(WatermarkPosition::TopLeft)
         );
         assert_eq!(
-            WatermarkPosition::from_str("BR"),
+            WatermarkPosition::parse_name("BR"),
             Some(WatermarkPosition::BottomRight)
         );
-        assert_eq!(WatermarkPosition::from_str("invalid"), None);
+        assert_eq!(WatermarkPosition::parse_name("invalid"), None);
     }
 }
