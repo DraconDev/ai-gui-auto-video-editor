@@ -11,7 +11,7 @@ use std::sync::{
 };
 use std::time::Duration;
 
-use ai_vid_editor::{Config, FolderSettings, JoinMode, WatchFolder};
+use crate::{Config, FolderSettings, JoinMode, WatchFolder};
 
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
 enum Tab {

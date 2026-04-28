@@ -1,7 +1,8 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock for video processing features
+Refactored module imports in GUI code to use crate-relative paths
 
 ## Completed
-- [x] Updated Cargo.lock with new dependency versions for video processing features
+- [x] Updated `gui.rs` to use `crate::` imports instead of direct `ai_vid_editor::` imports
+```
