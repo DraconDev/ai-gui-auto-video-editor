@@ -656,15 +656,15 @@ fn test_config_export_fields_exist() {
 #[test]
 fn test_folder_settings_silences_config_structure() {
     // Verify FolderSettings maps correctly to silence config
-    // When remove_silence = Some(true), it means don't cut silence (keep it)
-    // When remove_silence = Some(false), it means cut silence
+    // When remove_silence = Some(true), it means cut silence
+    // When remove_silence = Some(false), it means keep silence (default)
 
     let mut config = Config::default();
 
-    // Simulate: remove_silence = Some(false) -> cut silence
+    // Simulate: remove_silence = Some(true) -> cut silence
     // This sets mode to Cut with max min_duration (effectively cut all silence)
-    let remove_silence = Some(false);
-    if let Some(false) = remove_silence {
+    let remove_silence = Some(true);
+    if let Some(true) = remove_silence {
         config.silence.mode = ai_vid_editor::config::SilenceMode::Cut;
         config.silence.min_duration = f32::MAX;
     }
@@ -672,13 +672,13 @@ fn test_folder_settings_silences_config_structure() {
     assert_eq!(config.silence.mode, ai_vid_editor::config::SilenceMode::Cut);
     assert_eq!(config.silence.min_duration, f32::MAX);
 
-    // Simulate: remove_silence = Some(true) -> keep silence (default mode)
+    // Simulate: remove_silence = Some(false) -> keep silence (default mode)
     let mut config2 = Config::default();
-    let remove_silence2 = Some(true);
-    if let Some(false) = remove_silence2 {
+    let remove_silence2 = Some(false);
+    if let Some(true) = remove_silence2 {
         config2.silence.mode = ai_vid_editor::config::SilenceMode::Cut;
     }
-    // true means don't cut, so mode stays as default (Cut)
+    // false means don't cut, so mode stays as default (Cut)
     assert_eq!(config2.silence.mode, ai_vid_editor::config::SilenceMode::Cut);
 }
 

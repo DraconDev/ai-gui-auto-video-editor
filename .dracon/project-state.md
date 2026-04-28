@@ -1,7 +1,9 @@
 # Project State
 
 ## Current Focus
-Fixes silence removal logic in folder configuration by inverting the condition check
+Fixed silence removal logic in folder configuration by inverting the boolean logic for `remove_silence`
 
 ## Completed
-- [x] Fixed `build_folder_config` to properly apply `SilenceMode::Cut` when `remove_silence` is enabled (previously was checking for disabled state)
+- [x] Corrected `remove_silence` logic to properly map to silence removal behavior
+- [x] Updated test assertions to verify correct silence mode configuration
+- [x] Fixed documentation comments to accurately reflect the behavior of silence removal settings
