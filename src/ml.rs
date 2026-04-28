@@ -810,7 +810,7 @@ mod tests {
 
     #[test]
     fn test_crop_region_from_face_right_edge() {
-        // Face at right edge
+        // Face at right edge - should clamp properly
         let face = FaceBox {
             x: 0.7,
             y: 0.0,
@@ -819,7 +819,7 @@ mod tests {
             confidence: 0.8,
         };
         let region = CropRegion::from_face(&face, 16.0 / 9.0);
-        // crop_x would be > 1 - crop_width, so should be clamped
-        assert!(region.x < 1.0 - region.width);
+        // x + width should be <= 1.0 due to clamping
+        assert!(region.x + region.width <= 1.0);
     }
 }

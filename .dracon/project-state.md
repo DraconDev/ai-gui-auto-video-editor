@@ -1,9 +1,8 @@
 # Project State
 
 ## Current Focus
-Improved test assertions for center crop region calculations in video processing
+Improved test assertions for face detection edge case handling in video processing
 
 ## Completed
-- [x] Updated test assertions to verify non-zero crop region dimensions for 16:9 video
-- [x] Added verification that crop region is properly centered horizontally
-- [x] Added comments explaining the expected crop behavior for 16:9 aspect ratio
+- [x] Updated test assertion to verify proper clamping of crop region coordinates when face is at right edge
+- [x] Updated Cargo.lock with dependency version updates for video processing features
