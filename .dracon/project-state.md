@@ -1,8 +1,10 @@
 # Project State
 
 ## Current Focus
-Refactored preview path handling in integration test to use explicit test filename instead of derived path
+Improved error handling for preview generation in integration tests
 
 ## Completed
-- [x] Changed preview path generation to use explicit "test_video_preview.mp4" filename instead of deriving from dummy output path
-- [x] Removed unused dummy output file creation in preview generation test
+- [x] Changed error message to indicate ffmpeg-specific issues
+- [x] Added early return on preview generation failure
+- [x] Updated preview file path to use consistent naming pattern
+```
