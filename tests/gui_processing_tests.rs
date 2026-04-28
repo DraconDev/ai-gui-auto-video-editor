@@ -29,7 +29,11 @@ fn test_build_folder_config_youtube_preset() {
     let result = build_folder_config(&config, &folder);
     assert_eq!(result.silence.mode, SilenceMode::Cut, "youtube should use Cut mode");
     assert_eq!(result.audio.enhance, true, "youtube should enable audio enhance");
-    assert_eq!(result.export.chapters, true, "youtube should enable chapters");
+    // Check all export fields individually
+    assert!(result.export.subtitles, "subtitles");
+    assert!(result.export.chapters, "chapters");
+    assert!(result.export.captions, "captions");
+    assert!(result.export.clips, "clips");
     assert_eq!(result.video.target_resolution, VideoResolution::Fhd1080p, "youtube should use FHD");
 }
 
