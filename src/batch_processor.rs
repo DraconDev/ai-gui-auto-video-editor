@@ -546,29 +546,41 @@ fn merge_silences_and_scenes(
         return silences.to_vec();
     }
 
-    // Convert scene timestamps to segments (gaps between scenes are "keep" regions)
     let scene_segments = crate::scene_detection::scenes_to_segments(scenes, duration);
 
-    // Merge: a silence segment is extended to nearest scene boundary if close
-    let mut merged = Vec::new();
-    for silence in silences {
-        let mut start = silence.start;
-        let mut end = silence.end;
+    let mut merged: Vec<crate::analyzer::Segment> = silences
+        .iter()
+        .map(|silence| {
+            let mut start = silence.start;
+            let mut end = silence.end;
 
-        // Extend silence to nearest scene boundary if within 0.5s
-        for scene in &scene_segments {
-            if (scene.start - start).abs() < 0.5 {
-                start = scene.start.min(start);
+            for scene in &scene_segments {
+                if (scene.start - start).abs() < 0.5 {
+                    start = scene.start.min(start);
+                }
+                if (scene.end - end).abs() < 0.5 {
+                    end = scene.end.max(end);
+                }
             }
-            if (scene.end - end).abs() < 0.5 {
-                end = scene.end.max(end);
+
+            crate::analyzer::Segment { start, end }
+        })
+        .collect();
+
+    merged.sort_by(|a, b| a.start.partial_cmp(&b.start).unwrap_or(std::cmp::Ordering::Equal));
+
+    let mut deduplicated = Vec::new();
+    for seg in merged {
+        if let Some(last) = deduplicated.last_mut() {
+            if seg.start <= last.end {
+                last.end = last.end.max(seg.end);
+                continue;
             }
         }
-
-        merged.push(crate::analyzer::Segment { start, end });
+        deduplicated.push(seg);
     }
 
-    merged
+    deduplicated
 }
 
 fn report_progress<F>(progress: &mut F, fraction: f32, stage: impl Into<String>)
