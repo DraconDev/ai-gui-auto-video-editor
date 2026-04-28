@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Changed visibility of `FolderState` and `build_folder_config` to public for broader module access
+Updated dependency versions in Cargo.lock for video processing features
 
 ## Completed
-- [x] Made `FolderState` public to allow broader access across modules
-- [x] Made `build_folder_config` public to enable folder configuration building from other modules
+- [x] Updated dependency versions in Cargo.lock to ensure compatibility with video processing features
+```
