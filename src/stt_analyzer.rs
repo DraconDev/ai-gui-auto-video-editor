@@ -159,6 +159,12 @@ fn pcm_to_mel(config: &Config, pcm: &[f32], device: &Device) -> Result<Tensor> {
     let n_fft = 400;
     let hop_length = 160;
     let n_mels = config.num_mel_bins;
+
+    if pcm.len() < n_fft {
+        return Tensor::zeros((n_mels, 1, 1), DType::F32, device)
+            .context("failed to create empty mel tensor");
+    }
+
     let n_frames = (pcm.len() - n_fft) / hop_length + 1;
 
     let filterbank = build_mel_filterbank(n_fft, n_mels, sample_rate);
