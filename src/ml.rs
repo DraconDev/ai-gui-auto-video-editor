@@ -818,3 +818,4 @@ mod tests {
         // crop_x would be > 1 - crop_width, so should be clamped
         assert!(region.x < 1.0 - region.width);
     }
+}
