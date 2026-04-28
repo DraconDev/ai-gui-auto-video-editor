@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Improved FFmpeg subtitle path handling to prevent command injection vulnerabilities
+Improved FFmpeg path handling to prevent command injection in video stabilization
 
 ## Completed
-- [x] Added path escaping utility function to handle special characters in FFmpeg filter paths
-- [x] Refactored subtitle burning to use escaped paths instead of raw paths in FFmpeg commands
+- [x] Added path escaping for FFmpeg filter inputs to prevent command injection
+- [x] Updated video stabilization pipeline to use properly escaped paths in FFmpeg commands

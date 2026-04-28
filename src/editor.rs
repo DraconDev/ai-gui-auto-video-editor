@@ -377,7 +377,7 @@ impl VideoEditor for FfmpegEditor {
         let output_str = output.to_str().context("invalid output path")?;
         let trf_file =
             std::env::temp_dir().join(format!("ai-vid-editor-vidstab-{}.trf", std::process::id()));
-        let trf_path = trf_file.to_str().context("invalid temp path")?;
+        let escaped_trf_path = crate::utils::escape_ffmpeg_filter_path(&trf_file);
 
         // Pass 1: Detect motion and generate transforms
         let status1 = Command::new("ffmpeg")
@@ -387,7 +387,7 @@ impl VideoEditor for FfmpegEditor {
                 "-vf",
                 &format!(
                     "vidstabdetect=stepsize=6:shakiness=5:accuracy=15:result={}",
-                    trf_path
+                    escaped_trf_path
                 ),
                 "-f",
                 "null",
@@ -409,7 +409,7 @@ impl VideoEditor for FfmpegEditor {
                 "-vf",
                 &format!(
                     "vidstabtransform=input={}:smoothing=10:optzoom=1:interpol=bicubic",
-                    trf_path
+                    escaped_trf_path
                 ),
                 "-c:a",
                 "copy",
