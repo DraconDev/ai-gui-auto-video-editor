@@ -6,7 +6,7 @@ use std::sync::mpsc;
 
 use super::{App, ActivityEntry, EntryStatus, FolderState, ProcessingStatus, SetupStep, Tab};
 use crate::config::{FolderSettings, VideoResolution};
-use crate::HwAccel;
+use crate::hwaccel::HwAccel;
 use super::theme::*;
 
 impl App {
