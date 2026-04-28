@@ -725,7 +725,7 @@ fn export_additional_files(
                 .unwrap_or("mp4");
             let multi_path = {
                 let mut p = base_path.as_os_str().to_os_string();
-                p.push(&format!("_{}p.{}", h, ext));
+                p.push(format!("_{}p.{}", h, ext));
                 PathBuf::from(p)
             };
             debug!(path = %multi_path.display(), resolution = ?resolution, "Generating alternate resolution");
