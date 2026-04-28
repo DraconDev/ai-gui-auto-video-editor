@@ -1,8 +1,7 @@
 # Project State
 
 ## Current Focus
-Refactored `ProcessingProgress` import path in GUI processing module
+Updated dependency versions in Cargo.lock for video processing features
 
 ## Completed
-- [x] Updated `ProcessingProgress` import to use `crate::batch_processor::ProcessingProgress` path
-```
+- [x] Updated dependency versions in Cargo.lock to ensure compatibility with video processing features
