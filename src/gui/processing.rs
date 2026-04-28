@@ -8,7 +8,7 @@ use std::sync::{
 use std::time::{Duration, Instant};
 
 use super::{FolderState, ProcessingStatus, QueueEvent, WatcherEvent};
-use crate::config::{Config, FfmpegAnalyzer, FfmpegDurationGetter, FfmpegEditor, Preset, ProcessingProgress,
+use crate::{Config, FfmpegAnalyzer, FfmpegDurationGetter, FfmpegEditor, Preset, ProcessingProgress,
     SilenceMode, process_single_file_with_intro_outro_progress};
 
 #[cfg(feature = "notify-rust")]
