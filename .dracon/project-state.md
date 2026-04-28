@@ -1,8 +1,7 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock to resolve version conflicts and ensure consistent builds
+Changed `ProcessingStatus` enum visibility to `pub(crate)` for internal use
 
 ## Completed
-- [x] Updated dependency versions in Cargo.lock (likely due to recent refactoring work)
-```
+- [x] Made `ProcessingStatus` enum accessible within the crate by changing visibility modifier from private to `pub(crate)`

@@ -33,7 +33,7 @@ enum SetupStep {
 
 #[allow(dead_code)]
 #[derive(Debug, Clone, PartialEq)]
-enum ProcessingStatus {
+pub(crate) enum ProcessingStatus {
     Idle,
     Watching,
     Processing(String),
