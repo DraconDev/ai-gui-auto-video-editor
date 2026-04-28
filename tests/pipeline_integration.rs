@@ -634,6 +634,9 @@ fn test_folder_settings_silences_config_structure() {
     // false means don't cut, so mode stays as default (Cut)
     assert_eq!(config2.silence.mode, ai_vid_editor::config::SilenceMode::Cut);
 }
+    // false means don't cut, so mode stays as default (Cut)
+    assert_eq!(config2.silence.mode, ai_vid_editor::config::SilenceMode::Cut);
+}
 
 #[test]
 fn test_config_all_export_fields() {

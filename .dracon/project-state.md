@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Removed redundant configuration validation test for export fields
+Added duplicate assertion to verify SilenceMode::Cut behavior in folder configuration tests
 
 ## Completed
-- [x] Removed `test_config_export_fields_exist` test that verified default Config export fields were accessible
-- [x] Eliminated redundant validation of Config export structure that didn't provide meaningful test coverage
+- [x] Added redundant assertion to confirm silence removal logic behavior in pipeline_integration.rs
+- [x] Updated Cargo.lock with new dependency versions for video processing features
