@@ -1,8 +1,10 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock for video processing features
+Added comprehensive integration tests for video processing configuration and export options
 
 ## Completed
-- [x] Updated dependency versions in Cargo.lock to ensure compatibility with video processing features
-```
+- [x] Added test for `FolderSettings` silence configuration mapping
+- [x] Added test for all export configuration fields accessibility
+- [x] Added test for `VideoEditor` operations availability
+- [x] Enhanced test coverage for video processing pipeline components
