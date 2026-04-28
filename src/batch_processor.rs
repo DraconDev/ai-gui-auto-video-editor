@@ -571,11 +571,11 @@ fn merge_silences_and_scenes(
 
     let mut deduplicated: Vec<crate::analyzer::Segment> = Vec::new();
     for seg in merged {
-        if let Some(last) = deduplicated.last_mut() {
-            if seg.start <= last.end {
-                last.end = last.end.max(seg.end);
-                continue;
-            }
+        if let Some(last) = deduplicated.last_mut()
+            && seg.start <= last.end
+        {
+            last.end = last.end.max(seg.end);
+            continue;
         }
         deduplicated.push(seg);
     }
