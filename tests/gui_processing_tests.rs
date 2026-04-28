@@ -272,7 +272,7 @@ fn test_build_folder_config_all_settings_at_once() {
     assert_eq!(result.export.chapters, true);
     assert_eq!(result.export.captions, true);
     assert_eq!(result.export.clips, true);
-    assert_eq!(result.video.target_resolution, VideoResolution::Vertical1080p);
+    assert_eq!(result.video.target_resolution, VideoResolution::Fhd1080p);
 }
 
 #[test]

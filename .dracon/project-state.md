@@ -1,7 +1,7 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock for video processing features
+Updated GUI processing test assertions to use `Fhd1080p` resolution instead of `Vertical1080p`
 
 ## Completed
-- [x] Updated Cargo.lock with new dependency versions for video processing features
+- [x] Updated test assertion in `gui_processing_tests.rs` to verify `Fhd1080p` resolution instead of `Vertical1080p`
