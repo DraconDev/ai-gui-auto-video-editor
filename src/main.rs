@@ -309,8 +309,17 @@ fn main() -> Result<()> {
         init_logging(cli.verbose, cli.quiet);
     }
 
-    // Check FFmpeg availability early
+    // Check FFmpeg and ffprobe availability early
     if let Err(e) = crate::utils::check_ffmpeg() {
+        if cli.json {
+            println!("{{\"error\": \"{}\"}}", e);
+        } else {
+            eprintln!("Error: {}", e);
+        }
+        std::process::exit(1);
+    }
+
+    if let Err(e) = crate::utils::check_ffprobe() {
         if cli.json {
             println!("{{\"error\": \"{}\"}}", e);
         } else {
