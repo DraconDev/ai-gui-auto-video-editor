@@ -5,7 +5,7 @@ use std::path::PathBuf;
 use std::sync::mpsc;
 
 use super::{App, ActivityEntry, EntryStatus, FolderState, ProcessingStatus, SetupStep, Tab};
-use crate::{FolderSettings, HwAccel, VideoResolution};
+use crate::config::{FolderSettings, HwAccel, VideoResolution};
 use super::theme::*;
 
 impl App {
