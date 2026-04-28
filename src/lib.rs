@@ -6,7 +6,6 @@ pub mod batch_processor;
 pub mod config;
 pub mod editor;
 pub mod exporter;
-pub mod gui;
 pub mod hwaccel;
 pub mod ml;
 pub mod preset_rules;
@@ -17,6 +16,7 @@ pub mod stt_analyzer;
 pub mod thumbnail;
 pub mod utils;
 pub mod watermark;
+pub mod gui;
 
 pub use analyzer::FfmpegAnalyzer;
 pub use batch_processor::{
