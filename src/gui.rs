@@ -120,7 +120,7 @@ impl ActivityEntry {
 }
 
 #[derive(Debug, Clone)]
-pub(crate) struct FolderState {
+pub struct FolderState {
     input: PathBuf,
     output: PathBuf,
     preset: String,
