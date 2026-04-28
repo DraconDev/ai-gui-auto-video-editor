@@ -17,6 +17,10 @@ pub mod thumbnail;
 pub mod utils;
 pub mod watermark;
 
+// gui module conditionally compiled to avoid circular dependency during crate compilation
+#[cfg(feature = "gui")]
+pub mod gui;
+
 pub use analyzer::FfmpegAnalyzer;
 pub use batch_processor::{
     FfmpegDurationGetter, ProcessingProgress, process_batch_dir, process_batch_dir_parallel,
@@ -30,5 +34,3 @@ pub use config::{
 pub use editor::FfmpegEditor;
 pub use hwaccel::HwAccel;
 pub use ml::{AutoReframeProcessor, FaceDetector, FrameExtractor, PersonSegmenter};
-
-pub mod gui;
