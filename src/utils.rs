@@ -1,54 +1,35 @@
-use anyhow::Result;
-use std::path::{Path, PathBuf};
-use walkdir::WalkDir;
+use anyhow::{Context, Result};
+use std::path::Path;
+use std::process::Command;
 
-pub fn find_video_files(dir: &Path) -> Result<Vec<PathBuf>> {
-    let mut video_files = Vec::new();
-    let supported_extensions = ["mp4", "mov", "avi", "mkv", "webm"];
-
-    for entry in WalkDir::new(dir).max_depth(5).into_iter().filter_map(|e| e.ok()) {
-        let path = entry.path();
-        if path.is_file()
-            && let Some(extension) = path.extension().and_then(|s| s.to_str())
-            && supported_extensions.contains(&extension.to_lowercase().as_str())
-        {
-            video_files.push(path.to_path_buf());
-        }
-    }
-    Ok(video_files)
+pub fn check_ffmpeg() -> Result<()> {
+    Command::new("ffmpeg")
+        .arg("-version")
+        .output()
+        .context("FFmpeg not found. Please install FFmpeg: https://ffmpeg.org/download.html")?;
+    Ok(())
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use std::fs;
-    use tempfile::tempdir;
+pub fn check_ffprobe() -> Result<()> {
+    Command::new("ffprobe")
+        .arg("-version")
+        .output()
+        .context(
+            "FFprobe not found. Please install FFmpeg (which includes ffprobe): https://ffmpeg.org/download.html",
+        )?;
+    Ok(())
+}
 
-    #[test]
-    fn test_find_video_files() -> Result<()> {
-        let dir = tempdir()?;
-        let video1 = dir.path().join("video1.mp4");
-        let video2 = dir.path().join("subdir/video2.mov");
-        let text_file = dir.path().join("text.txt");
-        let unsupported_video = dir.path().join("unsupported.ogg");
+pub fn check_ffmpeg_available() -> bool {
+    std::process::Command::new("ffmpeg")
+        .arg("-version")
+        .output()
+        .is_ok()
+}
 
-        fs::write(&video1, "dummy video content")?;
-        fs::create_dir(dir.path().join("subdir"))?;
-        fs::write(&video2, "dummy video content")?;
-        fs::write(&text_file, "dummy text content")?;
-        fs::write(&unsupported_video, "dummy video content")?;
-
-        let video3 = dir.path().join("video3.mkv");
-        fs::write(&video3, "dummy video content")?;
-
-        let found_files = find_video_files(dir.path())?;
-        assert_eq!(found_files.len(), 3);
-        assert!(found_files.contains(&video1));
-        assert!(found_files.contains(&video2));
-        assert!(found_files.contains(&video3));
-        assert!(!found_files.contains(&text_file));
-        assert!(!found_files.contains(&unsupported_video));
-
-        Ok(())
-    }
+pub fn check_ffprobe_available() -> bool {
+    std::process::Command::new("ffprobe")
+        .arg("-version")
+        .output()
+        .is_ok()
 }
