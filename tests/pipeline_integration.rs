@@ -690,7 +690,7 @@ fn test_folder_settings_silences_config_structure() {
     if let Some(false) = remove_silence2 {
         config2.silence.mode = ai_vid_editor::config::SilenceMode::Cut;
     }
-    // true means don't cut, so mode stays as default (Keep)
+    // true means don't cut, so mode stays as default (Cut)
     assert_eq!(config2.silence.mode, ai_vid_editor::config::SilenceMode::Cut);
 }
 
