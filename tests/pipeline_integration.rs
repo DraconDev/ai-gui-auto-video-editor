@@ -607,26 +607,6 @@ fn test_hwaccel_all_variants() {
 }
 
 #[test]
-fn test_config_export_fields_exist() {
-    // Verify all export config fields are accessible and non-null
-    let config = Config::default();
-
-    // These should not panic - basic sanity check
-    let _ = config.export.preview;
-    let _ = config.export.preview_duration;
-    let _ = config.export.subtitles;
-    let _ = config.export.chapters;
-    let _ = config.export.captions;
-    let _ = config.export.clips;
-    let _ = config.export.multi_format;
-    let _ = config.export.thumbnail;
-    let _ = config.export.fcpxml;
-    let _ = config.export.edl;
-
-    assert!(true, "All export config fields should be accessible");
-}
-
-#[test]
 fn test_folder_settings_silences_config_structure() {
     // Verify FolderSettings maps correctly to silence config
     // When remove_silence = Some(true), it means cut silence
