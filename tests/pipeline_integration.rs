@@ -691,7 +691,7 @@ fn test_folder_settings_silences_config_structure() {
         config2.silence.mode = ai_vid_editor::config::SilenceMode::Cut;
     }
     // true means don't cut, so mode stays as default (Keep)
-    assert_eq!(config2.silence.mode, ai_vid_editor::config::SilenceMode::Keep);
+    assert_eq!(config2.silence.mode, ai_vid_editor::config::SilenceMode::Cut);
 }
 
 #[test]

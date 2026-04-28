@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock for video processing features
+Updated test assertion to verify SilenceMode::Cut behavior in folder settings configuration
 
 ## Completed
-- [x] Updated dependency versions in Cargo.lock to reflect recent changes in video processing features
+- [x] Fixed test assertion to correctly verify SilenceMode::Cut behavior when processing folder settings
 ```
