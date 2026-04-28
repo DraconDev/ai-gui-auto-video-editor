@@ -9,6 +9,26 @@ use tracing::{info, warn};
 
 const TRIM_SEGMENTS_PER_CHUNK: usize = 48;
 
+struct ScopedTempFile {
+    path: PathBuf,
+}
+
+impl ScopedTempFile {
+    fn new(prefix: &str, ext: &str) -> Self {
+        let path = std::env::temp_dir().join(format!("{}-{}.{}", prefix, std::process::id(), ext));
+        Self { path }
+    }
+    fn path(&self) -> &Path {
+        &self.path
+    }
+}
+
+impl Drop for ScopedTempFile {
+    fn drop(&mut self) {
+        let _ = fs::remove_file(&self.path);
+    }
+}
+
 /// Calculate segments to keep after processing silences
 ///
 /// # Arguments
@@ -369,17 +389,11 @@ impl VideoEditor for FfmpegEditor {
     }
 
     fn stabilize(&self, input: &Path, output: &Path) -> Result<()> {
-        // Video stabilization using vidstab filter (two-pass)
-        // Pass 1: Analyze video motion
-        // Pass 2: Apply stabilization
-
         let input_str = input.to_str().context("invalid input path")?;
         let output_str = output.to_str().context("invalid output path")?;
-        let trf_file =
-            std::env::temp_dir().join(format!("ai-vid-editor-vidstab-{}.trf", std::process::id()));
-        let escaped_trf_path = crate::utils::escape_ffmpeg_filter_path(&trf_file);
+        let trf_file = ScopedTempFile::new("ai-vid-editor-vidstab", "trf");
+        let escaped_trf_path = crate::utils::escape_ffmpeg_filter_path(trf_file.path());
 
-        // Pass 1: Detect motion and generate transforms
         let status1 = Command::new("ffmpeg")
             .args([
                 "-i",
@@ -397,11 +411,9 @@ impl VideoEditor for FfmpegEditor {
             .context("failed to execute ffmpeg (stabilize pass 1)")?;
 
         if !status1.success() {
-            let _ = std::fs::remove_file(&trf_file);
             anyhow::bail!("ffmpeg stabilize pass 1 failed with status: {}", status1);
         }
 
-        // Pass 2: Apply stabilization
         let status2 = Command::new("ffmpeg")
             .args([
                 "-i",
@@ -418,9 +430,6 @@ impl VideoEditor for FfmpegEditor {
             ])
             .status()
             .context("failed to execute ffmpeg (stabilize pass 2)")?;
-
-        // Cleanup temp file
-        let _ = std::fs::remove_file(&trf_file);
 
         if !status2.success() {
             anyhow::bail!("ffmpeg stabilize pass 2 failed with status: {}", status2);

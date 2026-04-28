@@ -1,9 +1,9 @@
 # Project State
 
 ## Current Focus
-Improved temporary directory handling in thumbnail generation and removed redundant cleanup code
+Improved temporary file handling for video stabilization with scoped cleanup
 
 ## Completed
-- [x] Replaced manual temp directory management with `TempDir` utility in thumbnail generation
-- [x] Removed redundant temp directory cleanup code in both files
-- [x] Simplified frame extraction path handling in thumbnail generation
+- [x] Added `ScopedTempFile` struct to manage temporary files with automatic cleanup
+- [x] Refactored video stabilization to use scoped temporary file instead of manual cleanup
+- [x] Removed redundant temporary file cleanup code in stabilization process
