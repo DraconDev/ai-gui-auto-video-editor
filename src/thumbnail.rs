@@ -234,11 +234,13 @@ mod tests {
     fn test_parse_entropy() {
         // Standard ffmpeg entropy output - entropy must be the LAST field on its line
         let output = "[Parsed_showinfo_0] n:0.123456 q:0.123456\n[Parsed_showinfo_0] entropy:7.23456";
-        assert_eq!(parse_entropy(output), Some(7.23456));
+        let result = parse_entropy(output);
+        assert_eq!(result, Some(7.23456), "first test failed, got {:?}", result);
 
         // Multiple lines, last one wins
         let output2 = "frame:1\nentropy:5.0\nframe:2\nentropy:8.5";
-        assert_eq!(parse_entropy(output2), Some(8.5));
+        let result2 = parse_entropy(output2);
+        assert_eq!(result2, Some(8.5), "second test failed, got {:?}", result2);
 
         // No entropy line
         let output3 = "frame:1 time:0.0";
@@ -254,5 +256,9 @@ mod tests {
         // Invalid entropy value
         let output5 = "entropy:notanumber";
         assert_eq!(parse_entropy(output5), None);
+
+        // entropy in middle of line should not match
+        let output6 = "something entropy:5.0 more";
+        assert_eq!(parse_entropy(output6), None);
     }
 }
