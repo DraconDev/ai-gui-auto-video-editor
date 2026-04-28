@@ -1,0 +1,350 @@
+mod common;
+
+use ai_vid_editor::config::{Config, FolderSettings, Preset, SilenceMode, VideoResolution};
+use ai_vid_editor::gui::FolderState;
+
+fn build_folder_config(config: &Config, folder: &FolderState) -> Config {
+    let mut merged = if let Some(preset) = Preset::from_str(&folder.preset) {
+        preset.to_config().merge(config.clone())
+    } else {
+        config.clone()
+    };
+
+    if let Some(remove_silence) = folder.settings.remove_silence
+        && remove_silence
+    {
+        merged.silence.mode = SilenceMode::Cut;
+        merged.silence.min_duration = f32::MAX;
+    }
+    if let Some(threshold) = folder.settings.silence_threshold_db {
+        merged.silence.threshold_db = threshold;
+    }
+    if let Some(enhance_audio) = folder.settings.enhance_audio {
+        merged.audio.enhance = enhance_audio;
+    }
+    if let Some(target_lufs) = folder.settings.target_lufs {
+        merged.audio.target_lufs = target_lufs;
+    }
+    if let Some(stabilize) = folder.settings.stabilize {
+        merged.video.stabilize = stabilize;
+    }
+    if let Some(color_correct) = folder.settings.color_correct {
+        merged.video.color_correct = color_correct;
+    }
+    if let Some(reframe) = folder.settings.reframe {
+        merged.video.reframe = reframe;
+    }
+    if let Some(blur_background) = folder.settings.blur_background {
+        merged.video.blur_background = blur_background;
+    }
+    if let Some(hw_accel) = folder.settings.hw_accel {
+        merged.video.hw_accel = hw_accel;
+    }
+    if let Some(target_resolution) = folder.settings.target_resolution {
+        merged.video.target_resolution = target_resolution;
+    }
+    if let Some(noise_reduction) = folder.settings.noise_reduction {
+        merged.audio.noise_reduction = noise_reduction;
+    }
+    if let Some(preview) = folder.settings.preview {
+        merged.export.preview = preview;
+    }
+    if let Some(scene_detect) = folder.settings.scene_detect {
+        merged.silence.scene_detect = scene_detect;
+    }
+    if let Some(multi_format) = folder.settings.multi_format {
+        merged.export.multi_format = multi_format;
+    }
+    if let Some(subtitles) = folder.settings.subtitles {
+        merged.export.subtitles = subtitles;
+    }
+    if let Some(chapters) = folder.settings.chapters {
+        merged.export.chapters = chapters;
+    }
+    if let Some(captions) = folder.settings.captions {
+        merged.export.captions = captions;
+    }
+    if let Some(clips) = folder.settings.clips {
+        merged.export.clips = clips;
+    }
+
+    merged
+}
+
+fn make_folder_state() -> FolderState {
+    FolderState {
+        input: std::path::PathBuf::from("/input"),
+        output: std::path::PathBuf::from("/output"),
+        preset: String::new(),
+        enabled: true,
+        settings: FolderSettings::default(),
+    }
+}
+
+#[test]
+fn test_build_folder_config_no_overrides() {
+    let config = Config::default();
+    let mut folder = make_folder_state();
+    folder.preset = String::new();
+
+    let result = build_folder_config(&config, &folder);
+    assert_eq!(result.silence.threshold_db, config.silence.threshold_db);
+    assert_eq!(result.audio.enhance, config.audio.enhance);
+}
+
+#[test]
+fn test_build_folder_config_youtube_preset() {
+    let config = Config::default();
+    let mut folder = make_folder_state();
+    folder.preset = "youtube".to_string();
+
+    let result = build_folder_config(&config, &folder);
+    assert_eq!(result.silence.mode, SilenceMode::Cut);
+    assert_eq!(result.audio.enhance, true);
+    assert_eq!(result.export.chapters, true);
+    assert_eq!(result.video.target_resolution, VideoResolution::Fhd1080p);
+}
+
+#[test]
+fn test_build_folder_config_shorts_preset() {
+    let config = Config::default();
+    let mut folder = make_folder_state();
+    folder.preset = "shorts".to_string();
+
+    let result = build_folder_config(&config, &folder);
+    assert_eq!(result.silence.mode, SilenceMode::Speedup);
+    assert_eq!(result.silence.speedup_factor, 3.0);
+    assert_eq!(result.video.reframe, true);
+    assert_eq!(result.video.target_resolution, VideoResolution::Vertical1080p);
+    assert_eq!(result.export.clips, true);
+}
+
+#[test]
+fn test_build_folder_config_remove_silence_true() {
+    let config = Config::default();
+    let mut folder = make_folder_state();
+    folder.settings.remove_silence = Some(true);
+
+    let result = build_folder_config(&config, &folder);
+    assert_eq!(result.silence.mode, SilenceMode::Cut);
+    assert_eq!(result.silence.min_duration, f32::MAX);
+}
+
+#[test]
+fn test_build_folder_config_remove_silence_false() {
+    let config = Config::default();
+    let mut folder = make_folder_state();
+    folder.settings.remove_silence = Some(false);
+
+    let result = build_folder_config(&config, &folder);
+    assert_eq!(result.silence.mode, SilenceMode::Cut);
+    assert_eq!(result.silence.min_duration, config.silence.min_duration);
+}
+
+#[test]
+fn test_build_folder_config_threshold_override() {
+    let mut config = Config::default();
+    config.silence.threshold_db = -30.0;
+
+    let mut folder = make_folder_state();
+    folder.settings.silence_threshold_db = Some(-45.0);
+
+    let result = build_folder_config(&config, &folder);
+    assert_eq!(result.silence.threshold_db, -45.0);
+}
+
+#[test]
+fn test_build_folder_config_enhance_audio_override() {
+    let let mut folder = make_folder_state();
+    folder.settings.enhance_audio = Some(false);
+
+    let result = build_folder_config(&Config::default(), &folder);
+    assert_eq!(result.audio.enhance, false);
+}
+
+#[test]
+fn test_build_folder_config_target_lufs_override() {
+    let mut folder = make_folder_state();
+    folder.settings.target_lufs = Some(-14.0);
+
+    let result = build_folder_config(&Config::default(), &folder);
+    assert_eq!(result.audio.target_lufs, -14.0);
+}
+
+#[test]
+fn test_build_folder_config_stabilize_override() {
+    let mut folder = make_folder_state();
+    folder.settings.stabilize = Some(true);
+
+    let result = build_folder_config(&Config::default(), &folder);
+    assert_eq!(result.video.stabilize, true);
+}
+
+#[test]
+fn test_build_folder_config_color_correct_override() {
+    let mut folder = make_folder_state();
+    folder.settings.color_correct = Some(true);
+
+    let result = build_folder_config(&Config::default(), &folder);
+    assert_eq!(result.video.color_correct, true);
+}
+
+#[test]
+fn test_build_folder_config_reframe_override() {
+    let mut folder = make_folder_state();
+    folder.settings.reframe = Some(true);
+
+    let result = build_folder_config(&Config::default(), &folder);
+    assert_eq!(result.video.reframe, true);
+}
+
+#[test]
+fn test_build_folder_config_blur_background_override() {
+    let mut folder = make_folder_state();
+    folder.settings.blur_background = Some(true);
+
+    let result = build_folder_config(&Config::default(), &folder);
+    assert_eq!(result.video.blur_background, true);
+}
+
+#[test]
+fn test_build_folder_config_noise_reduction_override() {
+    let mut folder = make_folder_state();
+    folder.settings.noise_reduction = Some(true);
+
+    let result = build_folder_config(&Config::default(), &folder);
+    assert_eq!(result.audio.noise_reduction, true);
+}
+
+#[test]
+fn test_build_folder_config_preview_override() {
+    let mut folder = make_folder_state();
+    folder.settings.preview = Some(true);
+
+    let result = build_folder_config(&Config::default(), &folder);
+    assert_eq!(result.export.preview, true);
+}
+
+#[test]
+fn test_build_folder_config_scene_detect_override() {
+    let mut folder = make_folder_state();
+    folder.settings.scene_detect = Some(true);
+
+    let result = build_folder_config(&Config::default(), &folder);
+    assert_eq!(result.silence.scene_detect, true);
+}
+
+#[test]
+fn test_build_folder_config_multi_format_override() {
+    let let mut folder = make_folder_state();
+    folder.settings.multi_format = Some(true);
+
+    let result = build_folder_config(&Config::default(), &folder);
+    assert_eq!(result.export.multi_format, true);
+}
+
+#[test]
+fn test_build_folder_config_subtitles_override() {
+    let mut folder = make_folder_state();
+    folder.settings.subtitles = Some(true);
+
+    let result = build_folder_config(&Config::default(), &folder);
+    assert_eq!(result.export.subtitles, true);
+}
+
+#[test]
+fn test_build_folder_config_chapters_override() {
+    let mut folder = make_folder_state();
+    folder.settings.chapters = Some(true);
+
+    let result = build_folder_config(&Config::default(), &folder);
+    assert_eq!(result.export.chapters, true);
+}
+
+#[test]
+fn test_build_folder_config_captions_override() {
+    let mut folder = make_folder_state();
+    folder.settings.captions = Some(true);
+
+    let result = build_folder_config(&Config::default(), &folder);
+    assert_eq!(result.export.captions, true);
+}
+
+#[test]
+fn test_build_folder_config_clips_override() {
+    let mut folder = make_folder_state();
+    folder.settings.clips = Some(true);
+
+    let result = build_folder_config(&Config::default(), &folder);
+    assert_eq!(result.export.clips, true);
+}
+
+#[test]
+fn test_build_folder_config_unknown_preset_falls_back() {
+    let let mut config = Config::default();
+    config.audio.enhance = true;
+
+    let mut folder = make_folder_state();
+    folder.preset = "nonexistent".to_string();
+    folder.settings.enhance_audio = Some(false);
+
+    let result = build_folder_config(&config, &folder);
+    assert_eq!(result.audio.enhance, false);
+}
+
+#[test]
+fn test_build_folder_config_all_settings_at_once() {
+    let let mut folder = make_folder_state();
+    folder.preset = "youtube".to_string();
+    folder.settings.enhance_audio = Some(false);
+    folder.settings.remove_silence = Some(true);
+    folder.settings.silence_threshold_db = Some(-50.0);
+    folder.settings.target_lufs = Some(-15.0);
+    folder.settings.stabilize = Some(true);
+    folder.settings.color_correct = Some(true);
+    folder.settings.reframe = Some(true);
+    folder.settings.blur_background = Some(true);
+    folder.settings.noise_reduction = Some(true);
+    folder.settings.preview = Some(true);
+    folder.settings.scene_detect = Some(true);
+    folder.settings.multi_format = Some(true);
+    folder.settings.subtitles = Some(true);
+    folder.settings.chapters = Some(true);
+    folder.settings.captions = Some(true);
+    folder.settings.clips = Some(true);
+
+    let result = build_folder_config(&Config::default(), &folder);
+
+    assert_eq!(result.silence.mode, SilenceMode::Cut);
+    assert_eq!(result.silence.min_duration, f32::MAX);
+    assert_eq!(result.silence.threshold_db, -50.0);
+    assert_eq!(result.audio.enhance, false);
+    assert_eq!(result.audio.target_lufs, -15.0);
+    assert_eq!(result.audio.noise_reduction, true);
+    assert_eq!(result.video.stabilize, true);
+    assert_eq!(result.video.color_correct, true);
+    assert_eq!(result.video.reframe, true);
+    assert_eq!(result.video.blur_background, true);
+    assert_eq!(result.export.preview, true);
+    assert_eq!(result.silence.scene_detect, true);
+    assert_eq!(result.export.multi_format, true);
+    assert_eq!(result.export.subtitles, true);
+    assert_eq!(result.export.chapters, true);
+    assert_eq!(result.export.captions, true);
+    assert_eq!(result.export.clips, true);
+    assert_eq!(result.video.target_resolution, VideoResolution::Vertical1080p);
+}
+
+#[test]
+fn test_build_folder_config_preset_then_folder_overrides() {
+    let config = Config::default();
+    let mut folder = make_folder_state();
+    folder.preset = "shorts".to_string();
+    folder.settings.enhance_audio = Some(false);
+    folder.settings.remove_silence = Some(false);
+
+    let result = build_folder_config(&config, &folder);
+
+    assert_eq!(result.silence.mode, SilenceMode::Speedup);
+    assert_eq!(result.audio.enhance, false);
+}

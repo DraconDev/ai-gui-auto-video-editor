@@ -1,7 +1,11 @@
 # Project State
 
 ## Current Focus
-Removed redundant test module from `stt_analyzer.rs`
+Added comprehensive test coverage for folder configuration processing in GUI workflows
 
 ## Completed
-- [x] Removed unused test module to reduce code clutter and improve maintainability
+- [x] Added `build_folder_config` function to merge folder-specific settings with global configuration
+- [x] Implemented test cases for all preset configurations (youtube, shorts)
+- [x] Added validation tests for individual setting overrides (silence removal, audio enhancement, etc.)
+- [x] Created test harness for folder state construction and configuration merging
+- [x] Added comprehensive assertions for all configurable parameters in video processing pipeline
