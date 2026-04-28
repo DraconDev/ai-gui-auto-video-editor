@@ -1368,6 +1368,143 @@ enhance = false
     }
 
     #[test]
+    fn test_validate_positive_threshold_fails() {
+        let mut config = Config::default();
+        config.silence.threshold_db = 1.0;
+        let result = config.validate();
+        assert!(result.is_err());
+        assert!(result.unwrap_err().to_string().contains("threshold_db"));
+    }
+
+    #[test]
+    fn test_validate_negative_speedup_fails() {
+        let mut config = Config::default();
+        config.silence.speedup_factor = 0.0;
+        let result = config.validate();
+        assert!(result.is_err());
+        assert!(result.unwrap_err().to_string().contains("speedup_factor"));
+    }
+
+    #[test]
+    fn test_validate_zero_speedup_fails() {
+        let mut config = Config::default();
+        config.silence.speedup_factor = -1.0;
+        let result = config.validate();
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_validate_duck_volume_negative_fails() {
+        let mut config = Config::default();
+        config.audio.duck_volume = -0.1;
+        let result = config.validate();
+        assert!(result.is_err());
+        assert!(result.unwrap_err().to_string().contains("duck_volume"));
+    }
+
+    #[test]
+    fn test_validate_duck_volume_over_one_fails() {
+        let mut config = Config::default();
+        config.audio.duck_volume = 1.5;
+        let result = config.validate();
+        assert!(result.is_err());
+        assert!(result.unwrap_err().to_string().contains("duck_volume"));
+    }
+
+    #[test]
+    fn test_validate_duck_volume_boundary_zero_ok() {
+        let mut config = Config::default();
+        config.audio.duck_volume = 0.0;
+        assert!(config.validate().is_ok());
+    }
+
+    #[test]
+    fn test_validate_duck_volume_boundary_one_ok() {
+        let mut config = Config::default();
+        config.audio.duck_volume = 1.0;
+        assert!(config.validate().is_ok());
+    }
+
+    #[test]
+    fn test_validate_clip_duration_order_fails() {
+        let mut config = Config::default();
+        config.export.clip_min_duration = 30.0;
+        config.export.clip_max_duration = 10.0;
+        let result = config.validate();
+        assert!(result.is_err());
+        assert!(result.unwrap_err().to_string().contains("clip_min_duration"));
+    }
+
+    #[test]
+    fn test_validate_clip_duration_equal_ok() {
+        let mut config = Config::default();
+        config.export.clip_min_duration = 10.0;
+        config.export.clip_max_duration = 10.0;
+        assert!(config.validate().is_ok());
+    }
+
+    #[test]
+    fn test_validate_watch_interval_zero_fails() {
+        let mut config = Config::default();
+        config.watch.interval = 0;
+        let result = config.validate();
+        assert!(result.is_err());
+        assert!(result.unwrap_err().to_string().contains("watch.interval"));
+    }
+
+    #[test]
+    fn test_validate_watch_interval_one_ok() {
+        let mut config = Config::default();
+        config.watch.interval = 1;
+        assert!(config.validate().is_ok());
+    }
+
+    #[test]
+    fn test_validate_min_duration_negative_fails() {
+        let mut config = Config::default();
+        config.silence.min_duration = -0.1;
+        let result = config.validate();
+        assert!(result.is_err());
+        assert!(result.unwrap_err().to_string().contains("min_duration"));
+    }
+
+    #[test]
+    fn test_validate_padding_negative_fails() {
+        let mut config = Config::default();
+        config.silence.padding = -0.1;
+        let result = config.validate();
+        assert!(result.is_err());
+        assert!(result.unwrap_err().to_string().contains("padding"));
+    }
+
+    #[test]
+    fn test_validate_min_silence_for_speedup_negative_fails() {
+        let mut config = Config::default();
+        config.silence.min_silence_for_speedup = -0.1;
+        let result = config.validate();
+        assert!(result.is_err());
+        assert!(result.unwrap_err().to_string().contains("min_silence_for_speedup"));
+    }
+
+    #[test]
+    fn test_validate_clip_min_duration_negative_fails() {
+        let mut config = Config::default();
+        config.export.clip_min_duration = -1.0;
+        let result = config.validate();
+        assert!(result.is_err());
+        assert!(result.unwrap_err().to_string().contains("clip_min_duration"));
+    }
+
+    #[test]
+    fn test_validate_clip_max_duration_negative_fails() {
+        let mut config = Config::default();
+        config.export.clip_max_duration = -1.0;
+        let result = config.validate();
+        assert!(result.is_err());
+        assert!(result.unwrap_err().to_string().contains("clip_max_duration"));
+    }
+
+    #[test]
     fn test_preset_from_str() {
         assert_eq!(Preset::from_str("youtube"), Some(Preset::Youtube));
         assert_eq!(Preset::from_str("SHORTS"), Some(Preset::Shorts));
