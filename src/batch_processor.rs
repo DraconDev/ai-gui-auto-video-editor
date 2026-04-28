@@ -611,27 +611,31 @@ fn export_additional_files(
     };
 
     if config.export.subtitles {
-        let srt_path = format!("{}.srt", base_path.display());
-        debug!(path = %srt_path, "Exporting SRT subtitles");
+        let srt_path = base_path.with_extension("srt");
+        debug!(path = %srt_path.display(), "Exporting SRT subtitles");
         if let Some(ref t) = transcript {
-            exporter::export_srt(t, Path::new(&srt_path))?;
+            exporter::export_srt(t, &srt_path)?;
         } else {
             fs::write(&srt_path, "# Transcription failed\n")?;
         }
     }
 
     if config.export.chapters {
-        let chapters_path = format!("{}.chapters.txt", base_path.display());
-        debug!(path = %chapters_path, "Exporting YouTube chapters");
+        let chapters_path = {
+            let mut p = base_path.as_os_str().to_os_string();
+            p.push(".chapters.txt");
+            PathBuf::from(p)
+        };
+        debug!(path = %chapters_path.display(), "Exporting YouTube chapters");
         if let Some(ref t) = transcript {
-            exporter::export_youtube_chapters(t, Path::new(&chapters_path))?;
+            exporter::export_youtube_chapters(t, &chapters_path)?;
         } else {
             fs::write(&chapters_path, "00:00 Intro\n")?;
         }
     }
 
     if config.export.captions {
-        let ass_path = PathBuf::from(format!("{}.ass", base_path.display()));
+        let ass_path = base_path.with_extension("ass");
         debug!(path = %ass_path.display(), "Generating styled captions");
         if let Some(ref t) = transcript {
             if let Err(e) = generate_styled_captions(t, &ass_path) {
@@ -640,7 +644,7 @@ fn export_additional_files(
                 info!("Burning captions into video");
                 let captioned_path = output_file.with_extension("captioned.mp4");
                 burn_subtitles_into_video(output_file, &ass_path, &captioned_path)?;
-                std::fs::rename(&captioned_path, output_file)?;
+                atomic_replace(&captioned_path, output_file)?;
             }
         }
     }

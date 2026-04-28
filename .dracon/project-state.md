@@ -1,8 +1,10 @@
 # Project State
 
 ## Current Focus
-Added atomic file replacement utility for cross-platform file operations
+Improved file path handling and atomic file operations in batch processing
 
 ## Completed
-- [x] Implemented `atomic_replace` function to handle file replacements safely across platforms, particularly addressing Windows-specific file locking issues
-- [x] Added platform-specific handling for Windows to ensure proper file replacement behavior
+- [x] Refactored file path construction to use `with_extension()` for consistency
+- [x] Updated SRT and chapters file exports to use proper path handling
+- [x] Replaced direct file rename with atomic replacement for cross-platform safety
+- [x] Improved error handling for caption generation and burning processes
