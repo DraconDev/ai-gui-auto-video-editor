@@ -842,33 +842,53 @@ impl Config {
     }
 
     /// Merge another config into this one (other takes precedence).
-    /// Scalar and enum fields are always taken from `other` if set to a non-default
-    /// value, or if they are explicit enum variants (which always override).
+    /// Scalar fields are taken from `other` only if they differ from their defaults.
+    /// Enum fields are always taken from `other` (enum variants are always explicit).
     /// Vec fields and Option fields are taken from `other` if present / non-empty.
     #[must_use]
     pub fn merge(mut self, other: Self) -> Self {
-        self.silence.threshold_db = other.silence.threshold_db;
-        self.silence.min_duration = other.silence.min_duration;
-        self.silence.padding = other.silence.padding;
+        let default = Self::default();
+
+        if other.silence.threshold_db != default.silence.threshold_db {
+            self.silence.threshold_db = other.silence.threshold_db;
+        }
+        if other.silence.min_duration != default.silence.min_duration {
+            self.silence.min_duration = other.silence.min_duration;
+        }
+        if other.silence.padding != default.silence.padding {
+            self.silence.padding = other.silence.padding;
+        }
         self.silence.mode = other.silence.mode;
-        self.silence.speedup_factor = other.silence.speedup_factor;
-        self.silence.min_silence_for_speedup = other.silence.min_silence_for_speedup;
+        if other.silence.speedup_factor != default.silence.speedup_factor {
+            self.silence.speedup_factor = other.silence.speedup_factor;
+        }
+        if other.silence.min_silence_for_speedup != default.silence.min_silence_for_speedup {
+            self.silence.min_silence_for_speedup = other.silence.min_silence_for_speedup;
+        }
         self.silence.scene_detect = other.silence.scene_detect;
-        self.silence.scene_threshold = other.silence.scene_threshold;
+        if other.silence.scene_threshold != default.silence.scene_threshold {
+            self.silence.scene_threshold = other.silence.scene_threshold;
+        }
 
         self.filler_words.enabled = other.filler_words.enabled;
         if !other.filler_words.words.is_empty() {
             self.filler_words.words = other.filler_words.words;
         }
-        self.filler_words.padding = other.filler_words.padding;
+        if other.filler_words.padding != default.filler_words.padding {
+            self.filler_words.padding = other.filler_words.padding;
+        }
 
         self.audio.enhance = other.audio.enhance;
         self.audio.noise_reduction = other.audio.noise_reduction;
-        self.audio.target_lufs = other.audio.target_lufs;
+        if other.audio.target_lufs != default.audio.target_lufs {
+            self.audio.target_lufs = other.audio.target_lufs;
+        }
         if other.audio.music_file.is_some() {
             self.audio.music_file = other.audio.music_file;
         }
-        self.audio.duck_volume = other.audio.duck_volume;
+        if other.audio.duck_volume != default.audio.duck_volume {
+            self.audio.duck_volume = other.audio.duck_volume;
+        }
 
         self.export.subtitles = other.export.subtitles;
         self.export.captions = other.export.captions;
@@ -879,15 +899,27 @@ impl Config {
         self.export.thumbnail = other.export.thumbnail;
         self.export.multi_format = other.export.multi_format;
         self.export.preview = other.export.preview;
-        self.export.preview_duration = other.export.preview_duration;
-        self.export.thumbnail_width = other.export.thumbnail_width;
-        self.export.thumbnail_height = other.export.thumbnail_height;
+        if other.export.preview_duration != default.export.preview_duration {
+            self.export.preview_duration = other.export.preview_duration;
+        }
+        if other.export.thumbnail_width != default.export.thumbnail_width {
+            self.export.thumbnail_width = other.export.thumbnail_width;
+        }
+        if other.export.thumbnail_height != default.export.thumbnail_height {
+            self.export.thumbnail_height = other.export.thumbnail_height;
+        }
         if !other.export.extra_resolutions.is_empty() {
             self.export.extra_resolutions = other.export.extra_resolutions.clone();
         }
-        self.export.clip_count = other.export.clip_count;
-        self.export.clip_min_duration = other.export.clip_min_duration;
-        self.export.clip_max_duration = other.export.clip_max_duration;
+        if other.export.clip_count != default.export.clip_count {
+            self.export.clip_count = other.export.clip_count;
+        }
+        if other.export.clip_min_duration != default.export.clip_min_duration {
+            self.export.clip_min_duration = other.export.clip_min_duration;
+        }
+        if other.export.clip_max_duration != default.export.clip_max_duration {
+            self.export.clip_max_duration = other.export.clip_max_duration;
+        }
 
         if other.paths.input.is_some() {
             self.paths.input = other.paths.input;
@@ -918,25 +950,37 @@ impl Config {
         }
 
         self.watch.enabled = other.watch.enabled;
-        self.watch.interval = other.watch.interval;
+        if other.watch.interval != default.watch.interval {
+            self.watch.interval = other.watch.interval;
+        }
 
         self.video.stabilize = other.video.stabilize;
         self.video.color_correct = other.video.color_correct;
         self.video.reframe = other.video.reframe;
         self.video.blur_background = other.video.blur_background;
-        self.video.target_resolution = other.video.target_resolution;
+        if other.video.target_resolution != default.video.target_resolution {
+            self.video.target_resolution = other.video.target_resolution;
+        }
         if other.video.hw_accel != crate::hwaccel::HwAccel::None {
             self.video.hw_accel = other.video.hw_accel;
         }
         if other.video.watermark.is_some() {
             self.video.watermark = other.video.watermark.clone();
         }
-        self.video.watermark_scale = other.video.watermark_scale;
-        self.video.watermark_position = other.video.watermark_position.clone();
+        if other.video.watermark_scale != default.video.watermark_scale {
+            self.video.watermark_scale = other.video.watermark_scale;
+        }
+        if other.video.watermark_position != default.video.watermark_position {
+            self.video.watermark_position = other.video.watermark_position.clone();
+        }
 
         self.processing.join_mode = other.processing.join_mode;
-        self.processing.join_after_count = other.processing.join_after_count;
-        self.processing.join_output_pattern = other.processing.join_output_pattern;
+        if other.processing.join_after_count != default.processing.join_after_count {
+            self.processing.join_after_count = other.processing.join_after_count;
+        }
+        if other.processing.join_output_pattern != default.processing.join_output_pattern {
+            self.processing.join_output_pattern = other.processing.join_output_pattern.clone();
+        }
 
         self
     }
