@@ -96,7 +96,7 @@ mod tests {
 
     #[test]
     fn test_is_video_file() {
-        let dir = tempdir()?;
+        let dir = tempdir().unwrap();
         let video = dir.path().join("test.mp4");
         let txt = dir.path().join("test.txt");
         fs::write(&video, "x").unwrap();
