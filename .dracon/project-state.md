@@ -1,9 +1,8 @@
 # Project State
 
 ## Current Focus
-Refactored preview path handling in integration test to avoid unused temporary directory
+Refactored preview path handling in integration test to use explicit test filename instead of derived path
 
 ## Completed
-- [x] Changed test to use a concrete dummy output path instead of creating an unused tempdir
-- [x] Simplified test setup by removing redundant directory creation
-- [x] Maintained same test functionality while reducing resource usage
+- [x] Changed preview path generation to use explicit "test_video_preview.mp4" filename instead of deriving from dummy output path
+- [x] Removed unused dummy output file creation in preview generation test
