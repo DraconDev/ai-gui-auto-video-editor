@@ -680,4 +680,141 @@ mod tests {
         assert!((cx - 0.25).abs() < 0.001);
         assert!((cy - 0.4).abs() < 0.001);
     }
-}
+
+    #[test]
+    fn test_face_box_center_at_origin() {
+        let face = FaceBox {
+            x: 0.0,
+            y: 0.0,
+            width: 0.2,
+            height: 0.2,
+            confidence: 0.5,
+        };
+        let (cx, cy) = face.center();
+        assert!((cx - 0.1).abs() < 0.001);
+        assert!((cy - 0.1).abs() < 0.001);
+    }
+
+    #[test]
+    fn test_segmentation_mask_get_valid() {
+        let mask = SegmentationMask {
+            data: vec![0.0, 0.5, 1.0, 0.25],
+            width: 2,
+            height: 2,
+        };
+        assert_eq!(mask.get(0, 0), 0.0);
+        assert_eq!(mask.get(1, 0), 0.5);
+        assert_eq!(mask.get(0, 1), 1.0);
+        assert_eq!(mask.get(1, 1), 0.25);
+    }
+
+    #[test]
+    fn test_segmentation_mask_get_out_of_bounds() {
+        let mask = SegmentationMask {
+            data: vec![0.5; 100],
+            width: 10,
+            height: 10,
+        };
+        assert_eq!(mask.get(99, 0), 0.0); // x too large
+        assert_eq!(mask.get(0, 99), 0.0); // y too large
+        assert_eq!(mask.get(5, 5), 0.5); // valid
+    }
+
+    #[test]
+    fn test_segmentation_mask_get_boundary() {
+        let mask = SegmentationMask {
+            data: vec![0.9; 100],
+            width: 10,
+            height: 10,
+        };
+        assert_eq!(mask.get(9, 9), 0.9); // last valid pixel
+        assert_eq!(mask.get(10, 9), 0.0); // just past edge
+    }
+
+    #[test]
+    fn test_crop_region_center_crop_16_9() {
+        let region = CropRegion::center_crop_9_16(16.0 / 9.0);
+        assert_eq!(region.x, 0.0);
+        assert_eq!(region.y, 0.0);
+        assert_eq!(region.width, 1.0);
+        assert_eq!(region.height, 1.0);
+    }
+
+    #[test]
+    fn test_crop_region_center_crop_4_3() {
+        // 4:3 video (aspect 1.33), target 9:16 (aspect 0.5625)
+        // crop_width = 0.5625 / 1.33 = 0.423
+        let region = CropRegion::center_crop_9_16(4.0 / 3.0);
+        assert!(region.x > 0.0 && region.x < 1.0);
+        assert_eq!(region.y, 0.0);
+        assert!(region.width > 0.0 && region.width < 1.0);
+        assert_eq!(region.height, 1.0);
+        // Centered horizontally
+        assert!((region.x - (1.0 - region.width) / 2.0).abs() < 0.001);
+    }
+
+    #[test]
+    fn test_crop_region_center_crop_wide() {
+        // Very wide video
+        let region = CropRegion::center_crop_9_16(21.0 / 9.0);
+        // crop_width = 0.5625 / 2.33 = 0.24, centered
+        assert!(region.x > 0.0);
+        assert!(region.width < 1.0);
+    }
+
+    #[test]
+    fn test_crop_region_center_crop_narrow() {
+        // Very narrow (tall) video
+        let region = CropRegion::center_crop_9_16(9.0 / 21.0);
+        // crop_width = 0.5625 / 0.428 = 1.31, clamped to 1.0
+        assert_eq!(region.width, 1.0);
+        assert_eq!(region.x, 0.0);
+    }
+
+    #[test]
+    fn test_crop_region_from_face_centered() {
+        let face = FaceBox {
+            x: 0.4,
+            y: 0.3,
+            width: 0.2,
+            height: 0.3,
+            confidence: 0.9,
+        };
+        let region = CropRegion::from_face(&face, 16.0 / 9.0);
+        // Face center X = 0.4 + 0.1 = 0.5
+        // crop should be centered on 0.5
+        assert!(region.x > 0.0 && region.x < 1.0);
+        assert_eq!(region.y, 0.0);
+        assert!(region.width > 0.0 && region.width < 1.0);
+        assert_eq!(region.height, 1.0);
+    }
+
+    #[test]
+    fn test_crop_region_from_face_edge_clamping() {
+        // Face at left edge
+        let face = FaceBox {
+            x: 0.0,
+            y: 0.0,
+            width: 0.3,
+            height: 0.5,
+            confidence: 0.8,
+        };
+        let region = CropRegion::from_face(&face, 16.0 / 9.0);
+        // crop_x should be clamped to 0.0 since face is at left edge
+        assert_eq!(region.x, 0.0);
+    }
+
+    #[test]
+    fn test_crop_region_from_face_right_edge() {
+        // Face at right edge
+        let face = FaceBox {
+            x: 0.7,
+            y: 0.0,
+            width: 0.3,
+            height: 0.5,
+            confidence: 0.8,
+        };
+        let region = CropRegion::from_face(&face, 16.0 / 9.0);
+        // crop_x would be > 1 - crop_width, so should be clamped
+        assert!(region.x < 1.0 - region.width);
+    }

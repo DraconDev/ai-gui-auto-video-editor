@@ -1,7 +1,11 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock for video processing features
+Added comprehensive tests for face detection and image processing utilities
 
 ## Completed
-- [x] Updated Cargo.lock with new dependency versions for video processing features
+- [x] Added tests for face box center calculations
+- [x] Added tests for segmentation mask boundary handling
+- [x] Added tests for center cropping with different aspect ratios
+- [x] Added tests for face-centered cropping with edge cases
+```
