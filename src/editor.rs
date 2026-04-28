@@ -1157,4 +1157,88 @@ mod tests {
         // Slow down below 0.5: chain multiple
         assert_eq!(chain_atempo_filters(0.25), "atempo=0.5,atempo=0.5");
     }
+
+    #[test]
+    fn test_calculate_keep_segments_boundary_at_min_silence() {
+        // Silence exactly at min_silence_for_speedup should be sped up
+        let silences = vec![
+            Segment {
+                start: 2.0,
+                end: 2.5, // exactly 0.5s silence
+            },
+        ];
+        let duration = 10.0;
+        let padding = 0.0;
+        let min_silence = 0.5;
+        let processed = calculate_keep_segments(
+            &silences,
+            duration,
+            padding,
+            SilenceMode::Speedup,
+            4.0,
+            min_silence,
+        );
+
+        // Silence at boundary should be included (>= not >)
+        assert_eq!(processed.len(), 2);
+        assert_eq!(processed[0].speed, 1.0);
+        assert_eq!(processed[1].speed, 4.0);
+        assert_eq!(processed[1].start, 2.0);
+        assert_eq!(processed[1].end, 2.5);
+    }
+
+    #[test]
+    fn test_calculate_keep_segments_just_below_min_silence() {
+        // Silence just below min_silence_for_speedup should be cut
+        let silences = vec![
+            Segment {
+                start: 2.0,
+                end: 2.49, // just below 0.5s
+            },
+        ];
+        let duration = 10.0;
+        let padding = 0.0;
+        let min_silence = 0.5;
+        let processed = calculate_keep_segments(
+            &silences,
+            duration,
+            padding,
+            SilenceMode::Speedup,
+            4.0,
+            min_silence,
+        );
+
+        // Short silence should be cut (skipped in speedup mode)
+        assert_eq!(processed.len(), 2);
+        assert_eq!(processed[0].speed, 1.0);
+        assert_eq!(processed[1].speed, 1.0);
+    }
+
+    #[test]
+    fn test_calculate_keep_segments_simple() {
+        use crate::analyzer::Segment;
+
+        let silences = vec![
+            Segment {
+                start: 2.0,
+                end: 3.0,
+            },
+        ];
+        let duration = 10.0;
+        let padding = 0.1;
+
+        let processed = calculate_keep_segments_simple(&silences, duration, padding);
+
+        // Should produce 2 segments (before and after silence)
+        assert_eq!(processed.len(), 2);
+        // Both should be normal speed in Cut mode
+        assert_eq!(processed[0].speed, 1.0);
+        assert_eq!(processed[1].speed, 1.0);
+        // First segment: 0.0 to 2.1 (2.0 + padding)
+        assert_eq!(processed[0].start, 0.0);
+        assert_eq!(processed[0].end, 2.1);
+        // Second segment: 2.9 (3.0 - padding) to 10.0
+        assert_eq!(processed[1].start, 2.9);
+        assert_eq!(processed[1].end, 10.0);
+    }
 }
