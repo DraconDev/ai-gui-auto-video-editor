@@ -1,84 +1,11 @@
 mod common;
 
-use ai_vid_editor::config::{Config, FolderSettings, Preset, SilenceMode, VideoResolution};
-use ai_vid_editor::gui::FolderState;
-
-fn build_folder_config(config: &Config, folder: &FolderState) -> Config {
-    let mut merged = if let Some(preset) = Preset::from_str(&folder.preset) {
-        preset.to_config().merge(config.clone())
-    } else {
-        config.clone()
-    };
-
-    if let Some(remove_silence) = folder.settings.remove_silence
-        && remove_silence
-    {
-        merged.silence.mode = SilenceMode::Cut;
-        merged.silence.min_duration = f32::MAX;
-    }
-    if let Some(threshold) = folder.settings.silence_threshold_db {
-        merged.silence.threshold_db = threshold;
-    }
-    if let Some(enhance_audio) = folder.settings.enhance_audio {
-        merged.audio.enhance = enhance_audio;
-    }
-    if let Some(target_lufs) = folder.settings.target_lufs {
-        merged.audio.target_lufs = target_lufs;
-    }
-    if let Some(stabilize) = folder.settings.stabilize {
-        merged.video.stabilize = stabilize;
-    }
-    if let Some(color_correct) = folder.settings.color_correct {
-        merged.video.color_correct = color_correct;
-    }
-    if let Some(reframe) = folder.settings.reframe {
-        merged.video.reframe = reframe;
-    }
-    if let Some(blur_background) = folder.settings.blur_background {
-        merged.video.blur_background = blur_background;
-    }
-    if let Some(hw_accel) = folder.settings.hw_accel {
-        merged.video.hw_accel = hw_accel;
-    }
-    if let Some(target_resolution) = folder.settings.target_resolution {
-        merged.video.target_resolution = target_resolution;
-    }
-    if let Some(noise_reduction) = folder.settings.noise_reduction {
-        merged.audio.noise_reduction = noise_reduction;
-    }
-    if let Some(preview) = folder.settings.preview {
-        merged.export.preview = preview;
-    }
-    if let Some(scene_detect) = folder.settings.scene_detect {
-        merged.silence.scene_detect = scene_detect;
-    }
-    if let Some(multi_format) = folder.settings.multi_format {
-        merged.export.multi_format = multi_format;
-    }
-    if let Some(subtitles) = folder.settings.subtitles {
-        merged.export.subtitles = subtitles;
-    }
-    if let Some(chapters) = folder.settings.chapters {
-        merged.export.chapters = chapters;
-    }
-    if let Some(captions) = folder.settings.captions {
-        merged.export.captions = captions;
-    }
-    if let Some(clips) = folder.settings.clips {
-        merged.export.clips = clips;
-    }
-
-    merged
-}
+use ai_vid_editor::config::{Config, Preset, SilenceMode, VideoResolution};
+use ai_vid_editor::gui::processing::build_folder_config;
+use ai_vid_editor::gui::processing::make_test_folder_state;
 
 fn make_folder_state() -> FolderState {
-    FolderState {
-        input: std::path::PathBuf::from("/input"),
-        output: std::path::PathBuf::from("/output"),
-        preset: String::new(),
-        enabled: true,
-        settings: FolderSettings::default(),
-    }
+    make_test_folder_state()
 }
 
 #[test]
