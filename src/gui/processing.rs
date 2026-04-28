@@ -330,6 +330,7 @@ fn is_video_file(path: &Path) -> bool {
             .unwrap_or(false)
 }
 
+#[allow(dead_code)]
 pub fn make_test_folder_state() -> FolderState {
     FolderState {
         input: std::path::PathBuf::from("/input"),

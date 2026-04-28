@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Dependency version updates in Cargo.lock for video processing features
+Added a test utility function for folder state management in video processing
 
 ## Completed
-- [x] Updated dependency versions in Cargo.lock to ensure compatibility with recent video processing feature implementations
-```
+- [x] Added `make_test_folder_state()` function to create mock folder states for testing
+- [x] Marked function as `#[allow(dead_code)]` since it's a test utility
