@@ -453,7 +453,10 @@ impl AppState {
     }
 
     fn auto_save_config(&mut self) {
-        self.config.paths.watch_folders = self.folders.iter().map(|f| f.clone().into()).collect();
+        self.config.paths.watch_folders = self.folders.iter().map(|f| {
+            let st: FolderState = f.clone();
+            WatchFolder::from(st)
+        }).collect();
 
         let path = if let Some(ref p) = self.config_path {
             Some(p.clone())
