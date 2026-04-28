@@ -14,7 +14,7 @@ use crate::editor::calculate_keep_segments;
 use crate::exporter;
 use crate::progress::BatchProgress;
 use crate::stt_analyzer::{CandleSttAnalyzer, TranscriptSegment, VideoSttAnalyzer};
-use crate::utils::find_video_files;
+use crate::utils::{find_video_files, is_video_file, VIDEO_EXTENSIONS};
 
 /// RAII guard for cleaning up temporary video files on drop.
 /// Tracks intermediate files and removes them when the guard goes out of scope.

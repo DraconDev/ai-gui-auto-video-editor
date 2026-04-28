@@ -699,13 +699,12 @@ fn run_watch_mode(
     let mut processed: HashSet<PathBuf> = HashSet::new();
 
     // Initial scan - process existing files
-    let video_extensions = ["mp4", "mov", "avi", "mkv", "webm"];
     for entry in std::fs::read_dir(watch_dir)? {
         let entry = entry?;
         let path = entry.path();
 
         if let Some(ext) = path.extension().and_then(|e| e.to_str())
-            && video_extensions.contains(&ext.to_lowercase().as_str())
+            && crate::utils::VIDEO_EXTENSIONS.contains(&ext.to_lowercase().as_str())
         {
             let name = path
                 .file_name()
@@ -879,7 +878,6 @@ fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
     let analyzer = FfmpegAnalyzer;
     let editor = FfmpegEditor::new(config.video.hw_accel);
     let duration_getter = FfmpegDurationGetter;
-    let video_extensions = ["mp4", "mov", "avi", "mkv", "webm"];
 
     // Track processed files per folder
     let mut processed_sets: Vec<HashSet<PathBuf>> = Vec::new();

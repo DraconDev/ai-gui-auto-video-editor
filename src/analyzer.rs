@@ -1,6 +1,8 @@
 use anyhow::{Context, Result};
 use std::path::Path;
 
+pub const VIDEO_EXTENSIONS: &[&str] = &["mp4", "mov", "avi", "mkv", "webm"];
+
 #[derive(Debug, PartialEq, Clone)]
 pub struct Segment {
     pub start: f32,

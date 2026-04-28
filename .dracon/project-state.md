@@ -1,9 +1,9 @@
 # Project State
 
 ## Current Focus
-Refactored configuration merging and added FFmpeg dependency check
+Standardized video file extension handling across the codebase
 
 ## Completed
-- [x] Simplified `Config::merge` method by removing redundant default checks and consolidating field assignments
-- [x] Added `check_ffmpeg` utility function to verify FFmpeg installation before processing
-- [x] Removed unused video file discovery utility and related tests
+- [x] Added `VIDEO_EXTENSIONS` constant in `analyzer.rs` to centralize supported video formats
+- [x] Updated `batch_processor.rs` to use the centralized extension list
+- [x] Replaced hardcoded video extensions in `main.rs` with the shared constant
