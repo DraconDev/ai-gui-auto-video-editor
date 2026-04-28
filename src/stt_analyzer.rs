@@ -2,8 +2,12 @@ use anyhow::{Context, Result};
 use candle_core::{DType, Device, Tensor};
 use candle_transformers::models::whisper::{Config, model::Whisper};
 use hf_hub::{Repo, RepoType, api::sync::Api};
+use rustfft::{num_complex::Complex, FftPlanner};
 use std::path::Path;
 use tokenizers::Tokenizer;
+use tracing::info;
+
+const WHISPER_MODEL_ID: &str = "openai/whisper-tiny";
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct TranscriptSegment {
@@ -19,56 +23,63 @@ pub trait VideoSttAnalyzer {
 
 pub struct CandleSttAnalyzer;
 
+impl CandleSttAnalyzer {
+    fn cached_model_path(name: &str) -> std::path::PathBuf {
+        directories::ProjectDirs::from("com", "ai-vid-editor", "ai-vid-editor")
+            .map(|dirs| dirs.cache_dir().join(name))
+            .unwrap_or_else(std::env::temp_dir)
+            .join(name)
+    }
+
+    fn ensure_model_cached() -> Result<(std::path::PathBuf, std::path::PathBuf, std::path::PathBuf)> {
+        let cache_dir = directories::ProjectDirs::from("com", "ai-vid-editor", "ai-vid-editor")
+            .map(|d| d.cache_dir().to_path_buf())
+            .unwrap_or_else(std::env::temp_dir);
+
+        std::fs::create_dir_all(&cache_dir).context("failed to create model cache directory")?;
+
+        let config_path = cache_dir.join("whisper-tiny-config.json");
+        let tokenizer_path = cache_dir.join("whisper-tiny-tokenizer.json");
+        let weights_path = cache_dir.join("whisper-tiny-model.safetensors");
+
+        if !config_path.exists() || !tokenizer_path.exists() || !weights_path.exists() {
+            info!("Downloading Whisper model (first time only)...");
+            let api = Api::new().context("failed to create hf-hub api")?;
+            let repo = api.repo(Repo::new(WHISPER_MODEL_ID.to_string(), RepoType::Model));
+
+            std::fs::write(&config_path, repo.get("config.json")?).context("failed to cache config.json")?;
+            std::fs::write(&tokenizer_path, repo.get("tokenizer.json")?).context("failed to cache tokenizer.json")?;
+            std::fs::copy(repo.get("model.safetensors")?, &weights_path).context("failed to cache model weights")?;
+            info!("Whisper model cached successfully");
+        }
+
+        Ok((config_path, tokenizer_path, weights_path))
+    }
+}
+
 impl VideoSttAnalyzer for CandleSttAnalyzer {
     fn transcribe(&self, audio_path: &Path) -> Result<Vec<TranscriptSegment>> {
         let device = Device::Cpu;
 
-        // Load model and tokenizer from HF hub
-        let api = Api::new().context("failed to create hf-hub api")?;
-        let repo = api.repo(Repo::new(
-            "openai/whisper-tiny".to_string(),
-            RepoType::Model,
-        ));
+        let (config_path, tokenizer_path, weights_path) =
+            Self::ensure_model_cached().context("failed to load/cached Whisper model")?;
 
-        let config_filename = repo
-            .get("config.json")
-            .context("failed to get config.json")?;
-        let tokenizer_filename = repo
-            .get("tokenizer.json")
-            .context("failed to get tokenizer.json")?;
-        let weights_filename = repo
-            .get("model.safetensors")
-            .context("failed to get model.safetensors")?;
-
-        let config: Config = serde_json::from_str(&std::fs::read_to_string(config_filename)?)
+        let config: Config = serde_json::from_str(&std::fs::read_to_string(&config_path)?)
             .context("failed to parse config")?;
-        let tokenizer = Tokenizer::from_file(tokenizer_filename)
+        let tokenizer = Tokenizer::from_file(&tokenizer_path)
             .map_err(anyhow::Error::msg)
             .context("failed to load tokenizer")?;
 
-        // SAFETY: `from_mmaped_safetensors` is unsafe because it memory-maps the model weights
-        // file, creating a raw pointer to the file data. The file is read-only and the mapping
-        // lives as long as the VarBuilder. We ensure the weights file exists and is valid by
-        // checking the hf-hub download succeeded above. The unsafe block is necessary because
-        // candle_nn's API requires it for zero-copy model loading.
         let vb = unsafe {
-            candle_nn::VarBuilder::from_mmaped_safetensors(
-                &[weights_filename],
-                DType::F32,
-                &device,
-            )?
+            candle_nn::VarBuilder::from_mmaped_safetensors(&[weights_path], DType::F32, &device)?
         };
 
         let mut model = Whisper::load(&vb, config.clone()).context("failed to load model")?;
 
-        // Load audio using ffmpeg
         let audio_data = load_audio_as_f32(audio_path)?;
-
-        // Convert to mel spectrogram
-        let mel = pcm_to_mel(&config, &audio_data, &device)?;
+        let mel = pcm_to_mel(&config, &audio_data, &device).context("failed to compute mel spectrogram")?;
         let mel_len = mel.dims()[2];
 
-        // Decode using greedy search
         let segments = decode_greedy(&mut model, &tokenizer, &mel, &config, mel_len)?;
 
         Ok(segments)
@@ -96,67 +107,103 @@ fn load_audio_as_f32(path: &Path) -> Result<Vec<f32>> {
         anyhow::bail!("ffmpeg failed to extract audio: {}", stderr);
     }
 
-    let bytes = output.stdout;
+    let bytes = &output.stdout;
     let samples: Vec<f32> = bytes
         .chunks_exact(4)
-        .map(|chunk| {
-            f32::from_le_bytes(
-                chunk
-                    .try_into()
-                    .expect("chunks_exact(4) guarantees 4 bytes"),
-            )
-        })
+        .map(|chunk| f32::from_le_bytes(chunk.try_into().expect("chunks_exact(4)")))
         .collect();
 
     Ok(samples)
 }
 
-/// Convert PCM audio to mel spectrogram
+fn hz_to_mel(hz: f32) -> f32 {
+    2595.0 * (1.0 + hz / 700.0).log10()
+}
+
+fn mel_to_hz(mel: f32) -> f32 {
+    700.0 * (10.0f32.powf(mel / 2595.0) - 1.0)
+}
+
+fn build_mel_filterbank(n_fft: usize, n_mels: usize, sample_rate: f32) -> Vec<Vec<f32>> {
+    let low_freq = 0.0;
+    let high_freq = sample_rate / 2.0;
+    let low_mel = hz_to_mel(low_freq);
+    let high_mel = hz_to_mel(high_freq);
+    let mel_points: Vec<f32> = (0..=n_mels)
+        .map(|i| low_mel + (high_mel - low_mel) * i as f32 / n_mels as f32)
+        .collect();
+    let hz_points: Vec<f32> = mel_points.iter().map(|&m| mel_to_hz(m)).collect();
+    let bin_points: Vec<f32> = hz_points
+        .iter()
+        .map(|&hz| (hz * n_fft as f32 / sample_rate).floor())
+        .collect();
+
+    let mut filterbank = vec![vec![0.0f32; n_fft / 2 + 1]; n_mels];
+    for m in 1..n_mels {
+        for k in bin_points[m - 1] as usize..bin_points[m + 1].min(n_fft as f32 - 1.0) as usize {
+            let anchor = k as f32 - bin_points[m - 1];
+            let width = bin_points[m] - bin_points[m - 1];
+            let height = if width > 0.0 {
+                anchor.min(width - anchor) / width
+            } else {
+                0.0
+            };
+            filterbank[m - 1][k] = height;
+        }
+    }
+    filterbank
+}
+
 fn pcm_to_mel(config: &Config, pcm: &[f32], device: &Device) -> Result<Tensor> {
-    // Whisper expects 16kHz audio
-    // Mel spectrogram: 80 mel bins, 25ms window, 10ms hop
-    let _sample_rate = 16000.0; // Used for reference, actual rate from ffmpeg
-    let n_fft = 400; // 25ms at 16kHz
-    let hop_length = 160; // 10ms at 16kHz
+    let sample_rate = 16000.0f32;
+    let n_fft = 400;
+    let hop_length = 160;
     let n_mels = config.num_mel_bins;
+    let n_frames = (pcm.len() - n_fft) / hop_length + 1;
 
-    // Pad audio
-    let padded_len = pcm.len() + n_fft / 2 * 2;
-    let mut padded = vec![0.0f32; padded_len];
-    padded[n_fft / 2..n_fft / 2 + pcm.len()].copy_from_slice(pcm);
+    let filterbank = build_mel_filterbank(n_fft, n_mels, sample_rate);
 
-    // Calculate number of frames
-    let n_frames = (padded_len - n_fft) / hop_length + 1;
+    let mut planner = FftPlanner::new();
+    let fft = planner.plan_fft_forward(n_fft);
 
-    // Create mel spectrogram (simplified - using Hann window)
     let mut mel_spec = vec![0.0f32; n_mels * n_frames];
 
-    for frame in 0..n_frames {
-        let start = frame * hop_length;
+    for frame_idx in 0..n_frames {
+        let start = frame_idx * hop_length;
 
-        // Simple energy calculation per mel band (simplified)
+        let mut windowed = vec![Complex::new(0.0, 0.0); n_fft];
+        for i in 0..n_fft {
+            let sample_idx = start + i;
+            let sample = if sample_idx < pcm.len() { pcm[sample_idx] } else { 0.0 };
+            let hann = 0.5 * (1.0 - (2.0 * std::f32::consts::PI * i as f32 / n_fft as f32).cos());
+            windowed[i] = Complex::new(sample * hann, 0.0);
+        }
+
+        fft.process(&mut windowed);
+
+        let magnitudes: Vec<f32> = windowed
+            .iter()
+            .take(n_fft / 2 + 1)
+            .map(|c| (c.re * c.re + c.im * c.im).sqrt())
+            .collect();
+
         for mel_bin in 0..n_mels {
-            let freq_low = mel_bin * 8000 / n_mels; // Simplified mel scale
-            let freq_high = (mel_bin + 1) * 8000 / n_mels;
-            let bin_low = freq_low * n_fft / 16000;
-            let bin_high = (freq_high * n_fft / 16000).min(n_fft);
-
             let mut energy = 0.0f32;
-            for i in bin_low..bin_high {
-                if start + i < padded.len() {
-                    let window =
-                        0.5 * (1.0 - (2.0 * std::f32::consts::PI * i as f32 / n_fft as f32).cos());
-                    energy += padded[start + i] * window;
-                }
+            for (bin_idx, &mag) in magnitudes.iter().enumerate() {
+                energy += mag * filterbank[mel_bin][bin_idx];
             }
-            mel_spec[mel_bin * n_frames + frame] = energy.abs().ln_1p();
+            let db = if energy > 0.0 {
+                20.0 * energy.log10()
+            } else {
+                -80.0
+            };
+            mel_spec[mel_bin * n_frames + frame_idx] = db.max(-80.0);
         }
     }
 
     Tensor::from_vec(mel_spec, (1, n_mels, n_frames), device).map_err(anyhow::Error::msg)
 }
 
-/// Greedy decoding - simple but effective for transcription
 fn decode_greedy(
     model: &mut Whisper,
     tokenizer: &Tokenizer,
@@ -164,7 +211,6 @@ fn decode_greedy(
     config: &Config,
     mel_len: usize,
 ) -> Result<Vec<TranscriptSegment>> {
-    // Token IDs
     let sot_token = tokenizer
         .token_to_id("<|startoftranscript|>")
         .context("missing sot token")?;
@@ -176,28 +222,23 @@ fn decode_greedy(
         .context("missing transcribe token")?;
     let no_speech_token = tokenizer.token_to_id("<|nospeech|>").unwrap_or(eot_token);
 
-    // Process in 30-second chunks
-    let chunk_size = 3000; // 30 seconds at 100 frames/sec
+    let chunk_size = 3000;
     let mut segments = Vec::new();
 
     for chunk_start in (0..mel_len).step_by(chunk_size) {
         let chunk_end = (chunk_start + chunk_size).min(mel_len);
         let chunk_len = chunk_end - chunk_start;
-        // Process short final chunks (at least 1 second = 100 frames)
         if chunk_len < 100 && chunk_start > 0 {
             continue;
         }
 
         let chunk_mel = mel.narrow(2, chunk_start, chunk_len)?;
 
-        // Encode this chunk
         let chunk_encoder_output = model.encoder.forward(&chunk_mel, true)?;
 
-        // Initialize with start tokens
         let mut tokens = vec![sot_token, transcribe_token];
         let mut token_probs = Vec::new();
 
-        // Greedy decode up to max tokens
         for _ in 0..config.max_target_positions.min(448) {
             let input = Tensor::new(tokens.clone(), mel.device())?.unsqueeze(0)?;
 
@@ -205,28 +246,24 @@ fn decode_greedy(
             let seq_len = logits.dims()[1];
             let next_token_logits = logits.get(seq_len - 1)?;
 
-            // Greedy: pick highest probability token
             let next_token = next_token_logits.argmax(0)?.to_scalar::<u32>()?;
 
             if next_token == eot_token || next_token == no_speech_token {
                 break;
             }
 
-            // Get probability for confidence
             let probs = candle_nn::ops::softmax(&next_token_logits, 0)?;
             let prob = probs.get(next_token as usize)?.to_scalar::<f32>()?;
             token_probs.push(prob);
 
             tokens.push(next_token);
 
-            // Safety limit
             if tokens.len() > 400 {
                 break;
             }
         }
 
-        // Decode tokens to text
-        let text_tokens: Vec<u32> = tokens[2..].to_vec(); // Skip sot and transcribe tokens
+        let text_tokens: Vec<u32> = tokens[2..].to_vec();
         if text_tokens.is_empty() {
             continue;
         }
@@ -239,11 +276,9 @@ fn decode_greedy(
             continue;
         }
 
-        // Calculate time bounds
         let time_start = chunk_start as f32 / 100.0;
         let time_end = chunk_end as f32 / 100.0;
 
-        // Average confidence
         let confidence = if token_probs.is_empty() {
             0.5
         } else {
@@ -258,7 +293,6 @@ fn decode_greedy(
         });
     }
 
-    // If no segments were produced, return a placeholder
     if segments.is_empty() {
         segments.push(TranscriptSegment {
             start: 0.0,
@@ -270,5 +304,3 @@ fn decode_greedy(
 
     Ok(segments)
 }
-
-
