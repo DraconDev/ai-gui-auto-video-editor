@@ -1,7 +1,7 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock to resolve version conflicts
+Removed commented-out frame extraction rate code from `ml.rs`
 
 ## Completed
-- [x] Updated Cargo.lock to resolve version conflicts in project dependencies
+- [x] Removed unused commented code for frame extraction rate configuration

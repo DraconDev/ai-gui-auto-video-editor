@@ -34,7 +34,6 @@ impl FrameExtractor {
             .to_str()
             .ok_or_else(|| anyhow::anyhow!("Output path contains invalid UTF-8 characters"))?;
 
-        // Extract frames at specified rate (e.g., 1 fps = 1 frame per second)
         let status = Command::new("ffmpeg")
             .args([
                 "-i",
