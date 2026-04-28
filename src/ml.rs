@@ -608,11 +608,6 @@ impl AutoReframeProcessor {
             crop_regions.push((timestamp, crop));
         }
 
-        // Cleanup temp frames
-        for frame in &frames {
-            let _ = std::fs::remove_file(frame);
-        }
-
         Ok(crop_regions)
     }
 

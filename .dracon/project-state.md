@@ -1,8 +1,9 @@
 # Project State
 
 ## Current Focus
-Improved temporary directory handling in frame extraction for better resource management
+Improved temporary directory handling in thumbnail generation and removed redundant cleanup code
 
 ## Completed
-- [x] Replaced manual temp dir creation/cleanup with `TempDir` utility for safer file operations
-- [x] Removed redundant directory cleanup step that could cause race conditions
+- [x] Replaced manual temp directory management with `TempDir` utility in thumbnail generation
+- [x] Removed redundant temp directory cleanup code in both files
+- [x] Simplified frame extraction path handling in thumbnail generation

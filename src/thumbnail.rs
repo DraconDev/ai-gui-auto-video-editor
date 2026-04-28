@@ -13,13 +13,8 @@ pub fn generate_thumbnail(
 ) -> Result<()> {
     info!("Generating thumbnail...");
 
-    // Extract candidate frames at 1-second intervals
-    let temp_dir =
-        std::env::temp_dir().join(format!("ai-vid-editor-thumbs-{}", std::process::id()));
-    let _ = std::fs::remove_dir_all(&temp_dir);
-    std::fs::create_dir_all(&temp_dir)?;
+    let temp_dir = crate::utils::TempDir::new("ai-vid-editor-thumbs")?;
 
-    // Extract frames using ffmpeg
     let status = Command::new("ffmpeg")
         .args([
             "-i",
@@ -29,29 +24,25 @@ pub fn generate_thumbnail(
             "-q:v",
             "2",
             "-y",
-            &format!("{}/frame_%04d.jpg", temp_dir.display()),
+            &format!("{}/frame_%04d.jpg", temp_dir.path().display()),
         ])
         .status()
         .context("failed to execute ffmpeg for thumbnail extraction")?;
 
     if !status.success() {
-        let _ = std::fs::remove_dir_all(&temp_dir);
         anyhow::bail!("ffmpeg thumbnail extraction failed");
     }
 
-    // Score frames and pick the best one
-    let best_frame = score_frames(&temp_dir)?;
+    let best_frame = score_frames(temp_dir.path())?;
 
     if let Some(best) = best_frame {
         std::fs::copy(&best, output_path)?;
         info!(frame = ?best, "Selected best thumbnail frame");
     } else {
-        // Fallback: just extract a frame at 1 second into the video
         extract_frame_at_time(video_path, output_path, width, height, 1.0)?;
         info!("Fallback thumbnail extracted at 1 second mark");
     }
 
-    let _ = std::fs::remove_dir_all(&temp_dir);
     Ok(())
 }
 
