@@ -1,9 +1,8 @@
 # Project State
 
 ## Current Focus
-Refactored duration getter implementation in pipeline integration tests
+Updated dependency versions in Cargo.lock for video processing features
 
 ## Completed
-- [x] Replaced hardcoded duration values with `FfmpegDurationGetter` implementation
-- [x] Updated all pipeline test cases to use the new duration getter
+- [x] Updated dependency versions in Cargo.lock
 ```
