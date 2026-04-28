@@ -1,6 +1,3 @@
-#![allow(clippy::too_many_arguments)]
-#![allow(clippy::should_implement_trait)]
-
 pub mod analyzer;
 pub mod batch_processor;
 pub mod config;

@@ -1,9 +1,10 @@
 # Project State
 
 ## Current Focus
-Added NixOS owner public key and updated gitignore to track encrypted secrets
+Added CI workflow triggers and Rust toolchain configuration
 
 ## Completed
-- [x] Added NixOS owner public key for secure deployment
-- [x] Updated .gitignore to explicitly track encrypted secrets files
+- [x] Added CI workflow triggers for push and pull_request events
+- [x] Added rust-toolchain.toml to pin Rust version
+- [x] Removed Clippy allow directives for too_many_arguments and should_implement_trait
 ```

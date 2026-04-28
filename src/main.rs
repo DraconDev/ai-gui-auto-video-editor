@@ -1,6 +1,3 @@
-#![allow(clippy::too_many_arguments)]
-#![allow(clippy::should_implement_trait)]
-
 use anyhow::Result;
 use clap::Parser;
 use std::io::IsTerminal;
