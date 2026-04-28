@@ -271,8 +271,4 @@ fn decode_greedy(
     Ok(segments)
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
 
-}
