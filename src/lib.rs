@@ -24,10 +24,10 @@ pub use batch_processor::{
     process_single_file, process_single_file_with_intro_outro,
     process_single_file_with_intro_outro_progress,
 };
-pub use editor::FfmpegEditor;
-pub use hwaccel::HwAccel;
-pub use ml::{AutoReframeProcessor, FaceDetector, FrameExtractor, PersonSegmenter};
 pub use config::{
     Config, FolderSettings, JoinMode, Preset, ProcessingConfig, SilenceMode, VideoResolution,
     WatchFolder,
 };
+pub use editor::FfmpegEditor;
+pub use hwaccel::HwAccel;
+pub use ml::{AutoReframeProcessor, FaceDetector, FrameExtractor, PersonSegmenter};
