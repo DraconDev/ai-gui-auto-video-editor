@@ -673,12 +673,101 @@ pub fn format_file_size(bytes: u64) -> String {
     }
 }
 
-pub fn format_duration(seconds: u64) -> String {
-    let mins = seconds / 60;
-    let secs = seconds % 60;
-    if mins > 0 {
-        format!("{}m {}s", mins, secs)
-    } else {
-        format!("{}s", secs)
+    pub fn format_duration(seconds: u64) -> String {
+        let mins = seconds / 60;
+        let secs = seconds % 60;
+        if mins > 0 {
+            format!("{}m {}s", mins, secs)
+        } else {
+            format!("{}s", secs)
+        }
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_truncate_path_short() {
+        let path = "/foo/bar.txt";
+        assert_eq!(truncate_path(path, 50), path);
+        assert_eq!(truncate_path(path, 100), path);
+    }
+
+    #[test]
+    fn test_truncate_path_exact_length() {
+        let path = "/foo/bar.txt";
+        assert_eq!(truncate_path(path, path.len()), path);
+    }
+
+    #[test]
+    fn test_truncate_path_long() {
+        let path = "/very/long/path/that/needs/truncating/especially/when/it/is/really/very/long/file.txt";
+        let result = truncate_path(path, 20);
+        assert!(result.len() <= 20);
+        assert!(result.contains("..."));
+    }
+
+    #[test]
+    fn test_truncate_path_very_short() {
+        let path = "/foo/bar.txt";
+        let result = truncate_path(path, 3);
+        assert!(result.len() <= 3);
+    }
+
+    #[test]
+    fn test_truncate_path_empty() {
+        assert_eq!(truncate_path("", 10), "");
+        assert_eq!(truncate_path("", 0), "");
+    }
+
+    #[test]
+    fn test_format_file_size_bytes() {
+        assert_eq!(format_file_size(0), "0 B");
+        assert_eq!(format_file_size(100), "100 B");
+        assert_eq!(format_file_size(1023), "1023 B");
+    }
+
+    #[test]
+    fn test_format_file_size_kb() {
+        assert_eq!(format_file_size(1024), "1 KB");
+        assert_eq!(format_file_size(1500), "1 KB");
+        assert_eq!(format_file_size(1024 * 100), "100 KB");
+    }
+
+    #[test]
+    fn test_format_file_size_mb() {
+        assert_eq!(format_file_size(1024 * 1024), "1 MB");
+        assert_eq!(format_file_size(1024 * 1024 * 50), "50 MB");
+        assert_eq!(format_file_size(1024 * 1024 * 100), "100 MB");
+    }
+
+    #[test]
+    fn test_format_file_size_gb() {
+        assert_eq!(format_file_size(1024 * 1024 * 1024), "1.0 GB");
+        assert_eq!(format_file_size(1024 * 1024 * 1024 * 2), "2.0 GB");
+        assert_eq!(format_file_size(1024 * 1024 * 1024 * 1500), "1500.0 GB");
+    }
+
+    #[test]
+    fn test_format_duration_seconds() {
+        assert_eq!(format_duration(0), "0s");
+        assert_eq!(format_duration(30), "30s");
+        assert_eq!(format_duration(59), "59s");
+    }
+
+    #[test]
+    fn test_format_duration_minutes() {
+        assert_eq!(format_duration(60), "1m 0s");
+        assert_eq!(format_duration(90), "1m 30s");
+        assert_eq!(format_duration(125), "2m 5s");
+    }
+
+    #[test]
+    fn test_format_duration_large() {
+        assert_eq!(format_duration(3600), "60m 0s");
+        assert_eq!(format_duration(3661), "61m 1s");
+    }
+}
 }
