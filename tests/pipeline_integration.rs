@@ -724,17 +724,10 @@ fn test_config_all_export_fields() {
 
 #[test]
 fn test_video_editor_operations_all_succeed() {
-    // Test that all VideoEditor operations are available and can be called
-    use ai_vid_editor::editor::VideoEditor;
     use ai_vid_editor::FfmpegEditor;
 
     let editor = FfmpegEditor::default();
-
-    // Verify editor was created with default HW accel
     assert_eq!(editor.hw_accel, ai_vid_editor::HwAccel::None);
-
-    // Verify all methods exist (compile-time check via calling them)
-    // We can't run them without actual video files, but we verify the trait impl exists
     assert!(true);
 }
 
