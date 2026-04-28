@@ -17,6 +17,8 @@ pub mod thumbnail;
 pub mod utils;
 pub mod watermark;
 
+pub mod gui;
+
 pub use analyzer::FfmpegAnalyzer;
 pub use batch_processor::{
     FfmpegDurationGetter, ProcessingProgress, process_batch_dir, process_batch_dir_parallel,

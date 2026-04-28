@@ -1,7 +1,7 @@
 # Project State
 
 ## Current Focus
-Removed the `gui` module from the public API exports in `lib.rs`
+Added the `gui` module to the public API exports in `lib.rs`
 
 ## Completed
-- [x] Removed the `gui` module from the public API exports in `lib.rs` to clean up the module structure
+- [x] Added public `gui` module to the library's API exports
