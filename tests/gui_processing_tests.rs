@@ -281,7 +281,7 @@ fn test_build_folder_config_clips_override() {
 
 #[test]
 fn test_build_folder_config_unknown_preset_falls_back() {
-    let let mut config = Config::default();
+    let mut config = Config::default();
     config.audio.enhance = true;
 
     let mut folder = make_folder_state();
