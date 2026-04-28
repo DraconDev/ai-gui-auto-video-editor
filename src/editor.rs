@@ -491,28 +491,8 @@ impl VideoEditor for FfmpegEditor {
     }
 
     fn blur_background(&self, input: &Path, output: &Path) -> Result<()> {
-        // Background blur using person segmentation
-        // Falls back to simple blur if ML not available
-
         info!("Background blur: Processing video...");
 
-        // For now, use a simple boxblur
-        // Full ML implementation would process each frame with segmentation
-        // This is computationally expensive and requires frame-by-frame processing
-
-        // Try ML-powered blur (experimental)
-        let use_ml = std::env::var("AI_VID_EDITOR_ML_BLUR")
-            .map(|v| v == "1" || v == "true")
-            .unwrap_or(false);
-
-        if use_ml {
-            info!("Using ML-powered background blur (experimental)...");
-            // ML blur would go here - requires significant processing time
-            // For production, this would extract frames, process with segmentation, and re-encode
-        }
-
-        // Use ffmpeg's boxblur as the practical solution
-        // This blurs the entire frame - for person-aware blur, use a video editor
         let filter = "boxblur=20:5";
 
         let status = Command::new("ffmpeg")

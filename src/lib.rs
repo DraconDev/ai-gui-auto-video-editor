@@ -31,3 +31,4 @@ pub use config::{
 pub use editor::FfmpegEditor;
 pub use hwaccel::HwAccel;
 pub use ml::{AutoReframeProcessor, FaceDetector, FrameExtractor, PersonSegmenter};
+pub use preview::{generate_preview, preview_path};
