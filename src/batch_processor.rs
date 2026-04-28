@@ -794,15 +794,13 @@ fn burn_subtitles_into_video(
     subtitle_path: &Path,
     output_path: &Path,
 ) -> Result<()> {
+    let escaped_subtitle_path = crate::utils::escape_ffmpeg_filter_path(subtitle_path);
     let status = std::process::Command::new("ffmpeg")
         .args([
             "-i",
             video_path.to_str().context("invalid video path")?,
             "-vf",
-            &format!(
-                "subtitles='{}'",
-                subtitle_path.to_str().context("invalid subtitle path")?
-            ),
+            &format!("subtitles='{}'", escaped_subtitle_path),
             "-c:a",
             "copy",
             "-y",
@@ -815,11 +813,9 @@ fn burn_subtitles_into_video(
         anyhow::bail!("ffmpeg subtitle burn failed with status: {}", status);
     }
 
-    // Replace original with captioned version
     if !output_path.exists() {
         anyhow::bail!("ffmpeg subtitle burn did not produce output file");
     }
-    fs::rename(output_path, video_path)?;
     Ok(())
 }
 

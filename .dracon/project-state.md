@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock to resolve version conflicts
+Improved FFmpeg subtitle path handling to prevent command injection vulnerabilities
 
 ## Completed
-- [x] Updated dependency versions in Cargo.lock (likely due to recent refactoring work)
-```
+- [x] Added path escaping utility function to handle special characters in FFmpeg filter paths
+- [x] Refactored subtitle burning to use escaped paths instead of raw paths in FFmpeg commands

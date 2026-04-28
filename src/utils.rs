@@ -64,6 +64,12 @@ pub fn check_ffprobe_available() -> bool {
         .is_ok()
 }
 
+pub fn escape_ffmpeg_filter_path(path: &Path) -> String {
+    path.to_string_lossy()
+        .replace('\\', "\\\\")
+        .replace('\'', "'\\''")
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
