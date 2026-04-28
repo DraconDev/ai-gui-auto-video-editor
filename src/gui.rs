@@ -1,5 +1,5 @@
 mod theme;
-mod processing;
+pub mod processing;
 mod tabs;
 
 use eframe::egui;
