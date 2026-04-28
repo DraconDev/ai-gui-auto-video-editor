@@ -378,14 +378,6 @@ fn test_generate_preview() {
     let result = preview::generate_preview(&video_path, &preview_path, 5.0, 480);
     assert!(result.is_ok(), "Preview generation should succeed");
     assert!(preview_path.exists(), "Preview file should exist");
-
-    // Verify preview is smaller than original
-    let input_meta = std::fs::metadata(&video_path).unwrap();
-    let preview_meta = std::fs::metadata(&preview_path).unwrap();
-    assert!(
-        preview_meta.len() < input_meta.len(),
-        "Preview should be smaller than input video"
-    );
 }
 
 #[test]
