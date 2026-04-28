@@ -30,6 +30,14 @@ fn test_build_folder_config_youtube_preset() {
     assert_eq!(result.silence.mode, SilenceMode::Cut, "youtube should use Cut mode");
     assert_eq!(result.audio.enhance, true, "youtube should enable audio enhance");
     // Check all export fields individually
+    eprintln!("export.subtitles = {}", result.export.subtitles);
+    eprintln!("export.chapters = {}", result.export.chapters);
+    eprintln!("export.captions = {}", result.export.captions);
+    eprintln!("export.clips = {}", result.export.clips);
+    eprintln!("export.fcpxml = {}", result.export.fcpxml);
+    eprintln!("export.edl = {}", result.export.edl);
+    eprintln!("export.thumbnail = {}", result.export.thumbnail);
+    eprintln!("export.preview = {}", result.export.preview);
     assert!(result.export.subtitles, "subtitles");
     assert!(result.export.chapters, "chapters");
     assert!(result.export.captions, "captions");
