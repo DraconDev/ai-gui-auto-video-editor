@@ -16,6 +16,16 @@ use crate::progress::BatchProgress;
 use crate::stt_analyzer::{CandleSttAnalyzer, TranscriptSegment, VideoSttAnalyzer};
 use crate::utils::find_video_files;
 
+fn atomic_replace(src: &Path, dst: &Path) -> Result<()> {
+    #[cfg(target_os = "windows")]
+    {
+        if dst.exists() {
+            std::fs::remove_file(dst).context("failed to remove existing destination")?;
+        }
+    }
+    std::fs::rename(src, dst).context("atomic replace failed")
+}
+
 /// RAII guard for cleaning up temporary video files on drop.
 /// Tracks intermediate files and removes them when the guard goes out of scope.
 struct TempFileGuard {
