@@ -47,9 +47,12 @@ impl CandleSttAnalyzer {
             let api = Api::new().context("failed to create hf-hub api")?;
             let repo = api.repo(Repo::new(WHISPER_MODEL_ID.to_string(), RepoType::Model));
 
-            std::fs::write(&config_path, repo.get("config.json")?).context("failed to cache config.json")?;
-            std::fs::write(&tokenizer_path, repo.get("tokenizer.json")?).context("failed to cache tokenizer.json")?;
-            std::fs::copy(repo.get("model.safetensors")?, &weights_path).context("failed to cache model weights")?;
+            let config_file = repo.get("config.json")?;
+            std::fs::copy(&config_file, &config_path).context("failed to cache config.json")?;
+            let tokenizer_file = repo.get("tokenizer.json")?;
+            std::fs::copy(&tokenizer_file, &tokenizer_path).context("failed to cache tokenizer.json")?;
+            let weights_file = repo.get("model.safetensors")?;
+            std::fs::copy(&weights_file, &weights_path).context("failed to cache model weights")?;
             info!("Whisper model cached successfully");
         }
 
