@@ -764,7 +764,7 @@ fn run_watch_mode(
                 let path = entry.path();
 
                 if let Some(ext) = path.extension().and_then(|e| e.to_str())
-                    && video_extensions.contains(&ext.to_lowercase().as_str())
+                    && crate::utils::VIDEO_EXTENSIONS.contains(&ext.to_lowercase().as_str())
                     && !processed.contains(&path)
                 {
                     let now = timestamp();
@@ -895,7 +895,7 @@ fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
             for entry in entries.flatten() {
                 let path = entry.path();
                 if let Some(ext) = path.extension().and_then(|e| e.to_str())
-                    && video_extensions.contains(&ext.to_lowercase().as_str())
+                    && crate::utils::VIDEO_EXTENSIONS.contains(&ext.to_lowercase().as_str())
                 {
                     let name = path
                         .file_name()
@@ -943,7 +943,7 @@ fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
                     let path = entry.path();
 
                     if let Some(ext) = path.extension().and_then(|e| e.to_str())
-                        && video_extensions.contains(&ext.to_lowercase().as_str())
+                        && crate::utils::VIDEO_EXTENSIONS.contains(&ext.to_lowercase().as_str())
                         && !processed_sets[idx].contains(&path)
                     {
                         let now = timestamp();
