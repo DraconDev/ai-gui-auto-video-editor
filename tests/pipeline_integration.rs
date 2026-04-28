@@ -474,6 +474,7 @@ fn test_full_pipeline_all_features_disabled() {
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
+    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
 
     let result = ai_vid_editor::batch_processor::process_single_file(
         video_path.clone(),
@@ -481,7 +482,7 @@ fn test_full_pipeline_all_features_disabled() {
         &config,
         &analyzer,
         &editor,
-        &|| Ok(6.0),
+        &duration_getter,
     );
 
     assert!(result.is_ok(), "Pipeline with all features disabled should succeed");
@@ -510,6 +511,7 @@ fn test_full_pipeline_noise_reduction_and_enhance() {
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
+    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
 
     let result = ai_vid_editor::batch_processor::process_single_file(
         video_path.clone(),
@@ -517,7 +519,7 @@ fn test_full_pipeline_noise_reduction_and_enhance() {
         &config,
         &analyzer,
         &editor,
-        &|| Ok(6.0),
+        &duration_getter,
     );
 
     assert!(result.is_ok(), "Pipeline with noise reduction and audio enhance should succeed");
@@ -545,6 +547,7 @@ fn test_full_pipeline_reframe_and_scale() {
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
+    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
 
     let result = ai_vid_editor::batch_processor::process_single_file(
         video_path,
@@ -552,7 +555,7 @@ fn test_full_pipeline_reframe_and_scale() {
         &config,
         &analyzer,
         &editor,
-        &|| Ok(6.0),
+        &duration_getter,
     );
 
     assert!(result.is_ok(), "Pipeline with reframe enabled should succeed");
@@ -570,7 +573,7 @@ fn test_full_pipeline_with_preview_export() {
         return;
     }
 
-    let output_dir = tempdir::unwrap();
+    let output_dir = tempdir();
     let output_path = output_dir.path().join("output_with_preview.mp4");
     let preview_path = preview::preview_path(&output_path);
 
@@ -580,6 +583,7 @@ fn test_full_pipeline_with_preview_export() {
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
+    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
 
     let result = ai_vid_editor::batch_processor::process_single_file(
         video_path,
@@ -587,7 +591,7 @@ fn test_full_pipeline_with_preview_export() {
         &config,
         &analyzer,
         &editor,
-        &|| Ok(6.0),
+        &duration_getter,
     );
 
     assert!(result.is_ok(), "Pipeline with preview export should succeed");
