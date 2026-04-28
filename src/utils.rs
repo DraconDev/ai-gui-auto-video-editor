@@ -88,7 +88,9 @@ impl TempDir {
     }
 
     pub fn into_path(self) -> PathBuf {
-        self.path
+        let path = self.path.clone();
+        std::mem::forget(self);
+        path
     }
 
     pub fn keep(mut self) {
@@ -119,7 +121,9 @@ impl TempFile {
     }
 
     pub fn into_path(self) -> PathBuf {
-        self.path
+        let path = self.path.clone();
+        std::mem::forget(self);
+        path
     }
 
     pub fn with_tmp<F: FnOnce(&Path) -> std::io::Result<()>>(path: &Path, f: F) -> std::io::Result<PathBuf> {
