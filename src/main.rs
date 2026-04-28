@@ -1265,5 +1265,60 @@ fn configure_dark_theme(ctx: &egui::Context) {
     ctx.set_style(style);
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_parse_resolution_all_variants() {
+        assert_eq!(parse_resolution("720p"), Some(crate::config::VideoResolution::Hd720p));
+        assert_eq!(parse_resolution("hd"), Some(crate::config::VideoResolution::Hd720p));
+        assert_eq!(parse_resolution("HD720p"), Some(crate::config::VideoResolution::Hd720p));
+
+        assert_eq!(parse_resolution("1080p"), Some(crate::config::VideoResolution::Fhd1080p));
+        assert_eq!(parse_resolution("fhd"), Some(crate::config::VideoResolution::Fhd1080p));
+        assert_eq!(parse_resolution("FHD1080p"), Some(crate::config::VideoResolution::Fhd1080p));
+        assert_eq!(parse_resolution("fullhd"), Some(crate::config::VideoResolution::Fhd1080p));
+
+        assert_eq!(parse_resolution("1440p"), Some(crate::config::VideoResolution::Qhd1440p));
+        assert_eq!(parse_resolution("qhd"), Some(crate::config::VideoResolution::Qhd1440p));
+        assert_eq!(parse_resolution("2k"), Some(crate::config::VideoResolution::Qhd1440p));
+
+        assert_eq!(parse_resolution("4k"), Some(crate::config::VideoResolution::Uhd4k));
+        assert_eq!(parse_resolution("uhd"), Some(crate::config::VideoResolution::Uhd4k));
+        assert_eq!(parse_resolution("UHD4k"), Some(crate::config::VideoResolution::Uhd4k));
+        assert_eq!(parse_resolution("2160p"), Some(crate::config::VideoResolution::Uhd4k));
+    }
+
+    #[test]
+    fn test_parse_resolution_vertical() {
+        assert_eq!(parse_resolution("vertical-1080p"), Some(crate::config::VideoResolution::Vertical1080p));
+        assert_eq!(parse_resolution("1080x1920"), Some(crate::config::VideoResolution::Vertical1080p));
+        assert_eq!(parse_resolution("shorts"), Some(crate::config::VideoResolution::Vertical1080p));
+        assert_eq!(parse_resolution("reels"), Some(crate::config::VideoResolution::Vertical1080p));
+        assert_eq!(parse_resolution("tiktok"), Some(crate::config::VideoResolution::Vertical1080p));
+
+        assert_eq!(parse_resolution("vertical-720p"), Some(crate::config::VideoResolution::Vertical720p));
+        assert_eq!(parse_resolution("720x1280"), Some(crate::config::VideoResolution::Vertical720p));
+    }
+
+    #[test]
+    fn test_parse_resolution_invalid() {
+        assert_eq!(parse_resolution(""), None);
+        assert_eq!(parse_resolution("invalid"), None);
+        assert_eq!(parse_resolution("1080i"), None);
+        assert_eq!(parse_resolution("sd"), None);
+        assert_eq!(parse_resolution("8k"), None);
+    }
+
+    #[test]
+    fn test_parse_resolution_case_insensitive() {
+        assert_eq!(parse_resolution("FHD"), Some(crate::config::VideoResolution::Fhd1080p));
+        assert_eq!(parse_resolution("QHD"), Some(crate::config::VideoResolution::Qhd1440p));
+        assert_eq!(parse_resolution("UHD"), Some(crate::config::VideoResolution::Uhd4k));
+        assert_eq!(parse_resolution("SHORTS"), Some(crate::config::VideoResolution::Vertical1080p));
+    }
+}
+
 #[cfg(feature = "gui")]
 mod gui;
