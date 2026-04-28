@@ -1,6 +1,6 @@
 mod common;
 
-use ai_vid_editor::config::{Config, SilenceMode, VideoResolution};
+use ai_vid_editor::config::{Config, Preset, SilenceMode, VideoResolution};
 use ai_vid_editor::gui::processing::build_folder_config;
 use ai_vid_editor::gui::processing::make_test_folder_state;
 use ai_vid_editor::gui::FolderState;
