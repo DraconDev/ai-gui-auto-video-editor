@@ -275,8 +275,4 @@ fn decode_greedy(
 mod tests {
     use super::*;
 
-    #[test]
-    fn test_transcription_structure() {
-        let _analyzer = CandleSttAnalyzer;
-    }
 }
