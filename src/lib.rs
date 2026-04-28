@@ -16,7 +16,6 @@ pub mod stt_analyzer;
 pub mod thumbnail;
 pub mod utils;
 pub mod watermark;
-pub mod gui;
 
 pub use analyzer::FfmpegAnalyzer;
 pub use batch_processor::{
