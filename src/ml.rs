@@ -575,10 +575,8 @@ impl AutoReframeProcessor {
         video_path: &Path,
         sample_fps: f32,
     ) -> Result<Vec<(f32, CropRegion)>> {
-        let temp_dir =
-            std::env::temp_dir().join(format!("ai-vid-editor-frames-{}", std::process::id()));
-        let _ = std::fs::remove_dir_all(&temp_dir);
-        let frames = FrameExtractor::extract_frames(video_path, &temp_dir, sample_fps)?;
+        let temp_dir = crate::utils::TempDir::new("ai-vid-editor-frames")?;
+        let frames = FrameExtractor::extract_frames(video_path, temp_dir.path(), sample_fps)?;
 
         let _video_duration = FrameExtractor::get_video_duration(video_path)?;
         let (video_width, video_height) = FrameExtractor::get_video_dimensions(video_path)?;
