@@ -608,10 +608,13 @@ fn concat_chunk_files(chunk_files: &[PathBuf], output: &Path) -> Result<()> {
     let concat_contents = chunk_files
         .iter()
         .map(|path| {
-            format!(
-                "file '{}'\n",
-                path.display().to_string().replace('\'', "'\\''")
-            )
+            let escaped = path
+                .display()
+                .to_string()
+                .replace('\'', "'\\''")
+                .replace('\n', "\\n")
+                .replace('\r', "\\r");
+            format!("file '{}'\n", escaped)
         })
         .collect::<String>();
     fs::write(&concat_list, concat_contents)?;

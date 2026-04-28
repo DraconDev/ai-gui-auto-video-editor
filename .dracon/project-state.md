@@ -1,7 +1,8 @@
 # Project State
 
 ## Current Focus
-Refactored font file detection to be case-insensitive for TTF files
+Improved file path escaping in chunk file concatenation to handle newlines and carriage returns
 
 ## Completed
-- [x] Modified `find_first_ttf` to convert file extensions to lowercase before comparison, ensuring case-insensitive matching for TTF files
+- [x] Enhanced path escaping in `concat_chunk_files` to handle newlines (`\n`) and carriage returns (`\r`) in file paths
+- [x] Updated Cargo.lock to reflect dependency version changes
