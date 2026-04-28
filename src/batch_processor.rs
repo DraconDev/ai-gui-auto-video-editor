@@ -974,10 +974,11 @@ where
     let mut skipped_files = 0;
 
     let pb = ProgressBar::new(total_files as u64);
+    let template = "{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {pos}/{len} {msg}";
     pb.set_style(
         ProgressStyle::default_bar()
-            .template("{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {pos}/{len} {msg}")
-            .unwrap()
+            .template(template)
+            .unwrap_or_else(|_| ProgressStyle::default_bar())
             .progress_chars("#>-"),
     );
 

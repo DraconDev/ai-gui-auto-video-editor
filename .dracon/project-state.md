@@ -1,9 +1,9 @@
 # Project State
 
 ## Current Focus
-Added early ffprobe availability check to fail fast if ffprobe is not available
+Improved progress bar styling in batch processor with more detailed template
 
 ## Completed
-- [x] Added ffprobe availability check after FFmpeg check
-- [x] Improved error handling with JSON output support for ffprobe check
+- [x] Updated progress bar template to include spinner, elapsed time, and position/length counters
+- [x] Made progress bar styling more robust with fallback to default style if template fails
 ```
