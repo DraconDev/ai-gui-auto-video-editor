@@ -1,11 +1,12 @@
 #![allow(clippy::too_many_arguments)]
 #![allow(clippy::should_implement_trait)]
 
-pub mod gui;
+pub mod analyzer;
 pub mod batch_processor;
 pub mod config;
 pub mod editor;
 pub mod exporter;
+pub mod gui;
 pub mod hwaccel;
 pub mod ml;
 pub mod preset_rules;
