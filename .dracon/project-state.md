@@ -1,10 +1,8 @@
 # Project State
 
 ## Current Focus
-Added CI workflow triggers and Rust toolchain configuration
+Renamed `from_str` method to `parse_name` in configuration preset parsing
 
 ## Completed
-- [x] Added CI workflow triggers for push and pull_request events
-- [x] Added rust-toolchain.toml to pin Rust version
-- [x] Removed Clippy allow directives for too_many_arguments and should_implement_trait
+- [x] Renamed `Preset::from_str` to `Preset::parse_name` for clearer intent
 ```

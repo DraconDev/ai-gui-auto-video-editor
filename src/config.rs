@@ -123,7 +123,7 @@ impl Preset {
     }
 
     /// Parse preset from string
-    pub fn from_str(s: &str) -> Option<Self> {
+    pub fn parse_name(s: &str) -> Option<Self> {
         match s.to_lowercase().as_str() {
             "youtube" => Some(Preset::Youtube),
             "shorts" | "ytshorts" => Some(Preset::Shorts),
