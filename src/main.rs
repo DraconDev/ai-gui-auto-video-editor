@@ -300,6 +300,7 @@ fn init_logging(verbose: u8, quiet: bool) {
         .init();
 }
 
+#[allow(clippy::too_many_arguments)]
 fn main() -> Result<()> {
     let cli = Cli::parse();
 
@@ -675,6 +676,7 @@ fn main() -> Result<()> {
 }
 
 /// Run in watch mode - monitor a directory and process new videos
+#[allow(clippy::too_many_arguments)]
 fn run_watch_mode(
     watch_dir: &PathBuf,
     output_dir: &PathBuf,
@@ -846,6 +848,7 @@ fn run_watch_mode(
 }
 
 /// Run watch mode for multiple folders from config
+#[allow(clippy::too_many_arguments)]
 fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
     use std::collections::HashSet;
     use std::time::Duration;
@@ -1086,6 +1089,7 @@ fn pick_random_music_file(music_dir: &PathBuf) -> Result<Option<PathBuf>> {
 }
 
 /// Handle dry-run mode: analyze and show what would be done
+#[allow(clippy::too_many_arguments)]
 fn handle_dry_run(cli: &Cli, config: &Config) -> Result<()> {
     use crate::analyzer::VideoAnalyzer;
     use crate::batch_processor::DurationGetter;

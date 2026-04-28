@@ -1,9 +1,12 @@
 # Project State
 
 ## Current Focus
-Standardized video file extension handling across the codebase
+Added `#[allow(clippy::too_many_arguments)]` annotations to functions with many parameters
 
 ## Completed
-- [x] Added `VIDEO_EXTENSIONS` constant in `analyzer.rs` to centralize supported video formats
-- [x] Updated `batch_processor.rs` to use the centralized extension list
-- [x] Replaced hardcoded video extensions in `main.rs` with the shared constant
+- [x] Added `#[allow(clippy::too_many_arguments)]` to `process_single_file_with_intro_outro_progress` in batch_processor.rs
+- [x] Added `#[allow(clippy::too_many_arguments)]` to `main` function in main.rs
+- [x] Added `#[allow(clippy::too_many_arguments)]` to `run_watch_mode` function in main.rs
+- [x] Added `#[allow(clippy::too_many_arguments)]` to `run_multi_watch_mode` function in main.rs
+- [x] Added `#[allow(clippy::too_many_arguments)]` to `handle_dry_run` function in main.rs
+```
