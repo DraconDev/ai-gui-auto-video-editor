@@ -559,7 +559,7 @@ fn test_full_pipeline_with_preview_export() {
 
     let output_dir = tempdir().unwrap();
     let output_path = output_dir.path().join("output_with_preview.mp4");
-    let preview_path = preview::preview_path(&output_path);
+    let _preview_path = preview::preview_path(&output_path);
 
     let mut config = Config::default();
     config.export.preview = true;

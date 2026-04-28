@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Updated test assertion to verify SilenceMode::Cut behavior in folder configuration
+Refactored preview path handling in integration test to avoid unused variable warning
 
 ## Completed
-- [x] Fixed test assertion to correctly verify SilenceMode::Cut behavior when remove_silence2 is true
+- [x] Changed `preview_path` variable name to `_preview_path` to explicitly mark it as unused
 ```
