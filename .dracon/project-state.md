@@ -1,9 +1,8 @@
 # Project State
 
 ## Current Focus
-Improved progress bar styling in batch processor with more detailed template
+Improved error handling for progress tracking in batch processing
 
 ## Completed
-- [x] Updated progress bar template to include spinner, elapsed time, and position/length counters
-- [x] Made progress bar styling more robust with fallback to default style if template fails
+- [x] Added fallback for progress lock poisoning by using `into_inner()` when lock is poisoned
 ```

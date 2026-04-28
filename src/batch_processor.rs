@@ -1151,7 +1151,7 @@ where
                         Ok(_) => {
                             info!(file = ?input_file, "Successfully processed");
                             successful.fetch_add(1, Ordering::SeqCst);
-                            let mut p = progress.lock().unwrap();
+                            let mut p = progress.lock().unwrap_or_else(|p| p.into_inner());
                             p.mark_completed(&input_file);
                             if let Err(e) = p.to_file(&progress_path) {
                                 warn!(error = %e, "Failed to save progress file");
@@ -1160,7 +1160,7 @@ where
                         Err(e) => {
                             warn!(file = ?input_file, error = %e, "Failed to process");
                             failed.fetch_add(1, Ordering::SeqCst);
-                            let mut p = progress.lock().unwrap();
+                            let mut p = progress.lock().unwrap_or_else(|p| p.into_inner());
                             p.mark_failed(&input_file);
                             if let Err(e) = p.to_file(&progress_path) {
                                 warn!(error = %e, "Failed to save progress file");
