@@ -386,13 +386,13 @@ impl PersonSegmenter {
 
         info!("Downloading person segmentation model from HuggingFace...");
 
-        // Use hf-hub to download the model
         let api = hf_hub::api::sync::Api::new()?;
         let repo = api.model(SEGMENT_MODEL_ID.to_string());
         let downloaded = repo.get(SEGMENT_MODEL_FILE)?;
 
-        // Copy to cache location
-        std::fs::copy(&downloaded, path)?;
+        let temp_path = path.with_extension("tmp");
+        std::fs::copy(&downloaded, &temp_path)?;
+        std::fs::rename(&temp_path, path)?;
 
         info!(path = ?path, "Model downloaded");
         Ok(())

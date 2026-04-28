@@ -42,12 +42,23 @@ impl CandleSttAnalyzer {
             let repo = api.repo(Repo::new(WHISPER_MODEL_ID.to_string(), RepoType::Model));
 
             let config_file = repo.get("config.json")?;
-            std::fs::copy(&config_file, &config_path).context("failed to cache config.json")?;
+            let config_tmp = config_path.with_extension("tmp");
+            std::fs::copy(&config_file, &config_tmp).context("failed to cache config.json")?;
+            std::fs::rename(&config_tmp, &config_path).context("failed to finalize config.json")?;
+
             let tokenizer_file = repo.get("tokenizer.json")?;
-            std::fs::copy(&tokenizer_file, &tokenizer_path)
+            let tokenizer_tmp = tokenizer_path.with_extension("tmp");
+            std::fs::copy(&tokenizer_file, &tokenizer_tmp)
                 .context("failed to cache tokenizer.json")?;
+            std::fs::rename(&tokenizer_tmp, &tokenizer_path)
+                .context("failed to finalize tokenizer.json")?;
+
             let weights_file = repo.get("model.safetensors")?;
-            std::fs::copy(&weights_file, &weights_path).context("failed to cache model weights")?;
+            let weights_tmp = weights_path.with_extension("tmp");
+            std::fs::copy(&weights_file, &weights_tmp)
+                .context("failed to cache model weights")?;
+            std::fs::rename(&weights_tmp, &weights_path)
+                .context("failed to finalize model weights")?;
             info!("Whisper model cached successfully");
         }
 
