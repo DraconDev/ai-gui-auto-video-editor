@@ -770,4 +770,3 @@ mod tests {
         assert_eq!(format_duration(3661), "61m 1s");
     }
 }
-}
