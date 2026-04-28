@@ -1,9 +1,8 @@
 # Project State
 
 ## Current Focus
-Refactored PCM to Mel spectrogram conversion with improved windowed sample handling
+Added a Clippy allow annotation to suppress unnecessary range loop warning in mel filterbank construction
 
 ## Completed
-- [x] Updated windowed sample assignment to use iterator pattern for better clarity
-- [x] Removed direct indexing in favor of iterator-based assignment in the windowed sample loop
-- [x] Maintained identical functionality while improving code readability and maintainability
+- [x] Added `#[allow(clippy::needless_range_loop)]` to suppress Clippy warning in mel filterbank construction
+- [x] Updated Cargo.lock with dependency version changes (likely due to recent refactoring work)

@@ -136,6 +136,7 @@ fn build_mel_filterbank(n_fft: usize, n_mels: usize, sample_rate: f32) -> Vec<Ve
 
     let mut filterbank = vec![vec![0.0f32; n_fft / 2 + 1]; n_mels];
     for m in 1..n_mels {
+        #[allow(clippy::needless_range_loop)]
         for k in bin_points[m - 1] as usize..bin_points[m + 1].min(n_fft as f32 - 1.0) as usize {
             let anchor = k as f32 - bin_points[m - 1];
             let width = bin_points[m] - bin_points[m - 1];
