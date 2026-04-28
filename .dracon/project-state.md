@@ -1,8 +1,9 @@
 # Project State
 
 ## Current Focus
-Refactored GUI module imports to use crate-relative paths for better organization
+Refactored GUI module imports by removing unused HwAccel import and adjusting import paths
 
 ## Completed
-- [x] Updated imports in `tabs.rs` to use `crate::config::{...}` instead of direct imports
-- [x] Updated Cargo.lock with dependency version changes
+- [x] Removed unused `HwAccel` import from `tabs.rs`
+- [x] Adjusted import paths to use crate-relative paths consistently
+```
