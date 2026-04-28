@@ -155,7 +155,7 @@ fn test_build_folder_config_threshold_override() {
 
 #[test]
 fn test_build_folder_config_enhance_audio_override() {
-    let let mut folder = make_folder_state();
+    let mut folder = make_folder_state();
     folder.settings.enhance_audio = Some(false);
 
     let result = build_folder_config(&Config::default(), &folder);
@@ -236,7 +236,7 @@ fn test_build_folder_config_scene_detect_override() {
 
 #[test]
 fn test_build_folder_config_multi_format_override() {
-    let let mut folder = make_folder_state();
+    let mut folder = make_folder_state();
     folder.settings.multi_format = Some(true);
 
     let result = build_folder_config(&Config::default(), &folder);
@@ -294,7 +294,7 @@ fn test_build_folder_config_unknown_preset_falls_back() {
 
 #[test]
 fn test_build_folder_config_all_settings_at_once() {
-    let let mut folder = make_folder_state();
+    let mut folder = make_folder_state();
     folder.preset = "youtube".to_string();
     folder.settings.enhance_audio = Some(false);
     folder.settings.remove_silence = Some(true);
