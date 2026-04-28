@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock for video processing features
+Removed test attribute from `make_test_folder_state` function to make it publicly accessible
 
 ## Completed
-- [x] Updated dependency versions in Cargo.lock to ensure compatibility with video processing features
+- [x] Changed visibility of `make_test_folder_state` from test-only to public
 ```
