@@ -535,19 +535,18 @@ impl CropRegion {
 
     /// Create crop region following a face
     pub fn from_face(face: &FaceBox, video_aspect: f32) -> Self {
-        // video_aspect = width / height (e.g., 16/9 = 1.78)
-        // Target aspect = 9/16 = 0.5625
-
         let target_aspect = 9.0 / 16.0;
+
+        if !video_aspect.is_finite() || video_aspect <= 0.0 {
+            return Self::center_crop_9_16(video_aspect);
+        }
+
         let crop_width = target_aspect / video_aspect;
 
-        // Center crop on face X position
         let face_center_x = face.x + face.width / 2.0;
 
-        // Calculate crop X to center on face
         let mut crop_x = face_center_x - crop_width / 2.0;
 
-        // Clamp to valid range
         crop_x = crop_x.max(0.0).min(1.0 - crop_width);
 
         Self {
@@ -584,7 +583,11 @@ impl AutoReframeProcessor {
 
         let _video_duration = FrameExtractor::get_video_duration(video_path)?;
         let (video_width, video_height) = FrameExtractor::get_video_dimensions(video_path)?;
-        let video_aspect = video_width as f32 / video_height as f32;
+        let video_aspect = if video_height > 0 {
+            video_width as f32 / video_height as f32
+        } else {
+            16.0 / 9.0
+        };
 
         let mut crop_regions = Vec::new();
 
