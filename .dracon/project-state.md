@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Refactored imports in integration test to remove unused configuration types
+Updated dependency versions in Cargo.lock for video processing features
 
 ## Completed
-- [x] Removed unused `ExportConfig`, `SilenceConfig`, `VideoConfig`, and `AudioConfig` imports from pipeline integration test
+- [x] Updated dependency versions in Cargo.lock to reflect recent changes in video processing features
 ```
