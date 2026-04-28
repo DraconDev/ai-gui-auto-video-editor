@@ -373,7 +373,8 @@ fn test_generate_preview() {
     }
 
     let output_dir = tempdir().unwrap();
-    let preview_path = preview::preview_path(output_dir.path());
+    let dummy_output = output_dir.path().join("video.mp4");
+    let preview_path = preview::preview_path(&dummy_output);
 
     let result = preview::generate_preview(&video_path, &preview_path, 5.0, 480);
     if let Err(ref e) = result {
