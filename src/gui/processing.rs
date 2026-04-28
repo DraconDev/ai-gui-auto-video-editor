@@ -249,7 +249,7 @@ fn watch_folders_loop(
 }
 
 pub fn build_folder_config(config: &Config, folder: &FolderState) -> Config {
-    let mut merged = if let Some(preset) = Preset::from_str(&folder.preset) {
+    let mut merged = if let Some(preset) = Preset::parse_name(&folder.preset) {
         config.clone().merge(preset.to_config())
     } else {
         config.clone()
