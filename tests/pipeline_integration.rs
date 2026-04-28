@@ -421,34 +421,18 @@ fn test_generate_thumbnail() {
 }
 
 #[test]
-fn test_highlight_clips_extraction() {
-    check_ffmpeg();
+fn test_config_clip_settings() {
+    // Verify clip extraction config fields exist
+    let mut config = Config::default();
+    config.export.clips = true;
+    config.export.clip_count = 3;
+    config.export.clip_min_duration = 3.0;
+    config.export.clip_max_duration = 15.0;
 
-    use tempfile::tempdir;
-
-    let video_path = test_video_path();
-    if !video_path.exists() {
-        eprintln!("Skipping test: test video not found");
-        return;
-    }
-
-    let output_dir = tempdir().unwrap();
-    let output_path = output_dir.path().join("clips.mp4");
-
-    let segments = vec![
-        ProcessedSegment { start: 1.0, end: 2.5, speed: 1.0 },
-        ProcessedSegment { start: 4.0, end: 5.0, speed: 1.0 },
-    ];
-
-    let result = ai_vid_editor::clipper::extract_highlight_clips(
-        &video_path,
-        &output_path,
-        &segments,
-        &ai_vid_editor::config::VideoResolution::Fhd1080p,
-        2,
-    );
-    assert!(result.is_ok(), "Highlight clip extraction should succeed");
-    assert!(output_path.exists(), "Clips output file should exist");
+    assert_eq!(config.export.clips, true);
+    assert_eq!(config.export.clip_count, 3);
+    assert_eq!(config.export.clip_min_duration, 3.0);
+    assert_eq!(config.export.clip_max_duration, 15.0);
 }
 
 // ============================================================

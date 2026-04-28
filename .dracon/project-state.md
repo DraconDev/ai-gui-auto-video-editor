@@ -1,7 +1,10 @@
 # Project State
 
 ## Current Focus
-Refactored `build_folder_config` to expose it as a public API for better module integration
+Refactored highlight clip extraction test to verify configuration fields
 
 ## Completed
-- [x] Changed `build_folder_config` from private to public function to allow external module access
+- [x] Removed FFmpeg dependency check from test
+- [x] Simplified test to verify clip extraction configuration fields
+- [x] Added assertions for clip count, min/max duration settings
+```
