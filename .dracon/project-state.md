@@ -1,9 +1,8 @@
 # Project State
 
 ## Current Focus
-Refactored GUI processing test utilities by removing Preset dependency and adding FolderState import
+Updated dependency versions in Cargo.lock for video processing features
 
 ## Completed
-- [x] Removed unused Preset import from gui_processing_tests.rs
-- [x] Added explicit FolderState import for test utility functions
-- [x] Maintained existing test functionality while improving module organization
+- [x] Updated Cargo.lock with new dependency versions for video processing features
+```
