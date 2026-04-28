@@ -14,7 +14,7 @@ use crate::FfmpegDurationGetter;
 use crate::FfmpegEditor;
 use crate::Preset;
 use crate::ProcessingProgress;
-use crate::SilenceMode;
+use crate::config::SilenceMode;
 use crate::batch_processor::process_single_file_with_intro_outro_progress;
 
 #[cfg(feature = "notify-rust")]
