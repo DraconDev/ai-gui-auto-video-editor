@@ -1,7 +1,7 @@
 # Project State
 
 ## Current Focus
-Fixed redundant `let` keyword in GUI processing tests for folder configuration overrides
+Updated dependency versions in Cargo.lock for video processing features
 
 ## Completed
-- [x] Removed redundant `let` keyword in test cases for folder configuration overrides (enhance_audio, multi_format, all_settings_at_once)
+- [x] Updated dependency versions in Cargo.lock to ensure compatibility with video processing features
