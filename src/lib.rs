@@ -17,8 +17,6 @@ pub mod thumbnail;
 pub mod utils;
 pub mod watermark;
 
-pub mod gui;
-
 pub use analyzer::FfmpegAnalyzer;
 pub use batch_processor::{
     FfmpegDurationGetter, ProcessingProgress, process_batch_dir, process_batch_dir_parallel,
@@ -32,3 +30,5 @@ pub use config::{
 pub use editor::FfmpegEditor;
 pub use hwaccel::HwAccel;
 pub use ml::{AutoReframeProcessor, FaceDetector, FrameExtractor, PersonSegmenter};
+
+pub mod gui;

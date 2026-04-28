@@ -1,7 +1,10 @@
 # Project State
 
 ## Current Focus
-Refactored hardware acceleration module import path for better module organization
+Refactored GUI module imports and public API exports for better module organization
 
 ## Completed
-- [x] Updated `HwAccel` import path from `crate::HwAccel` to `crate::hwaccel::HwAccel` for consistent module structure
+- [x] Updated GUI module imports to use consistent crate-relative paths
+- [x] Restored GUI module to public API exports in lib.rs
+- [x] Reordered public API exports to group related configuration types
+```
