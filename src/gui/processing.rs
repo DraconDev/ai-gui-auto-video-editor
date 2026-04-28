@@ -329,6 +329,17 @@ fn is_video_file(path: &Path) -> bool {
             .unwrap_or(false)
 }
 
+#[cfg(test)]
+pub fn make_test_folder_state() -> FolderState {
+    FolderState {
+        input: std::path::PathBuf::from("/input"),
+        output: std::path::PathBuf::from("/output"),
+        preset: String::new(),
+        enabled: true,
+        settings: FolderSettings::default(),
+    }
+}
+
 pub(crate) fn spawn_queue_worker(
     config: Config,
     queue: Vec<super::QueuedFile>,
