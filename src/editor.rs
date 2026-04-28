@@ -790,15 +790,9 @@ fn chain_atempo_filters(speed: f32) -> String {
 }
 
 fn generate_duck_filter(transcript: &[TranscriptSegment], duck_volume: f32) -> String {
-    // Limit transcript to avoid exponentially long ffmpeg expressions
-    // 100 segments is a reasonable upper bound for most videos
-    let max_segments = 100;
-    let effective_transcript: Vec<_> = transcript.iter().take(max_segments).collect();
-
     let mut volume_expr = "1.0".to_string();
 
-    // For each speech segment, lower the music volume
-    for seg in &effective_transcript {
+    for seg in transcript {
         volume_expr = format!(
             "if(between(t,{},{}),{},{volume_expr})",
             seg.start, seg.end, duck_volume
