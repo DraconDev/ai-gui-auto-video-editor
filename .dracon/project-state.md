@@ -1,8 +1,10 @@
 # Project State
 
 ## Current Focus
-Improved file path handling in batch processor by removing unnecessary `&` reference in path construction
+Improved code formatting and reliability in batch processing, ML region calculations, and STT model caching
 
 ## Completed
-- [x] Refactored path construction in `export_additional_files` to eliminate redundant `&` reference in `format!` call
-- [x] Updated Cargo.lock to reflect dependency changes from the refactoring
+- [x] Refactored silence merging logic in batch processor for better readability
+- [x] Improved ML region calculations with consistent formatting
+- [x] Enhanced STT model caching with more robust error handling
+- [x] Updated Cargo.lock to resolve dependency versions

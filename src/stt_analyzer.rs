@@ -55,8 +55,7 @@ impl CandleSttAnalyzer {
 
             let weights_file = repo.get("model.safetensors")?;
             let weights_tmp = weights_path.with_extension("tmp");
-            std::fs::copy(&weights_file, &weights_tmp)
-                .context("failed to cache model weights")?;
+            std::fs::copy(&weights_file, &weights_tmp).context("failed to cache model weights")?;
             std::fs::rename(&weights_tmp, &weights_path)
                 .context("failed to finalize model weights")?;
             info!("Whisper model cached successfully");

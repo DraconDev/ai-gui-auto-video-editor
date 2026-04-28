@@ -678,9 +678,18 @@ impl AutoReframeProcessor {
             let end = (i + half + 1).min(regions.len());
             let slice = &regions[start..end];
             let avg_x: f32 = slice.iter().map(|(_, r)| r.x).sum::<f32>() / slice.len() as f32;
-            let avg_width: f32 = slice.iter().map(|(_, r)| r.width).sum::<f32>() / slice.len() as f32;
+            let avg_width: f32 =
+                slice.iter().map(|(_, r)| r.width).sum::<f32>() / slice.len() as f32;
             let (t, first) = regions[i];
-            result.push((t, CropRegion { x: avg_x, y: first.y, width: avg_width, height: first.height }));
+            result.push((
+                t,
+                CropRegion {
+                    x: avg_x,
+                    y: first.y,
+                    width: avg_width,
+                    height: first.height,
+                },
+            ));
         }
         result
     }
