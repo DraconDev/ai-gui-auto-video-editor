@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Refactored module structure by reordering and renaming modules for better logical grouping
+Removed unused config module exports from the public API
 
 ## Completed
-- [x] Moved `gui` module from top to bottom of the module list for better logical grouping
-- [x] Added `analyzer` module declaration above `batch_processor` for improved module organization
+- [x] Removed unused `Config`, `FolderSettings`, `JoinMode`, `Preset`, `ProcessingConfig`, `SilenceMode`, and `VideoResolution` exports from the public API
+```
