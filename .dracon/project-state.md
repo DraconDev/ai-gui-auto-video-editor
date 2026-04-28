@@ -1,8 +1,13 @@
 # Project State
 
 ## Current Focus
-Improved test assertions for face detection edge case handling in video processing
+Added comprehensive tests for entropy parsing in video processing
 
 ## Completed
-- [x] Updated test assertion to verify proper clamping of crop region coordinates when face is at right edge
-- [x] Updated Cargo.lock with dependency version updates for video processing features
+- [x] Added test cases for parsing entropy values from ffmpeg output
+- [x] Implemented test for standard entropy output format
+- [x] Added test for multiple entropy values (last one wins)
+- [x] Included test for empty output case
+- [x] Added test for entropy values with spaces
+- [x] Implemented test for invalid entropy values
+- [x] Added test for cases with no entropy information

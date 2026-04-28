@@ -229,4 +229,30 @@ mod tests {
         extract_frame_at_time(&video, &frame, 320, 180, 1.5).unwrap();
         assert!(frame.exists(), "frame should be extracted");
     }
+
+    #[test]
+    fn test_parse_entropy() {
+        // Standard ffmpeg entropy output
+        let output = "[Parsed_showinfo_0] n:0.123456 q:0.123456\n[Parsed_showinfo_0] entropy:7.23456 next:0.000000";
+        assert_eq!(parse_entropy(output), Some(7.23456));
+
+        // Multiple lines, last one wins
+        let output2 = "frame:1\nentropy:5.0\nframe:2\nentropy:8.5";
+        assert_eq!(parse_entropy(output2), Some(8.5));
+
+        // No entropy line
+        let output3 = "frame:1 time:0.0";
+        assert_eq!(parse_entropy(output3), None);
+
+        // Empty output
+        assert_eq!(parse_entropy(""), None);
+
+        // Entropy with spaces
+        let output4 = "some log line\n  entropy:  9.75  \nend";
+        assert_eq!(parse_entropy(output4), Some(9.75));
+
+        // Invalid entropy value
+        let output5 = "entropy:notanumber";
+        assert_eq!(parse_entropy(output5), None);
+    }
 }
