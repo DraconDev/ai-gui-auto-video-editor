@@ -1,7 +1,9 @@
 # Project State
 
 ## Current Focus
-Updated dependency versions in Cargo.lock to resolve version conflicts and ensure consistent builds.
+Refactored caption burning process to directly overwrite the original output file
 
 ## Completed
-- [x] Updated dependency versions in Cargo.lock (likely due to recent refactoring work)
+- [x] Removed intermediate captioned video file by renaming the final output directly over the original file
+- [x] Simplified caption burning workflow by eliminating the temporary file step
+- [x] Maintained same functionality while reducing disk I/O operations

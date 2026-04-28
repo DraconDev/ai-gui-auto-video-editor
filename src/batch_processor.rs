@@ -623,15 +623,14 @@ fn export_additional_files(
     if config.export.captions {
         let ass_path = PathBuf::from(format!("{}.ass", base_path.display()));
         debug!(path = %ass_path.display(), "Generating styled captions");
-        // Generate styled ASS captions from transcript
         if let Some(ref t) = transcript {
             if let Err(e) = generate_styled_captions(t, &ass_path) {
                 warn!(error = %e, "Failed to generate styled captions");
             } else {
-                // Burn captions into video
                 info!("Burning captions into video");
                 let captioned_path = output_file.with_extension("captioned.mp4");
                 burn_subtitles_into_video(output_file, &ass_path, &captioned_path)?;
+                std::fs::rename(&captioned_path, output_file)?;
             }
         }
     }
