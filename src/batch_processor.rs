@@ -184,6 +184,7 @@ where
     )
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn process_single_file_with_intro_outro<A, E, D>(
     input_file: PathBuf,
     output_file: PathBuf,

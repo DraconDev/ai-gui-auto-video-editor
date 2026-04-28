@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Removed redundant model path caching logic in STT analyzer
+Improved FPS parsing in ML module and added argument annotation in batch processor
 
 ## Completed
-- [x] Removed duplicate `cached_model_path` function that was replaced by more robust caching in `ensure_model_cached`
-- [x] Simplified model path resolution by consolidating logic in the caching function
+- [x] Simplified FPS parsing in `FrameExtractor` by removing redundant `parse::<f32>` check
+- [x] Added `#[allow(clippy::too_many_arguments)]` annotation to `process_single_file_with_intro_outro` to suppress linter warning

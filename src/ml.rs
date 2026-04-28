@@ -122,10 +122,8 @@ impl FrameExtractor {
             let num: f32 = parts[0].parse().unwrap_or(25.0);
             let den: f32 = parts[1].parse().unwrap_or(1.0);
             if den > 0.0 { num / den } else { 25.0 }
-        } else if let Ok(fps) = fps_str.trim().parse::<f32>() {
-            fps
         } else {
-            25.0
+            fps_str.trim().parse::<f32>().unwrap_or(25.0)
         };
         Ok(fps)
     }
