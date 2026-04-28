@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Simplified video editor test assertions by removing redundant file size comparison
+Added error handling for preview generation in integration tests
 
 ## Completed
-- [x] Removed redundant assertion that verifies preview file size is smaller than original video
+- [x] Added error logging for preview generation failures in `test_generate_preview`
 - [x] Updated Cargo.lock with dependency version changes
