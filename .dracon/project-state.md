@@ -1,8 +1,7 @@
 # Project State
 
 ## Current Focus
-Refactored folder configuration merging logic to prioritize user config over preset defaults
+Updated dependency versions in Cargo.lock for video processing features
 
 ## Completed
-- [x] Changed `build_folder_config` to merge preset config into user config instead of the reverse
-- [x] Maintained same functionality while improving logical flow of configuration merging
+- [x] Updated Cargo.lock with new dependency versions for video processing features
