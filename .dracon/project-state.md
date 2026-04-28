@@ -1,8 +1,9 @@
 # Project State
 
 ## Current Focus
-Improved FPS parsing in ML module and added argument annotation in batch processor
+Refactored PCM to Mel spectrogram conversion with improved windowed sample handling
 
 ## Completed
-- [x] Simplified FPS parsing in `FrameExtractor` by removing redundant `parse::<f32>` check
-- [x] Added `#[allow(clippy::too_many_arguments)]` annotation to `process_single_file_with_intro_outro` to suppress linter warning
+- [x] Updated windowed sample assignment to use iterator pattern for better clarity
+- [x] Removed direct indexing in favor of iterator-based assignment in the windowed sample loop
+- [x] Maintained identical functionality while improving code readability and maintainability

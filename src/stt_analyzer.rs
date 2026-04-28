@@ -164,15 +164,15 @@ fn pcm_to_mel(config: &Config, pcm: &[f32], device: &Device) -> Result<Tensor> {
 
     let mut mel_spec = vec![0.0f32; n_mels * n_frames];
 
-    for frame_idx in 0..n_frames {
+        for frame_idx in 0..n_frames {
         let start = frame_idx * hop_length;
 
         let mut windowed = vec![Complex::new(0.0, 0.0); n_fft];
-        for i in 0..n_fft {
+        for (i, w) in windowed.iter_mut().enumerate() {
             let sample_idx = start + i;
             let sample = if sample_idx < pcm.len() { pcm[sample_idx] } else { 0.0 };
             let hann = 0.5 * (1.0 - (2.0 * std::f32::consts::PI * i as f32 / n_fft as f32).cos());
-            windowed[i] = Complex::new(sample * hann, 0.0);
+            *w = Complex::new(sample * hann, 0.0);
         }
 
         fft.process(&mut windowed);
