@@ -1,7 +1,8 @@
 # Project State
 
 ## Current Focus
-Removed an empty closing brace from the `tests` module in `theme.rs`
+Updated dependency versions in Cargo.lock for video processing features
 
 ## Completed
-- [x] Cleaned up the `theme.rs` file by removing an unnecessary closing brace in the `tests` module
+- [x] Updated dependency versions in Cargo.lock to ensure compatibility with video processing features
+```
