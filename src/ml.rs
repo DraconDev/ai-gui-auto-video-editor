@@ -733,11 +733,15 @@ mod tests {
 
     #[test]
     fn test_crop_region_center_crop_16_9() {
+        // 16:9 video: crop is a narrow vertical strip centered
         let region = CropRegion::center_crop_9_16(16.0 / 9.0);
-        assert_eq!(region.x, 0.0);
+        // crop_width = 0.5625 / 1.78 = 0.316 < 1.0
+        assert!(region.x > 0.0 && region.x < 1.0);
         assert_eq!(region.y, 0.0);
-        assert_eq!(region.width, 1.0);
+        assert!(region.width > 0.0 && region.width < 1.0);
         assert_eq!(region.height, 1.0);
+        // Centered horizontally
+        assert!((region.x - (1.0 - region.width) / 2.0).abs() < 0.001);
     }
 
     #[test]
