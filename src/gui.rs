@@ -121,11 +121,11 @@ impl ActivityEntry {
 
 #[derive(Debug, Clone)]
 pub struct FolderState {
-    input: PathBuf,
-    output: PathBuf,
-    preset: String,
-    enabled: bool,
-    settings: FolderSettings,
+    pub input: PathBuf,
+    pub output: PathBuf,
+    pub preset: String,
+    pub enabled: bool,
+    pub settings: FolderSettings,
 }
 
 impl From<WatchFolder> for FolderState {
