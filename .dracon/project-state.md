@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Refactored configuration preset parsing and folder configuration merging for better consistency
+Refactored hardware acceleration name parsing to standardize method naming
 
 ## Completed
-- [x] Renamed `Preset::from_str` to `Preset::parse_name` for consistent naming across configuration methods
-- [x] Updated folder configuration builder to use the new `parse_name` method instead of `from_str`
+- [x] Renamed `from_str` method to `parse_name` in hardware acceleration configuration
+```

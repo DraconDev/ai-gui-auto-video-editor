@@ -121,16 +121,16 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_hwaccel_from_str() {
-        assert_eq!(HwAccel::from_str("none"), Some(HwAccel::None));
-        assert_eq!(HwAccel::from_str("NVENC"), Some(HwAccel::Nvenc));
-        assert_eq!(HwAccel::from_str("nvidia"), Some(HwAccel::Nvenc));
-        assert_eq!(HwAccel::from_str("amf"), Some(HwAccel::Amf));
-        assert_eq!(HwAccel::from_str("amd"), Some(HwAccel::Amf));
-        assert_eq!(HwAccel::from_str("vaapi"), Some(HwAccel::Vaapi));
-        assert_eq!(HwAccel::from_str("videotoolbox"), Some(HwAccel::VideoToolbox));
-        assert_eq!(HwAccel::from_str("mac"), Some(HwAccel::VideoToolbox));
-        assert_eq!(HwAccel::from_str("unknown"), None);
+    fn test_hwaccel_parse_name() {
+        assert_eq!(HwAccel::parse_name("none"), Some(HwAccel::None));
+        assert_eq!(HwAccel::parse_name("NVENC"), Some(HwAccel::Nvenc));
+        assert_eq!(HwAccel::parse_name("nvidia"), Some(HwAccel::Nvenc));
+        assert_eq!(HwAccel::parse_name("amf"), Some(HwAccel::Amf));
+        assert_eq!(HwAccel::parse_name("amd"), Some(HwAccel::Amf));
+        assert_eq!(HwAccel::parse_name("vaapi"), Some(HwAccel::Vaapi));
+        assert_eq!(HwAccel::parse_name("videotoolbox"), Some(HwAccel::VideoToolbox));
+        assert_eq!(HwAccel::parse_name("mac"), Some(HwAccel::VideoToolbox));
+        assert_eq!(HwAccel::parse_name("unknown"), None);
     }
 
     #[test]
