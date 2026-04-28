@@ -96,6 +96,40 @@ impl FrameExtractor {
         }
     }
 
+    /// Get video frames per second (FPS) using ffprobe
+    pub fn get_video_fps(video_path: &Path) -> Result<f32> {
+        let path_str = video_path
+            .to_str()
+            .ok_or_else(|| anyhow::anyhow!("Video path contains invalid UTF-8 characters"))?;
+
+        let output = Command::new("ffprobe")
+            .args([
+                "-v",
+                "error",
+                "-select_streams",
+                "v:0",
+                "-show_entries",
+                "stream=r_frame_rate",
+                "-of",
+                "csv=p=0",
+                path_str,
+            ])
+            .output()?;
+
+        let fps_str = String::from_utf8_lossy(&output.stdout);
+        let parts: Vec<&str> = fps_str.trim().split('/').collect();
+        let fps = if parts.len() == 2 {
+            let num: f32 = parts[0].parse().unwrap_or(25.0);
+            let den: f32 = parts[1].parse().unwrap_or(1.0);
+            if den > 0.0 { num / den } else { 25.0 }
+        } else if let Ok(fps) = fps_str.trim().parse::<f32>() {
+            fps
+        } else {
+            25.0
+        };
+        Ok(fps)
+    }
+
     /// Get video duration in seconds
     pub fn get_video_duration(video_path: &Path) -> Result<f32> {
         let path_str = video_path
