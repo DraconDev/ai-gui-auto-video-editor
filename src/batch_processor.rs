@@ -452,7 +452,7 @@ where
         report_progress(&mut progress, 0.98, "Adding watermark");
         info!(watermark = ?watermark_path, "Adding watermark");
 
-        let position = crate::watermark::WatermarkPosition::from_str(&config.video.watermark_position)
+        let position = crate::watermark::WatermarkPosition::parse_name(&config.video.watermark_position)
             .unwrap_or(crate::watermark::WatermarkPosition::BottomRight);
         let scale = config.video.watermark_scale;
 

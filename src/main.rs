@@ -393,8 +393,8 @@ fn main() -> Result<()> {
     }
 
     // Apply config: use preloaded config if no CLI preset was specified
-    let mut config = if let Some(ref preset_str) = cli.preset {
-        let preset = Preset::from_str(preset_str).ok_or_else(|| {
+    let mut config =     if let Some(ref preset_str) = cli.preset {
+        let preset = Preset::parse_name(preset_str).ok_or_else(|| {
             anyhow::anyhow!(
                 "Unknown preset: {}. Valid presets: youtube, shorts, podcast, minimal",
                 preset_str
@@ -519,7 +519,7 @@ fn main() -> Result<()> {
         config.video.hw_accel = if gpu_str == "auto" {
             crate::hwaccel::HwAccel::detect()
         } else {
-            crate::hwaccel::HwAccel::from_str(gpu_str)
+            crate::hwaccel::HwAccel::parse_name(gpu_str)
                 .unwrap_or_else(|| {
                     eprintln!("Warning: unknown GPU type '{}', using CPU encoding", gpu_str);
                     crate::hwaccel::HwAccel::None
@@ -950,7 +950,7 @@ fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
 
                         // Build config for this folder's preset
                         let folder_config =
-                            if let Some(preset) = crate::config::Preset::from_str(&folder.preset) {
+                            if let Some(preset) = crate::config::Preset::parse_name(&folder.preset) {
                                 let mut c = preset.to_config();
                                 // Apply folder-level settings overrides
                                 if let Some(enhance) = folder.settings.enhance_audio {

@@ -81,7 +81,7 @@ impl WatermarkPosition {
     }
 
     /// Parse a position string into WatermarkPosition
-    pub fn from_str(s: &str) -> Option<Self> {
+    pub fn parse_name(s: &str) -> Option<Self> {
         match s.to_lowercase().as_str() {
             "top-left" | "topleft" | "tl" => Some(WatermarkPosition::TopLeft),
             "top-right" | "topright" | "tr" => Some(WatermarkPosition::TopRight),

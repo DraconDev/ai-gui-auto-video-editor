@@ -42,7 +42,7 @@ impl HwAccel {
     }
 
     /// Parse from string (case-insensitive).
-    pub fn from_str(s: &str) -> Option<Self> {
+    pub fn parse_name(s: &str) -> Option<Self> {
         match s.to_lowercase().as_str() {
             "none" => Some(HwAccel::None),
             "nvenc" | "nvidia" => Some(HwAccel::Nvenc),

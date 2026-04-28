@@ -1,8 +1,11 @@
 # Project State
 
 ## Current Focus
-Renamed `from_str` method to `parse_name` in configuration preset parsing
+Consistent naming for configuration parsing methods across the codebase
 
 ## Completed
-- [x] Renamed `Preset::from_str` to `Preset::parse_name` for clearer intent
+- [x] Renamed `from_str` to `parse_name` in watermark position parsing
+- [x] Renamed `from_str` to `parse_name` in hardware acceleration parsing
+- [x] Renamed `from_str` to `parse_name` in preset parsing
+- [x] Updated all call sites to use the new method names
 ```
