@@ -27,3 +27,7 @@ pub use batch_processor::{
 pub use editor::FfmpegEditor;
 pub use hwaccel::HwAccel;
 pub use ml::{AutoReframeProcessor, FaceDetector, FrameExtractor, PersonSegmenter};
+pub use config::{
+    Config, FolderSettings, JoinMode, Preset, ProcessingConfig, SilenceMode, VideoResolution,
+    WatchFolder,
+};

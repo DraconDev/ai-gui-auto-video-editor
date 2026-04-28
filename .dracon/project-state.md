@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Removed unused config module exports from the public API
+Added public exports for configuration-related types to the library API
 
 ## Completed
-- [x] Removed unused `Config`, `FolderSettings`, `JoinMode`, `Preset`, `ProcessingConfig`, `SilenceMode`, and `VideoResolution` exports from the public API
-```
+- [x] Exposed configuration-related types (`Config`, `FolderSettings`, `JoinMode`, `Preset`, `ProcessingConfig`, `SilenceMode`, `VideoResolution`, `WatchFolder`) through the public API
+- [x] Maintained consistent module structure while adding new public exports
