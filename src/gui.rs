@@ -120,7 +120,7 @@ impl ActivityEntry {
 }
 
 #[derive(Debug, Clone)]
-struct FolderState {
+pub(crate) struct FolderState {
     input: PathBuf,
     output: PathBuf,
     preset: String,
@@ -141,7 +141,7 @@ impl From<WatchFolder> for FolderState {
 }
 
 #[derive(Debug)]
-enum WatcherEvent {
+pub(crate) enum WatcherEvent {
     Status(ProcessingStatus),
     Log {
         message: String,
@@ -260,7 +260,7 @@ impl ModalState {
 }
 
 #[derive(Debug, Clone)]
-struct QueuedFile {
+pub(crate) struct QueuedFile {
     path: PathBuf,
     output_dir: PathBuf,
     preset: String,
