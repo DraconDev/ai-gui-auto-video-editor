@@ -8,7 +8,7 @@ use std::sync::{
 use std::time::{Duration, Instant};
 
 use super::{FolderState, ProcessingStatus, QueueEvent, WatcherEvent};
-use ai_vid_editor::{
+use crate::{
     Config, FfmpegAnalyzer, FfmpegDurationGetter, FfmpegEditor, Preset, ProcessingProgress,
     SilenceMode, process_single_file_with_intro_outro_progress,
 };

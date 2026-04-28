@@ -4,5 +4,5 @@
 Refactored module imports in GUI code to use crate-relative paths
 
 ## Completed
-- [x] Updated `gui.rs` to use `crate::` imports instead of direct `ai_vid_editor::` imports
-```
+- [x] Updated imports in `processing.rs` to use `crate::` instead of `ai_vid_editor::`
+- [x] Updated imports in `tabs.rs` to use `crate::` instead of `ai_vid_editor::`
