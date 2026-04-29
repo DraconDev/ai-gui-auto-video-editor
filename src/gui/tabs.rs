@@ -1394,24 +1394,20 @@ impl App {
 
             ui.label(label_secondary("Position"));
             ui.add_space(4.0);
-            let position_options: [(String, String); 4] = [
-                (String::from("Bottom Right"), String::from("bottom-right")),
-                (String::from("Bottom Left"), String::from("bottom-left")),
-                (String::from("Top Right"), String::from("top-right")),
-                (String::from("Top Left"), String::from("top-left")),
-            ];
-            let mut selected_pos = watermark_position.clone();
-            dropdown_selector(
-                ui,
-                &format!("watermark_pos_{}", folder_idx),
-                &mut selected_pos,
-                &position_options,
-                &watermark_position,
-            );
-            if selected_pos != watermark_position && let Some(f) = self.state.folders.get_mut(folder_idx) {
-                f.settings.watermark_position = Some(selected_pos);
-                needs_save = true;
-            }
+            ui.horizontal_wrapped(|ui| {
+                let positions = ["bottom-right", "bottom-left", "top-right", "top-left"];
+                let labels = ["Bottom R", "Bottom L", "Top R", "Top L"];
+                for (i, pos) in positions.iter().enumerate() {
+                    let is_selected = watermark_position == *pos;
+                    if ui.add(button_pill(is_selected, labels[i])).clicked()
+                        && let Some(f) = self.state.folders.get_mut(folder_idx)
+                    {
+                        f.settings.watermark_position = Some(pos.to_string());
+                        needs_save = true;
+                    }
+                    ui.add_space(4.0);
+                }
+            });
 
             ui.add_space(6.0);
 
@@ -1587,18 +1583,18 @@ impl App {
         if clips {
             ui.add_space(6.0);
 
-            let mut clip_count = clip_count;
+            let mut clip_count_f = clip_count as f32;
             let clip_count_label = format!("{} clips", clip_count);
             if Self::draw_advanced_slider(
                 ui,
                 "Clip Count",
                 "Number of highlight clips to extract",
-                &mut clip_count,
+                &mut clip_count_f,
                 1.0..=10.0,
                 clip_count_label,
             ) && let Some(f) = self.state.folders.get_mut(folder_idx)
             {
-                f.settings.clip_count = Some(clip_count as u32);
+                f.settings.clip_count = Some(clip_count_f as u32);
                 needs_save = true;
             }
             ui.add_space(6.0);
