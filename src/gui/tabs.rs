@@ -1486,8 +1486,6 @@ impl App {
         let clip_count = folder.and_then(|f| f.settings.clip_count).unwrap_or(3);
         let clip_min_duration = folder.and_then(|f| f.settings.clip_min_duration).unwrap_or(15.0);
         let clip_max_duration = folder.and_then(|f| f.settings.clip_max_duration).unwrap_or(60.0);
-        let original_clip_min = clip_min_duration;
-        let original_clip_max = clip_max_duration;
 
         ui.label(section_title("Exports"));
         ui.add_space(4.0);
@@ -1697,7 +1695,7 @@ impl App {
                 "Max Clip Duration",
                 "Longest clip length to extract",
                 &mut new_clip_max,
-                30.0..=300.0,
+                new_clip_min.max(30.0)..=300.0,
                 max_label,
                 1.0,
             ) && let Some(f) = self.state.folders.get_mut(folder_idx)
@@ -1705,18 +1703,6 @@ impl App {
                 f.settings.clip_max_duration = Some(new_clip_max);
                 needs_save = true;
             }
-
-            if new_clip_min > new_clip_max {
-                ui.add_space(6.0);
-                Self::draw_validation_warning(
-                    ui,
-                    &format!("Min duration ({:.0}s) > Max duration ({:.0}s)", new_clip_min, new_clip_max),
-                );
-                // Revert invalid settings and don't save
-                if let Some(f) = self.state.folders.get_mut(folder_idx) {
-                    f.settings.clip_min_duration = Some(original_clip_min);
-                    f.settings.clip_max_duration = Some(original_clip_max);
-                }
                 needs_save = false;
             }
         }
