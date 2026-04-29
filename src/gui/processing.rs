@@ -375,6 +375,9 @@ pub fn build_folder_config(config: &Config, folder: &FolderState) -> Config {
     if let Some(thumbnail) = folder.settings.thumbnail {
         merged.export.thumbnail = thumbnail;
     }
+    if let Some(ref extra_resolutions) = folder.settings.extra_resolutions {
+        merged.export.extra_resolutions = extra_resolutions.clone();
+    }
 
     merged
 }

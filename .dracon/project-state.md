@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Add `extra_resolutions` configuration support and update generation logic to consider it
+Add support for `extra_resolutions` configuration in the export settings
 
 ## Completed
-- [x] Added `extra_resolutions: Option<Vec<VideoResolution>>` field to `FolderSettings` with serialization guard
-- [x] Modified `FolderSettings::maybe_generate_local_files` to include `self.extra_resolutions.is_none()` condition
+- [x] Add handling for `extra_resolutions` in `build_folder_config`
+- [x] Clone `extra_resolutions` into `merged.export.extra_resolutions`
