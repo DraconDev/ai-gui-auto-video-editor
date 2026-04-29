@@ -250,20 +250,40 @@ mode = "cut"
 #   6.0 = 6x speed (very fast, may be noticeable)
 #
 # NOTE: Only applies when mode = "speedup"
-speedup_factor = 4.0
+min_silence_for_speedup = 0.5
 
-# Minimum silence duration to apply speedup (seconds)
+# Enable scene-change detection to augment silence-based cuts
 #
 # HOW IT WORKS:
-#   Silences shorter than this are CUT, not sped up
-#   Prevents jarring speed changes on short pauses
+#   Detects visual scene changes (cuts, transitions) and uses them
+#   as additional cut points alongside silence detection.
+#   This prevents keeping awkward transitions at the start/end of scenes.
 #
-# RECOMMENDED: 0.5 seconds (default)
+# WHEN TO USE:
+#   - Videos with lots of cuts or B-roll
+#   - When silence detection misses transitions
+#   - Interview content with camera cuts
 #
-# WHY THIS EXISTS:
-#   Speeding up a 0.2 second pause creates a weird blip
-#   Better to just cut very short silences
-min_silence_for_speedup = 0.5
+# WHEN NOT TO USE:
+#   - Single-shot videos (no cuts)
+#   - Screen recordings
+#
+# CLI equivalent: --scene-detect
+scene_detect = false
+
+# Scene detection threshold (0.0 to 1.0)
+#
+# HOW IT WORKS:
+#   Higher = only obvious scene changes detected
+#   Lower = more sensitive, detects subtle transitions
+#
+# RECOMMENDED VALUES:
+#   0.3 = Balanced (recommended)
+#   0.2 = Sensitive (detects more transitions)
+#   0.5 = Conservative (only clear cuts)
+#
+# CLI equivalent: --scene-threshold
+scene_threshold = 0.3
 
 # =============================================================================
 # FILLER WORD REMOVAL - Remove "um", "uh", etc.
