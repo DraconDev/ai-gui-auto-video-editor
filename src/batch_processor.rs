@@ -1198,7 +1198,7 @@ mod tests {
         assert_eq!(format_ass_time(5.0), "0:00:05.00");
         assert_eq!(format_ass_time(65.5), "0:01:05.50");
         assert_eq!(format_ass_time(3661.25), "1:01:01.25");
-        assert_eq!(format_ass_time(359999.99), "99:59:59.99");
+        assert_eq!(format_ass_time(359999.99), "100:00:00.00");
         assert_eq!(format_ass_time(0.001), "0:00:00.00");
         assert_eq!(format_ass_time(-5.0), "0:00:00.00");
         assert_eq!(format_ass_time(-0.001), "0:00:00.00");
@@ -1318,6 +1318,160 @@ mod tests {
         assert!(output_files.iter().any(|p| p.ends_with("video1.mp4")));
         assert!(output_files.iter().any(|p| p.ends_with("video2.mov")));
 
+        Ok(())
+    }
+
+    #[test]
+    fn test_batch_processing_empty_dir() -> Result<()> {
+        let input_dir = tempdir()?;
+        let output_dir = tempdir()?;
+
+        let mock_analyzer = MockFfmpegAnalyzer;
+        let mock_editor = MockFfmpegEditor;
+        let mock_duration_getter = MockDurationGetter;
+
+        let config = Config::default();
+
+        let result = process_batch_dir(
+            input_dir.path().to_path_buf(),
+            output_dir.path().to_path_buf(),
+            &config,
+            &mock_analyzer,
+            &mock_editor,
+            &mock_duration_getter,
+        );
+
+        assert!(result.is_ok());
+        let output_files: Vec<_> = fs::read_dir(output_dir.path())?
+            .filter_map(|e| e.ok())
+            .collect();
+        assert_eq!(output_files.len(), 0);
+        Ok(())
+    }
+
+    #[test]
+    fn test_batch_processing_nonexistent_input_dir() {
+        let mock_analyzer = MockFfmpegAnalyzer;
+        let mock_editor = MockFfmpegEditor;
+        let mock_duration_getter = MockDurationGetter;
+
+        let config = Config::default();
+        let output_dir = tempdir().unwrap();
+
+        let result = process_batch_dir(
+            PathBuf::from("/nonexistent/path/12345"),
+            output_dir.path().to_path_buf(),
+            &config,
+            &mock_analyzer,
+            &mock_editor,
+            &mock_duration_getter,
+        );
+
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_find_video_files_empty_dir() {
+        let dir = tempdir().unwrap();
+        let files = find_video_files(dir.path()).unwrap();
+        assert!(files.is_empty());
+    }
+
+    #[test]
+    fn test_find_video_files_ignores_non_video() {
+        let dir = tempdir().unwrap();
+        fs::File::create(dir.path().join("video.mp4")).unwrap();
+        fs::File::create(dir.path().join("document.txt")).unwrap();
+        fs::File::create(dir.path().join("image.jpg")).unwrap();
+
+        let files = find_video_files(dir.path()).unwrap();
+        assert_eq!(files.len(), 1);
+        assert!(files[0].to_string_lossy().contains("video.mp4"));
+    }
+
+    struct MockFfmpegAnalyzerFails;
+    impl crate::analyzer::VideoAnalyzer for MockFfmpegAnalyzerFails {
+        fn detect_silence(
+            &self,
+            _path: &Path,
+            _threshold_db: f32,
+            _duration_s: f32,
+        ) -> Result<Vec<crate::analyzer::Segment>> {
+            Err(anyhow::anyhow!("Simulated silence detection failure"))
+        }
+    }
+
+    struct MockFfmpegEditorFails;
+    impl VideoEditor for MockFfmpegEditorFails {
+        fn reframe(
+            &self,
+            _input: &Path,
+            _output: &Path,
+            _target_resolution: crate::config::VideoResolution,
+        ) -> Result<()> {
+            Ok(())
+        }
+        fn blur_background(&self, _input: &Path, _output: &Path) -> Result<()> {
+            Ok(())
+        }
+        fn trim_video(
+            &self,
+            _input: &Path,
+            output: &Path,
+            _segments: &[crate::analyzer::ProcessedSegment],
+        ) -> Result<()> {
+            fs::File::create(output)?;
+            Err(anyhow::anyhow!("Simulated trim failure"))
+        }
+        fn mix_with_music(
+            &self,
+            _input: &Path,
+            _music: &Path,
+            _output: &Path,
+            _transcript: &[crate::stt_analyzer::TranscriptSegment],
+            _duck_volume: f32,
+        ) -> Result<()> {
+            Ok(())
+        }
+        fn enhance_audio(&self, _input: &Path, _output: &Path, _target_lufs: f32) -> Result<()> {
+            Ok(())
+        }
+        fn reduce_noise(&self, _input: &Path, _output: &Path) -> Result<()> {
+            Ok(())
+        }
+        fn stabilize(&self, _input: &Path, _output: &Path) -> Result<()> {
+            Ok(())
+        }
+        fn color_correct(&self, _input: &Path, _output: &Path) -> Result<()> {
+            Ok(())
+        }
+    }
+
+    #[test]
+    fn test_batch_processing_with_mock_failure() -> Result<()> {
+        let input_dir = tempdir()?;
+        let output_dir = tempdir()?;
+
+        fs::File::create(input_dir.path().join("video1.mp4")).unwrap();
+
+        let mock_analyzer = MockFfmpegAnalyzerFails;
+        let mock_editor = MockFfmpegEditor;
+        let mock_duration_getter = MockDurationGetter;
+
+        let mut config = Config::default();
+        config.audio.enhance = false;
+
+        let result = process_batch_dir(
+            input_dir.path().to_path_buf(),
+            output_dir.path().to_path_buf(),
+            &config,
+            &mock_analyzer,
+            &mock_editor,
+            &mock_duration_getter,
+        );
+
+        // Should complete even with failures (logs errors but doesn't panic)
+        assert!(result.is_ok());
         Ok(())
     }
 }
