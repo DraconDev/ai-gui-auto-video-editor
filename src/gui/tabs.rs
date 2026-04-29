@@ -1609,6 +1609,36 @@ impl App {
             f.settings.multi_format = Some(multi_format);
             needs_save = true;
         }
+
+        if multi_format {
+            ui.add_space(6.0);
+            ui.label(label_secondary("Extra Resolutions"));
+            ui.add_space(4.0);
+            let mut current_resolutions = extra_resolutions;
+            let available_resolutions: [(VideoResolution, &str); 4] = [
+                (VideoResolution::Hd720p, "720p"),
+                (VideoResolution::Qhd1440p, "1440p"),
+                (VideoResolution::Uhd4k, "4K"),
+                (VideoResolution::Vertical720p, "Vertical 720p"),
+            ];
+            ui.horizontal_wrapped(|ui| {
+                for (res, label) in available_resolutions {
+                    let is_selected = current_resolutions.contains(&res);
+                    if ui.add(button_pill(is_selected, label)).clicked() {
+                        if is_selected {
+                            current_resolutions.retain(|r| *r != res);
+                        } else {
+                            current_resolutions.push(res);
+                        }
+                        if let Some(f) = self.state.folders.get_mut(folder_idx) {
+                            f.settings.extra_resolutions = Some(current_resolutions.clone());
+                            needs_save = true;
+                        }
+                    }
+                    ui.add_space(4.0);
+                }
+            });
+        }
         ui.add_space(12.0);
 
         let mut clips = clips;
