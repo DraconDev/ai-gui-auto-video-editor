@@ -255,18 +255,53 @@ pub fn build_folder_config(config: &Config, folder: &FolderState) -> Config {
         config.clone()
     };
 
+    // Silence settings
     if let Some(silence_mode) = folder.settings.silence_mode {
         merged.silence.mode = silence_mode;
     }
     if let Some(threshold) = folder.settings.silence_threshold_db {
         merged.silence.threshold_db = threshold;
     }
+    if let Some(min_duration) = folder.settings.silence_min_duration {
+        merged.silence.min_duration = min_duration;
+    }
+    if let Some(padding) = folder.settings.silence_padding {
+        merged.silence.padding = padding;
+    }
+    if let Some(speedup_factor) = folder.settings.silence_speedup_factor {
+        merged.silence.speedup_factor = speedup_factor;
+    }
+    if let Some(min_silence_for_speedup) = folder.settings.silence_min_silence_for_speedup {
+        merged.silence.min_silence_for_speedup = min_silence_for_speedup;
+    }
+    if let Some(scene_threshold) = folder.settings.silence_scene_threshold {
+        merged.silence.scene_threshold = scene_threshold;
+    }
+    if let Some(scene_detect) = folder.settings.scene_detect {
+        merged.silence.scene_detect = scene_detect;
+    }
+
+    // Audio settings
     if let Some(enhance_audio) = folder.settings.enhance_audio {
         merged.audio.enhance = enhance_audio;
     }
     if let Some(target_lufs) = folder.settings.target_lufs {
         merged.audio.target_lufs = target_lufs;
     }
+    if let Some(noise_reduction) = folder.settings.noise_reduction {
+        merged.audio.noise_reduction = noise_reduction;
+    }
+    if let Some(music_path) = folder.settings.music_path.clone() {
+        merged.paths.music = Some(music_path);
+    }
+    if let Some(duck_volume) = folder.settings.duck_volume {
+        merged.audio.duck_volume = duck_volume;
+    }
+    if let Some(filler_words) = folder.settings.filler_words {
+        merged.filler_words.enabled = filler_words;
+    }
+
+    // Video settings
     if let Some(stabilize) = folder.settings.stabilize {
         merged.video.stabilize = stabilize;
     }
@@ -285,14 +320,27 @@ pub fn build_folder_config(config: &Config, folder: &FolderState) -> Config {
     if let Some(target_resolution) = folder.settings.target_resolution {
         merged.video.target_resolution = target_resolution;
     }
-    if let Some(noise_reduction) = folder.settings.noise_reduction {
-        merged.audio.noise_reduction = noise_reduction;
+    if let Some(watermark_path) = folder.settings.watermark_path.clone() {
+        merged.video.watermark = Some(watermark_path);
     }
+    if let Some(watermark_position) = folder.settings.watermark_position.clone() {
+        merged.video.watermark_position = watermark_position;
+    }
+    if let Some(watermark_scale) = folder.settings.watermark_scale {
+        merged.video.watermark_scale = watermark_scale;
+    }
+
+    // Path settings
+    if let Some(intro_path) = folder.settings.intro_path.clone() {
+        merged.paths.intro = Some(intro_path);
+    }
+    if let Some(outro_path) = folder.settings.outro_path.clone() {
+        merged.paths.outro = Some(outro_path);
+    }
+
+    // Export settings
     if let Some(preview) = folder.settings.preview {
         merged.export.preview = preview;
-    }
-    if let Some(scene_detect) = folder.settings.scene_detect {
-        merged.silence.scene_detect = scene_detect;
     }
     if let Some(multi_format) = folder.settings.multi_format {
         merged.export.multi_format = multi_format;
@@ -308,6 +356,24 @@ pub fn build_folder_config(config: &Config, folder: &FolderState) -> Config {
     }
     if let Some(clips) = folder.settings.clips {
         merged.export.clips = clips;
+    }
+    if let Some(clip_count) = folder.settings.clip_count {
+        merged.export.clip_count = clip_count;
+    }
+    if let Some(clip_min_duration) = folder.settings.clip_min_duration {
+        merged.export.clip_min_duration = clip_min_duration;
+    }
+    if let Some(clip_max_duration) = folder.settings.clip_max_duration {
+        merged.export.clip_max_duration = clip_max_duration;
+    }
+    if let Some(fcpxml) = folder.settings.fcpxml {
+        merged.export.fcpxml = fcpxml;
+    }
+    if let Some(edl) = folder.settings.edl {
+        merged.export.edl = edl;
+    }
+    if let Some(thumbnail) = folder.settings.thumbnail {
+        merged.export.thumbnail = thumbnail;
     }
 
     merged
