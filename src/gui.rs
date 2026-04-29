@@ -312,6 +312,7 @@ enum QueueStatus {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
+#[allow(dead_code)]
 pub(crate) enum ToastKind {
     Success,
     Error,
@@ -366,10 +367,12 @@ impl AppState {
         }
     }
 
+    #[allow(dead_code)]
     fn add_warning(&mut self, message: impl Into<String>) {
         self.add_toast(message, ToastKind::Warning);
     }
 
+    #[allow(dead_code)]
     fn add_info(&mut self, message: impl Into<String>) {
         self.add_toast(message, ToastKind::Info);
     }

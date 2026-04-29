@@ -1,7 +1,10 @@
 # Project State
 
 ## Current Focus
-Update dependency lock file after dependency rebuild with unchanged dependencies
+Adds warning and info toast kinds with theming to UI notifications
 
 ## Completed
-- [x] chore(deps): regenerated Cargo.lock after dependency rebuild (unchanged dependencies)
+- [x] Defines ToastKind enum with underlying variants for toast categorisation
+- [x] Implements add_warning(&mut self, message) method to enqueue warning toasts
+- [x] Implements add_info(&mut self, message) method to enqueue info toasts
+- [x] Adds allow‑dead_code attributes to suppress warnings on newly added items
