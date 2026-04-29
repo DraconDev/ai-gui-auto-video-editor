@@ -598,12 +598,10 @@ impl AppState {
     }
 
     fn remove_folder(&mut self, index: usize) {
-        if self.folders.len() > 1 {
-            self.folders.remove(index);
-            self.activity_log
-                .push(ActivityEntry::simple("Removed watch folder", true));
-            self.auto_save_config();
-        }
+        self.folders.remove(index);
+        self.activity_log
+            .push(ActivityEntry::simple("Removed watch folder", true));
+        self.auto_save_config();
     }
 
     fn toggle_folder(&mut self, index: usize) {
