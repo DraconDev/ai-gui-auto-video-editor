@@ -2144,12 +2144,16 @@ impl App {
                                 let output_dir = folder
                                     .map(|f| f.output.clone())
                                     .unwrap_or_else(|| PathBuf::from("output"));
+                                let preset = folder
+                                    .map(|f| f.preset.clone())
+                                    .unwrap_or_else(|| "youtube".to_string());
                                 let settings = folder
                                     .map(|f| f.settings.clone())
                                     .unwrap_or_default();
                                 self.state.batch_queue.push(super::QueuedFile {
                                     path,
                                     output_dir,
+                                    preset,
                                     settings,
                                     status: super::QueueStatus::Queued,
                                     progress: 0.0,
