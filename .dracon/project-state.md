@@ -1,8 +1,7 @@
 # Project State
 
 ## Current Focus
-Build release binary with both CLI and GUI enabled
+Update release script to build the project with default features instead of explicitly enabling the `gui` feature flag.
 
 ## Completed
-- [x] Update message to indicate CLI + GUI build
-- [x] Remove GUI feature flag from cargo build command to produce a unified binary
+- [x] Release script now uses `cargo build --release` to build the binary with default feature set, removing the explicit `--features gui` flag.

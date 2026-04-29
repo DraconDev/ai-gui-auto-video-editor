@@ -23,7 +23,7 @@ cargo test --all-features
 cargo clippy --all-features
 
 info "Building release binary"
-cargo build --release --features gui
+cargo build --release
 
 info "Preparing release directory"
 rm -rf "$DIST_DIR"
