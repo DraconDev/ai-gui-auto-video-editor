@@ -411,6 +411,7 @@ pub fn slider_glow(
     value: &mut f32,
     range: std::ops::RangeInclusive<f32>,
     ui: &mut egui::Ui,
+    step: f32,
 ) -> egui::Response {
     let spacing = ui.spacing();
     let slider_width = spacing.slider_width;
@@ -459,13 +460,18 @@ pub fn slider_glow(
         if let Some(pos) = pointer_pos {
             let new_fraction = ((pos.x - rect.left()) / rect.width()).clamp(0.0, 1.0);
             let new_value = *range.start() + new_fraction * range_size;
-            let stepped = (new_value / 1.0).round() * 1.0;
+            let stepped = (new_value / step).round() * step;
             *value = stepped.clamp(*range.start(), *range.end());
             response.mark_changed();
         }
     }
 
-    let value_text = format!("{}", *value as i32);
+    let value_text = if step >= 1.0 {
+        format!("{}", *value as i32)
+    } else {
+        let decimals = (-step.log10()).ceil() as usize;
+        format!("{:.min(decimals, 2)$}", *value)
+    };
     let text_color = TEXT_SECONDARY;
     let font_id = egui::FontId::proportional(13.0);
     let text_galley = painter.layout_no_wrap(value_text, font_id, text_color);

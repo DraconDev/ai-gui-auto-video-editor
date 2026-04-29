@@ -1103,6 +1103,7 @@ impl App {
             &mut threshold,
             -60.0..=-10.0,
             threshold_label,
+            1.0,
         ) && let Some(f) = self.state.folders.get_mut(folder_idx)
         {
             f.settings.silence_threshold_db = Some(threshold);
@@ -1139,6 +1140,7 @@ impl App {
             &mut silence_padding,
             0.0..=0.5,
             padding_label,
+            0.01,
         ) && let Some(f) = self.state.folders.get_mut(folder_idx)
         {
             f.settings.silence_padding = Some(silence_padding);
@@ -1155,6 +1157,7 @@ impl App {
             &mut silence_min_duration,
             0.1..=2.0,
             min_dur_label,
+            0.1,
         ) && let Some(f) = self.state.folders.get_mut(folder_idx)
         {
             f.settings.silence_min_duration = Some(silence_min_duration);
@@ -1172,6 +1175,7 @@ impl App {
                 &mut silence_speedup_factor,
                 1.5..=8.0,
                 speedup_label,
+                0.1,
             ) && let Some(f) = self.state.folders.get_mut(folder_idx)
             {
                 f.settings.silence_speedup_factor = Some(silence_speedup_factor);
@@ -1823,6 +1827,7 @@ impl App {
         value: &mut f32,
         range: std::ops::RangeInclusive<f32>,
         value_label: String,
+        step: f32,
     ) -> bool {
         let mut changed = false;
         settings_toggle_frame(true).show(ui, |ui| {
@@ -1833,7 +1838,7 @@ impl App {
                 });
             });
             ui.add_space(8.0);
-            if slider_glow(value, range, ui).changed() {
+            if slider_glow(value, range, ui, step).changed() {
                 changed = true;
             }
             ui.add_space(4.0);
