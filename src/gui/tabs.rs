@@ -2138,6 +2138,30 @@ impl App {
                         .strong(),
                 );
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                    if ui.add(button_small("Import")).clicked() {
+                        if let Some(path) = rfd::FileDialog::new()
+                            .add_filter("JSON", &["json"])
+                            .pick_file()
+                        {
+                            if let Err(e) = self.state.import_config_from(&path) {
+                                self.state.add_toast(&format!("Import failed: {}", e), ToastKind::Error);
+                            } else {
+                                self.state.add_toast("Config imported successfully", ToastKind::Success);
+                            }
+                        }
+                    }
+                    if ui.add(button_small("Export")).clicked() {
+                        if let Some(path) = rfd::FileDialog::new()
+                            .add_filter("JSON", &["json"])
+                            .save_file()
+                        {
+                            if let Err(e) = self.state.export_config_to(&path) {
+                                self.state.add_toast(&format!("Export failed: {}", e), ToastKind::Error);
+                            } else {
+                                self.state.add_toast("Config exported successfully", ToastKind::Success);
+                            }
+                        }
+                    }
                     if ui.add(button_small("Clear")).clicked() {
                         self.state.activity_log.clear();
                     }
