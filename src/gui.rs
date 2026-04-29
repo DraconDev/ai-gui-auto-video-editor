@@ -612,6 +612,54 @@ impl AppState {
         self.auto_save_config();
     }
 
+    fn duplicate_folder(&mut self, index: usize) {
+        if let Some(original) = self.folders.get(index).cloned() {
+            let mut new_folder = original;
+            new_folder.input = PathBuf::from(format!("{}_copy", original.input.display()));
+            new_folder.output = PathBuf::from(format!("{}_copy", original.output.display()));
+            self.folders.push(new_folder);
+            self.selected_folder_idx = self.folders.len() - 1;
+            self.activity_log
+                .push(ActivityEntry::simple("Duplicated watch folder", true));
+            self.auto_save_config();
+        }
+    }
+
+    fn export_config_to(&mut self, path: &Path) -> std::io::Result<()> {
+        self.config.paths.watch_folders = self
+            .folders
+            .iter()
+            .map(|f| {
+                let st: FolderState = f.clone();
+                WatchFolder::from(st)
+            })
+            .collect();
+
+        let json = serde_json::to_string_pretty(&self.config.paths.watch_folders)
+            .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))?;
+
+        std::fs::write(path, json)?;
+        self.activity_log
+            .push(ActivityEntry::simple("Exported config to file", true));
+        Ok(())
+    }
+
+    fn import_config_from(&mut self, path: &Path) -> std::io::Result<()> {
+        let json = std::fs::read_to_string(path)?;
+        let watch_folders: Vec<WatchFolder> = serde_json::from_str(&json)
+            .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))?;
+
+        self.folders = watch_folders
+            .iter()
+            .map(|f| f.clone().into())
+            .collect();
+        self.selected_folder_idx = 0;
+        self.activity_log
+            .push(ActivityEntry::simple("Imported config from file", true));
+        self.auto_save_config();
+        Ok(())
+    }
+
     fn toggle_folder(&mut self, index: usize) {
         if let Some(folder) = self.folders.get_mut(index) {
             folder.enabled = !folder.enabled;
