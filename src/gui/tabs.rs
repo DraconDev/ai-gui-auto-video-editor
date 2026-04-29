@@ -1294,6 +1294,11 @@ impl App {
         let target_res = folder
             .and_then(|f| f.settings.target_resolution)
             .unwrap_or(VideoResolution::Fhd1080p);
+        let watermark_path = folder.and_then(|f| f.settings.watermark_path.clone());
+        let watermark_position = folder
+            .and_then(|f| f.settings.watermark_position.clone())
+            .unwrap_or_else(|| "bottom-right".to_string());
+        let watermark_scale = folder.and_then(|f| f.settings.watermark_scale).unwrap_or(1.0);
 
         ui.label(section_title("Video Output"));
         ui.add_space(8.0);
@@ -1350,6 +1355,82 @@ impl App {
             needs_save = true;
         }
 
+        ui.add_space(12.0);
+        ui.label(section_title("Watermark"));
+        ui.add_space(8.0);
+
+        ui.label(label_secondary("Watermark Image"));
+        ui.add_space(4.0);
+        ui.horizontal(|ui| {
+            let watermark_label = watermark_path
+                .as_ref()
+                .and_then(|p| p.file_name())
+                .map(|n| n.to_string_lossy().to_string())
+                .unwrap_or_else(|| "None".to_string());
+            ui.label(label_muted(&watermark_label));
+            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                if ui.add(button_small("Choose PNG...")).clicked() {
+                    if let Some(path) = FileDialog::new()
+                        .add_filter("Image", &["png"])
+                        .pick_file()
+                    {
+                        if let Some(f) = self.state.folders.get_mut(folder_idx) {
+                            f.settings.watermark_path = Some(path);
+                            needs_save = true;
+                        }
+                    }
+                }
+                if watermark_path.is_some() && ui.add(button_small("✕")).clicked() {
+                    if let Some(f) = self.state.folders.get_mut(folder_idx) {
+                        f.settings.watermark_path = None;
+                        needs_save = true;
+                    }
+                }
+            });
+        });
+
+        if watermark_path.is_some() {
+            ui.add_space(6.0);
+
+            ui.label(label_secondary("Position"));
+            ui.add_space(4.0);
+            let position_options: [(String, String); 4] = [
+                (String::from("Bottom Right"), String::from("bottom-right")),
+                (String::from("Bottom Left"), String::from("bottom-left")),
+                (String::from("Top Right"), String::from("top-right")),
+                (String::from("Top Left"), String::from("top-left")),
+            ];
+            let mut selected_pos = watermark_position.clone();
+            dropdown_selector(
+                ui,
+                &format!("watermark_pos_{}", folder_idx),
+                &mut selected_pos,
+                &position_options,
+                &watermark_position,
+            );
+            if selected_pos != watermark_position && let Some(f) = self.state.folders.get_mut(folder_idx) {
+                f.settings.watermark_position = Some(selected_pos);
+                needs_save = true;
+            }
+
+            ui.add_space(6.0);
+
+            let mut watermark_scale = watermark_scale;
+            let scale_label = format!("{:.1}x", watermark_scale);
+            if Self::draw_advanced_slider(
+                ui,
+                "Scale",
+                "Size of watermark relative to video",
+                &mut watermark_scale,
+                0.1..=3.0,
+                scale_label,
+            ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+            {
+                f.settings.watermark_scale = Some(watermark_scale);
+                needs_save = true;
+            }
+        }
+
         needs_save
     }
 
@@ -1363,6 +1444,13 @@ impl App {
         let clips = folder.and_then(|f| f.settings.clips).unwrap_or(false);
         let preview = folder.and_then(|f| f.settings.preview).unwrap_or(false);
         let multi_format = folder.and_then(|f| f.settings.multi_format).unwrap_or(false);
+        let fcpxml = folder.and_then(|f| f.settings.fcpxml).unwrap_or(false);
+        let edl = folder.and_then(|f| f.settings.edl).unwrap_or(false);
+        let thumbnail = folder.and_then(|f| f.settings.thumbnail).unwrap_or(false);
+        let filler_words = folder.and_then(|f| f.settings.filler_words).unwrap_or(false);
+        let clip_count = folder.and_then(|f| f.settings.clip_count).unwrap_or(3);
+        let clip_min_duration = folder.and_then(|f| f.settings.clip_min_duration).unwrap_or(15.0);
+        let clip_max_duration = folder.and_then(|f| f.settings.clip_max_duration).unwrap_or(60.0);
 
         ui.label(section_title("Exports"));
         ui.add_space(8.0);
@@ -1406,15 +1494,54 @@ impl App {
         }
         ui.add_space(6.0);
 
-        let mut clips = clips;
+        let mut fcpxml = fcpxml;
         if Self::draw_settings_toggle(
             ui,
-            "Extract Clips",
-            "Pull highlight clips for Shorts, Reels, TikTok",
-            &mut clips,
+            "FCPXML",
+            "Final Cut Pro XML for DaVinci/Premiere",
+            &mut fcpxml,
         ) && let Some(f) = self.state.folders.get_mut(folder_idx)
         {
-            f.settings.clips = Some(clips);
+            f.settings.fcpxml = Some(fcpxml);
+            needs_save = true;
+        }
+        ui.add_space(6.0);
+
+        let mut edl = edl;
+        if Self::draw_settings_toggle(
+            ui,
+            "EDL",
+            "Edit Decision List for Avid/Premiere",
+            &mut edl,
+        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.edl = Some(edl);
+            needs_save = true;
+        }
+        ui.add_space(6.0);
+
+        let mut thumbnail = thumbnail;
+        if Self::draw_settings_toggle(
+            ui,
+            "Thumbnail",
+            "Extract a thumbnail image from the video",
+            &mut thumbnail,
+        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.thumbnail = Some(thumbnail);
+            needs_save = true;
+        }
+        ui.add_space(6.0);
+
+        let mut filler_words = filler_words;
+        if Self::draw_settings_toggle(
+            ui,
+            "Remove Filler Words",
+            "Automatically cut um, uh, ah, er from audio",
+            &mut filler_words,
+        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.filler_words = Some(filler_words);
             needs_save = true;
         }
         ui.add_space(6.0);
@@ -1443,6 +1570,70 @@ impl App {
             f.settings.multi_format = Some(multi_format);
             needs_save = true;
         }
+        ui.add_space(12.0);
+
+        let mut clips = clips;
+        if Self::draw_settings_toggle(
+            ui,
+            "Extract Clips",
+            "Pull highlight clips for Shorts, Reels, TikTok",
+            &mut clips,
+        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.clips = Some(clips);
+            needs_save = true;
+        }
+
+        if clips {
+            ui.add_space(6.0);
+
+            let mut clip_count = clip_count;
+            let clip_count_label = format!("{} clips", clip_count);
+            if Self::draw_advanced_slider(
+                ui,
+                "Clip Count",
+                "Number of highlight clips to extract",
+                &mut clip_count,
+                1.0..=10.0,
+                clip_count_label,
+            ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+            {
+                f.settings.clip_count = Some(clip_count as u32);
+                needs_save = true;
+            }
+            ui.add_space(6.0);
+
+            let mut clip_min_duration = clip_min_duration;
+            let min_label = format!("{:.0}s min", clip_min_duration);
+            if Self::draw_advanced_slider(
+                ui,
+                "Min Clip Duration",
+                "Clips shorter than this won't be extracted",
+                &mut clip_min_duration,
+                5.0..=60.0,
+                min_label,
+            ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+            {
+                f.settings.clip_min_duration = Some(clip_min_duration);
+                needs_save = true;
+            }
+            ui.add_space(6.0);
+
+            let mut clip_max_duration = clip_max_duration;
+            let max_label = format!("{:.0}s max", clip_max_duration);
+            if Self::draw_advanced_slider(
+                ui,
+                "Max Clip Duration",
+                "Longest clip length to extract",
+                &mut clip_max_duration,
+                30.0..=300.0,
+                max_label,
+            ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+            {
+                f.settings.clip_max_duration = Some(clip_max_duration);
+                needs_save = true;
+            }
+        }
 
         needs_save
     }
@@ -1453,6 +1644,8 @@ impl App {
 
         let threshold = folder.and_then(|f| f.settings.silence_threshold_db).unwrap_or(-30.0);
         let lufs = folder.and_then(|f| f.settings.target_lufs).unwrap_or(-14.0);
+        let intro_path = folder.and_then(|f| f.settings.intro_path.clone());
+        let outro_path = folder.and_then(|f| f.settings.outro_path.clone());
 
         ui.label(section_title("Advanced"));
         ui.add_space(8.0);
@@ -1489,6 +1682,72 @@ impl App {
                 {
                     f.settings.target_lufs = Some(lufs);
                     needs_save = true;
+                }
+            });
+        });
+
+        ui.add_space(12.0);
+        ui.label(section_title("Intro / Outro"));
+        ui.add_space(8.0);
+
+        ui.label(label_secondary("Intro Video"));
+        ui.add_space(4.0);
+        ui.horizontal(|ui| {
+            let intro_label = intro_path
+                .as_ref()
+                .and_then(|p| p.file_name())
+                .map(|n| n.to_string_lossy().to_string())
+                .unwrap_or_else(|| "None".to_string());
+            ui.label(label_muted(&intro_label));
+            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                if ui.add(button_small("Choose...")).clicked() {
+                    if let Some(path) = FileDialog::new()
+                        .add_filter("Video", &["mp4", "mov", "mkv", "avi"])
+                        .pick_file()
+                    {
+                        if let Some(f) = self.state.folders.get_mut(folder_idx) {
+                            f.settings.intro_path = Some(path);
+                            needs_save = true;
+                        }
+                    }
+                }
+                if intro_path.is_some() && ui.add(button_small("✕")).clicked() {
+                    if let Some(f) = self.state.folders.get_mut(folder_idx) {
+                        f.settings.intro_path = None;
+                        needs_save = true;
+                    }
+                }
+            });
+        });
+
+        ui.add_space(8.0);
+
+        ui.label(label_secondary("Outro Video"));
+        ui.add_space(4.0);
+        ui.horizontal(|ui| {
+            let outro_label = outro_path
+                .as_ref()
+                .and_then(|p| p.file_name())
+                .map(|n| n.to_string_lossy().to_string())
+                .unwrap_or_else(|| "None".to_string());
+            ui.label(label_muted(&outro_label));
+            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                if ui.add(button_small("Choose...")).clicked() {
+                    if let Some(path) = FileDialog::new()
+                        .add_filter("Video", &["mp4", "mov", "mkv", "avi"])
+                        .pick_file()
+                    {
+                        if let Some(f) = self.state.folders.get_mut(folder_idx) {
+                            f.settings.outro_path = Some(path);
+                            needs_save = true;
+                        }
+                    }
+                }
+                if outro_path.is_some() && ui.add(button_small("✕")).clicked() {
+                    if let Some(f) = self.state.folders.get_mut(folder_idx) {
+                        f.settings.outro_path = None;
+                        needs_save = true;
+                    }
                 }
             });
         });

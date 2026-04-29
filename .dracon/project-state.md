@@ -1,9 +1,9 @@
 # Project State
 
 ## Current Focus
-Add per-folder audio ducking and background music selection settings to GUI
+Add per-folder watermark controls and expand export options (FCPXML, EDL, thumbnail, filler-word removal, clip-count/duration tuning) in the GUI.
 
 ## Completed
-- [x] Add duck volume slider for audio speech reduction during background music playback
-- [x] Add background music file selection with support for mp3, wav, ogg, flac, and m4a formats
-- [x] Integrate new audio settings into per-folder processing options panel
+- [x] Integrate watermark path selector, position dropdown, and scale slider into per-folder video settings, with persistence and dirty-state tracking.
+- [x] Extend per-folder exports UI with toggles for FCPXML, EDL, thumbnail, and filler-word removal, plus clip count and min/max duration sliders gated by the clips toggle.
+- [x] Update Cargo.lock to reflect current dependency versions after feature additions.
