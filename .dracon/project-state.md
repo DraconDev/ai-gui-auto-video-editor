@@ -1,9 +1,8 @@
 # Project State
 
 ## Current Focus
-Introduce UI feedback for no configured folders and lock settings UI while processing is active.
+feat(ui): add validation warning for clip min duration exceeding max duration and reusable warning UI helper
 
 ## Completed
-- [x] Show a centered placeholder message when the folder list is empty, prompting the user to add a folder.
-- [x] Detect when processing is ongoing (queue or active) and replace the settings panels with a locked‑settings notice.
-- [x] Preserve existing settings panel rendering for when processing is not active by nesting the original match logic inside a conditional.
+- [x] Display validation warning in clip duration settings when min duration exceeds max duration, including both values formatted to whole seconds
+- [x] Implement reusable draw_validation_warning function to render styled warning elements with ⚠ icon, custom message, and warning-themed background, stroke, and text colors
