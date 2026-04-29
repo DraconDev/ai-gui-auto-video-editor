@@ -818,13 +818,82 @@ impl App {
             state: AppState::new(),
         }
     }
+
+    fn navigate_settings_category(&mut self, delta: i8) {
+        let categories = [
+            SettingsCategory::Processing,
+            SettingsCategory::Audio,
+            SettingsCategory::Video,
+            SettingsCategory::Exports,
+            SettingsCategory::Advanced,
+        ];
+        let current_idx = categories
+            .iter()
+            .position(|&c| c == self.state.settings_category)
+            .unwrap_or(0);
+        let new_idx = ((current_idx as i8 + delta) % categories.len() as i8 + categories.len() as i8) as usize;
+        self.state.settings_category = categories[new_idx];
+    }
 }
 
 impl eframe::App for App {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         self.state.drain_watcher_events();
         self.state.drain_queue_events();
-        ctx.request_repaint_after(Duration::from_millis(250));
+
+        // Keyboard shortcuts for settings navigation
+        if self.state.current_tab == Tab::Settings || self.state.current_tab == Tab::All {
+            let modifiers = ctx.input(|i| i.modifiers);
+            #[cfg(target_os = "macos")]
+            let is_ctrl = modifiers.ctrl || modifiers.mac_cmd;
+            #[cfg(not(target_os = "macos"))]
+            let is_ctrl = modifiers.ctrl;
+
+            if is_ctrl && ctx.input(|i| i.key_pressed(egui::Key::S)) {
+                self.state.auto_save_config();
+                self.state.add_toast("Config saved", ToastKind::Success);
+            }
+
+            if is_ctrl && ctx.input(|i| i.key_pressed(egui::Key::ArrowLeft)) {
+                self.navigate_settings_category(-1);
+            }
+            if is_ctrl && ctx.input(|i| i.key_pressed(egui::Key::ArrowRight)) {
+                self.navigate_settings_category(1);
+            }
+
+            // Ctrl+1-5 for direct category access
+            let categories = [
+                SettingsCategory::Processing,
+                SettingsCategory::Audio,
+                SettingsCategory::Video,
+                SettingsCategory::Exports,
+                SettingsCategory::Advanced,
+            ];
+            let num_keys = [
+                (egui::Key::Num1, 0),
+                (egui::Key::Num2, 1),
+                (egui::Key::Num3, 2),
+                (egui::Key::Num4, 3),
+                (egui::Key::Num5, 4),
+            ];
+            for (key, idx) in num_keys {
+                if is_ctrl && ctx.input(|i| i.key_pressed(key)) {
+                    self.state.settings_category = categories[idx];
+                    break;
+                }
+            }
+        }
+
+        // Adaptive repaint: faster when processing (smooth progress), slower when idle (save CPU)
+        let is_processing = matches!(
+            self.state.status,
+            ProcessingStatus::Processing(_) | ProcessingStatus::Watching
+        );
+        if is_processing {
+            ctx.request_repaint();
+        } else {
+            ctx.request_repaint_after(Duration::from_millis(250));
+        }
 
         // Show setup wizard for first-run
         if self.state.show_setup {
