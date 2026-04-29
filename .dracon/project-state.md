@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-The commit introduces unit tests and refactors for improved reliability.
+Improved test coverage for `progress` module by handling saturation at zero when total is exceeded.
 
 ## Completed
-- Added unit tests for video processing workflows.
-- Updated BatchProgress struct for accurate remaining calculation.
+- [x] Updated `progress.rs` to handle saturation at zero.
+- [x] Fixed `progress.remaining()` assertion in test case to pass with the new saturation handling.

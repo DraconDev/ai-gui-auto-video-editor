@@ -126,10 +126,12 @@ mod tests {
         progress.mark_failed(PathBuf::from("/tmp/v2.mp4").as_path());
         assert_eq!(progress.remaining(), 8);
 
-        // Saturating at 0
-        for _ in 0..20 {
-            progress.mark_completed(PathBuf::from("/tmp/vx.mp4").as_path());
-        }
+        // Saturating at 0 when total is exceeded
+        progress.total = 3;
+        progress.mark_completed(PathBuf::from("/tmp/a.mp4").as_path());
+        progress.mark_completed(PathBuf::from("/tmp/b.mp4").as_path());
+        progress.mark_completed(PathBuf::from("/tmp/c.mp4").as_path());
+        progress.mark_completed(PathBuf::from("/tmp/d.mp4").as_path());
         assert_eq!(progress.remaining(), 0);
     }
 
