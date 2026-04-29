@@ -1,9 +1,8 @@
 # Project State
 
 ## Current Focus
-Replace `remove_silence` setting with `silence_mode` using conditional mapping to `SilenceMode::Cut` or `SilenceMode::Keep`.
+Updated dropdown selector to hide popup based on pointer interaction position and rectangle containment rather than using the rectangle’s minimum coordinate.
 
 ## Completed
-- [x] Rename `remove_silence` to `silence_mode` in FolderSettings struct
-- [x] Add conditional logic mapping to `SilenceMode::Cut` when `setup_remove_silence` is true, otherwise `SilenceMode::Keep`
-- [x] Update default construction to include the new `silence_mode` field
+- [x] Modified `src/gui/theme.rs` to refine popup dismissal logic using `pointer.interact_pos()` and explicit containment check
+- [x] Regenerated `Cargo.lock` after dependency rebuild (no functional changes)
