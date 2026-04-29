@@ -1198,8 +1198,10 @@ mod tests {
         assert_eq!(format_ass_time(5.0), "0:00:05.00");
         assert_eq!(format_ass_time(65.5), "0:01:05.50");
         assert_eq!(format_ass_time(3661.25), "1:01:01.25");
-        // Negative values should be clamped to 0
+        assert_eq!(format_ass_time(359999.99), "99:59:59.99");
+        assert_eq!(format_ass_time(0.001), "0:00:00.00");
         assert_eq!(format_ass_time(-5.0), "0:00:00.00");
+        assert_eq!(format_ass_time(-0.001), "0:00:00.00");
     }
 
     struct MockFfmpegAnalyzer;
