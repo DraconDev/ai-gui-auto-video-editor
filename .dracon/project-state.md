@@ -1,9 +1,8 @@
 # Project State
 
 ## Current Focus
-Refactor toast color calculations to reuse bg_alpha variable for consistent styling and reduced redundancy
+Add toast notification helper methods and display percentage labels on processing progress bars
 
 ## Completed
-- [x] Replace hardcoded bg_alpha calculation in each toast kind with reference to existing bg_alpha variable, maintaining alpha * 220 scaling but ensuring type conversion consistency
-- [x] Simplify color definitions by eliminating duplicate alpha calculations across all toast variants while preserving visual consistency
-The changes centralize alpha blending logic while removing redundant calculations, improving maintainability without altering visual behavior.
+- [x] Add toast notification helper methods to AppState (add_toast, add_info_toast, add_warning_toast) with 10-item limit
+- [x] Display percentage labels alongside progress bars in the processing queue UI

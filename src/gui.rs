@@ -357,6 +357,23 @@ impl Toast {
     }
 }
 
+impl AppState {
+    fn add_toast(&mut self, message: impl Into<String>, kind: ToastKind) {
+        self.toasts.push(Toast::new(message, kind));
+        if self.toasts.len() > 10 {
+            self.toasts.remove(0);
+        }
+    }
+
+    fn add_info_toast(&mut self, message: impl Into<String>) {
+        self.add_toast(message, ToastKind::Info);
+    }
+
+    fn add_warning_toast(&mut self, message: impl Into<String>) {
+        self.add_toast(message, ToastKind::Warning);
+    }
+}
+
 #[derive(Debug)]
 pub struct AppState {
     config: Config,

@@ -2198,12 +2198,21 @@ impl App {
 
                         if file.status == super::QueueStatus::Processing {
                             ui.add_space(4.0);
-                            ui.add(
-                                egui::ProgressBar::new(file.progress)
-                                    .fill(PROCESSING)
-                                    .corner_radius(4.0)
-                                    .desired_width(ui.available_width()),
-                            );
+                            ui.horizontal(|ui| {
+                                ui.add(
+                                    egui::ProgressBar::new(file.progress)
+                                        .fill(PROCESSING)
+                                        .corner_radius(4.0)
+                                        .desired_width(ui.available_width() - 50.0),
+                                );
+                                ui.add_space(8.0);
+                                ui.label(
+                                    RichText::new(format!("{}%", (file.progress * 100.0) as u32))
+                                        .color(PROCESSING)
+                                        .size(12.0)
+                                        .strong(),
+                                );
+                            });
                         }
 
                         ui.horizontal(|ui| {
