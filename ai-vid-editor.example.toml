@@ -309,7 +309,7 @@ scene_threshold = 0.3
 #   - Interview content (may cut natural speech patterns)
 #
 # CLI equivalent: --remove-fillers
-enabled = false
+enabled = true
 
 # Words to remove (case-insensitive)
 #
