@@ -1094,7 +1094,7 @@ impl App {
         if Self::draw_settings_toggle(
             ui,
             "Auto-Reframe (9:16)",
-            "Crop to vertical for Shorts, Reels, TikTok",
+            "Uses AI face detection to track subjects and crop to vertical 9:16",
             &mut reframe,
         ) && let Some(f) = self.state.folders.get_mut(folder_idx)
         {
@@ -1107,7 +1107,7 @@ impl App {
         if Self::draw_settings_toggle(
             ui,
             "Blur Background",
-            "Blur the background when reframing to portrait",
+            "Only works with Auto-Reframe above. Blurs edges outside the vertical crop",
             &mut blur,
         ) && let Some(f) = self.state.folders.get_mut(folder_idx)
         {
@@ -1120,7 +1120,7 @@ impl App {
         if Self::draw_settings_toggle(
             ui,
             "Scene Detection",
-            "Use scene changes to refine edit points",
+            "Uses visual scene changes (not just audio silence) to find better cut points",
             &mut scene_detect,
         ) && let Some(f) = self.state.folders.get_mut(folder_idx)
         {
@@ -1157,6 +1157,7 @@ impl App {
             SilenceMode::Speedup => "Speed Up",
         };
         dropdown_selector(ui, &format!("silence_mode_{}", folder_idx), &mut selected_mode, &mode_options, mode_label);
+        ui.add(egui::Label::new(egui::RichText::new("Cut = remove silence. Speed Up = keep but play faster").size(11.0).color(TEXT_SECONDARY)));
         if selected_mode != silence_mode && let Some(f) = self.state.folders.get_mut(folder_idx) {
             f.settings.silence_mode = Some(selected_mode);
             needs_save = true;
@@ -1312,7 +1313,7 @@ impl App {
         if Self::draw_advanced_slider(
             ui,
             "Duck Volume",
-            "Background music reduction during speech",
+            "Only when Background Music is set. Lowers music volume when someone speaks",
             &mut duck_volume,
             0.0..=1.0,
             duck_label,
@@ -1371,7 +1372,9 @@ impl App {
         let watermark_scale = folder.and_then(|f| f.settings.watermark_scale).unwrap_or(1.0);
 
         ui.label(section_title("Video Output"));
-        ui.add_space(8.0);
+        ui.add_space(4.0);
+        ui.add(egui::Label::new(egui::RichText::new("Output resolution, GPU encoding, watermark overlay").size(12.0).color(TEXT_SECONDARY)));
+        ui.add_space(12.0);
 
         ui.label(label_secondary("GPU Encoding"));
         ui.add_space(4.0);
@@ -1521,7 +1524,9 @@ impl App {
         let original_clip_max = clip_max_duration;
 
         ui.label(section_title("Exports"));
-        ui.add_space(8.0);
+        ui.add_space(4.0);
+        ui.add(egui::Label::new(egui::RichText::new("Generate subtitles, chapters, clips, and additional formats").size(12.0).color(TEXT_SECONDARY)));
+        ui.add_space(12.0);
 
         let mut subtitles = subtitles;
         if Self::draw_settings_toggle(
@@ -1605,7 +1610,7 @@ impl App {
         if Self::draw_settings_toggle(
             ui,
             "Remove Filler Words",
-            "Automatically cut um, uh, ah, er from audio",
+            "Requires speech transcription. Cuts common filler words (um, uh, ah, er)",
             &mut filler_words,
         ) && let Some(f) = self.state.folders.get_mut(folder_idx)
         {
@@ -1728,7 +1733,9 @@ impl App {
         let outro_path = folder.and_then(|f| f.settings.outro_path.clone());
 
         ui.label(section_title("Advanced"));
-        ui.add_space(8.0);
+        ui.add_space(4.0);
+        ui.add(egui::Label::new(egui::RichText::new("Fine-tune silence detection, add intro/outro videos").size(12.0).color(TEXT_SECONDARY)));
+        ui.add_space(12.0);
 
         ui.label(section_title("Intro / Outro"));
         ui.add_space(8.0);
