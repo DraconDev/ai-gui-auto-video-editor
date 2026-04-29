@@ -266,6 +266,37 @@ mod tests {
     }
 
     #[test]
+    fn test_export_youtube_chapters_empty() -> Result<()> {
+        let dir = tempdir()?;
+        let output_chapters = dir.path().join("chapters.txt");
+        let transcript: Vec<TranscriptSegment> = vec![];
+
+        export_youtube_chapters(&transcript, &output_chapters)?;
+
+        let content = fs::read_to_string(output_chapters)?;
+        assert!(content.is_empty() || content.contains("00:00 Intro"));
+        Ok(())
+    }
+
+    #[test]
+    fn test_export_youtube_chapters_single_segment() -> Result<()> {
+        let dir = tempdir()?;
+        let output_chapters = dir.path().join("chapters.txt");
+        let transcript = vec![TranscriptSegment {
+            start: 0.0,
+            end: 60.0,
+            text: "Single segment video".to_string(),
+            confidence: 1.0,
+        }];
+
+        export_youtube_chapters(&transcript, &output_chapters)?;
+
+        let content = fs::read_to_string(output_chapters)?;
+        assert!(content.contains("00:00 Intro"));
+        Ok(())
+    }
+
+    #[test]
     fn test_export_srt() -> Result<()> {
         let dir = tempdir()?;
         let output_srt = dir.path().join("subtitles.srt");
