@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security (Critical)
+- **Command injection in FFmpeg filters**: Paths in `subtitles=`, `vidstab=`, and `drawtext=` filter strings were interpolated directly without escaping single quotes. A malicious filename containing `'` could inject arbitrary FFmpeg filter commands. Fixed by adding `escape_ffmpeg_filter_path()` in `utils.rs` that escapes `\`, `'`.
+
+### Fixed (Critical)
+- **Caption burn data loss**: `burn_subtitles_into_video()` was renaming the captioned output over the input video, but the original rename logic was broken and could silently destroy the original. Fixed with atomic rename via `atomic_replace()` helper that handles Windows safely.
+- **Config merge destroyed base values**: `Config::merge()` was unconditionally overwriting all scalar fields, so merging a default config would destroy user values. Fixed to only take non-default values from `other` as documented.
+- **STT panic on short audio**: `pcm_to_mel()` would underflow when computing `n_frames = (pcm.len() - n_fft) / hop_length + 1` if audio was shorter than 25ms (400 samples), causing a panic. Fixed with a guard that returns an empty tensor for short audio.
+- **Division by zero in auto-reframe**: `CropRegion::from_face()` computed `crop_width = target_aspect / video_aspect` without checking for zero height, producing `inf`. Fixed with `is_finite()` and `video_height > 0` checks.
+- **Auto-reframe ignored face movement**: `generate_crop_filter()` only used the first detected crop region for the entire video, ignoring all intermediate face detections. Fixed with temporal smoothing (moving average) across 5-frame windows and linear interpolation between first/last positions.
+
+### Fixed (High)
+- **Silent overlapping segments**: `merge_silences_and_scenes()` could create overlapping silence segments after extending to scene boundaries, causing invalid trim data. Fixed by adding sort + deduplication pass.
+- **Missing ffprobe check**: Only `ffmpeg` was checked at startup, but many code paths depend on `ffprobe`. Added `check_ffprobe()` alongside `check_ffmpeg()` at startup.
+
+### Fixed (Medium)
+- **ProgressStyle template panic**: `ProgressStyle::template().unwrap()` would panic if the template string was invalid. Fixed with `unwrap_or_else` fallback.
+- **Mutex poison panic**: `progress.lock().unwrap()` in parallel batch workers would panic on thread panic (poisoned mutex). Fixed with `lock().unwrap_or_else(|p| p.into_inner())`.
+- **Lossy path construction**: 6 instances of `format!("{}.ext", path.display())` could mangle non-UTF-8 filenames. Fixed with `PathBuf::with_extension()` and `OsString::push()`.
+- **RAII temp cleanup**: Temp directories in ML frame extraction, thumbnail generation, and vidstab processing were manually cleaned, leaking on early return or panic. Fixed with `TempDir`/`TempFile` RAII wrappers in `utils.rs`.
+- **TOCTOU on model download**: Model files could be partially downloaded before another process saw them. Fixed by downloading to `.tmp` then atomically renaming to final path.
+- **Case-sensitive font extension**: `find_first_ttf()` only matched lowercase `ttf`, missing `.TTF` on case-sensitive filesystems. Fixed with `to_ascii_lowercase()`.
+- **Incomplete concat escaping**: FFmpeg concat demuxer path escaping only handled `'` but not `\n` or `\r`, which could break on filenames with newlines. Fixed by also escaping newlines and carriage returns.
+
+### Added
+- **RAII utilities in utils**: `TempDir` (auto-cleanup on drop) and `TempFile` (auto-delete on drop) helpers for safe temp file/directory management.
+- **`escape_ffmpeg_filter_path()`**: Sanitizes paths for safe insertion into FFmpeg filter strings by escaping `\`, `'`.
+
 ## [0.76.0] - 2026-04-25
 
 ### Added
