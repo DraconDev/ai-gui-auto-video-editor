@@ -6,7 +6,7 @@ use std::sync::mpsc;
 
 use super::theme::*;
 use super::{ActivityEntry, App, EntryStatus, FolderState, ProcessingStatus, SettingsCategory, SetupStep, Tab};
-use crate::config::{FolderSettings, VideoResolution};
+use crate::config::{FolderSettings, SilenceMode, VideoResolution};
 use crate::hwaccel::HwAccel;
 
 impl App {
@@ -960,6 +960,12 @@ impl App {
         let blur = folder.and_then(|f| f.settings.blur_background).unwrap_or(false);
         let scene_detect = folder.and_then(|f| f.settings.scene_detect).unwrap_or(false);
         let threshold = folder.and_then(|f| f.settings.silence_threshold_db).unwrap_or(-30.0);
+        let silence_mode = folder.and_then(|f| f.settings.silence_mode).unwrap_or(SilenceMode::Cut);
+        let silence_padding = folder.and_then(|f| f.settings.silence_padding).unwrap_or(0.1);
+        let silence_speedup_factor = folder.and_then(|f| f.settings.silence_speedup_factor).unwrap_or(4.0);
+        let silence_min_duration = folder.and_then(|f| f.settings.silence_min_duration).unwrap_or(0.5);
+        let silence_min_for_speedup = folder.and_then(|f| f.settings.silence_min_silence_for_speedup).unwrap_or(0.5);
+        let silence_scene_threshold = folder.and_then(|f| f.settings.silence_scene_threshold).unwrap_or(0.3);
 
         ui.label(section_title("Processing"));
         ui.add_space(8.0);
@@ -1068,6 +1074,109 @@ impl App {
         {
             f.settings.silence_threshold_db = Some(threshold);
             needs_save = true;
+        }
+        ui.add_space(6.0);
+
+        ui.label(label_secondary("Silence Mode"));
+        ui.add_space(4.0);
+        let mode_options: [(String, SilenceMode); 2] = [
+            (String::from("Cut"), SilenceMode::Cut),
+            (String::from("Speed Up"), SilenceMode::Speedup),
+        ];
+        let mut selected_mode = silence_mode;
+        let mode_label = match selected_mode {
+            SilenceMode::Cut => "Cut",
+            SilenceMode::Speedup => "Speed Up",
+        };
+        dropdown_selector(ui, &format!("silence_mode_{}", folder_idx), &mut selected_mode, &mode_options, mode_label);
+        if selected_mode != silence_mode && let Some(f) = self.state.folders.get_mut(folder_idx) {
+            f.settings.silence_mode = Some(selected_mode);
+            needs_save = true;
+        }
+
+        ui.add_space(8.0);
+
+        let mut silence_padding = silence_padding;
+        let padding_label = format!("{:.2}s", silence_padding);
+        if Self::draw_advanced_slider(
+            ui,
+            "Silence Padding",
+            "Keep this much audio before/after cuts",
+            &mut silence_padding,
+            0.0..=0.5,
+            padding_label,
+        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.silence_padding = Some(silence_padding);
+            needs_save = true;
+        }
+        ui.add_space(6.0);
+
+        let mut silence_min_duration = silence_min_duration;
+        let min_dur_label = format!("{:.1}s", silence_min_duration);
+        if Self::draw_advanced_slider(
+            ui,
+            "Min Silence Duration",
+            "Ignore silences shorter than this",
+            &mut silence_min_duration,
+            0.1..=2.0,
+            min_dur_label,
+        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.silence_min_duration = Some(silence_min_duration);
+            needs_save = true;
+        }
+        ui.add_space(6.0);
+
+        if selected_mode == SilenceMode::Speedup {
+            let mut silence_speedup_factor = silence_speedup_factor;
+            let speedup_label = format!("{:.1}x", silence_speedup_factor);
+            if Self::draw_advanced_slider(
+                ui,
+                "Speed Up Factor",
+                "How much to speed up silent sections",
+                &mut silence_speedup_factor,
+                1.5..=8.0,
+                speedup_label,
+            ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+            {
+                f.settings.silence_speedup_factor = Some(silence_speedup_factor);
+                needs_save = true;
+            }
+            ui.add_space(6.0);
+
+            let mut silence_min_for_speedup = silence_min_for_speedup;
+            let min_speedup_label = format!("{:.1}s", silence_min_for_speedup);
+            if Self::draw_advanced_slider(
+                ui,
+                "Min Speedup Duration",
+                "Only speed up silences longer than this",
+                &mut silence_min_for_speedup,
+                0.1..=2.0,
+                min_speedup_label,
+            ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+            {
+                f.settings.silence_min_silence_for_speedup = Some(silence_min_for_speedup);
+                needs_save = true;
+            }
+            ui.add_space(6.0);
+        }
+
+        if scene_detect {
+            let mut silence_scene_threshold = silence_scene_threshold;
+            let scene_label = format!("{:.2}", silence_scene_threshold);
+            if Self::draw_advanced_slider(
+                ui,
+                "Scene Threshold",
+                "Higher = fewer scene changes detected",
+                &mut silence_scene_threshold,
+                0.1..=0.9,
+                scene_label,
+            ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+            {
+                f.settings.silence_scene_threshold = Some(silence_scene_threshold);
+                needs_save = true;
+            }
         }
 
         needs_save

@@ -412,6 +412,18 @@ pub struct FolderSettings {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub silence_threshold_db: Option<f32>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub silence_min_duration: Option<f32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub silence_padding: Option<f32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub silence_mode: Option<SilenceMode>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub silence_speedup_factor: Option<f32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub silence_min_silence_for_speedup: Option<f32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub silence_scene_threshold: Option<f32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub target_lufs: Option<f32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub stabilize: Option<bool>,
@@ -441,6 +453,34 @@ pub struct FolderSettings {
     pub captions: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub clips: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub clip_count: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub clip_min_duration: Option<f32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub clip_max_duration: Option<f32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub filler_words: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub watermark_path: Option<PathBuf>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub watermark_position: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub watermark_scale: Option<f32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub intro_path: Option<PathBuf>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub outro_path: Option<PathBuf>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub music_path: Option<PathBuf>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub duck_volume: Option<f32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub fcpxml: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub edl: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub thumbnail: Option<bool>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -460,6 +500,12 @@ impl FolderSettings {
         self.enhance_audio.is_none()
             && self.remove_silence.is_none()
             && self.silence_threshold_db.is_none()
+            && self.silence_min_duration.is_none()
+            && self.silence_padding.is_none()
+            && self.silence_mode.is_none()
+            && self.silence_speedup_factor.is_none()
+            && self.silence_min_silence_for_speedup.is_none()
+            && self.silence_scene_threshold.is_none()
             && self.target_lufs.is_none()
             && self.stabilize.is_none()
             && self.color_correct.is_none()
@@ -475,6 +521,20 @@ impl FolderSettings {
             && self.chapters.is_none()
             && self.captions.is_none()
             && self.clips.is_none()
+            && self.clip_count.is_none()
+            && self.clip_min_duration.is_none()
+            && self.clip_max_duration.is_none()
+            && self.filler_words.is_none()
+            && self.watermark_path.is_none()
+            && self.watermark_position.is_none()
+            && self.watermark_scale.is_none()
+            && self.intro_path.is_none()
+            && self.outro_path.is_none()
+            && self.music_path.is_none()
+            && self.duck_volume.is_none()
+            && self.fcpxml.is_none()
+            && self.edl.is_none()
+            && self.thumbnail.is_none()
     }
 }
 
