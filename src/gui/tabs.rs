@@ -1626,11 +1626,13 @@ impl App {
             ui.label(label_secondary("Extra Resolutions"));
             ui.add_space(4.0);
             let mut current_resolutions = extra_resolutions;
-            let available_resolutions: [(VideoResolution, &str); 4] = [
+            let available_resolutions: [(VideoResolution, &str); 6] = [
                 (VideoResolution::Hd720p, "720p"),
+                (VideoResolution::Fhd1080p, "1080p"),
                 (VideoResolution::Qhd1440p, "1440p"),
                 (VideoResolution::Uhd4k, "4K"),
                 (VideoResolution::Vertical720p, "Vertical 720p"),
+                (VideoResolution::Vertical1080p, "Vertical 1080p"),
             ];
             ui.horizontal_wrapped(|ui| {
                 for (res, label) in available_resolutions {

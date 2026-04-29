@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Remove draw_validation_warning UI method and update dependency lock file
+Expand video resolution options in the tabs UI by adding additional preset entries.
 
 ## Completed
-- [x] Removed draw_validation_warning method from src/gui/tabs.rs
-- [x] Regenerated Cargo.lock after dependency rebuild
+- [x] Add FHD1080p and Vertical1080p entries to the available_resolutions array in src/gui/tabs.rs
+- [x] Regenerate Cargo.lock to reflect updated dependencies
