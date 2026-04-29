@@ -1,11 +1,12 @@
 # Project State
 
 ## Current Focus
-Add comprehensive settings sidebar panels for audio, video, and export categories, providing interactive controls (toggles, sliders, dropdowns) that update per‑folder settings and mark the project as needing save.
+refactor(gui): Remove advanced settings UI panels for audio, video, and export configurations
 
 ## Completed
-- [x] Implemented `draw_settings_audio` function that renders audio settings (enhance audio toggle, noise reduction toggle, target loudness slider) and persists changes to folder settings.
-- [x] Implemented `draw_settings_video` function that renders video output settings (hardware acceleration dropdown, target resolution dropdown) and persists changes.
-- [x] Implemented `draw_settings_exports` function that renders export options (subtitles, chapters, captions, clips toggles) and persists changes.
-- [x] Added UI sections with appropriate labels and spacing to organize settings within the sidebar.
-- [x] Integrated per‑folder indexing to ensure settings modifications apply to the correct folder.
+- [x] Remove Auto-Reframe (9:16), Blur Background, Scene Detection, and Silence Threshold setting controls from `draw_settings_advanced`
+- [x] Remove `draw_settings_audio` function containing Enhance Audio, Noise Reduction, and Target Loudness controls
+- [x] Remove `draw_settings_video` function containing GPU Encoding and Target Resolution dropdown controls
+- [x] Remove `draw_settings_exports` function for export format and quality settings
+- [x] Simplify `draw_settings_advanced` to return `needs_save` directly after removing 271 lines of UI code
+- [x] Update Cargo.lock dependencies
