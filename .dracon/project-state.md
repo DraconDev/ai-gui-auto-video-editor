@@ -1,8 +1,7 @@
 # Project State
 
 ## Current Focus
-Add support for `extra_resolutions` configuration in the export settings
+Add handling for extra_resolutions folder setting
 
 ## Completed
-- [x] Add handling for `extra_resolutions` in `build_folder_config`
-- [x] Clone `extra_resolutions` into `merged.export.extra_resolutions`
+- [x] Introduce `extra_resolutions` variable that clones `folder.settings.extra_resolutions` or defaults to an empty vector

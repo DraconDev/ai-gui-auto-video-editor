@@ -1478,6 +1478,7 @@ impl App {
         let clips = folder.and_then(|f| f.settings.clips).unwrap_or(false);
         let preview = folder.and_then(|f| f.settings.preview).unwrap_or(false);
         let multi_format = folder.and_then(|f| f.settings.multi_format).unwrap_or(false);
+        let extra_resolutions = folder.and_then(|f| f.settings.extra_resolutions.clone()).unwrap_or_default();
         let fcpxml = folder.and_then(|f| f.settings.fcpxml).unwrap_or(false);
         let edl = folder.and_then(|f| f.settings.edl).unwrap_or(false);
         let thumbnail = folder.and_then(|f| f.settings.thumbnail).unwrap_or(false);
