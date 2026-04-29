@@ -1,9 +1,10 @@
 # Project State
 
 ## Current Focus
-Handle edge cases when removing a watch folder to maintain correct selection and logging
+Add new preset badge entries for TikTok, Instagram Reels, Twitter, and Minimal processing in the UI.
 
 ## Completed
-- [x] Reset `selected_folder_idx` to 0 or the last valid index when folder removal leaves the list empty or the index out of range
-- [x] Log the removal of a watch folder in the activity log
-- [x] Auto‑save the configuration after folder removal
+- [x] Add TikTok-specific preset badge with icon and description
+- [x] Add Instagram Reels preset badge with icon and description
+- [x] Add Twitter-specific preset badge with icon and description
+- [x] Add Minimal/no processing preset badge with icon and description

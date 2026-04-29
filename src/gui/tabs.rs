@@ -442,6 +442,10 @@ impl App {
                 ("youtube", "🎬", "YouTube videos (landscape)"),
                 ("shorts", "📱", "Shorts/Reels/TikTok (vertical)"),
                 ("podcast", "🎙️", "Podcast/audio focus"),
+                ("tiktok", "♪", "TikTok-specific style"),
+                ("reels", "📸", "Instagram Reels style"),
+                ("twitter", "🐦", "Twitter/video style"),
+                ("minimal", "⬜", "Minimal/no processing"),
             ] {
                 let selected = self.state.setup_preset == preset;
                 if self
