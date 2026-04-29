@@ -839,43 +839,6 @@ impl App {
             || path.to_string_lossy() == "videos/output"
     }
 
-    pub(crate) fn draw_settings_sidebar(&mut self, ui: &mut egui::Ui) {
-        ui.set_width(160.0);
-        ui.vertical(|ui| {
-            let categories = [
-                SettingsCategory::Processing,
-                SettingsCategory::Audio,
-                SettingsCategory::Video,
-                SettingsCategory::Exports,
-                SettingsCategory::Advanced,
-            ];
-            for cat in categories {
-                let is_active = self.state.settings_category == cat;
-                let label = format!("{} {}", cat.icon(), cat.label());
-                if ui
-                    .add(egui::Button::new(
-                        egui::RichText::new(&label).size(14.0).color(if is_active {
-                            TEXT_PRIMARY
-                        } else {
-                            TEXT_SECONDARY
-                        }),
-                    )
-                    .fill(if is_active { PANEL_BG_LIGHTER } else { PANEL_BG })
-                    .stroke(egui::Stroke::new(
-                        if is_active { 1.5 } else { 0.0 },
-                        if is_active { ACCENT_PRIMARY } else { egui::Color32::TRANSPARENT },
-                    ))
-                    .corner_radius(CORNER_RADIUS_SMALL)
-                    .min_size(egui::vec2(ui.available_width(), 40.0)))
-                    .clicked()
-                {
-                    self.state.settings_category = cat;
-                }
-                ui.add_space(4.0);
-            }
-        });
-    }
-
     pub(crate) fn draw_settings_panel(&mut self, ui: &mut egui::Ui) {
         let folder_names: Vec<String> = self
             .state

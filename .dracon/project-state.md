@@ -1,7 +1,7 @@
 # Project State
 
 ## Current Focus
-Refresh Cargo.lock to latest dependency versions (binary lockfile update)
+Remove the draw_settings_sidebar method
 
 ## Completed
-- [x] Refresh Cargo.lock to latest dependency versions
+- [x] Remove draw_settings_sidebar function implementation
