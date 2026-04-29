@@ -1,10 +1,11 @@
-# ProjectState
+# Project State
 
 ## Current Focus
-Add SettingsCategory enum and sidebar UI to enable navigation among settings categories.
+Add comprehensive settings sidebar with per‑category panels for processing, audio, video, exports, and advanced options.
 
 ## Completed
-- [x] Define SettingsCategory enum with variants Processing, Audio, Video, Exports, Advanced and implement label and icon methods.
-- [x] Add settings_category field to AppState struct and initialize it with the default variant.
-- [x] Implement draw_settings_sidebar method to render selectable category buttons with icons and labels.
-- [x] Update AppState initialization to set settings_category to its default value.
+- [x] Implement SettingsCategory enum and sidebar navigation UI.
+- [x] Create dedicated drawing functions for each settings category.
+- [x] Add per‑folder configuration controls (enhance audio, remove silence, stabilize video, etc.).
+- [x] Enable auto‑saving when any setting is changed.
+- [x] Refresh Cargo.lock to lock updated dependencies.

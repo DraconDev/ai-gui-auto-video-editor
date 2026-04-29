@@ -967,17 +967,467 @@ impl App {
         };
 
         settings_panel_frame().show(ui, |ui| {
-            ui.horizontal(|ui| {
-                ui.horizontal_wrapped(|ui| {
-                    for (idx, name) in folder_names.iter().enumerate() {
-                        if ui
-                            .add(button_pill(idx == self.state.selected_folder_idx, name))
-                            .clicked()
-                        {
-                            self.state.selected_folder_idx = idx;
-                        }
+            ui.horizontal_wrapped(|ui| {
+                for (idx, name) in folder_names.iter().enumerate() {
+                    if ui
+                        .add(button_pill(idx == self.state.selected_folder_idx, name))
+                        .clicked()
+                    {
+                        self.state.selected_folder_idx = idx;
                     }
+                }
+                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                    preset_badge(&preset_name, ui);
                 });
+            });
+
+            ui.add_space(14.0);
+
+            let mut needs_save = false;
+            let folder_idx = self.state.selected_folder_idx;
+
+            ui.horizontal(|ui| {
+                self.draw_settings_sidebar(ui);
+                ui.add_space(16.0);
+                egui::VerticalLayout::default()
+                    .align_at_end(false)
+                    .show(ui, |ui| {
+                        match self.state.settings_category {
+                            SettingsCategory::Processing => {
+                                needs_save = self.draw_settings_processing(ui, folder_idx);
+                            }
+                            SettingsCategory::Audio => {
+                                needs_save = self.draw_settings_audio(ui, folder_idx);
+                            }
+                            SettingsCategory::Video => {
+                                needs_save = self.draw_settings_video(ui, folder_idx);
+                            }
+                            SettingsCategory::Exports => {
+                                needs_save = self.draw_settings_exports(ui, folder_idx);
+                            }
+                            SettingsCategory::Advanced => {
+                                needs_save = self.draw_settings_advanced(ui, folder_idx);
+                            }
+                        }
+                    });
+            });
+
+            if needs_save {
+                self.state.auto_save_config();
+            }
+        });
+    }
+
+    fn draw_settings_processing(&mut self, ui: &mut egui::Ui, folder_idx: usize) -> bool {
+        let mut needs_save = false;
+        let folder = self.state.folders.get(folder_idx);
+
+        let enhance = folder.and_then(|f| f.settings.enhance_audio).unwrap_or(true);
+        let remove_silence = folder.and_then(|f| f.settings.remove_silence).unwrap_or(true);
+        let stabilize = folder.and_then(|f| f.settings.stabilize).unwrap_or(false);
+        let color_correct = folder.and_then(|f| f.settings.color_correct).unwrap_or(false);
+        let reframe = folder.and_then(|f| f.settings.reframe).unwrap_or(false);
+        let blur = folder.and_then(|f| f.settings.blur_background).unwrap_or(false);
+        let scene_detect = folder.and_then(|f| f.settings.scene_detect).unwrap_or(false);
+        let threshold = folder.and_then(|f| f.settings.silence_threshold_db).unwrap_or(-30.0);
+
+        ui.label(section_title("Processing"));
+        ui.add_space(8.0);
+
+        let mut enhance = enhance;
+        if Self::draw_settings_toggle(
+            ui,
+            "Enhance Audio",
+            "Normalize loudness and improve voice clarity",
+            &mut enhance,
+        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.enhance_audio = Some(enhance);
+            needs_save = true;
+        }
+        ui.add_space(6.0);
+
+        let mut remove_silence = remove_silence;
+        if Self::draw_settings_toggle(
+            ui,
+            "Remove Silence",
+            "Cut dead air and gaps for tighter pacing",
+            &mut remove_silence,
+        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.remove_silence = Some(remove_silence);
+            needs_save = true;
+        }
+        ui.add_space(6.0);
+
+        let mut stabilize = stabilize;
+        if Self::draw_settings_toggle(
+            ui,
+            "Stabilize Video",
+            "Reduce camera shake in moving footage",
+            &mut stabilize,
+        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.stabilize = Some(stabilize);
+            needs_save = true;
+        }
+        ui.add_space(6.0);
+
+        let mut color_correct = color_correct;
+        if Self::draw_settings_toggle(
+            ui,
+            "Color Correct",
+            "Auto-balance contrast and white levels",
+            &mut color_correct,
+        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.color_correct = Some(color_correct);
+            needs_save = true;
+        }
+        ui.add_space(6.0);
+
+        let mut reframe = reframe;
+        if Self::draw_settings_toggle(
+            ui,
+            "Auto-Reframe (9:16)",
+            "Crop to vertical for Shorts, Reels, TikTok",
+            &mut reframe,
+        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.reframe = Some(reframe);
+            needs_save = true;
+        }
+        ui.add_space(6.0);
+
+        let mut blur = blur;
+        if Self::draw_settings_toggle(
+            ui,
+            "Blur Background",
+            "Blur the background when reframing to portrait",
+            &mut blur,
+        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.blur_background = Some(blur);
+            needs_save = true;
+        }
+        ui.add_space(6.0);
+
+        let mut scene_detect = scene_detect;
+        if Self::draw_settings_toggle(
+            ui,
+            "Scene Detection",
+            "Use scene changes to refine edit points",
+            &mut scene_detect,
+        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.scene_detect = Some(scene_detect);
+            needs_save = true;
+        }
+        ui.add_space(6.0);
+
+        let mut threshold = threshold;
+        let threshold_label = format!("{threshold:.0} dB");
+        if Self::draw_advanced_slider(
+            ui,
+            "Silence Threshold",
+            "Lower values keep more ambient speech",
+            &mut threshold,
+            -60.0..=-10.0,
+            threshold_label,
+        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.silence_threshold_db = Some(threshold);
+            needs_save = true;
+        }
+
+        ui
+    }
+
+    fn draw_settings_audio(&mut self, ui: &mut egui::Ui, folder_idx: usize) -> bool {
+        let mut needs_save = false;
+        let folder = self.state.folders.get(folder_idx);
+
+        let enhance = folder.and_then(|f| f.settings.enhance_audio).unwrap_or(true);
+        let noise_reduction = folder.and_then(|f| f.settings.noise_reduction).unwrap_or(false);
+        let lufs = folder.and_then(|f| f.settings.target_lufs).unwrap_or(-14.0);
+
+        ui.label(section_title("Audio"));
+        ui.add_space(8.0);
+
+        let mut enhance = enhance;
+        if Self::draw_settings_toggle(
+            ui,
+            "Enhance Audio",
+            "Normalize loudness and improve voice clarity",
+            &mut enhance,
+        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.enhance_audio = Some(enhance);
+            needs_save = true;
+        }
+        ui.add_space(6.0);
+
+        let mut noise_reduction = noise_reduction;
+        if Self::draw_settings_toggle(
+            ui,
+            "Noise Reduction",
+            "Remove background hum, hiss, and noise",
+            &mut noise_reduction,
+        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.noise_reduction = Some(noise_reduction);
+            needs_save = true;
+        }
+        ui.add_space(6.0);
+
+        let mut lufs = lufs;
+        let lufs_label = format!("{lufs:.0} LUFS");
+        if Self::draw_advanced_slider(
+            ui,
+            "Target Loudness",
+            "Final audio loudness (YouTube = -14 LUFS)",
+            &mut lufs,
+            -24.0..=-6.0,
+            lufs_label,
+        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.target_lufs = Some(lufs);
+            needs_save = true;
+        }
+
+        ui
+    }
+
+    fn draw_settings_video(&mut self, ui: &mut egui::Ui, folder_idx: usize) -> bool {
+        let mut needs_save = false;
+        let folder = self.state.folders.get(folder_idx);
+
+        let hw_accel = folder.and_then(|f| f.settings.hw_accel).unwrap_or(HwAccel::None);
+        let target_res = folder
+            .and_then(|f| f.settings.target_resolution)
+            .unwrap_or(VideoResolution::Fhd1080p);
+
+        ui.label(section_title("Video Output"));
+        ui.add_space(8.0);
+
+        ui.label(label_secondary("GPU Encoding"));
+        ui.add_space(4.0);
+        let hw_accel_options: [(String, HwAccel); 5] = [
+            (String::from("None (CPU)"), HwAccel::None),
+            (String::from("NVIDIA NVENC"), HwAccel::Nvenc),
+            (String::from("AMD AMF"), HwAccel::Amf),
+            (String::from("VAAPI"), HwAccel::Vaapi),
+            (String::from("VideoToolbox (macOS)"), HwAccel::VideoToolbox),
+        ];
+        let mut selected_hw = hw_accel;
+        let hw_label = selected_hw.display_name();
+        dropdown_selector(
+            ui,
+            &format!("hw_accel_{}", folder_idx),
+            &mut selected_hw,
+            &hw_accel_options,
+            hw_label,
+        );
+        if selected_hw != hw_accel
+            && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.hw_accel = Some(selected_hw);
+            needs_save = true;
+        }
+
+        ui.add_space(8.0);
+        ui.label(label_secondary("Target Resolution"));
+        ui.add_space(4.0);
+        let resolution_options: [(String, VideoResolution); 6] = [
+            (String::from("720p HD"), VideoResolution::Hd720p),
+            (String::from("1080p Full HD"), VideoResolution::Fhd1080p),
+            (String::from("1440p QHD"), VideoResolution::Qhd1440p),
+            (String::from("4K UHD"), VideoResolution::Uhd4k),
+            (
+                String::from("1080p Vertical"),
+                VideoResolution::Vertical1080p,
+            ),
+            (String::from("720p Vertical"), VideoResolution::Vertical720p),
+        ];
+        let mut selected_res = target_res;
+        let res_label = selected_res.display_name();
+        dropdown_selector(
+            ui,
+            &format!("resolution_{}", folder_idx),
+            &mut selected_res,
+            &resolution_options,
+            res_label,
+        );
+        if selected_res != target_res
+            && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.target_resolution = Some(selected_res);
+            needs_save = true;
+        }
+
+        ui
+    }
+
+    fn draw_settings_exports(&mut self, ui: &mut egui::Ui, folder_idx: usize) -> bool {
+        let mut needs_save = false;
+        let folder = self.state.folders.get(folder_idx);
+
+        let subtitles = folder.and_then(|f| f.settings.subtitles).unwrap_or(false);
+        let chapters = folder.and_then(|f| f.settings.chapters).unwrap_or(false);
+        let captions = folder.and_then(|f| f.settings.captions).unwrap_or(false);
+        let clips = folder.and_then(|f| f.settings.clips).unwrap_or(false);
+        let preview = folder.and_then(|f| f.settings.preview).unwrap_or(false);
+        let multi_format = folder.and_then(|f| f.settings.multi_format).unwrap_or(false);
+
+        ui.label(section_title("Exports"));
+        ui.add_space(8.0);
+
+        let mut subtitles = subtitles;
+        if Self::draw_settings_toggle(
+            ui,
+            "SRT Subtitles",
+            "Generate .srt subtitle file from transcript",
+            &mut subtitles,
+        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.subtitles = Some(subtitles);
+            needs_save = true;
+        }
+        ui.add_space(6.0);
+
+        let mut chapters = chapters;
+        if Self::draw_settings_toggle(
+            ui,
+            "YouTube Chapters",
+            "Generate timestamped chapters from transcript",
+            &mut chapters,
+        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.chapters = Some(chapters);
+            needs_save = true;
+        }
+        ui.add_space(6.0);
+
+        let mut captions = captions;
+        if Self::draw_settings_toggle(
+            ui,
+            "Burn Captions",
+            "Embed styled subtitles directly in video",
+            &mut captions,
+        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.captions = Some(captions);
+            needs_save = true;
+        }
+        ui.add_space(6.0);
+
+        let mut clips = clips;
+        if Self::draw_settings_toggle(
+            ui,
+            "Extract Clips",
+            "Pull highlight clips for Shorts, Reels, TikTok",
+            &mut clips,
+        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.clips = Some(clips);
+            needs_save = true;
+        }
+        ui.add_space(6.0);
+
+        let mut preview = preview;
+        if Self::draw_settings_toggle(
+            ui,
+            "Preview File",
+            "Generate a short low-res preview alongside output",
+            &mut preview,
+        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.preview = Some(preview);
+            needs_save = true;
+        }
+        ui.add_space(6.0);
+
+        let mut multi_format = multi_format;
+        if Self::draw_settings_toggle(
+            ui,
+            "Multi-Format Export",
+            "Generate outputs at multiple resolutions",
+            &mut multi_format,
+        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.multi_format = Some(multi_format);
+            needs_save = true;
+        }
+
+        ui
+    }
+
+    fn draw_settings_advanced(&mut self, ui: &mut egui::Ui, folder_idx: usize) -> bool {
+        let mut needs_save = false;
+        let folder = self.state.folders.get(folder_idx);
+
+        let threshold = folder.and_then(|f| f.settings.silence_threshold_db).unwrap_or(-30.0);
+        let lufs = folder.and_then(|f| f.settings.target_lufs).unwrap_or(-14.0);
+
+        ui.label(section_title("Advanced"));
+        ui.add_space(8.0);
+
+        settings_section_frame(false).show(ui, |ui| {
+            ui.horizontal_wrapped(|ui| {
+                let mut threshold = threshold;
+                let threshold_label = format!("{threshold:.0} dB");
+                if Self::draw_advanced_slider(
+                    ui,
+                    "Silence Threshold",
+                    "Lower = keep more ambient sound",
+                    &mut threshold,
+                    -60.0..=-10.0,
+                    threshold_label,
+                ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+                {
+                    f.settings.silence_threshold_db = Some(threshold);
+                    needs_save = true;
+                }
+
+                ui.add_space(16.0);
+
+                let mut lufs = lufs;
+                let lufs_label = format!("{lufs:.0} LUFS");
+                if Self::draw_advanced_slider(
+                    ui,
+                    "Target LUFS",
+                    "Final loudness target",
+                    &mut lufs,
+                    -24.0..=-6.0,
+                    lufs_label,
+                ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+                {
+                    f.settings.target_lufs = Some(lufs);
+                    needs_save = true;
+                }
+            });
+        });
+
+        ui.add_space(12.0);
+
+        ui.horizontal(|ui| {
+            ui.label(label_muted("Restore this folder's settings to defaults."));
+            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                if ui.add(button_small("Reset to Defaults")).clicked()
+                    && let Some(f) = self.state.folders.get_mut(folder_idx)
+                {
+                    f.settings = FolderSettings::default();
+                    needs_save = true;
+                    self.state.activity_log.push(ActivityEntry::simple(
+                        format!("Reset folder {} to defaults", folder_idx + 1),
+                        true,
+                    ));
+                }
+            });
+        });
+
+        ui
+    }
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                     preset_badge(&preset_name, ui);
                 });
