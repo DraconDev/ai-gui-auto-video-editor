@@ -391,7 +391,9 @@ fn main() -> Result<()> {
             use clap::CommandFactory;
             Cli::command().print_help()?;
             println!();
-            println!("No input specified and no watch folders configured. Use --input-file, --input-dir, or configure watch folders in config.");
+            println!(
+                "No input specified and no watch folders configured. Use --input-file, --input-dir, or configure watch folders in config."
+            );
             return Ok(());
         }
 

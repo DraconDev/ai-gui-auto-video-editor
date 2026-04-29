@@ -701,7 +701,7 @@ fn test_hwaccel_all_variants() {
             "HwAccel {:?} should have display name",
             hw
         );
-        let from_str = HwAccel::from_str(as_str);
+        let from_str = HwAccel::parse_name(as_str);
         assert_eq!(from_str, Some(hw), "Round-trip for {:?} should succeed", hw);
     }
 }

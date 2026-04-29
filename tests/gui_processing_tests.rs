@@ -28,17 +28,17 @@ fn test_build_folder_config_youtube_preset() {
         config.export.chapters
     );
 
-    // Check if Preset::from_str works
+    // Check if Preset::parse_name works
     eprintln!(
-        "Preset::from_str(\"youtube\") = {:?}",
-        Preset::from_str("youtube")
+        "Preset::parse_name(\"youtube\") = {:?}",
+        Preset::parse_name("youtube")
     );
     eprintln!(
-        "Preset::from_str(\"Youtube\") = {:?}",
-        Preset::from_str("Youtube")
+        "Preset::parse_name(\"Youtube\") = {:?}",
+        Preset::parse_name("Youtube")
     );
 
-    let preset = Preset::from_str("youtube").unwrap();
+    let preset = Preset::parse_name("youtube").unwrap();
     let preset_config = preset.to_config();
     eprintln!(
         "youtube preset export.chapters = {}",
