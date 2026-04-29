@@ -468,9 +468,10 @@ pub fn slider_glow(
 
     let value_text = if step >= 1.0 {
         format!("{}", *value as i32)
+    } else if step >= 0.1 {
+        format!("{:.1}", *value)
     } else {
-        let decimals = (-step.log10()).ceil() as usize;
-        format!("{:.min(decimals, 2)$}", *value)
+        format!("{:.2}", *value)
     };
     let text_color = TEXT_SECONDARY;
     let font_id = egui::FontId::proportional(13.0);

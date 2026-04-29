@@ -1,9 +1,12 @@
 # Project State
 
 ## Current Focus
-Added step‑based precision to three sliders for silence_min_for_speedup, silence_scene_threshold, and target_lufs settings.
+feat(step‑based precision): Add incremental step values and refined formatting to audio/video sliders for duck volume, watermark scale, and clip durations
 
 ## Completed
-- [x] Added step size 0.1 to the silence_min_for_speedup slider input.
-- [x] Added step size 0.01 to the silence_scene_threshold slider input.
-- [x] Added step size 1.0 to the target_lufs slider input.
+- [x] Add step increment of 0.01 to duck volume slider
+- [x] Add step increment of 0.1 to watermark scale slider
+- [x] Add step increment of 1.0 to clip count slider
+- [x] Add step increment of 1.0 to clip minimum duration slider
+- [x] Add step increment of 1.0 to clip maximum duration slider
+- [x] Update value formatting to use one decimal for values ≥0.1 and two decimals otherwise

@@ -1320,6 +1320,7 @@ impl App {
                 &mut duck_volume,
                 0.0..=1.0,
                 duck_label,
+                0.01,
             ) && let Some(f) = self.state.folders.get_mut(folder_idx)
             {
                 f.settings.duck_volume = Some(duck_volume);
@@ -1466,6 +1467,7 @@ impl App {
                 &mut watermark_scale,
                 0.1..=3.0,
                 scale_label,
+                0.1,
             ) && let Some(f) = self.state.folders.get_mut(folder_idx)
             {
                 f.settings.watermark_scale = Some(watermark_scale);
@@ -1642,6 +1644,7 @@ impl App {
                 &mut clip_count_f,
                 1.0..=10.0,
                 clip_count_label,
+                1.0,
             ) && let Some(f) = self.state.folders.get_mut(folder_idx)
             {
                 f.settings.clip_count = Some(clip_count_f as u32);
@@ -1658,6 +1661,7 @@ impl App {
                 &mut new_clip_min,
                 5.0..=60.0,
                 min_label,
+                1.0,
             ) && let Some(f) = self.state.folders.get_mut(folder_idx)
             {
                 f.settings.clip_min_duration = Some(new_clip_min);
@@ -1674,6 +1678,7 @@ impl App {
                 &mut new_clip_max,
                 30.0..=300.0,
                 max_label,
+                1.0,
             ) && let Some(f) = self.state.folders.get_mut(folder_idx)
             {
                 f.settings.clip_max_duration = Some(new_clip_max);
