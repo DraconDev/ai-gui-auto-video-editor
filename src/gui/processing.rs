@@ -427,10 +427,6 @@ fn queue_worker_loop(
     stop: Arc<AtomicBool>,
     notify: bool,
 ) {
-    let analyzer = FfmpegAnalyzer;
-    let editor = FfmpegEditor::new(config.video.hw_accel);
-    let duration_getter = FfmpegDurationGetter;
-
     let mut successful = 0;
     let mut failed = 0;
     let queue_len = queue.len();
@@ -460,15 +456,28 @@ fn queue_worker_loop(
                 .unwrap_or("output")
         ));
 
+        let folder_state = FolderState {
+            input: file.path.clone(),
+            output: file.output_dir.clone(),
+            preset: file.preset.clone(),
+            enabled: true,
+            settings: file.settings.clone(),
+        };
+        let file_config = build_folder_config(&config, &folder_state);
+
+        let analyzer = FfmpegAnalyzer;
+        let editor = FfmpegEditor::new(file_config.video.hw_accel);
+        let duration_getter = FfmpegDurationGetter;
+
         let result = process_single_file_with_intro_outro_progress(
             file.path.clone(),
             output_file.clone(),
-            &config,
+            &file_config,
             &analyzer,
             &editor,
             &duration_getter,
-            config.paths.intro.clone(),
-            config.paths.outro.clone(),
+            file_config.paths.intro.clone(),
+            file_config.paths.outro.clone(),
             |progress| {
                 let _ = tx.send(QueueEvent::Progress {
                     filename: filename.clone(),
