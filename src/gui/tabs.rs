@@ -2140,22 +2140,17 @@ impl App {
                     if ui.add(button_add("+ Add Files")).clicked() {
                         if let Some(paths) = rfd::FileDialog::new().pick_files() {
                             for path in paths {
-                                let preset = self
-                                    .state
-                                    .folders
-                                    .get(self.state.selected_folder_idx)
-                                    .map(|f| f.preset.clone())
-                                    .unwrap_or_else(|| "youtube".to_string());
-                                let output_dir = self
-                                    .state
-                                    .folders
-                                    .get(self.state.selected_folder_idx)
+                                let folder = self.state.folders.get(self.state.selected_folder_idx);
+                                let output_dir = folder
                                     .map(|f| f.output.clone())
                                     .unwrap_or_else(|| PathBuf::from("output"));
+                                let settings = folder
+                                    .map(|f| f.settings.clone())
+                                    .unwrap_or_default();
                                 self.state.batch_queue.push(super::QueuedFile {
                                     path,
                                     output_dir,
-                                    preset,
+                                    settings,
                                     status: super::QueueStatus::Queued,
                                     progress: 0.0,
                                     output_path: None,
