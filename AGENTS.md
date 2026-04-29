@@ -133,6 +133,21 @@ cargo check --all-features    # Type-check all feature combos
 3. Preset values (only if non-default)
 4. Default values (lowest)
 
+## Default Behavior (CLI vs GUI)
+
+When running `ai-vid-editor` with no arguments:
+- **GUI launches by default** (when compiled with `gui` feature)
+- Use `--headless` flag to enter watch/daemon mode instead
+- Use `--gui` flag to explicitly request GUI (same as default)
+
+```
+cargo run              # Launches GUI (default)
+cargo run -- --headless # Launches watch mode (if watch folders configured)
+cargo run -- --gui      # Explicit GUI (same as default)
+```
+
+The old behavior (TTY detection → fallback to watch mode) has been removed. GUI is now the unconditional default.
+
 ## Feature Flags
 
 | Flag | Enables |
