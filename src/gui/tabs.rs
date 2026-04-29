@@ -1830,6 +1830,222 @@ impl App {
         changed
     }
 
+    pub(crate) fn draw_summary_card(&mut self, ui: &mut egui::Ui) {
+        let new_entries = self
+            .state
+            .activity_log
+            .len()
+            .saturating_sub(self.state.last_seen_activity_len);
+        if new_entries == 0 {
+            return;
+        }
+
+        let success_count = self
+            .state
+            .activity_log
+            .iter()
+            .rev()
+            .take(new_entries)
+            .filter(|e| e.status == EntryStatus::Success)
+            .count();
+        let error_count = new_entries.saturating_sub(success_count);
+        let has_errors = error_count > 0;
+
+        let bg = if has_errors { WARNING_BG } else { SUCCESS_BG };
+        let accent = if has_errors { WARNING } else { SUCCESS };
+        let dim = if has_errors { WARNING } else { SUCCESS_DIM };
+
+        egui::Frame::NONE
+            .fill(bg)
+            .corner_radius(10.0)
+            .stroke(egui::Stroke::new(1.0, accent))
+            .inner_margin(14.0)
+            .show(ui, |ui| {
+                ui.horizontal_wrapped(|ui| {
+                    ui.set_width(ui.available_width());
+                    let dot_size = 10.0;
+                    let (rect, _) = ui
+                        .allocate_exact_size(egui::vec2(dot_size, dot_size), egui::Sense::hover());
+                    ui.painter().circle_filled(rect.center(), 4.5, accent);
+
+                    ui.add_space(10.0);
+
+                    let label = if has_errors {
+                        format!(
+                            "{} new — {} done, {} failed",
+                            new_entries, success_count, error_count
+                        )
+                    } else {
+                        format!("{} new — {} completed", new_entries, success_count)
+                    };
+                    ui.label(
+                        egui::RichText::new(label)
+                            .size(14.0)
+                            .color(TEXT_PRIMARY)
+                            .strong(),
+                    );
+
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                        if let Some(last) = self
+                            .state
+                            .activity_log
+                            .iter()
+                            .rev()
+                            .find(|e| !e.filename.is_empty())
+                        {
+                            ui.label(
+                                egui::RichText::new(truncate_path(&last.filename, 36))
+                                    .size(12.0)
+                                    .color(TEXT_MUTED),
+                            );
+                        }
+                    });
+                });
+
+                ui.add_space(4.0);
+
+                ui.horizontal_wrapped(|ui| {
+                    ui.set_width(ui.available_width());
+                    ui.add_space(14.0);
+                    if has_errors {
+                        ui.label(
+                            egui::RichText::new(
+                                "Some files failed — check the Activity tab for details",
+                            )
+                            .size(12.0)
+                            .color(WARNING),
+                        );
+                    } else {
+                        ui.label(
+                            egui::RichText::new("All files processed successfully")
+                                .size(12.0)
+                                .color(dim),
+                        );
+                    }
+                });
+            });
+
+        self.state.last_seen_activity_len = self.state.activity_log.len();
+    }
+
+    pub(crate) fn draw_toasts(&mut self, ctx: &egui::Context) {
+        for toast in &self.state.toasts {
+            let elapsed = toast.created.elapsed().as_secs() as f32;
+            let alpha = 1.0 - (elapsed / 5.0).min(1.0);
+
+            let toast_text = if toast.success { "✓" } else { "✗" };
+            let color = if toast.success { SUCCESS } else { ERROR };
+
+            egui::Area::new(egui::Id::new(format!("toast_{}", toast.created.elapsed().as_nanos())))
+                .anchor(egui::Align2::RIGHT_BOTTOM, egui::vec2(-20.0, -20.0))
+                .show(ctx, |ui| {
+                    egui::Frame::NONE
+                        .fill(egui::Color32::from_rgba_unmultiplied(
+                            if toast.success { 18 } else { 45 },
+                            if toast.success { 40 } else { 16 },
+                            if toast.success { 26 } else { 16 },
+                            (alpha * 255.0) as u8,
+                        ))
+                        .corner_radius(8.0)
+                        .inner_margin(egui::vec2(14.0, 10.0))
+                        .stroke(egui::Stroke::new(
+                            1.0,
+                            egui::Color32::from_rgba_unmultiplied(
+                                color.r(),
+                                color.g(),
+                                color.b(),
+                                (alpha * 200.0) as u8,
+                            ),
+                        ))
+                        .show(ui, |ui| {
+                            ui.horizontal(|ui| {
+                                ui.label(
+                                    egui::RichText::new(toast_text)
+                                        .size(16.0)
+                                        .color(color),
+                                );
+                                ui.add_space(8.0);
+                                ui.label(
+                                    egui::RichText::new(&toast.message)
+                                        .size(14.0)
+                                        .color(TEXT_PRIMARY),
+                                );
+                            });
+                        });
+                });
+        }
+    }
+
+    pub(crate) fn draw_activity_log(&mut self, ui: &mut egui::Ui, full_height: bool) {
+        panel_frame().show(ui, |ui| {
+            ui.horizontal(|ui| {
+                ui.label(
+                    RichText::new("Activity")
+                        .size(18.0)
+                        .color(ACCENT_PRIMARY)
+                        .strong(),
+                );
+                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                    if ui.add(button_small("Clear")).clicked() {
+                        self.state.activity_log.clear();
+                    }
+                });
+            });
+
+            ui.add_space(12.0);
+
+            if self.state.activity_log.is_empty() {
+                inner_panel().show(ui, |ui| {
+                    ui.add_space(12.0);
+                    ui.label(label_muted("No activity yet"));
+                    ui.add_space(12.0);
+                });
+            } else {
+                let entries: Vec<_> = if full_height {
+                    self.state.activity_log.iter().rev().collect()
+                } else {
+                    self.state.activity_log.iter().rev().take(50).collect()
+                };
+
+                egui::ScrollArea::vertical()
+                    .max_height(if full_height { 800.0 } else { 200.0 })
+                    .show(ui, |ui| {
+                        for entry in entries {
+                            ui.add_space(4.0);
+                            match entry.status {
+                                EntryStatus::Success => {
+                                    log_entry_success(
+                                        ui,
+                                        &entry.timestamp,
+                                        &entry.filename,
+                                        &format_file_size(entry.file_size),
+                                        &format_duration(entry.duration.unwrap_or(0)),
+                                    );
+                                }
+                                EntryStatus::Processing => {
+                                    log_entry_processing(
+                                        ui,
+                                        &entry.timestamp,
+                                        &entry.filename,
+                                        &entry.message,
+                                        entry.progress.unwrap_or(0.0),
+                                    );
+                                }
+                                EntryStatus::Error => {
+                                    log_entry_error(
+                                        ui,
+                                        &entry.timestamp,
+                                        &entry.filename,
+                                        &entry.message,
+                                    );
+                                }
+                            }
+                        }
+                    });
+            }
+        });
+    }
+
     pub(crate) fn draw_queue_panel(&mut self, ui: &mut egui::Ui) {
         panel_frame().show(ui, |ui| {
             ui.horizontal(|ui| {

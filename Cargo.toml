@@ -1,6 +1,6 @@
 [package]
 name = "ai-vid-editor"
-version = "6.0.0"
+version = "6.0.2"
 edition = "2024"
 authors = ["DraconDev"]
 description = "AI-powered video editor for content creators"
