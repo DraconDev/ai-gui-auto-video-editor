@@ -1621,43 +1621,49 @@ impl App {
             }
             ui.add_space(6.0);
 
-            let mut clip_min_duration = clip_min_duration;
+            let mut new_clip_min = clip_min_duration;
             let min_label = format!("{:.0}s min", clip_min_duration);
             if Self::draw_advanced_slider(
                 ui,
                 "Min Clip Duration",
                 "Clips shorter than this won't be extracted",
-                &mut clip_min_duration,
+                &mut new_clip_min,
                 5.0..=60.0,
                 min_label,
             ) && let Some(f) = self.state.folders.get_mut(folder_idx)
             {
-                f.settings.clip_min_duration = Some(clip_min_duration);
+                f.settings.clip_min_duration = Some(new_clip_min);
                 needs_save = true;
             }
             ui.add_space(6.0);
 
-            let mut clip_max_duration = clip_max_duration;
+            let mut new_clip_max = clip_max_duration;
             let max_label = format!("{:.0}s max", clip_max_duration);
             if Self::draw_advanced_slider(
                 ui,
                 "Max Clip Duration",
                 "Longest clip length to extract",
-                &mut clip_max_duration,
+                &mut new_clip_max,
                 30.0..=300.0,
                 max_label,
             ) && let Some(f) = self.state.folders.get_mut(folder_idx)
             {
-                f.settings.clip_max_duration = Some(clip_max_duration);
+                f.settings.clip_max_duration = Some(new_clip_max);
                 needs_save = true;
             }
 
-            if clip_min_duration > clip_max_duration {
+            if new_clip_min > new_clip_max {
                 ui.add_space(6.0);
                 Self::draw_validation_warning(
                     ui,
-                    &format!("Min duration ({:.0}s) > Max duration ({:.0}s)", clip_min_duration, clip_max_duration),
+                    &format!("Min duration ({:.0}s) > Max duration ({:.0}s)", new_clip_min, new_clip_max),
                 );
+                // Revert invalid settings and don't save
+                if let Some(f) = self.state.folders.get_mut(folder_idx) {
+                    f.settings.clip_min_duration = Some(original_clip_min);
+                    f.settings.clip_max_duration = Some(original_clip_max);
+                }
+                needs_save = false;
             }
         }
 

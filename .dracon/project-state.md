@@ -1,9 +1,9 @@
-# Project State
-This commit refactors the toast system to present only success and error toasts, simplifies their appearance, and introduces a persistent click handler for dismissing them.
+#Project State
+
+## Current Focus
+Fix validation warning and prevent saving invalid clip duration settings when min > max
 
 ## Completed
-- Updated Cargo.lock to match latest dependency versions
-- Refactored the toast logic to display only relevant error/toast messages
-- Improved visual consistency by standardizing toast size, color, and layout
-- Added a manual click dismiss feature within the UI for better control
-- Ensured proper removal of stale dismissed toasts during user interaction
+- [x] Implemented new variables (`new_clip_min`, `new_clip_max`) to track slider values before validation
+- [x] Added logic to revert invalid settings to original values when min duration exceeds max duration
+- [x] Updated validation warning message to reflect new variable names
