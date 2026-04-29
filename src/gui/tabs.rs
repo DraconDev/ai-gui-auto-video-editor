@@ -1189,6 +1189,8 @@ impl App {
         let enhance = folder.and_then(|f| f.settings.enhance_audio).unwrap_or(true);
         let noise_reduction = folder.and_then(|f| f.settings.noise_reduction).unwrap_or(false);
         let lufs = folder.and_then(|f| f.settings.target_lufs).unwrap_or(-14.0);
+        let duck_volume = folder.and_then(|f| f.settings.duck_volume).unwrap_or(0.2);
+        let music_path = folder.and_then(|f| f.settings.music_path.clone());
 
         ui.label(section_title("Audio"));
         ui.add_space(8.0);
@@ -1233,6 +1235,53 @@ impl App {
             f.settings.target_lufs = Some(lufs);
             needs_save = true;
         }
+        ui.add_space(6.0);
+
+        let mut duck_volume = duck_volume;
+        let duck_label = format!("{:.0}%", duck_volume * 100.0);
+        if Self::draw_advanced_slider(
+            ui,
+            "Duck Volume",
+            "Background music reduction during speech",
+            &mut duck_volume,
+            0.0..=1.0,
+            duck_label,
+        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.duck_volume = Some(duck_volume);
+            needs_save = true;
+        }
+        ui.add_space(8.0);
+
+        ui.label(label_secondary("Background Music"));
+        ui.add_space(4.0);
+        ui.horizontal(|ui| {
+            let music_label = music_path
+                .as_ref()
+                .and_then(|p| p.file_name())
+                .map(|n| n.to_string_lossy().to_string())
+                .unwrap_or_else(|| "None".to_string());
+            ui.label(label_muted(&music_label));
+            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                if ui.add(button_small("Choose...")).clicked() {
+                    if let Some(path) = FileDialog::new()
+                        .add_filter("Audio", &["mp3", "wav", "ogg", "flac", "m4a"])
+                        .pick_file()
+                    {
+                        if let Some(f) = self.state.folders.get_mut(folder_idx) {
+                            f.settings.music_path = Some(path);
+                            needs_save = true;
+                        }
+                    }
+                }
+                if music_path.is_some() && ui.add(button_small("✕")).clicked() {
+                    if let Some(f) = self.state.folders.get_mut(folder_idx) {
+                        f.settings.music_path = None;
+                        needs_save = true;
+                    }
+                }
+            });
+        });
 
         needs_save
     }
