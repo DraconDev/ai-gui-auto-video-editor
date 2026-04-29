@@ -1142,6 +1142,7 @@ fn handle_dry_run(cli: &Cli, config: &Config) -> Result<()> {
     // Calculate total silence duration
     let total_silence: f32 = silences.iter().map(|s| s.end - s.start).sum();
     let output_duration = match config.silence.mode {
+        crate::config::SilenceMode::Keep => video_duration,
         crate::config::SilenceMode::Cut => video_duration - total_silence,
         crate::config::SilenceMode::Speedup => {
             // Approximate: silences are sped up
