@@ -1,8 +1,7 @@
 # Project State
 
 ## Current Focus
-Regenerated Cargo.lock after internal rebuild with unchanged dependencies
+Remove unused SilenceMode import from processing.rs
 
 ## Completed
-- [x] Regenerated Cargo.lock for reproducibility
-- [x] Preserved all dependency versions without updates
+- [x] Drop SilenceMode import line from src/gui/processing.rs
