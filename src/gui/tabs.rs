@@ -995,7 +995,6 @@ impl App {
         let mut needs_save = false;
         let folder = self.state.folders.get(folder_idx);
 
-        let remove_silence = folder.and_then(|f| f.settings.remove_silence).unwrap_or(true);
         let stabilize = folder.and_then(|f| f.settings.stabilize).unwrap_or(false);
         let color_correct = folder.and_then(|f| f.settings.color_correct).unwrap_or(false);
         let reframe = folder.and_then(|f| f.settings.reframe).unwrap_or(false);
@@ -1013,19 +1012,6 @@ impl App {
         ui.add_space(4.0);
         ui.add(egui::Label::new(egui::RichText::new("Core video editing: silence removal, stabilization, color correction").size(12.0).color(TEXT_SECONDARY)));
         ui.add_space(12.0);
-
-        let mut remove_silence = remove_silence;
-        if Self::draw_settings_toggle(
-            ui,
-            "Remove Silence",
-            "Cut dead air and gaps for tighter pacing",
-            &mut remove_silence,
-        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
-        {
-            f.settings.remove_silence = Some(remove_silence);
-            needs_save = true;
-        }
-        ui.add_space(6.0);
 
         let mut stabilize = stabilize;
         if Self::draw_settings_toggle(
@@ -1113,17 +1099,19 @@ impl App {
 
         ui.label(label_secondary("Silence Mode"));
         ui.add_space(4.0);
-        let mode_options: [(String, SilenceMode); 2] = [
+        let mode_options: [(String, SilenceMode); 3] = [
+            (String::from("Keep All"), SilenceMode::Keep),
             (String::from("Cut"), SilenceMode::Cut),
             (String::from("Speed Up"), SilenceMode::Speedup),
         ];
         let mut selected_mode = silence_mode;
         let mode_label = match selected_mode {
+            SilenceMode::Keep => "Keep All",
             SilenceMode::Cut => "Cut",
             SilenceMode::Speedup => "Speed Up",
         };
         dropdown_selector(ui, &format!("silence_mode_{}", folder_idx), &mut selected_mode, &mode_options, mode_label);
-        ui.add(egui::Label::new(egui::RichText::new("Cut = remove silence. Speed Up = keep but play faster").size(11.0).color(TEXT_SECONDARY)));
+        ui.add(egui::Label::new(egui::RichText::new("Keep All = no changes. Cut = remove silence. Speed Up = keep but play faster").size(11.0).color(TEXT_SECONDARY)));
         if selected_mode != silence_mode && let Some(f) = self.state.folders.get_mut(folder_idx) {
             f.settings.silence_mode = Some(selected_mode);
             needs_save = true;
@@ -1131,39 +1119,41 @@ impl App {
 
         ui.add_space(8.0);
 
-        let mut silence_padding = silence_padding;
-        let padding_label = format!("{:.2}s", silence_padding);
-        if Self::draw_advanced_slider(
-            ui,
-            "Silence Padding",
-            "Keep this much audio before/after cuts",
-            &mut silence_padding,
-            0.0..=0.5,
-            padding_label,
-            0.01,
-        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
-        {
-            f.settings.silence_padding = Some(silence_padding);
-            needs_save = true;
-        }
-        ui.add_space(6.0);
+        if selected_mode != SilenceMode::Keep {
+            let mut silence_padding = silence_padding;
+            let padding_label = format!("{:.2}s", silence_padding);
+            if Self::draw_advanced_slider(
+                ui,
+                "Silence Padding",
+                "Keep this much audio before/after cuts",
+                &mut silence_padding,
+                0.0..=0.5,
+                padding_label,
+                0.01,
+            ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+            {
+                f.settings.silence_padding = Some(silence_padding);
+                needs_save = true;
+            }
+            ui.add_space(6.0);
 
-        let mut silence_min_duration = silence_min_duration;
-        let min_dur_label = format!("{:.1}s", silence_min_duration);
-        if Self::draw_advanced_slider(
-            ui,
-            "Min Silence Duration",
-            "Ignore silences shorter than this",
-            &mut silence_min_duration,
-            0.1..=2.0,
-            min_dur_label,
-            0.1,
-        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
-        {
-            f.settings.silence_min_duration = Some(silence_min_duration);
-            needs_save = true;
+            let mut silence_min_duration = silence_min_duration;
+            let min_dur_label = format!("{:.1}s", silence_min_duration);
+            if Self::draw_advanced_slider(
+                ui,
+                "Min Silence Duration",
+                "Ignore silences shorter than this",
+                &mut silence_min_duration,
+                0.1..=2.0,
+                min_dur_label,
+                0.1,
+            ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+            {
+                f.settings.silence_min_duration = Some(silence_min_duration);
+                needs_save = true;
+            }
+            ui.add_space(6.0);
         }
-        ui.add_space(6.0);
 
         if selected_mode == SilenceMode::Speedup {
             let mut silence_speedup_factor = silence_speedup_factor;
