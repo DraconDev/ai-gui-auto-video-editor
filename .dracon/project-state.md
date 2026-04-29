@@ -1,8 +1,10 @@
 # Project State
 
 ## Current Focus
-Refactor output filename generation to preserve file extension
+Add `join_mode`, `join_after_count`, and `join_output_pattern` fields to `FolderSettings` and update `is_finalized` to consider them in the finalization emptiness check
 
 ## Completed
-- [x] Added extraction of file extension with fallback to "mp4"
-- [x] Modified filename construction to include the extension in the output name
+- [x] Added `join_mode` `Option<JoinMode>` field with `skip_serializing_if` attribute
+- [x] Added `join_after_count` `Option<u32>` field with `skip_serializing_if` attribute
+- [x] Added `join_output_pattern` `Option<String>` field with `skip_serializing_if` attribute
+- [x] Modified `is_finalized` to include these three options in the emptiness condition check

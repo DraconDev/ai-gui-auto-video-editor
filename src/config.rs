@@ -485,6 +485,12 @@ pub struct FolderSettings {
     pub thumbnail: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub extra_resolutions: Option<Vec<VideoResolution>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub join_mode: Option<JoinMode>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub join_after_count: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub join_output_pattern: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -540,6 +546,9 @@ impl FolderSettings {
             && self.edl.is_none()
             && self.thumbnail.is_none()
             && self.extra_resolutions.is_none()
+            && self.join_mode.is_none()
+            && self.join_after_count.is_none()
+            && self.join_output_pattern.is_none()
     }
 }
 
