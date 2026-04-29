@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Simplify toast interaction detection by replacing manual primary button check with `.clicked()`
+Add Warning and Info toast kinds with theming to UI notifications
 
 ## Completed
-- [x] Replace `is_pointer_button_down_on(egui::PointerButton::Primary)` with `.clicked()` in the toast click handling logic
-- [x] Remove the redundant `is_pointer_button_down_on` call, simplifying the code path
+- [x] add ToastKind::Warning color definition
+- [x] add ToastKind::Info color definition

@@ -2049,6 +2049,8 @@ impl App {
             let bg_color = match toast.kind {
                 ToastKind::Success => egui::Color32::from_rgba_unmultiplied(18, 40, 26, bg_alpha),
                 ToastKind::Error => egui::Color32::from_rgba_unmultiplied(45, 16, 16, bg_alpha),
+                ToastKind::Warning => egui::Color32::from_rgba_unmultiplied(50, 40, 10, bg_alpha),
+                ToastKind::Info => egui::Color32::from_rgba_unmultiplied(20, 36, 60, bg_alpha),
             };
 
             let toast_id = egui::Id::new(format!("toast_{}", i));
