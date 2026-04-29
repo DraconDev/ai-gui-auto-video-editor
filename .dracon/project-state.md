@@ -1,8 +1,7 @@
 # Project State
 
 ## Current Focus
-Add Warning and Info toast kinds with theming to UI notifications
+Dependency updates reflected in Cargo.lock
 
 ## Completed
-- [x] add ToastKind::Warning color definition
-- [x] add ToastKind::Info color definition
+- [x] Dependency updates in Cargo.lock
