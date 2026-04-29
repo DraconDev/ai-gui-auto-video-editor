@@ -986,7 +986,6 @@ impl App {
         let mut needs_save = false;
         let folder = self.state.folders.get(folder_idx);
 
-        let enhance = folder.and_then(|f| f.settings.enhance_audio).unwrap_or(true);
         let remove_silence = folder.and_then(|f| f.settings.remove_silence).unwrap_or(true);
         let stabilize = folder.and_then(|f| f.settings.stabilize).unwrap_or(false);
         let color_correct = folder.and_then(|f| f.settings.color_correct).unwrap_or(false);
@@ -1003,19 +1002,6 @@ impl App {
 
         ui.label(section_title("Processing"));
         ui.add_space(8.0);
-
-        let mut enhance = enhance;
-        if Self::draw_settings_toggle(
-            ui,
-            "Enhance Audio",
-            "Normalize loudness and improve voice clarity",
-            &mut enhance,
-        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
-        {
-            f.settings.enhance_audio = Some(enhance);
-            needs_save = true;
-        }
-        ui.add_space(6.0);
 
         let mut remove_silence = remove_silence;
         if Self::draw_settings_toggle(
@@ -1680,51 +1666,12 @@ impl App {
         let mut needs_save = false;
         let folder = self.state.folders.get(folder_idx);
 
-        let threshold = folder.and_then(|f| f.settings.silence_threshold_db).unwrap_or(-30.0);
-        let lufs = folder.and_then(|f| f.settings.target_lufs).unwrap_or(-14.0);
         let intro_path = folder.and_then(|f| f.settings.intro_path.clone());
         let outro_path = folder.and_then(|f| f.settings.outro_path.clone());
 
         ui.label(section_title("Advanced"));
         ui.add_space(8.0);
 
-        settings_section_frame(false).show(ui, |ui| {
-            ui.horizontal_wrapped(|ui| {
-                let mut threshold = threshold;
-                let threshold_label = format!("{threshold:.0} dB");
-                if Self::draw_advanced_slider(
-                    ui,
-                    "Silence Threshold",
-                    "Lower = keep more ambient sound",
-                    &mut threshold,
-                    -60.0..=-10.0,
-                    threshold_label,
-                ) && let Some(f) = self.state.folders.get_mut(folder_idx)
-                {
-                    f.settings.silence_threshold_db = Some(threshold);
-                    needs_save = true;
-                }
-
-                ui.add_space(16.0);
-
-                let mut lufs = lufs;
-                let lufs_label = format!("{lufs:.0} LUFS");
-                if Self::draw_advanced_slider(
-                    ui,
-                    "Target LUFS",
-                    "Final loudness target",
-                    &mut lufs,
-                    -24.0..=-6.0,
-                    lufs_label,
-                ) && let Some(f) = self.state.folders.get_mut(folder_idx)
-                {
-                    f.settings.target_lufs = Some(lufs);
-                    needs_save = true;
-                }
-            });
-        });
-
-        ui.add_space(12.0);
         ui.label(section_title("Intro / Outro"));
         ui.add_space(8.0);
 
@@ -2175,9 +2122,15 @@ impl App {
                         }
                     }
                     ui.add_space(8.0);
-                    if ui.add(button_primary("Process All")).clicked()
+                    if self.state.queue_processing {
+                        if ui.add(button_small("Stop")).clicked() {
+                            if let Some(stop) = self.state.queue_stop.take() {
+                                stop.store(true, std::sync::atomic::Ordering::SeqCst);
+                            }
+                            self.state.queue_processing = false;
+                        }
+                    } else if ui.add(button_primary("Process All")).clicked()
                         && !self.state.batch_queue.is_empty()
-                        && !self.state.queue_processing
                     {
                         self.state.queue_processing = true;
                         self.start_queue_processing();

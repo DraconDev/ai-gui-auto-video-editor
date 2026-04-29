@@ -1,11 +1,9 @@
 # Project State
 
 ## Current Focus
-Simplify toast system to success/error only and promote config-save feedback to success toast.
+Remove advanced audio settings UI and add stop button for queue processing
 
 ## Completed
-- [x] Remove ToastKind::Info and ToastKind::Warning variants and related helper methods (add_info_toast, add_warning_toast).
-- [x] Promote “Config saved” auto-save notification from info to success toast.
-- [x] Delete unused draw_settings_metric helper (settings metric card UI).
-- [x] Drop toast-specific rendering branches for info/warning in settings and reduce color/label branches.
-- [x] Update Cargo.lock to latest dependency versions.
+- [x] Remove "Enhance Audio" toggle and its associated settings control from processing options
+- [x] Remove advanced audio settings sliders for silence threshold and target LUFS
+- [x] Add "Stop" button during queue processing to allow cancellation of batch operations
