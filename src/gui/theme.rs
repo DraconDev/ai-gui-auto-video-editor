@@ -663,30 +663,6 @@ pub fn log_entry_error(ui: &mut egui::Ui, timestamp: &str, filename: &str, messa
     });
 }
 
-pub fn log_entry_simple(ui: &mut egui::Ui, timestamp: &str, message: &str, success: bool) {
-    let (color, bg) = if success {
-        (SUCCESS_DIM, SUCCESS_BG)
-    } else {
-        (ERROR, ERROR_BG)
-    };
-
-    egui::Frame::NONE
-        .fill(bg)
-        .corner_radius(CORNER_RADIUS_SMALL)
-        .inner_margin(egui::vec2(10.0, 6.0))
-        .show(ui, |ui| {
-            ui.horizontal(|ui| {
-                let (rect, _) =
-                    ui.allocate_exact_size(egui::vec2(10.0, 10.0), egui::Sense::hover());
-                ui.painter().circle_filled(rect.center(), 4.0, color);
-                ui.add_space(6.0);
-                ui.label(label_muted(timestamp));
-                ui.add_space(6.0);
-                ui.label(label_secondary(message));
-            });
-        });
-}
-
 pub fn format_file_size(bytes: u64) -> String {
     const KB: u64 = 1024;
     const MB: u64 = KB * 1024;

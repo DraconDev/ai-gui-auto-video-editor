@@ -1,7 +1,9 @@
 # Project State
 
 ## Current Focus
-Regenerated Cargo.lock after internal rebuild with unchanged dependencies, resulting in a binary lock file change
+Remove the `log_entry_simple` helper function used for simple log toast UI rendering
 
 ## Completed
-- [x] Regenerated Cargo.lock after internal rebuild (binary lock file updated)
+- [x] Removed the `log_entry_simple` function definition and its implementation
+- [x] Deleted associated style constants and drawing code
+- [x] Updated code to eliminate references to the removed function
