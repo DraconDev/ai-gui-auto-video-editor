@@ -69,7 +69,7 @@ mod tests {
     use super::*;
     use std::process::Command;
 
-    fn create_test_video(path: &Path, duration_secs: f32) {
+    fn create_test_video(path: &Path, duration_secs: f32) -> Result<(), String> {
         let status = Command::new("ffmpeg")
             .args([
                 "-f",
@@ -95,8 +95,12 @@ mod tests {
                 path.to_str().unwrap(),
             ])
             .status()
-            .expect("ffmpeg not found");
-        assert!(status.success());
+            .map_err(|_| "ffmpeg not found".to_string())?;
+        if status.success() {
+            Ok(())
+        } else {
+            Err("ffmpeg test video creation failed".to_string())
+        }
     }
 
     #[test]
@@ -104,7 +108,7 @@ mod tests {
         let temp_dir = tempfile::tempdir().unwrap();
         let video = temp_dir.path().join("input.mp4");
         let preview = temp_dir.path().join("preview.mp4");
-        create_test_video(&video, 5.0);
+        create_test_video(&video, 5.0).expect("ffmpeg not found");
 
         generate_preview(&video, &preview, 3.0, 240).unwrap();
         assert!(preview.exists(), "preview should be generated");

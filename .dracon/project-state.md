@@ -1,11 +1,10 @@
-# Project State
+#Project State
 
 ## Current Focus
-Improve robustness of test utilities by adding explicit error handling for missing or failing ffmpeg invocations.
+Refactor test video creation helpers to use explicit error handling and add unit tests for STT analyzer components
 
 ## Completed
-- [x] Refactor test video creation helper to return `Result<(), String>` and propagate ffmpeg errors instead of panicking
-- [x] Refactor test image creation helper in watermark tests to return `Result<(), String>` with detailed error messaging
-- [x] Update test callers to handle the new `Result` via `.expect("ffmpeg not found")`
-- [x] Ensure all ffmpeg command failures now produce a clear error string (`"ffmpeg test video creation failed"` or `"ffmpeg test image creation failed"`) rather than an unchecked panic
-- [x] Adjust test code to check ffmpeg command success before proceeding with thumbnail or watermark generation
+- [x] Refactor `create_test_video` test helper in `src/preview.rs` to return `Result<(), String>` with explicit ffmpeg error handling, replacing panicking `expect` and `assert` calls
+- [x] Refactor `create_test_video` test helper in `src/scene_detection.rs` with identical Result-based error handling for ffmpeg failures
+- [x] Add 9 unit tests to `src/stt_analyzer.rs` validating `hz_to_mel`/`mel_to_hz` roundtrips, mel filterbank properties, and `TranscriptSegment` equality, cloning, and ordering
+- [x] Update `Cargo.lock` dependency lock file (binary diff, identical 192973-byte size)

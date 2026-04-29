@@ -324,3 +324,112 @@ fn decode_greedy(
 
     Ok(segments)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_hz_to_mel_conversion() {
+        assert_eq!(hz_to_mel(0.0), 0.0);
+        let mel_1000 = hz_to_mel(1000.0);
+        assert!(mel_1000 > 900.0 && mel_1000 < 1100.0);
+        let mel_700 = hz_to_mel(700.0);
+        assert!(mel_700 > 2500.0 && mel_700 < 2700.0);
+    }
+
+    #[test]
+    fn test_mel_to_hz_conversion() {
+        assert_eq!(mel_to_hz(0.0), 0.0);
+        let hz_1000 = mel_to_hz(hz_to_mel(1000.0));
+        assert!((hz_1000 - 1000.0).abs() < 1.0);
+    }
+
+    #[test]
+    fn test_mel_to_hz_is_inverse_of_hz_to_mel() {
+        for hz in [100.0, 500.0, 1000.0, 4000.0, 8000.0] {
+            let mel = hz_to_mel(hz);
+            let hz_back = mel_to_hz(mel);
+            assert!((hz_back - hz).abs() < 0.1, "roundtrip failed for hz={}", hz);
+        }
+    }
+
+    #[test]
+    fn test_build_mel_filterbank_values_are_nonnegative() {
+        let filterbank = build_mel_filterbank(400, 80, 16000.0);
+        for row in &filterbank {
+            assert!(row.iter().all(|&v| v >= 0.0), "all values should be >= 0");
+        }
+    }
+
+    #[test]
+    fn test_build_mel_filterbank_first_bin_is_zero() {
+        let filterbank = build_mel_filterbank(400, 80, 16000.0);
+        assert_eq!(filterbank[0][0], 0.0);
+    }
+
+    #[test]
+    fn test_transcript_segment_equality() {
+        let seg1 = TranscriptSegment {
+            start: 0.0,
+            end: 5.0,
+            text: "Hello".to_string(),
+            confidence: 0.9,
+        };
+        let seg2 = TranscriptSegment {
+            start: 0.0,
+            end: 5.0,
+            text: "Hello".to_string(),
+            confidence: 0.9,
+        };
+        assert_eq!(seg1, seg2);
+    }
+
+    #[test]
+    fn test_transcript_segment_clone() {
+        let seg = TranscriptSegment {
+            start: 1.0,
+            end: 2.0,
+            text: "Test".to_string(),
+            confidence: 0.5,
+        };
+        let cloned = seg.clone();
+        assert_eq!(seg, cloned);
+    }
+
+    #[test]
+    fn test_filterbank_sum_is_bounded() {
+        let filterbank = build_mel_filterbank(400, 80, 16000.0);
+        for (m, row) in filterbank.iter().enumerate().take(5) {
+            let sum: f32 = row.iter().sum();
+            assert!(
+                sum <= 2.0,
+                "filterbank[{}] sum {} exceeds expected bound",
+                m,
+                sum
+            );
+        }
+    }
+
+    #[test]
+    fn test_transcript_segment_ordering() {
+        let segs = vec![
+            TranscriptSegment {
+                start: 5.0,
+                end: 10.0,
+                text: "Second".to_string(),
+                confidence: 0.8,
+            },
+            TranscriptSegment {
+                start: 0.0,
+                end: 5.0,
+                text: "First".to_string(),
+                confidence: 0.9,
+            },
+        ];
+        let mut sorted = segs.clone();
+        sorted.sort_by(|a, b| a.start.partial_cmp(&b.start).unwrap());
+        assert_eq!(sorted[0].text, "First");
+        assert_eq!(sorted[1].text, "Second");
+    }
+}

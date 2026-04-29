@@ -93,7 +93,7 @@ mod tests {
     use super::*;
     use std::process::Command;
 
-    fn create_test_video(path: &std::path::Path, duration_secs: f32) {
+    fn create_test_video(path: &std::path::Path, duration_secs: f32) -> Result<(), String> {
         let status = Command::new("ffmpeg")
             .args([
                 "-f",
@@ -119,15 +119,19 @@ mod tests {
                 path.to_str().unwrap(),
             ])
             .status()
-            .expect("ffmpeg not found");
-        assert!(status.success());
+            .map_err(|_| "ffmpeg not found".to_string())?;
+        if status.success() {
+            Ok(())
+        } else {
+            Err("ffmpeg test video creation failed".to_string())
+        }
     }
 
     #[test]
     fn test_detect_scene_changes() {
         let temp_dir = tempfile::tempdir().unwrap();
         let video = temp_dir.path().join("input.mp4");
-        create_test_video(&video, 3.0);
+        create_test_video(&video, 3.0).expect("ffmpeg not found");
 
         // Test video with testsrc may not have scene changes, but the function should not panic
         let scenes = detect_scene_changes(&video, 0.3).unwrap();
