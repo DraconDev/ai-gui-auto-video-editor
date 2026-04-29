@@ -1,6 +1,9 @@
-# Project State## Current Focus
-Add settings navigation keyboard shortcuts and adaptive UI repaint logic
+# Project State
+
+## Current Focus
+Added debounce for auto-save configuration and refined to flush only when necessary
 
 ## Completed
-- [x] Implement Euclidean modulo index calculation for settings navigation (`new_idx` computation) to ensure correct index wrapping for negative deltas and avoid off-by-one errors
-- [x] Update index bounds calculation in category navigation logic to use `rem_euclid` for stable numeric behavior across all delta values
+- Implemented configuration saving delay logic to avoid unnecessary disk writes
+- Updated save timestamp and ensured proper cleanup on restart
+- Enhanced logging with more descriptive toast messages for user feedback

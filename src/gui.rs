@@ -404,6 +404,8 @@ pub struct AppState {
     last_seen_activity_len: usize,
     // Settings sidebar navigation
     settings_category: SettingsCategory,
+    // Debounced config save
+    last_save_time: Option<std::time::Instant>,
 }
 
 #[allow(dead_code)]
@@ -480,6 +482,7 @@ impl AppState {
             queue_stop: None,
             last_seen_activity_len: 0,
             settings_category: SettingsCategory::default(),
+            last_save_time: None,
         };
 
         if !is_first_run {
@@ -540,22 +543,31 @@ impl AppState {
             })
             .collect();
 
-        let path = if let Some(ref p) = self.config_path {
-            Some(p.clone())
-        } else {
-            Config::default_config_path()
-        };
+        // Debounce: only save to disk and restart watcher if 1 second has passed
+        let now = std::time::Instant::now();
+        let should_flush = self.last_save_time
+            .map(|t| now.duration_since(t).as_secs() >= 1)
+            .unwrap_or(true);
 
-        if let Some(path) = path
-            && let Err(e) = self.config.to_file(&path)
-        {
-            self.activity_log.push(ActivityEntry::simple(
-                format!("Failed to auto-save config: {}", e),
-                false,
-            ));
+        if should_flush {
+            let path = if let Some(ref p) = self.config_path {
+                Some(p.clone())
+            } else {
+                Config::default_config_path()
+            };
+
+            if let Some(path) = path
+                && let Err(e) = self.config.to_file(&path)
+            {
+                self.activity_log.push(ActivityEntry::simple(
+                    format!("Failed to auto-save config: {}", e),
+                    false,
+                ));
+            }
+
+            self.restart_watcher();
+            self.last_save_time = Some(now);
         }
-
-        self.restart_watcher();
     }
 
     fn add_folder_from_modal(&mut self) {
@@ -851,7 +863,7 @@ impl eframe::App for App {
 
             if is_ctrl && ctx.input(|i| i.key_pressed(egui::Key::S)) {
                 self.state.auto_save_config();
-                self.state.add_toast("Config saved", ToastKind::Success);
+                self.state.add_toast("Config saved", ToastKind::Info);
             }
 
             if is_ctrl && ctx.input(|i| i.key_pressed(egui::Key::ArrowLeft)) {
@@ -887,7 +899,7 @@ impl eframe::App for App {
         // Adaptive repaint: faster when processing (smooth progress), slower when idle (save CPU)
         let is_processing = matches!(
             self.state.status,
-            ProcessingStatus::Processing(_) | ProcessingStatus::Watching
+            ProcessingStatus::Processing(_)
         );
         if is_processing {
             ctx.request_repaint();
