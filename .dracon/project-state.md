@@ -1,9 +1,8 @@
 # Project State
 
 ## Current Focus
-Prevent premature resetting of needs_save when updating clip max duration
+Refactor output filename generation to preserve file extension
 
 ## Completed
-- [x] refreshed Cargo.lock with latest dependency versions
-- [x] removed redundant `needs_save = false;` assignment in src/gui/tabs.rs
-- [x] removed unnecessary closing brace in src/gui/tabs.rs
+- [x] Added extraction of file extension with fallback to "mp4"
+- [x] Modified filename construction to include the extension in the output name

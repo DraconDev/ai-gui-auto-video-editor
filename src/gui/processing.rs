@@ -451,12 +451,17 @@ fn queue_worker_loop(
             path: file.path.clone(),
         });
 
+        let output_ext = file.path
+            .extension()
+            .and_then(|e| e.to_str())
+            .unwrap_or("mp4");
         let output_file = file.output_dir.join(format!(
-            "{}.mp4",
+            "{}.{}",
             file.path
                 .file_stem()
                 .and_then(|s| s.to_str())
-                .unwrap_or("output")
+                .unwrap_or("output"),
+            output_ext
         ));
 
         let folder_state = FolderState {
