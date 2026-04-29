@@ -141,7 +141,7 @@ dependencies = [
 
 [[package]]
 name = "ai-vid-editor"
-version = "8.1.2"
+version = "8.1.4"
 dependencies = [
  "anyhow",
  "candle-core",
