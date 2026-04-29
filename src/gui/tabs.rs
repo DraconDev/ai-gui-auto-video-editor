@@ -1261,7 +1261,9 @@ impl App {
         let music_path = folder.and_then(|f| f.settings.music_path.clone());
 
         ui.label(section_title("Audio"));
-        ui.add_space(8.0);
+        ui.add_space(4.0);
+        ui.add(egui::Label::new(egui::RichText::new("Audio enhancement, noise reduction, background music mixing").size(12.0).color(TEXT_SECONDARY)));
+        ui.add_space(12.0);
 
         let mut enhance = enhance;
         if Self::draw_settings_toggle(
