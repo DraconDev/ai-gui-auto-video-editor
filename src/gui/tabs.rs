@@ -1103,18 +1103,20 @@ impl App {
         }
         ui.add_space(6.0);
 
-        let mut blur = blur;
-        if Self::draw_settings_toggle(
-            ui,
-            "Blur Background",
-            "Only works with Auto-Reframe above. Blurs edges outside the vertical crop",
-            &mut blur,
-        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
-        {
-            f.settings.blur_background = Some(blur);
-            needs_save = true;
+        if reframe {
+            let mut blur = blur;
+            if Self::draw_settings_toggle(
+                ui,
+                "Blur Background",
+                "Only works with Auto-Reframe above. Blurs edges outside the vertical crop",
+                &mut blur,
+            ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+            {
+                f.settings.blur_background = Some(blur);
+                needs_save = true;
+            }
+            ui.add_space(6.0);
         }
-        ui.add_space(6.0);
 
         let mut scene_detect = scene_detect;
         if Self::draw_settings_toggle(
@@ -1308,23 +1310,56 @@ impl App {
         }
         ui.add_space(6.0);
 
-        let mut duck_volume = duck_volume;
-        let duck_label = format!("{:.0}%", duck_volume * 100.0);
-        if Self::draw_advanced_slider(
-            ui,
-            "Duck Volume",
-            "Only when Background Music is set. Lowers music volume when someone speaks",
-            &mut duck_volume,
-            0.0..=1.0,
-            duck_label,
-        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
-        {
-            f.settings.duck_volume = Some(duck_volume);
-            needs_save = true;
+        ui.label(label_secondary("Background Music"));
+        ui.add_space(4.0);
+        ui.horizontal(|ui| {
+            let music_label = music_path
+                .as_ref()
+                .and_then(|p| p.file_name())
+                .map(|n| n.to_string_lossy().to_string())
+                .unwrap_or_else(|| "None".to_string());
+            ui.label(label_muted(&music_label));
+            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                if ui.add(button_small("Choose...")).clicked() {
+                    if let Some(path) = FileDialog::new()
+                        .add_filter("Audio", &["mp3", "wav", "ogg", "flac", "m4a"])
+                        .pick_file()
+                    {
+                        if let Some(f) = self.state.folders.get_mut(folder_idx) {
+                            f.settings.music_path = Some(path);
+                            needs_save = true;
+                        }
+                    }
+                }
+                if music_path.is_some() && ui.add(button_small("✕")).clicked() {
+                    if let Some(f) = self.state.folders.get_mut(folder_idx) {
+                        f.settings.music_path = None;
+                        needs_save = true;
+                    }
+                }
+            });
+        });
+
+        if music_path.is_some() {
+            ui.add_space(6.0);
+            let mut duck_volume = duck_volume;
+            let duck_label = format!("{:.0}%", duck_volume * 100.0);
+            if Self::draw_advanced_slider(
+                ui,
+                "Duck Volume",
+                "Only when Background Music is set. Lowers music volume when someone speaks",
+                &mut duck_volume,
+                0.0..=1.0,
+                duck_label,
+            ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+            {
+                f.settings.duck_volume = Some(duck_volume);
+                needs_save = true;
+            }
         }
         ui.add_space(8.0);
 
-        ui.label(label_secondary("Background Music"));
+        needs_save
         ui.add_space(4.0);
         ui.horizontal(|ui| {
             let music_label = music_path
