@@ -369,7 +369,7 @@ fn main() -> Result<()> {
         .iter()
         .any(|f| f.enabled);
 
-    // If no input specified and not a special command, launch GUI or show help
+    // If no input specified and not a special command, launch GUI or go to watch mode
     if cli.input_file.is_none()
         && cli.input_dir.is_none()
         && cli.watch.is_none()
@@ -379,21 +379,29 @@ fn main() -> Result<()> {
         #[cfg(feature = "gui")]
         let start_minimized = cli.start_minimized;
 
-        #[cfg(feature = "gui")]
-        if cli.gui {
-            return run_gui(start_minimized);
-        }
-
         // Check if running from terminal (TTY) or launched from desktop
         let is_tty = std::io::stdout().is_terminal();
 
+        // Headless mode: skip GUI even in TTY, go straight to watch mode if configured
+        if cli.headless {
+            if has_watch_folders {
+                return run_multi_watch_mode(&preloaded_config, &cli);
+            }
+            // Headless with no watch folders: show help
+            use clap::CommandFactory;
+            Cli::command().print_help()?;
+            println!();
+            println!("No input specified and no watch folders configured. Use --input-file, --input-dir, or configure watch folders in config.");
+            return Ok(());
+        }
+
         #[cfg(feature = "gui")]
-        if !is_tty {
-            // Always launch GUI when launched from desktop, even with watch folders configured
+        if !is_tty || cli.gui {
+            // Launch GUI when: launched from desktop (non-TTY), OR --gui explicitly passed
             return run_gui(start_minimized);
         }
 
-        // From terminal: if watch folders are configured, go to watch mode
+        // From terminal (TTY): if watch folders are configured, go to watch mode
         if has_watch_folders {
             return run_multi_watch_mode(&preloaded_config, &cli);
         }
@@ -402,9 +410,8 @@ fn main() -> Result<()> {
         use clap::CommandFactory;
         Cli::command().print_help()?;
         println!();
-
-        #[cfg(feature = "gui")]
         println!("Run with --gui to launch the graphical interface.");
+        println!("Run with --headless for daemon/watch mode without GUI.");
 
         return Ok(());
     }
