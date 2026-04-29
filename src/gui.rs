@@ -23,6 +23,38 @@ enum Tab {
     Activity,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub(crate) enum SettingsCategory {
+    #[default]
+    Processing,
+    Audio,
+    Video,
+    Exports,
+    Advanced,
+}
+
+impl SettingsCategory {
+    fn label(&self) -> &'static str {
+        match self {
+            SettingsCategory::Processing => "Processing",
+            SettingsCategory::Audio => "Audio",
+            SettingsCategory::Video => "Video",
+            SettingsCategory::Exports => "Exports",
+            SettingsCategory::Advanced => "Advanced",
+        }
+    }
+
+    fn icon(&self) -> &'static str {
+        match self {
+            SettingsCategory::Processing => "🎬",
+            SettingsCategory::Audio => "🎵",
+            SettingsCategory::Video => "📹",
+            SettingsCategory::Exports => "📤",
+            SettingsCategory::Advanced => "⚙️",
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum SetupStep {
     Welcome,
@@ -327,6 +359,8 @@ pub struct AppState {
     queue_stop: Option<Arc<AtomicBool>>,
     // Activity summary tracking
     last_seen_activity_len: usize,
+    // Settings sidebar navigation
+    settings_category: SettingsCategory,
 }
 
 #[allow(dead_code)]
@@ -402,6 +436,7 @@ impl AppState {
             queue_rx: None,
             queue_stop: None,
             last_seen_activity_len: 0,
+            settings_category: SettingsCategory::default(),
         };
 
         if !is_first_run {

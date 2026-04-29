@@ -1,12 +1,10 @@
-# Project State
+# ProjectState
 
 ## Current Focus
-Ship v3.0.0 release bundle: binary, docs, desktop integration, installer, and checksums.
+Add SettingsCategory enum and sidebar UI to enable navigation among settings categories.
 
 ## Completed
-- [x] Package v3.0.0 release binary (CLI + GUI) with desktop entry and icon for Linux integration.
-- [x] Create comprehensive CHANGELOG following Keep a Changelog with security and critical fixes highlighted.
-- [x] Publish user-facing README with quick-start, feature overview, and usage guidance.
-- [x] Add customer-facing and release-location docs to clarify audience and artifact locations.
-- [x] Provide install.sh script for automated installation and PATH setup.
-- [x] Generate sha256 checksum and tarball for reproducible downloads.
+- [x] Define SettingsCategory enum with variants Processing, Audio, Video, Exports, Advanced and implement label and icon methods.
+- [x] Add settings_category field to AppState struct and initialize it with the default variant.
+- [x] Implement draw_settings_sidebar method to render selectable category buttons with icons and labels.
+- [x] Update AppState initialization to set settings_category to its default value.
