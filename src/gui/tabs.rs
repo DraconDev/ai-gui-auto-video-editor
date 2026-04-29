@@ -1869,9 +1869,11 @@ impl App {
                 ui.painter()
                     .circle_filled(dot_rect.center(), 3.5, dot_color);
                 ui.add_space(6.0);
-                ui.label(RichText::new(label).color(TEXT_PRIMARY).size(15.0).strong());
+                let label_widget = ui.label(RichText::new(label).color(TEXT_PRIMARY).size(15.0).strong());
+                label_widget.on_hover_text(help_text);
                 ui.add_space(8.0);
-                ui.label(label_muted(help_text));
+                let help_widget = ui.label(label_muted(help_text));
+                help_widget.on_hover_text(help_text);
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                     let switch_text = if *value { "ON" } else { "OFF" };
                     if ui.add(button_toggle(*value, switch_text)).clicked() {
