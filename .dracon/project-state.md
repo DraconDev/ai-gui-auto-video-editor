@@ -1,7 +1,7 @@
 # Project State
 
 ## Current Focus
-Remove unused SilenceMode import from processing.rs
+Update dependency lock file after dependency rebuild with unchanged dependencies
 
 ## Completed
-- [x] Drop SilenceMode import line from src/gui/processing.rs
+- [x] chore(deps): regenerated Cargo.lock after dependency rebuild (unchanged dependencies)
