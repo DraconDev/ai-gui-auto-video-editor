@@ -379,6 +379,17 @@ pub fn build_folder_config(config: &Config, folder: &FolderState) -> Config {
         merged.export.extra_resolutions = extra_resolutions.clone();
     }
 
+    // Processing settings
+    if let Some(join_mode) = folder.settings.join_mode {
+        merged.processing.join_mode = join_mode;
+    }
+    if let Some(join_after_count) = folder.settings.join_after_count {
+        merged.processing.join_after_count = join_after_count;
+    }
+    if let Some(ref join_output_pattern) = folder.settings.join_output_pattern {
+        merged.processing.join_output_pattern = join_output_pattern.clone();
+    }
+
     merged
 }
 
