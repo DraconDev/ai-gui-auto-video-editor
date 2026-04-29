@@ -1258,7 +1258,7 @@ impl App {
         if Self::draw_advanced_slider(
             ui,
             "Target Loudness",
-            "Final audio loudness (YouTube = -14 LUFS)",
+            "Loudness in decibels relative to full scale - YouTube = -14 LUFS",
             &mut lufs,
             -24.0..=-6.0,
             lufs_label,
@@ -1535,7 +1535,7 @@ impl App {
         if Self::draw_settings_toggle(
             ui,
             "FCPXML",
-            "Final Cut Pro XML for DaVinci/Premiere",
+            "XML file for importing into Final Cut Pro, DaVinci Resolve, or Premiere Pro",
             &mut fcpxml,
         ) && let Some(f) = self.state.folders.get_mut(folder_idx)
         {
@@ -1548,7 +1548,7 @@ impl App {
         if Self::draw_settings_toggle(
             ui,
             "EDL",
-            "Edit Decision List for Avid/Premiere",
+            "Edit list for importing into Avid Media Composer or other NLEs",
             &mut edl,
         ) && let Some(f) = self.state.folders.get_mut(folder_idx)
         {
