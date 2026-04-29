@@ -186,6 +186,9 @@ impl App {
             if let Some(idx) = delete_idx {
                 self.state.modal.prompt_delete(idx);
             }
+            if let Some(idx) = duplicate_idx {
+                self.state.duplicate_folder(idx);
+            }
             if let Some(idx) = edit_idx {
                 let folder = &self.state.folders[idx];
                 self.state.modal.set_for_edit(idx, folder);
@@ -2146,7 +2149,7 @@ impl App {
                             .pick_file()
                         {
                             if let Err(e) = self.state.import_config_from(&path) {
-                                self.state.add_toast(&format!("Import failed: {}", e), ToastKind::Error);
+                                self.state.add_toast(format!("Import failed: {}", e), ToastKind::Error);
                             } else {
                                 self.state.add_toast("Config imported successfully", ToastKind::Success);
                             }
@@ -2158,7 +2161,7 @@ impl App {
                             .save_file()
                         {
                             if let Err(e) = self.state.export_config_to(&path) {
-                                self.state.add_toast(&format!("Export failed: {}", e), ToastKind::Error);
+                                self.state.add_toast(format!("Export failed: {}", e), ToastKind::Error);
                             } else {
                                 self.state.add_toast("Config exported successfully", ToastKind::Success);
                             }

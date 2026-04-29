@@ -1,8 +1,10 @@
 # Project State
 
 ## Current Focus
-Assign duplicate index when UI button clicked to trigger folder duplication
+Implement duplicate folder functionality and fix toast message formatting
 
 ## Completed
-- [x] Replace `self.state.duplicate_folder(idx)` call with `duplicate_idx = Some(idx)`
-- [x] Store clicked folder index for later duplication handling
+- [x] Trigger folder duplication when UI button clicks duplicate index
+- [x] Use format! directly in toast messages for import and export errors
+- [x] Import Path for path handling in GUI module
+- [x] Update dependency lock file
