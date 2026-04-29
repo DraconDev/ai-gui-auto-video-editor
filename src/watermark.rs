@@ -227,7 +227,7 @@ mod tests {
     use super::*;
     use std::process::Command;
 
-    fn create_test_video(path: &Path, duration_secs: f32) {
+    fn create_test_video(path: &Path, duration_secs: f32) -> Result<(), String> {
         let status = Command::new("ffmpeg")
             .args([
                 "-f",
@@ -253,11 +253,15 @@ mod tests {
                 path.to_str().unwrap(),
             ])
             .status()
-            .expect("ffmpeg not found");
-        assert!(status.success());
+            .map_err(|_| "ffmpeg not found".to_string())?;
+        if status.success() {
+            Ok(())
+        } else {
+            Err("ffmpeg test video creation failed".to_string())
+        }
     }
 
-    fn create_test_image(path: &Path) {
+    fn create_test_image(path: &Path) -> Result<(), String> {
         let status = Command::new("ffmpeg")
             .args([
                 "-f",
@@ -270,8 +274,12 @@ mod tests {
                 path.to_str().unwrap(),
             ])
             .status()
-            .expect("ffmpeg not found");
-        assert!(status.success());
+            .map_err(|_| "ffmpeg not found".to_string())?;
+        if status.success() {
+            Ok(())
+        } else {
+            Err("ffmpeg test image creation failed".to_string())
+        }
     }
 
     #[test]
@@ -290,8 +298,8 @@ mod tests {
         let watermark = temp_dir.path().join("watermark.png");
         let output = temp_dir.path().join("output.mp4");
 
-        create_test_video(&video, 2.0);
-        create_test_image(&watermark);
+        create_test_video(&video, 2.0).expect("ffmpeg not found");
+        create_test_image(&watermark).expect("ffmpeg not found");
 
         add_watermark(
             &video,
@@ -310,7 +318,7 @@ mod tests {
         let video = temp_dir.path().join("input.mp4");
         let output = temp_dir.path().join("output.mp4");
 
-        create_test_video(&video, 2.0);
+        create_test_video(&video, 2.0).expect("ffmpeg not found");
 
         add_text_watermark(
             &video,
