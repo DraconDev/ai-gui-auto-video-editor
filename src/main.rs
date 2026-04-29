@@ -226,9 +226,14 @@ pub struct Cli {
     #[arg(long)]
     pub clear_progress: bool,
 
-    /// Launch graphical interface
+    /// Launch graphical interface (default when no input specified)
     #[arg(long)]
     pub gui: bool,
+
+    /// Headless mode: run in background without GUI (for daemon/watch mode)
+    /// Use this when running as a service or in CI/CD pipelines
+    #[arg(long)]
+    pub headless: bool,
 
     /// Start the GUI minimized (no window, keeps watching in background)
     #[arg(long)]
