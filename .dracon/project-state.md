@@ -1,7 +1,8 @@
 # Project State
-This commit updates the `App` struct implementation in `gui/tabs.rs`, adjusting UI rendering logic for activity summary cards and toast notifications.
+
+## Current Focus
+Remove legacy per‑folder settings UI and associated logic, simplifying the settings panel to static text rendering.
 
 ## Completed
-- Modified `draw_summary_card` to handle success and error counts with visual feedback
-- Updated `draw_toasts` to use alpha-to-visibility transitions for better clarity
-- Adjusted drawing paths and styling to differentiate successful and failed entries
+- [x] Refactor settings extraction and rendering logic in `src/gui/tabs.rs`, eliminating duplicated toggle and slider code for per‑folder audio, video, and export settings.
+- [x] Consolidate state handling into a single section, reducing code duplication and improving maintainability.
