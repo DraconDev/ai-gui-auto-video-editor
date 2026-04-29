@@ -1,7 +1,8 @@
 # Project State
 
 ## Current Focus
-Integrate join_mode UI settings by updating imports in the tabs module
+Add Warning and Info toast kinds to UI notifications
 
 ## Completed
-- [x] Added JoinMode to the imports in src/gui/tabs.rs
+- [x] Add Warning variant to ToastKind enum
+- [x] Add Info variant to ToastKind enum

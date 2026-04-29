@@ -315,6 +315,8 @@ enum QueueStatus {
 pub(crate) enum ToastKind {
     Success,
     Error,
+    Warning,
+    Info,
 }
 
 #[derive(Debug, Clone)]
