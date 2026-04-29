@@ -1,7 +1,8 @@
 # Project State
 
 ## Current Focus
-Expand preset selection in the tabs UI to include additional platforms.
+Remove draw_validation_warning UI method and update dependency lock file
 
 ## Completed
-- [x] Added preset options: "tiktok", "reels", "twitter", "minimal" to the preset selector.
+- [x] Removed draw_validation_warning method from src/gui/tabs.rs
+- [x] Regenerated Cargo.lock after dependency rebuild

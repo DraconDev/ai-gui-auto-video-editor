@@ -1922,30 +1922,6 @@ impl App {
         changed
     }
 
-    #[allow(dead_code)]
-    pub(crate) fn draw_validation_warning(ui: &mut egui::Ui, message: &str) {
-        egui::Frame::NONE
-            .fill(WARNING_BG)
-            .corner_radius(6.0)
-            .inner_margin(egui::vec2(10.0, 8.0))
-            .stroke(egui::Stroke::new(1.0, WARNING))
-            .show(ui, |ui| {
-                ui.horizontal(|ui| {
-                    ui.label(
-                        egui::RichText::new("⚠")
-                            .size(14.0)
-                            .color(WARNING),
-                    );
-                    ui.add_space(6.0);
-                    ui.label(
-                        egui::RichText::new(message)
-                            .size(13.0)
-                            .color(WARNING),
-                    );
-                });
-            });
-    }
-
     pub(crate) fn draw_summary_card(&mut self, ui: &mut egui::Ui) {
         let new_entries = self
             .state
