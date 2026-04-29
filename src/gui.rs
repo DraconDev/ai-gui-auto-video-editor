@@ -295,7 +295,7 @@ impl ModalState {
 pub(crate) struct QueuedFile {
     path: PathBuf,
     output_dir: PathBuf,
-    preset: String,
+    settings: FolderSettings,
     status: QueueStatus,
     progress: f32,
     output_path: Option<PathBuf>,
