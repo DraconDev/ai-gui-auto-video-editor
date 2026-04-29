@@ -1,9 +1,8 @@
 # Project State
 
 ## Current Focus
-Refactor name‑parsing APIs usage and improve code readability.
+Add robust error handling for test video creation and prevent flaky ML integration tests by ignoring them when network resources are unavailable.
 
 ## Completed
-- [x] Refactor long CLI help string in `main.rs` into a multi‑line `println!` for better readability.
-- [x] Update GUI processing tests to use `Preset::parse_name` instead of the removed/renamed `Preset::from_str`.
-- [x] Update pipeline integration test to use `HwAccel::parse_name` for round‑trip name parsing validation.
+- [x] Refactor `create_test_video` to return `Result<(), String>` with explicit error messages for missing ffmpeg or failed video creation.
+- [x] Mark ML integration tests that require downloading ONNX models as ignored, adding rationale comments to each test.

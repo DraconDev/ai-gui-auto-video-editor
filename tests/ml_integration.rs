@@ -10,6 +10,7 @@ fn check_ffmpeg() {
 }
 
 #[test]
+#[ignore = "requires network to download ONNX model from HuggingFace"]
 fn test_face_detector_load() {
     let result = FaceDetector::load();
 
@@ -25,6 +26,7 @@ fn test_face_detector_load() {
 }
 
 #[test]
+#[ignore = "requires network to download ONNX model from HuggingFace"]
 fn test_person_segmenter_load() {
     let result = PersonSegmenter::load();
 
@@ -103,6 +105,7 @@ fn test_frame_extraction() {
 }
 
 #[test]
+#[ignore = "requires network to download ONNX model from HuggingFace"]
 fn test_face_detection_on_frame() {
     check_ffmpeg();
 
@@ -154,6 +157,7 @@ fn test_face_detection_on_frame() {
 }
 
 #[test]
+#[ignore = "requires network to download ONNX model from HuggingFace"]
 fn test_auto_reframe_processor() {
     check_ffmpeg();
 
@@ -194,6 +198,7 @@ fn test_auto_reframe_processor() {
 }
 
 #[test]
+#[ignore = "requires network to download ONNX model from HuggingFace"]
 fn test_person_segmentation_on_frame() {
     check_ffmpeg();
 

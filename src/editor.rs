@@ -816,7 +816,7 @@ mod tests {
     use std::process::Command;
 
     /// Helper: create a small test video using ffmpeg
-    fn create_test_video(path: &Path, duration_secs: f32) {
+    fn create_test_video(path: &Path, duration_secs: f32) -> Result<(), String> {
         let status = Command::new("ffmpeg")
             .args([
                 "-f",
@@ -842,8 +842,12 @@ mod tests {
                 path.to_str().unwrap(),
             ])
             .status()
-            .expect("ffmpeg not found - install ffmpeg to run integration tests");
-        assert!(status.success(), "ffmpeg test video creation failed");
+            .map_err(|_| "ffmpeg not found".to_string())?;
+        if status.success() {
+            Ok(())
+        } else {
+            Err("ffmpeg test video creation failed".to_string())
+        }
     }
 
     #[test]
