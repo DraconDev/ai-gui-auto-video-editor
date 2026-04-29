@@ -1,11 +1,8 @@
 # Project State
 
-## Current Focus
-Add comprehensive unit tests for batch processing and progress persistence.
+## CurrentFocus
+Enhance test coverage for batch processor output handling in different scenarios, including enhanced mode and disabled features.
 
 ## Completed
-- [x] Added `test_batch_processing_multiple_video_types` to verify processing of five different video file types.
-- [x] Added `test_batch_processing_creates_output_dir` to confirm nested output directory creation during batch processing.
-- [x] Added `test_batch_processing_with_disabled_features` to ensure processing works when audio and video features are disabled.
-- [x] Added `test_batch_processing_progress_persists_across_runs` to check that already processed files are skipped in subsequent runs.
-- [x] Modified `test_progress_serialization_roundtrip` to remove the `mut` qualifier on the `BatchProgress` variable and adjust the completed paths list.
+- [x] Refactor batch processor tests to handle enhanced mode where intermediate files may exist (replaces fixed output count check with existence verification)
+- [x] Update test expectations for video output creation to account for scenarios where trim is called but output files may reside in output_dir
