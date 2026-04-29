@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-docs(readme): clarify FFmpeg requirements by specifying ffprobe inclusion
+Added comprehensive agent documentation for the AI video editor project
 
 ## Completed
-- [x] Updated README.md to explicitly mention ffprobe as required FFmpeg component
+- [x] Created AGENTS.md with project overview, repository structure, build commands, key conventions, critical code locations, feature flags, and known limitations
 ```
