@@ -162,7 +162,7 @@ impl App {
                                 egui::Layout::right_to_left(egui::Align::Center),
                                 |ui| {
                                     if ui.add(button_small("Duplicate")).clicked() {
-                                        self.state.duplicate_folder(idx);
+                                        duplicate_idx = Some(idx);
                                     }
                                     if ui.add(button_small("Remove")).clicked() {
                                         delete_idx = Some(idx);
