@@ -1467,6 +1467,8 @@ impl App {
         let clip_count = folder.and_then(|f| f.settings.clip_count).unwrap_or(3);
         let clip_min_duration = folder.and_then(|f| f.settings.clip_min_duration).unwrap_or(15.0);
         let clip_max_duration = folder.and_then(|f| f.settings.clip_max_duration).unwrap_or(60.0);
+        let original_clip_min = clip_min_duration;
+        let original_clip_max = clip_max_duration;
 
         ui.label(section_title("Exports"));
         ui.add_space(8.0);
@@ -1935,13 +1937,14 @@ impl App {
     }
 
     pub(crate) fn draw_toasts(&mut self, ctx: &egui::Context) {
-        let toasts = &self.state.toasts;
-        if toasts.is_empty() {
+        if self.state.toasts.is_empty() {
             return;
         }
 
-        let count = toasts.len();
+        // Take ownership so we can modify while processing
+        let mut toasts = std::mem::take(&mut self.state.toasts);
         let stack_offset = 70.0;
+        let mut dismiss_indices = Vec::new();
 
         for (i, toast) in toasts.iter().enumerate() {
             let elapsed = toast.created.elapsed().as_secs() as f32;
@@ -1956,7 +1959,8 @@ impl App {
                 ToastKind::Error => egui::Color32::from_rgba_unmultiplied(45, 16, 16, bg_alpha),
             };
 
-            egui::Area::new(egui::Id::new(format!("toast_{}", i)))
+            let toast_id = egui::Id::new(format!("toast_{}", i));
+            let response = egui::Area::new(toast_id)
                 .anchor(egui::Align2::RIGHT_BOTTOM, egui::vec2(-20.0, -20.0 - stack_y))
                 .interactable(true)
                 .show(ctx, |ui| {
@@ -1987,15 +1991,11 @@ impl App {
                                         .size(13.0)
                                         .color(TEXT_PRIMARY),
                                 );
-                                if count > 1 {
-                                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                                        ui.label(
-                                            egui::RichText::new(format!("{} of {}", i + 1, count))
-                                                .size(11.0)
-                                                .color(TEXT_MUTED),
-                                        );
-                                    });
-                                }
+                                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                                    if ui.add(egui::Button::new("×").small().frame(false)).clicked() {
+                                        dismiss_indices.push(i);
+                                    }
+                                });
                             });
 
                             let remaining = 5.0 - elapsed;
@@ -2011,7 +2011,19 @@ impl App {
                             }
                         });
                 });
+            // Check if toast was clicked
+            if response.response.interact(egui::Sense::click()).is_pointer_button_down_on() {
+                dismiss_indices.push(i);
+            }
         }
+
+        // Remove dismissed toasts (in reverse order to maintain indices)
+        for &idx in dismiss_indices.iter().rev() {
+            toasts.remove(idx);
+        }
+
+        // Put remaining toasts back
+        self.state.toasts = toasts;
     }
 
     pub(crate) fn draw_activity_log(&mut self, ui: &mut egui::Ui, full_height: bool) {
