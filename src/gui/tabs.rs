@@ -1047,7 +1047,9 @@ impl App {
         let silence_scene_threshold = folder.and_then(|f| f.settings.silence_scene_threshold).unwrap_or(0.3);
 
         ui.label(section_title("Processing"));
-        ui.add_space(8.0);
+        ui.add_space(4.0);
+        ui.add(egui::Label::new(egui::RichText::new("Core video editing: silence removal, stabilization, color correction").size(12.0).color(TEXT_SECONDARY)));
+        ui.add_space(12.0);
 
         let mut remove_silence = remove_silence;
         if Self::draw_settings_toggle(

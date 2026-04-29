@@ -1,12 +1,10 @@
 # Project State
 
 ## Current Focus
-Implementing a fixed‑width settings sidebar in the topics tab using `allocate_ui`.
+Refine UI spacing and add processing description label in topics tab
 
 ## Completed
-- [x] Replaced the old dynamic sidebar drawing with a fixed‑width allocation using `ui.allocate_ui(egui::vec2(sidebar_width, ui.available_height()), …)`.
-- [x] Introduced `sidebar_width` and `spacing` constants and calculated `available` and `content_width` for precise layout.
-- [x] Added a loop over `SettingsCategory` to generate buttons for Processing, Audio, Video, Exports, and Advanced with active‑state styling.
-- [x] Removed the previous vertical layout and manual `ui.add_space(16.0)` handling, consolidating spacing logic.
-- [x] Allocated a separate area for the content region using `content_width` to fill the remaining width after the sidebar.
-- [x] Updated styling (background, border, corner radius) to reflect active/inactive categories.
+- [x] Adjust vertical spacing from 8.0 to 4.0 before the processing label
+- [x] Insert a label describing core video editing operations with specified styling
+- [x] Add extra spacing of 12.0 after the inserted label
+- [x] Refresh Cargo.lock to the latest dependency versions
