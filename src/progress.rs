@@ -66,6 +66,7 @@ impl BatchProgress {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use tempfile::tempdir;
 
     #[test]
     fn test_progress_tracking() {
@@ -83,5 +84,69 @@ mod tests {
 
         progress.mark_failed(&file2);
         assert_eq!(progress.remaining(), 3);
+    }
+
+    #[test]
+    fn test_progress_serialization_roundtrip() -> Result<()> {
+        let mut progress = BatchProgress {
+            total: 3,
+            completed: vec![
+                PathBuf::from("/tmp/video1.mp4"),
+                PathBuf::from("/tmp/video2.mov"),
+            ]
+            .into_iter()
+            .collect(),
+            failed: vec![PathBuf::from("/tmp/video3.avi")]
+                .into_iter()
+                .collect(),
+        };
+
+        let dir = tempdir()?;
+        let path = dir.path().join("progress.json");
+        progress.to_file(&path)?;
+
+        let loaded = BatchProgress::from_file(&path)?;
+        assert_eq!(loaded.total, 3);
+        assert_eq!(loaded.completed.len(), 2);
+        assert_eq!(loaded.failed.len(), 1);
+        assert!(loaded.is_completed(PathBuf::from("/tmp/video1.mp4").as_path()));
+        Ok(())
+    }
+
+    #[test]
+    fn test_progress_remaining_calculation() {
+        let mut progress = BatchProgress::default();
+        progress.total = 10;
+
+        assert_eq!(progress.remaining(), 10);
+
+        progress.mark_completed(PathBuf::from("/tmp/v1.mp4").as_path());
+        assert_eq!(progress.remaining(), 9);
+
+        progress.mark_failed(PathBuf::from("/tmp/v2.mp4").as_path());
+        assert_eq!(progress.remaining(), 8);
+
+        // Saturating at 0
+        for _ in 0..20 {
+            progress.mark_completed(PathBuf::from("/tmp/vx.mp4").as_path());
+        }
+        assert_eq!(progress.remaining(), 0);
+    }
+
+    #[test]
+    fn test_progress_default_path() {
+        let input_dir = PathBuf::from("/videos/holiday");
+        let path = BatchProgress::default_path(&input_dir);
+        let path_str = path.to_string_lossy();
+        assert!(path_str.contains("ai-vid-editor-progress"));
+        assert!(path_str.contains("holiday"));
+    }
+
+    #[test]
+    fn test_progress_default_path_fallback() {
+        let input_dir = PathBuf::from("/");
+        let path = BatchProgress::default_path(&input_dir);
+        let path_str = path.to_string_lossy();
+        assert!(path_str.contains("default"));
     }
 }
