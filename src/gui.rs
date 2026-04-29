@@ -831,7 +831,7 @@ impl App {
             .iter()
             .position(|&c| c == self.state.settings_category)
             .unwrap_or(0);
-        let new_idx = ((current_idx as i8 + delta) % categories.len() as i8 + categories.len() as i8) as usize;
+        let new_idx = ((current_idx as i8 + delta).rem_euclid(categories.len() as i8)) as usize;
         self.state.settings_category = categories[new_idx];
     }
 }
