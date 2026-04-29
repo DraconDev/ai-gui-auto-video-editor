@@ -855,7 +855,7 @@ mod tests {
         let temp_dir = tempfile::tempdir().unwrap();
         let input = temp_dir.path().join("input.mp4");
         let output = temp_dir.path().join("output.mp4");
-        create_test_video(&input, 3.0);
+        create_test_video(&input, 3.0).expect("ffmpeg not found");
 
         let editor = FfmpegEditor::default();
         let segments = vec![ProcessedSegment {
@@ -873,7 +873,7 @@ mod tests {
         let temp_dir = tempfile::tempdir().unwrap();
         let input = temp_dir.path().join("input.mp4");
         let output = temp_dir.path().join("output.mp4");
-        create_test_video(&input, 5.0);
+        create_test_video(&input, 5.0).expect("ffmpeg not found");
 
         let editor = FfmpegEditor::default();
         let segments = vec![
@@ -898,7 +898,7 @@ mod tests {
         let temp_dir = tempfile::tempdir().unwrap();
         let input = temp_dir.path().join("input.mp4");
         let output = temp_dir.path().join("output.mp4");
-        create_test_video(&input, 1.0);
+        create_test_video(&input, 1.0).expect("ffmpeg not found");
 
         let editor = FfmpegEditor::default();
         let result = editor.trim_video(&input, &output, &[]);
@@ -910,7 +910,7 @@ mod tests {
         let temp_dir = tempfile::tempdir().unwrap();
         let input = temp_dir.path().join("input.mp4");
         let output = temp_dir.path().join("output.mp4");
-        create_test_video(&input, 2.0);
+        create_test_video(&input, 2.0).expect("ffmpeg not found");
 
         let editor = FfmpegEditor::default();
         editor.enhance_audio(&input, &output, -14.0).unwrap();
@@ -922,7 +922,7 @@ mod tests {
         let temp_dir = tempfile::tempdir().unwrap();
         let input = temp_dir.path().join("input.mp4");
         let output = temp_dir.path().join("output.mp4");
-        create_test_video(&input, 2.0);
+        create_test_video(&input, 2.0).expect("ffmpeg not found");
 
         let editor = FfmpegEditor::default();
         editor.reduce_noise(&input, &output).unwrap();
@@ -934,7 +934,7 @@ mod tests {
         let temp_dir = tempfile::tempdir().unwrap();
         let input = temp_dir.path().join("input.mp4");
         let output = temp_dir.path().join("output.mp4");
-        create_test_video(&input, 2.0);
+        create_test_video(&input, 2.0).expect("ffmpeg not found");
 
         let editor = FfmpegEditor::default();
         editor.color_correct(&input, &output).unwrap();
@@ -946,7 +946,7 @@ mod tests {
         let temp_dir = tempfile::tempdir().unwrap();
         let chunk = temp_dir.path().join("chunk.mp4");
         let output = temp_dir.path().join("output.mp4");
-        create_test_video(&chunk, 1.0);
+        create_test_video(&chunk, 1.0).expect("ffmpeg not found");
 
         concat_chunk_files(&[chunk], &output).unwrap();
         assert!(output.exists(), "concat output should exist");
@@ -958,8 +958,8 @@ mod tests {
         let chunk1 = temp_dir.path().join("chunk1.mp4");
         let chunk2 = temp_dir.path().join("chunk2.mp4");
         let output = temp_dir.path().join("output.mp4");
-        create_test_video(&chunk1, 1.0);
-        create_test_video(&chunk2, 1.0);
+        create_test_video(&chunk1, 1.0).expect("ffmpeg not found");
+        create_test_video(&chunk2, 1.0).expect("ffmpeg not found");
 
         concat_chunk_files(&[chunk1, chunk2], &output).unwrap();
         assert!(output.exists(), "concat output should exist");

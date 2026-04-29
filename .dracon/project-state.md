@@ -1,8 +1,9 @@
 # Project State
 
 ## Current Focus
-Add robust error handling for test video creation and prevent flaky ML integration tests by ignoring them when network resources are unavailable.
+Add explicit error handling for missing ffmpeg in integration tests by propagating panic via `.expect("ffmpeg not found")`.
 
 ## Completed
-- [x] Refactor `create_test_video` to return `Result<(), String>` with explicit error messages for missing ffmpeg or failed video creation.
-- [x] Mark ML integration tests that require downloading ONNX models as ignored, adding rationale comments to each test.
+- [x] Updated all `create_test_video` calls in tests to panic when ffmpeg is unavailable
+- [x] Modified `Cargo.lock` binary file (dependency version bump)
+- [x] Added expectation handling in `trim_video`, `enhance_audio`, `reduce_noise`, `color_correct`, and chunk concatenation tests
