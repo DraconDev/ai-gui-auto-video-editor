@@ -1,7 +1,7 @@
 # Project State
 
 ## Current Focus
-Refresh Cargo.lock dependencies
+The implementation replaces toggle display with static text rendering.
 
 ## Completed
-- [x] refresh Cargo.lock dependency lockfile
+- The toggle functionality is fully implemented via direct text embedding.

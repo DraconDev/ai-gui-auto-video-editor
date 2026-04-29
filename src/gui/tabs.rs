@@ -1427,6 +1427,82 @@ impl App {
         ui
     }
 
+    pub(crate) fn draw_settings_metric(
+        ui: &mut egui::Ui,
+        label: &str,
+        value: &str,
+        color: egui::Color32,
+    ) {
+        let bg = egui::Color32::from_rgba_unmultiplied(color.r(), color.g(), color.b(), 24);
+        egui::Frame::NONE
+            .fill(bg)
+            .corner_radius(6.0)
+            .inner_margin(egui::vec2(10.0, 9.0))
+            .stroke(egui::Stroke::new(1.0, color))
+            .show(ui, |ui| {
+                ui.vertical(|ui| {
+                    ui.label(RichText::new(label).size(12.0).color(TEXT_MUTED));
+                    ui.label(RichText::new(value).size(15.0).color(TEXT_PRIMARY).strong());
+                });
+            });
+    }
+
+    pub(crate) fn draw_settings_toggle(
+        ui: &mut egui::Ui,
+        label: &str,
+        help_text: &str,
+        value: &mut bool,
+    ) -> bool {
+        let mut changed = false;
+        settings_toggle_frame(*value).show(ui, |ui| {
+            ui.horizontal(|ui| {
+                let dot_color = if *value { ACCENT_PRIMARY } else { TEXT_MUTED };
+                let (dot_rect, _) =
+                    ui.allocate_exact_size(egui::vec2(8.0, 8.0), egui::Sense::hover());
+                ui.painter()
+                    .circle_filled(dot_rect.center(), 3.5, dot_color);
+                ui.add_space(6.0);
+                ui.label(RichText::new(label).color(TEXT_PRIMARY).size(15.0).strong());
+                ui.add_space(8.0);
+                ui.label(label_muted(help_text));
+                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                    let switch_text = if *value { "ON" } else { "OFF" };
+                    if ui.add(button_toggle(*value, switch_text)).clicked() {
+                        *value = !*value;
+                        changed = true;
+                    }
+                });
+            });
+        });
+        changed
+    }
+
+    pub(crate) fn draw_advanced_slider(
+        ui: &mut egui::Ui,
+        title: &str,
+        help_text: &str,
+        value: &mut f32,
+        range: std::ops::RangeInclusive<f32>,
+        value_label: String,
+    ) -> bool {
+        let mut changed = false;
+        settings_toggle_frame(true).show(ui, |ui| {
+            ui.horizontal(|ui| {
+                ui.label(label_secondary(title));
+                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                    settings_value_badge(ui, &value_label);
+                });
+            });
+            ui.add_space(8.0);
+            if slider_glow(value, range, ui).changed() {
+                changed = true;
+            }
+            ui.add_space(4.0);
+            ui.label(label_muted(help_text));
+        });
+        changed
+    }
+
     pub(crate) fn draw_queue_panel(&mut self, ui: &mut egui::Ui) {
         panel_frame().show(ui, |ui| {
             ui.horizontal(|ui| {
