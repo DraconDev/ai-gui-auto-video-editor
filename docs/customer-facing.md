@@ -7,6 +7,7 @@ This document captures what we already ship (desktop install script, GUI launche
 2. **Desktop integration** now overwrites the desktop entry on every install so clicking the dash launches the GUI, and the icon is refreshed via `assets/icon.svg` (purple gradient film + AI badge).
 3. **First-run wizard** introduces the product to non-technical users: welcome screen, folder picker, content preset, and audio/mute toggles that automatically save into the config and start watch mode.
 4. **CLI & GUI parity** is complete – the same binary contains both modes, both read `[[paths.watch_folders]]` from the same config file (`~/.config/ai-vid-editor/config.toml`, auto-loaded), and the README documents GUI/CLI usage and the install script.
+5. **Security hardening complete** – Command injection in FFmpeg filter strings fixed, TOCTOU model downloads resolved, STT panic on short audio fixed, config merge now preserves explicit values, RAII temp cleanup added, mutex poison handled gracefully.
 
 ## Remaining work to go fully customer-facing
 | Area | Work | Why it matters |

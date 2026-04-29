@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Added comprehensive agent documentation for the AI video editor project
+Added security hardening documentation for customer-facing features
 
 ## Completed
-- [x] Created AGENTS.md with project overview, repository structure, build commands, key conventions, critical code locations, feature flags, and known limitations
+- [x] Documented security hardening measures including command injection fixes, TOCTOU resolution, STT panic handling, config merge preservation, RAII temp cleanup, and mutex poison handling
 ```
