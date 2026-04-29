@@ -1357,7 +1357,223 @@ impl App {
             needs_save = true;
         }
 
-        ui
+        needs_save
+    }
+
+    fn draw_settings_audio(&mut self, ui: &mut egui::Ui, folder_idx: usize) -> bool {
+        let mut needs_save = false;
+        let folder = self.state.folders.get(folder_idx);
+
+        let enhance = folder.and_then(|f| f.settings.enhance_audio).unwrap_or(true);
+        let noise_reduction = folder.and_then(|f| f.settings.noise_reduction).unwrap_or(false);
+        let lufs = folder.and_then(|f| f.settings.target_lufs).unwrap_or(-14.0);
+
+        ui.label(section_title("Audio"));
+        ui.add_space(8.0);
+
+        let mut enhance = enhance;
+        if Self::draw_settings_toggle(
+            ui,
+            "Enhance Audio",
+            "Normalize loudness and improve voice clarity",
+            &mut enhance,
+        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.enhance_audio = Some(enhance);
+            needs_save = true;
+        }
+        ui.add_space(6.0);
+
+        let mut noise_reduction = noise_reduction;
+        if Self::draw_settings_toggle(
+            ui,
+            "Noise Reduction",
+            "Remove background hum, hiss, and noise",
+            &mut noise_reduction,
+        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.noise_reduction = Some(noise_reduction);
+            needs_save = true;
+        }
+        ui.add_space(6.0);
+
+        let mut lufs = lufs;
+        let lufs_label = format!("{lufs:.0} LUFS");
+        if Self::draw_advanced_slider(
+            ui,
+            "Target Loudness",
+            "Final audio loudness (YouTube = -14 LUFS)",
+            &mut lufs,
+            -24.0..=-6.0,
+            lufs_label,
+        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.target_lufs = Some(lufs);
+            needs_save = true;
+        }
+
+        needs_save
+    }
+
+    fn draw_settings_video(&mut self, ui: &mut egui::Ui, folder_idx: usize) -> bool {
+        let mut needs_save = false;
+        let folder = self.state.folders.get(folder_idx);
+
+        let hw_accel = folder.and_then(|f| f.settings.hw_accel).unwrap_or(HwAccel::None);
+        let target_res = folder
+            .and_then(|f| f.settings.target_resolution)
+            .unwrap_or(VideoResolution::Fhd1080p);
+
+        ui.label(section_title("Video Output"));
+        ui.add_space(8.0);
+
+        ui.label(label_secondary("GPU Encoding"));
+        ui.add_space(4.0);
+        let hw_accel_options: [(String, HwAccel); 5] = [
+            (String::from("None (CPU)"), HwAccel::None),
+            (String::from("NVIDIA NVENC"), HwAccel::Nvenc),
+            (String::from("AMD AMF"), HwAccel::Amf),
+            (String::from("VAAPI"), HwAccel::Vaapi),
+            (String::from("VideoToolbox (macOS)"), HwAccel::VideoToolbox),
+        ];
+        let mut selected_hw = hw_accel;
+        let hw_label = selected_hw.display_name();
+        dropdown_selector(
+            ui,
+            &format!("hw_accel_{}", folder_idx),
+            &mut selected_hw,
+            &hw_accel_options,
+            hw_label,
+        );
+        if selected_hw != hw_accel
+            && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.hw_accel = Some(selected_hw);
+            needs_save = true;
+        }
+
+        ui.add_space(8.0);
+        ui.label(label_secondary("Target Resolution"));
+        ui.add_space(4.0);
+        let resolution_options: [(String, VideoResolution); 6] = [
+            (String::from("720p HD"), VideoResolution::Hd720p),
+            (String::from("1080p Full HD"), VideoResolution::Fhd1080p),
+            (String::from("1440p QHD"), VideoResolution::Qhd1440p),
+            (String::from("4K UHD"), VideoResolution::Uhd4k),
+            (String::from("1080p Vertical"), VideoResolution::Vertical1080p),
+            (String::from("720p Vertical"), VideoResolution::Vertical720p),
+        ];
+        let mut selected_res = target_res;
+        let res_label = selected_res.display_name();
+        dropdown_selector(
+            ui,
+            &format!("resolution_{}", folder_idx),
+            &mut selected_res,
+            &resolution_options,
+            res_label,
+        );
+        if selected_res != target_res
+            && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.target_resolution = Some(selected_res);
+            needs_save = true;
+        }
+
+        needs_save
+    }
+
+    fn draw_settings_exports(&mut self, ui: &mut egui::Ui, folder_idx: usize) -> bool {
+        let mut needs_save = false;
+        let folder = self.state.folders.get(folder_idx);
+
+        let subtitles = folder.and_then(|f| f.settings.subtitles).unwrap_or(false);
+        let chapters = folder.and_then(|f| f.settings.chapters).unwrap_or(false);
+        let captions = folder.and_then(|f| f.settings.captions).unwrap_or(false);
+        let clips = folder.and_then(|f| f.settings.clips).unwrap_or(false);
+        let preview = folder.and_then(|f| f.settings.preview).unwrap_or(false);
+        let multi_format = folder.and_then(|f| f.settings.multi_format).unwrap_or(false);
+
+        ui.label(section_title("Exports"));
+        ui.add_space(8.0);
+
+        let mut subtitles = subtitles;
+        if Self::draw_settings_toggle(
+            ui,
+            "SRT Subtitles",
+            "Generate .srt subtitle file from transcript",
+            &mut subtitles,
+        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.subtitles = Some(subtitles);
+            needs_save = true;
+        }
+        ui.add_space(6.0);
+
+        let mut chapters = chapters;
+        if Self::draw_settings_toggle(
+            ui,
+            "YouTube Chapters",
+            "Generate timestamped chapters from transcript",
+            &mut chapters,
+        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.chapters = Some(chapters);
+            needs_save = true;
+        }
+        ui.add_space(6.0);
+
+        let mut captions = captions;
+        if Self::draw_settings_toggle(
+            ui,
+            "Burn Captions",
+            "Embed styled subtitles directly in video",
+            &mut captions,
+        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.captions = Some(captions);
+            needs_save = true;
+        }
+        ui.add_space(6.0);
+
+        let mut clips = clips;
+        if Self::draw_settings_toggle(
+            ui,
+            "Extract Clips",
+            "Pull highlight clips for Shorts, Reels, TikTok",
+            &mut clips,
+        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.clips = Some(clips);
+            needs_save = true;
+        }
+        ui.add_space(6.0);
+
+        let mut preview = preview;
+        if Self::draw_settings_toggle(
+            ui,
+            "Preview File",
+            "Generate a short low-res preview alongside output",
+            &mut preview,
+        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.preview = Some(preview);
+            needs_save = true;
+        }
+        ui.add_space(6.0);
+
+        let mut multi_format = multi_format;
+        if Self::draw_settings_toggle(
+            ui,
+            "Multi-Format Export",
+            "Generate outputs at multiple resolutions",
+            &mut multi_format,
+        ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
+            f.settings.multi_format = Some(multi_format);
+            needs_save = true;
+        }
+
+        needs_save
     }
 
     fn draw_settings_advanced(&mut self, ui: &mut egui::Ui, folder_idx: usize) -> bool {
@@ -1424,7 +1640,7 @@ impl App {
             });
         });
 
-        ui
+        needs_save
     }
 
     pub(crate) fn draw_settings_metric(
