@@ -599,6 +599,11 @@ impl AppState {
 
     fn remove_folder(&mut self, index: usize) {
         self.folders.remove(index);
+        if self.folders.is_empty() {
+            self.selected_folder_idx = 0;
+        } else if self.selected_folder_idx >= self.folders.len() {
+            self.selected_folder_idx = self.folders.len() - 1;
+        }
         self.activity_log
             .push(ActivityEntry::simple("Removed watch folder", true));
         self.auto_save_config();
