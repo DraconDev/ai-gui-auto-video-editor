@@ -7,6 +7,8 @@ use std::path::{Path, PathBuf};
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, Default)]
 #[serde(rename_all = "lowercase")]
 pub enum SilenceMode {
+    /// Keep all audio (no silence processing)
+    Keep,
     /// Cut out silences completely (default)
     #[default]
     Cut,

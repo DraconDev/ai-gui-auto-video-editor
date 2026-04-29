@@ -255,11 +255,8 @@ pub fn build_folder_config(config: &Config, folder: &FolderState) -> Config {
         config.clone()
     };
 
-    if let Some(remove_silence) = folder.settings.remove_silence
-        && remove_silence
-    {
-        merged.silence.mode = SilenceMode::Cut;
-        merged.silence.min_duration = f32::MAX;
+    if let Some(silence_mode) = folder.settings.silence_mode {
+        merged.silence.mode = silence_mode;
     }
     if let Some(threshold) = folder.settings.silence_threshold_db {
         merged.silence.threshold_db = threshold;

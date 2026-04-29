@@ -46,6 +46,14 @@ pub fn calculate_keep_segments(
     speedup_factor: f32,
     min_silence_for_speedup: f32,
 ) -> Vec<ProcessedSegment> {
+    if mode == SilenceMode::Keep {
+        return vec![ProcessedSegment {
+            start: 0.0,
+            end: total_duration,
+            speed: 1.0,
+        }];
+    }
+
     let mut processed = Vec::new();
     let mut current_pos = 0.0;
 
@@ -64,6 +72,10 @@ pub fn calculate_keep_segments(
 
         // Handle the silence based on mode
         match mode {
+            SilenceMode::Keep => {
+                // Already handled above - keep all audio at normal speed
+                current_pos = silence.end;
+            }
             SilenceMode::Cut => {
                 // Cut mode: skip the silence entirely
                 current_pos = (silence.end - padding).max(0.0);
