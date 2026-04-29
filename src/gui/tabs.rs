@@ -99,6 +99,7 @@ impl App {
             let mut toggle_idx: Option<usize> = None;
             let mut edit_idx: Option<usize> = None;
             let mut delete_idx: Option<usize> = None;
+            let mut duplicate_idx: Option<usize> = None;
 
             if self.state.folders.is_empty() {
                 inner_panel().show(ui, |ui| {
@@ -155,19 +156,20 @@ impl App {
                             );
                         });
 
-                        if self.state.folders.len() > 1 {
-                            ui.add_space(4.0);
-                            ui.horizontal(|ui| {
-                                ui.with_layout(
-                                    egui::Layout::right_to_left(egui::Align::Center),
-                                    |ui| {
-                                        if ui.add(button_small("Remove")).clicked() {
-                                            delete_idx = Some(idx);
-                                        }
-                                    },
-                                );
-                            });
-                        }
+                        ui.add_space(4.0);
+                        ui.horizontal(|ui| {
+                            ui.with_layout(
+                                egui::Layout::right_to_left(egui::Align::Center),
+                                |ui| {
+                                    if ui.add(button_small("Duplicate")).clicked() {
+                                        self.state.duplicate_folder(idx);
+                                    }
+                                    if ui.add(button_small("Remove")).clicked() {
+                                        delete_idx = Some(idx);
+                                    }
+                                },
+                            );
+                        });
                     });
 
                     if response.response.clicked() {

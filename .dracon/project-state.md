@@ -1,8 +1,10 @@
 # Project State
 
 ## Current Focus
-Adds Import and Export buttons to the configuration tab for loading and saving JSON configuration files.
+Implement folder duplication through a new UI button and internal duplicate logic
 
 ## Completed
-- [x] Added Import button that opens a file dialog to select a JSON file and imports it via `state.import_config_from`, showing a success toast or error toast.
-- [x] Added Export button that opens a file dialog to save the current configuration as a JSON file, handling errors and showing a success toast on successful export.
+- [x] Added `duplicate_folder` method in `AppState` that creates a new `FolderState` with copied fields and pushes it to the folders collection
+- [x] Updated the tab UI in `src/gui/tabs.rs` to always display a “Duplicate” button for each folder, invoking the new duplicate method
+- [x] Refactored the duplicate operation to explicitly initialize all `FolderState` fields rather than mutating a cloned struct
+- [x] Updated `Cargo.lock` reflecting the dependency rebuild after the changes above
