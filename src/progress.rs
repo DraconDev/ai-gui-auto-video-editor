@@ -88,7 +88,7 @@ mod tests {
 
     #[test]
     fn test_progress_serialization_roundtrip() -> Result<()> {
-        let mut progress = BatchProgress {
+        let progress = BatchProgress {
             total: 3,
             completed: vec![
                 PathBuf::from("/tmp/video1.mp4"),

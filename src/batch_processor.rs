@@ -1500,4 +1500,150 @@ mod tests {
         assert!(result.is_ok());
         Ok(())
     }
+
+    #[test]
+    fn test_batch_processing_multiple_video_types() -> Result<()> {
+        let input_dir = tempdir()?;
+        let output_dir = tempdir()?;
+
+        let video_types = ["video1.mp4", "video2.mov", "video3.avi", "video4.mkv", "video5.webm"];
+        for name in &video_types {
+            fs::File::create(input_dir.path().join(name))?;
+        }
+        fs::File::create(input_dir.path().join("document.txt"))?;
+
+        let mock_analyzer = MockFfmpegAnalyzer;
+        let mock_editor = MockFfmpegEditor;
+        let mock_duration_getter = MockDurationGetter;
+
+        let config = Config::default();
+
+        let result = process_batch_dir(
+            input_dir.path().to_path_buf(),
+            output_dir.path().to_path_buf(),
+            &config,
+            &mock_analyzer,
+            &mock_editor,
+            &mock_duration_getter,
+        );
+
+        assert!(result.is_ok());
+        let output_files: Vec<_> = fs::read_dir(output_dir.path())?
+            .filter_map(|e| e.ok())
+            .map(|e| e.path())
+            .collect();
+        assert_eq!(output_files.len(), 5);
+        Ok(())
+    }
+
+    #[test]
+    fn test_batch_processing_creates_output_dir() -> Result<()> {
+        let input_dir = tempdir()?;
+        let output_dir = tempdir()?;
+
+        fs::File::create(input_dir.path().join("video.mp4"))?;
+
+        let mock_analyzer = MockFfmpegAnalyzer;
+        let mock_editor = MockFfmpegEditor;
+        let mock_duration_getter = MockDurationGetter;
+
+        let config = Config::default();
+
+        // Output dir exists but is empty
+        assert!(output_dir.path().exists());
+
+        let result = process_batch_dir(
+            input_dir.path().to_path_buf(),
+            output_dir.path().join("nested"),
+            &config,
+            &mock_analyzer,
+            &mock_editor,
+            &mock_duration_getter,
+        );
+
+        assert!(result.is_ok());
+        assert!(output_dir.path().join("nested").exists());
+        Ok(())
+    }
+
+    #[test]
+    fn test_batch_processing_with_disabled_features() -> Result<()> {
+        let input_dir = tempdir()?;
+        let output_dir = tempdir()?;
+
+        fs::File::create(input_dir.path().join("video.mp4"))?;
+
+        let mock_analyzer = MockFfmpegAnalyzer;
+        let mock_editor = MockFfmpegEditor;
+        let mock_duration_getter = MockDurationGetter;
+
+        let mut config = Config::default();
+        config.audio.enhance = false;
+        config.audio.noise_reduction = false;
+        config.video.stabilize = false;
+        config.video.color_correct = false;
+        config.video.reframe = false;
+        config.video.blur_background = false;
+        config.export.subtitles = false;
+        config.export.chapters = false;
+
+        let result = process_batch_dir(
+            input_dir.path().to_path_buf(),
+            output_dir.path().to_path_buf(),
+            &config,
+            &mock_analyzer,
+            &mock_editor,
+            &mock_duration_getter,
+        );
+
+        assert!(result.is_ok());
+        assert!(output_dir.path().join("video.mp4").exists());
+        Ok(())
+    }
+
+    #[test]
+    fn test_batch_processing_progress_persists_across_runs() -> Result<()> {
+        let input_dir = tempdir()?;
+        let output_dir = tempdir()?;
+
+        fs::File::create(input_dir.path().join("video1.mp4"))?;
+        fs::File::create(input_dir.path().join("video2.mp4"))?;
+
+        let mock_analyzer = MockFfmpegAnalyzer;
+        let mock_editor = MockFfmpegEditor;
+        let mock_duration_getter = MockDurationGetter;
+
+        let mut config = Config::default();
+        config.audio.enhance = false;
+
+        // First run
+        let result1 = process_batch_dir(
+            input_dir.path().to_path_buf(),
+            output_dir.path().to_path_buf(),
+            &config,
+            &mock_analyzer,
+            &mock_editor,
+            &mock_duration_getter,
+        );
+        assert!(result1.is_ok());
+
+        // Second run should skip already completed files
+        let result2 = process_batch_dir(
+            input_dir.path().to_path_buf(),
+            output_dir.path().to_path_buf(),
+            &config,
+            &mock_analyzer,
+            &mock_editor,
+            &mock_duration_getter,
+        );
+        assert!(result2.is_ok());
+
+        // Both files should exist (one from each run)
+        let output_files: Vec<_> = fs::read_dir(output_dir.path())?
+            .filter_map(|e| e.ok())
+            .map(|e| e.path())
+            .collect();
+        assert_eq!(output_files.len(), 2);
+        Ok(())
+    }
 }
