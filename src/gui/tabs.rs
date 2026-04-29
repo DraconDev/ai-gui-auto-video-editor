@@ -1320,22 +1320,21 @@ impl App {
                 .unwrap_or_else(|| "None".to_string());
             ui.label(label_muted(&music_label));
             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                if ui.add(button_small("Choose...")).clicked() {
-                    if let Some(path) = FileDialog::new()
+                if ui.add(button_small("Choose...")).clicked()
+                    && let Some(path) = FileDialog::new()
                         .add_filter("Audio", &["mp3", "wav", "ogg", "flac", "m4a"])
                         .pick_file()
-                    {
-                        if let Some(f) = self.state.folders.get_mut(folder_idx) {
-                            f.settings.music_path = Some(path);
-                            needs_save = true;
-                        }
-                    }
+                    && let Some(f) = self.state.folders.get_mut(folder_idx)
+                {
+                    f.settings.music_path = Some(path);
+                    needs_save = true;
                 }
-                if music_path.is_some() && ui.add(button_small("✕")).clicked() {
-                    if let Some(f) = self.state.folders.get_mut(folder_idx) {
-                        f.settings.music_path = None;
-                        needs_save = true;
-                    }
+                if music_path.is_some()
+                    && ui.add(button_small("✕")).clicked()
+                    && let Some(f) = self.state.folders.get_mut(folder_idx)
+                {
+                    f.settings.music_path = None;
+                    needs_save = true;
                 }
             });
         });
@@ -1358,36 +1357,6 @@ impl App {
             }
         }
         ui.add_space(8.0);
-
-        needs_save
-        ui.add_space(4.0);
-        ui.horizontal(|ui| {
-            let music_label = music_path
-                .as_ref()
-                .and_then(|p| p.file_name())
-                .map(|n| n.to_string_lossy().to_string())
-                .unwrap_or_else(|| "None".to_string());
-            ui.label(label_muted(&music_label));
-            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                if ui.add(button_small("Choose...")).clicked() {
-                    if let Some(path) = FileDialog::new()
-                        .add_filter("Audio", &["mp3", "wav", "ogg", "flac", "m4a"])
-                        .pick_file()
-                    {
-                        if let Some(f) = self.state.folders.get_mut(folder_idx) {
-                            f.settings.music_path = Some(path);
-                            needs_save = true;
-                        }
-                    }
-                }
-                if music_path.is_some() && ui.add(button_small("✕")).clicked() {
-                    if let Some(f) = self.state.folders.get_mut(folder_idx) {
-                        f.settings.music_path = None;
-                        needs_save = true;
-                    }
-                }
-            });
-        });
 
         needs_save
     }
@@ -1477,22 +1446,21 @@ impl App {
                 .unwrap_or_else(|| "None".to_string());
             ui.label(label_muted(&watermark_label));
             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                if ui.add(button_small("Choose PNG...")).clicked() {
-                    if let Some(path) = FileDialog::new()
+                if ui.add(button_small("Choose PNG...")).clicked()
+                    && let Some(path) = FileDialog::new()
                         .add_filter("Image", &["png"])
                         .pick_file()
-                    {
-                        if let Some(f) = self.state.folders.get_mut(folder_idx) {
-                            f.settings.watermark_path = Some(path);
-                            needs_save = true;
-                        }
-                    }
+                    && let Some(f) = self.state.folders.get_mut(folder_idx)
+                {
+                    f.settings.watermark_path = Some(path);
+                    needs_save = true;
                 }
-                if watermark_path.is_some() && ui.add(button_small("✕")).clicked() {
-                    if let Some(f) = self.state.folders.get_mut(folder_idx) {
-                        f.settings.watermark_path = None;
-                        needs_save = true;
-                    }
+                if watermark_path.is_some()
+                    && ui.add(button_small("✕")).clicked()
+                    && let Some(f) = self.state.folders.get_mut(folder_idx)
+                {
+                    f.settings.watermark_path = None;
+                    needs_save = true;
                 }
             });
         });
@@ -1785,22 +1753,21 @@ impl App {
                 .unwrap_or_else(|| "None".to_string());
             ui.label(label_muted(&intro_label));
             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                if ui.add(button_small("Choose...")).clicked() {
-                    if let Some(path) = FileDialog::new()
+                if ui.add(button_small("Choose...")).clicked()
+                    && let Some(path) = FileDialog::new()
                         .add_filter("Video", &["mp4", "mov", "mkv", "avi"])
                         .pick_file()
-                    {
-                        if let Some(f) = self.state.folders.get_mut(folder_idx) {
-                            f.settings.intro_path = Some(path);
-                            needs_save = true;
-                        }
-                    }
+                    && let Some(f) = self.state.folders.get_mut(folder_idx)
+                {
+                    f.settings.intro_path = Some(path);
+                    needs_save = true;
                 }
-                if intro_path.is_some() && ui.add(button_small("✕")).clicked() {
-                    if let Some(f) = self.state.folders.get_mut(folder_idx) {
-                        f.settings.intro_path = None;
-                        needs_save = true;
-                    }
+                if intro_path.is_some()
+                    && ui.add(button_small("✕")).clicked()
+                    && let Some(f) = self.state.folders.get_mut(folder_idx)
+                {
+                    f.settings.intro_path = None;
+                    needs_save = true;
                 }
             });
         });

@@ -1,11 +1,11 @@
 # Project State
 
 ## Current Focus
-ONE LINE: Refactored blur‑background toggle, overhauled background‑music UI with file picker and ducked‑volume handling, and updated Cargo.lock.
+Simplify folder‑path selection UI and streamline conditional handling in settings tabs
 
 ## Completed
-- [x] Moved blur‑background setting under `if reframe` condition and removed redundant spacing code
-- [x] Replaced old music‑toggle UI with a file‑picker button and explicit “✕” removal control
-- [x] Consolidated duck‑volume slider under the new music‑path section and retained saving logic
-- [x] Updated Cargo.lock to the latest dependency versions
----
+- [x] Refactored music_path, watermark_path, and intro_path dialogs to chain .clicked() && let conditions
+- [x] Removed redundant label_muted and button_small UI elements for those paths
+- [x] Dropped extra ui.add_space and horizontal layout blocks that displayed path labels
+- [x] Integrated needs_save updates directly within the simplified conditional flow
+- [x] Updated Cargo.lock to latest dependency versions
