@@ -483,6 +483,8 @@ pub struct FolderSettings {
     pub edl: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub thumbnail: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub extra_resolutions: Option<Vec<VideoResolution>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -537,6 +539,7 @@ impl FolderSettings {
             && self.fcpxml.is_none()
             && self.edl.is_none()
             && self.thumbnail.is_none()
+            && self.extra_resolutions.is_none()
     }
 }
 
