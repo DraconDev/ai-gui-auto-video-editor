@@ -78,7 +78,8 @@ pub fn calculate_keep_segments(
             }
             SilenceMode::Cut => {
                 // Cut mode: skip the silence entirely
-                current_pos = (silence.end - padding).max(0.0);
+                let cut_end = (silence.end - padding).max(0.0);
+                current_pos = current_pos.max(keep_end).max(cut_end);
             }
             SilenceMode::Speedup => {
                 // Speedup mode: keep silence but speed it up if long enough
@@ -92,7 +93,7 @@ pub fn calculate_keep_segments(
                         speed: speedup_factor,
                     });
                 }
-                current_pos = silence_end;
+                current_pos = current_pos.max(keep_end).max(silence_end);
             }
         }
     }

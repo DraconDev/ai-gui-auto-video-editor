@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Updated dropdown selector to hide popup based on pointer interaction position and rectangle containment rather than using the rectangle’s minimum coordinate.
+Improve silence handling in `calculate_keep_segments` by ensuring `current_pos` respects `keep_end`, padding, and cut boundaries.
 
 ## Completed
-- [x] Modified `src/gui/theme.rs` to refine popup dismissal logic using `pointer.interact_pos()` and explicit containment check
-- [x] Regenerated `Cargo.lock` after dependency rebuild (no functional changes)
+- [x] Modify Cut mode to compute `cut_end` and set `current_pos` as the maximum of `current_pos`, `keep_end`, and `cut_end`
+- [x] Update Speedup mode to apply `keep_end` before assigning `current_pos` from `silence_end`
