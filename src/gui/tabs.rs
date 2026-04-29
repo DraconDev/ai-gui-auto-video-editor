@@ -1703,8 +1703,6 @@ impl App {
                 f.settings.clip_max_duration = Some(new_clip_max);
                 needs_save = true;
             }
-                needs_save = false;
-            }
         }
 
         needs_save
