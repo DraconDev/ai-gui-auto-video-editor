@@ -1714,6 +1714,8 @@ impl App {
 
         let intro_path = folder.and_then(|f| f.settings.intro_path.clone());
         let outro_path = folder.and_then(|f| f.settings.outro_path.clone());
+        let join_mode = folder.and_then(|f| f.settings.join_mode).unwrap_or(JoinMode::Off);
+        let join_after_count = folder.and_then(|f| f.settings.join_after_count).unwrap_or(5);
 
         ui.label(section_title("Advanced"));
         ui.add_space(4.0);
@@ -1782,6 +1784,51 @@ impl App {
                 }
             });
         });
+
+        ui.add_space(12.0);
+
+        ui.label(section_title("Video Joining"));
+        ui.add_space(8.0);
+
+        ui.label(label_secondary("Join Mode"));
+        ui.add_space(4.0);
+        let mode_options: [(String, JoinMode); 4] = [
+            (String::from("Off"), JoinMode::Off),
+            (String::from("By Date"), JoinMode::ByDate),
+            (String::from("By Name"), JoinMode::ByName),
+            (String::from("After Count"), JoinMode::AfterCount),
+        ];
+        let mut selected_mode = join_mode;
+        let mode_label = match selected_mode {
+            JoinMode::Off => "Off",
+            JoinMode::ByDate => "By Date",
+            JoinMode::ByName => "By Name",
+            JoinMode::AfterCount => "After Count",
+        };
+        dropdown_selector(ui, &format!("join_mode_{}", folder_idx), &mut selected_mode, &mode_options, mode_label);
+        ui.add(egui::Label::new(egui::RichText::new("Off = no joining. After Count = join every N videos.").size(11.0).color(TEXT_SECONDARY)));
+        if selected_mode != join_mode && let Some(f) = self.state.folders.get_mut(folder_idx) {
+            f.settings.join_mode = Some(selected_mode);
+            needs_save = true;
+        }
+
+        if selected_mode == JoinMode::AfterCount {
+            ui.add_space(6.0);
+            let mut count = join_after_count as f32;
+            let count_label = format!("{} videos", join_after_count);
+            if Self::draw_advanced_slider(
+                ui,
+                "Join After Count",
+                "Join videos after this many are processed",
+                &mut count,
+                2.0..=20.0,
+                count_label,
+                1.0,
+            ) && let Some(f) = self.state.folders.get_mut(folder_idx) {
+                f.settings.join_after_count = Some(count as u32);
+                needs_save = true;
+            }
+        }
 
         ui.add_space(12.0);
 
