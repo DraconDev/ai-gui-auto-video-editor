@@ -1,9 +1,9 @@
 # Project State
 
 ## Current Focus
-Add step‑based precision and formatting to slider inputs used in the settings UI.
+Added step‑based precision to three sliders for silence_min_for_speedup, silence_scene_threshold, and target_lufs settings.
 
 ## Completed
-- [x] Added `step` parameter to `slider_glow` in `src/gui/theme.rs` and implemented stepping logic and dynamic value formatting.
-- [x] Updated `slider_glow` to round values to the nearest step and adjust displayed text based on the step size.
-- [x] Modified four calls to `slider_glow` in `src/gui/tabs.rs` (silence threshold, silence padding, silence min duration, and silence speedup factor) to pass the new `step` argument.
+- [x] Added step size 0.1 to the silence_min_for_speedup slider input.
+- [x] Added step size 0.01 to the silence_scene_threshold slider input.
+- [x] Added step size 1.0 to the target_lufs slider input.

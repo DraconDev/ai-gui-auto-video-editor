@@ -1192,6 +1192,7 @@ impl App {
                 &mut silence_min_for_speedup,
                 0.1..=2.0,
                 min_speedup_label,
+                0.1,
             ) && let Some(f) = self.state.folders.get_mut(folder_idx)
             {
                 f.settings.silence_min_silence_for_speedup = Some(silence_min_for_speedup);
@@ -1210,6 +1211,7 @@ impl App {
                 &mut silence_scene_threshold,
                 0.1..=0.9,
                 scene_label,
+                0.01,
             ) && let Some(f) = self.state.folders.get_mut(folder_idx)
             {
                 f.settings.silence_scene_threshold = Some(silence_scene_threshold);
@@ -1270,6 +1272,7 @@ impl App {
             &mut lufs,
             -24.0..=-6.0,
             lufs_label,
+            1.0,
         ) && let Some(f) = self.state.folders.get_mut(folder_idx)
         {
             f.settings.target_lufs = Some(lufs);
