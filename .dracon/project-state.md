@@ -1,8 +1,7 @@
 # Project State
 
 ## Current Focus
-Added a `draw_validation_warning` method to display validation warnings in the UI.
+Regenerated Cargo.lock after internal rebuild with unchanged dependencies, resulting in a binary lock file change
 
 ## Completed
-- [x] Added `draw_validation_warning` function with UI theming for warning messages
-- [x] Included `#[allow(dead_code)]` attribute to suppress lint warnings for the new function
+- [x] Regenerated Cargo.lock after internal rebuild (binary lock file updated)
