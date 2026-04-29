@@ -1784,22 +1784,21 @@ impl App {
                 .unwrap_or_else(|| "None".to_string());
             ui.label(label_muted(&outro_label));
             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                if ui.add(button_small("Choose...")).clicked() {
-                    if let Some(path) = FileDialog::new()
+                if ui.add(button_small("Choose...")).clicked()
+                    && let Some(path) = FileDialog::new()
                         .add_filter("Video", &["mp4", "mov", "mkv", "avi"])
                         .pick_file()
-                    {
-                        if let Some(f) = self.state.folders.get_mut(folder_idx) {
-                            f.settings.outro_path = Some(path);
-                            needs_save = true;
-                        }
-                    }
+                    && let Some(f) = self.state.folders.get_mut(folder_idx)
+                {
+                    f.settings.outro_path = Some(path);
+                    needs_save = true;
                 }
-                if outro_path.is_some() && ui.add(button_small("✕")).clicked() {
-                    if let Some(f) = self.state.folders.get_mut(folder_idx) {
-                        f.settings.outro_path = None;
-                        needs_save = true;
-                    }
+                if outro_path.is_some()
+                    && ui.add(button_small("✕")).clicked()
+                    && let Some(f) = self.state.folders.get_mut(folder_idx)
+                {
+                    f.settings.outro_path = None;
+                    needs_save = true;
                 }
             });
         });
