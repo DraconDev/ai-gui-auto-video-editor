@@ -154,8 +154,8 @@ mkdir -p "$PREFIX/bin"
 mkdir -p "$CONFIG_DIR"
 
 # Build release binary
-echo -e "${BLUE}Building release binary (with GUI)...${NC}"
-cargo build --release --features gui
+echo -e "${BLUE}Building release binary (CLI + GUI)...${NC}"
+cargo build --release
 echo -e "${GREEN}✓ Build complete${NC}"
 
 # Install binary

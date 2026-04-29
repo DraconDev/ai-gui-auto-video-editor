@@ -1,7 +1,8 @@
 # Project State
 
 ## Current Focus
-chore(lockfile): refresh Cargo.lock dependency lockfile
+Build release binary with both CLI and GUI enabled
 
 ## Completed
-- [x] chore(lockfile): regenerate Cargo.lock with no dependency version updates
+- [x] Update message to indicate CLI + GUI build
+- [x] Remove GUI feature flag from cargo build command to produce a unified binary
