@@ -4,6 +4,10 @@
 gui:
     cargo run -- --gui
 
+# Run headless (watch mode for configured folders)
+watch:
+    cargo run -- --headless
+
 # Run CLI with a file
 cli input output:
     cargo run --release -- -i {{input}} -o {{output}}

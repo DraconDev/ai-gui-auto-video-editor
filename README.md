@@ -6,7 +6,7 @@ A command-line and GUI tool for automated video editing using AI. Designed for c
 
 ## Quick Start
 
-**GUI** (default when launched from desktop):
+**GUI** (default):
 ```bash
 cargo run
 ```
@@ -16,9 +16,15 @@ cargo run
 cargo run --release -- -i input.mp4 -o output.mp4 --preset youtube
 ```
 
+**Watch/daemon mode** (headless, for servers):
+```bash
+cargo run -- --headless
+```
+
 **Using just:**
 ```bash
 just gui      # Run GUI explicitly
+just watch    # Run in headless watch mode
 just build    # Build release
 just test     # Run tests
 ```
