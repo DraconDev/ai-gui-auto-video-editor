@@ -5,7 +5,7 @@ use std::path::PathBuf;
 use std::sync::mpsc;
 
 use super::theme::*;
-use super::{ActivityEntry, App, EntryStatus, FolderState, ProcessingStatus, SettingsCategory, SetupStep, Tab};
+use super::{ActivityEntry, App, EntryStatus, FolderState, ProcessingStatus, SettingsCategory, SetupStep, Tab, ToastKind};
 use crate::config::{FolderSettings, SilenceMode, VideoResolution};
 use crate::hwaccel::HwAccel;
 
@@ -1943,23 +1943,34 @@ impl App {
     }
 
     pub(crate) fn draw_toasts(&mut self, ctx: &egui::Context) {
-        for toast in &self.state.toasts {
+        let toasts = &self.state.toasts;
+        if toasts.is_empty() {
+            return;
+        }
+
+        let count = toasts.len();
+        let stack_offset = 70.0;
+
+        for (i, toast) in toasts.iter().enumerate() {
             let elapsed = toast.created.elapsed().as_secs() as f32;
             let alpha = 1.0 - (elapsed / 5.0).min(1.0);
+            let stack_y = i as f32 * stack_offset;
+            let color = toast.color();
+            let icon = toast.icon();
 
-            let toast_text = if toast.success { "✓" } else { "✗" };
-            let color = if toast.success { SUCCESS } else { ERROR };
+            let bg_color = match toast.kind {
+                super::ToastKind::Success => egui::Color32::from_rgba_unmultiplied(18, 40, 26, ((alpha * 220.0) as u32).min(220)),
+                super::ToastKind::Error => egui::Color32::from_rgba_unmultiplied(45, 16, 16, ((alpha * 220.0) as u32).min(220)),
+                super::ToastKind::Info => egui::Color32::from_rgba_unmultiplied(20, 30, 50, ((alpha * 220.0) as u32).min(220)),
+                super::ToastKind::Warning => egui::Color32::from_rgba_unmultiplied(50, 35, 10, ((alpha * 220.0) as u32).min(220)),
+            };
 
-            egui::Area::new(egui::Id::new(format!("toast_{}", toast.created.elapsed().as_nanos())))
-                .anchor(egui::Align2::RIGHT_BOTTOM, egui::vec2(-20.0, -20.0))
+            egui::Area::new(egui::Id::new(format!("toast_{}", i)))
+                .anchor(egui::Align2::RIGHT_BOTTOM, egui::vec2(-20.0, -20.0 - stack_y))
+                .interactable(true)
                 .show(ctx, |ui| {
                     egui::Frame::NONE
-                        .fill(egui::Color32::from_rgba_unmultiplied(
-                            if toast.success { 18 } else { 45 },
-                            if toast.success { 40 } else { 16 },
-                            if toast.success { 26 } else { 16 },
-                            (alpha * 255.0) as u8,
-                        ))
+                        .fill(bg_color)
                         .corner_radius(8.0)
                         .inner_margin(egui::vec2(14.0, 10.0))
                         .stroke(egui::Stroke::new(
@@ -1968,23 +1979,45 @@ impl App {
                                 color.r(),
                                 color.g(),
                                 color.b(),
-                                (alpha * 200.0) as u8,
+                                ((alpha * 180.0) as u32).min(180) as u8,
                             ),
                         ))
                         .show(ui, |ui| {
+                            ui.set_width(300.0);
                             ui.horizontal(|ui| {
                                 ui.label(
-                                    egui::RichText::new(toast_text)
+                                    egui::RichText::new(icon)
                                         .size(16.0)
                                         .color(color),
                                 );
                                 ui.add_space(8.0);
                                 ui.label(
                                     egui::RichText::new(&toast.message)
-                                        .size(14.0)
+                                        .size(13.0)
                                         .color(TEXT_PRIMARY),
                                 );
+                                if count > 1 {
+                                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                                        ui.label(
+                                            egui::RichText::new(format!("{} of {}", i + 1, count))
+                                                .size(11.0)
+                                                .color(TEXT_MUTED),
+                                        );
+                                    });
+                                }
                             });
+
+                            let remaining = 5.0 - elapsed;
+                            if remaining > 0.0 && remaining < 2.0 {
+                                ui.add_space(4.0);
+                                let progress = remaining / 2.0;
+                                ui.add(
+                                    egui::ProgressBar::new(1.0 - progress)
+                                        .fill(color)
+                                        .corner_radius(2.0)
+                                        .desired_width(ui.available_width()),
+                                );
+                            }
                         });
                 });
         }

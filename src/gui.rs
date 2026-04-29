@@ -310,24 +310,50 @@ enum QueueStatus {
     Error,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq)]
+enum ToastKind {
+    Success,
+    Error,
+    Info,
+    Warning,
+}
+
 #[derive(Debug, Clone)]
 struct Toast {
     message: String,
-    success: bool,
+    kind: ToastKind,
     created: std::time::Instant,
 }
 
 impl Toast {
-    fn new(message: impl Into<String>, success: bool) -> Self {
+    fn new(message: impl Into<String>, kind: ToastKind) -> Self {
         Self {
             message: message.into(),
-            success,
+            kind,
             created: std::time::Instant::now(),
         }
     }
 
     fn expired(&self) -> bool {
         self.created.elapsed().as_secs() > 5
+    }
+
+    fn color(&self) -> egui::Color32 {
+        match self.kind {
+            ToastKind::Success => crate::gui::theme::SUCCESS,
+            ToastKind::Error => crate::gui::theme::ERROR,
+            ToastKind::Info => crate::gui::theme::ACCENT_PRIMARY,
+            ToastKind::Warning => crate::gui::theme::WARNING,
+        }
+    }
+
+    fn icon(&self) -> &'static str {
+        match self.kind {
+            ToastKind::Success => "✓",
+            ToastKind::Error => "✗",
+            ToastKind::Info => "ℹ",
+            ToastKind::Warning => "⚠",
+        }
     }
 }
 
@@ -636,7 +662,7 @@ impl AppState {
                         duration_secs,
                     ));
                     self.toasts
-                        .push(Toast::new(format!("{} processed", filename), true));
+                        .push(Toast::new(format!("{} processed", filename), ToastKind::Success));
                 }
                 WatcherEvent::Failed { filename, message } => {
                     self.status = ProcessingStatus::Error(message.clone());
@@ -644,7 +670,7 @@ impl AppState {
                         .push(ActivityEntry::error(filename.clone(), message.clone()));
                     self.toasts.push(Toast::new(
                         format!("{} failed: {}", filename, message),
-                        false,
+                        ToastKind::Error,
                     ));
                 }
             }
@@ -701,7 +727,7 @@ impl AppState {
                         }
                     }
                     self.toasts
-                        .push(Toast::new(format!("{} processed", filename), true));
+                        .push(Toast::new(format!("{} processed", filename), ToastKind::Success));
                 }
                 QueueEvent::Failed {
                     filename,
@@ -716,7 +742,7 @@ impl AppState {
                     }
                     self.toasts.push(Toast::new(
                         format!("{} failed: {}", filename, message),
-                        false,
+                        ToastKind::Error,
                     ));
                 }
                 QueueEvent::Finished => {
