@@ -365,6 +365,14 @@ impl AppState {
             self.toasts.remove(0);
         }
     }
+
+    fn add_warning(&mut self, message: impl Into<String>) {
+        self.add_toast(message, ToastKind::Warning);
+    }
+
+    fn add_info(&mut self, message: impl Into<String>) {
+        self.add_toast(message, ToastKind::Info);
+    }
 }
 
 #[derive(Debug)]
