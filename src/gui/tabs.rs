@@ -789,7 +789,7 @@ impl App {
                     ui.label(label_secondary("Preset"));
                     ui.add_space(3.0);
                     ui.horizontal_wrapped(|ui| {
-                        for preset in &["youtube", "shorts", "podcast"] {
+                        for preset in &["youtube", "shorts", "podcast", "tiktok", "reels", "twitter", "minimal"] {
                             if ui
                                 .add(button_pill(self.state.modal.preset == *preset, *preset))
                                 .clicked()
