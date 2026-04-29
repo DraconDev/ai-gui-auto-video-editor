@@ -49,7 +49,7 @@ The install script will:
 ### Requirements
 
 - [Rust](https://rustup.rs/) (edition 2024)
-- [FFmpeg](https://ffmpeg.org/) (for video processing)
+- [FFmpeg](https://ffmpeg.org/) (for video processing, includes ffprobe)
 
 ### NixOS
 
