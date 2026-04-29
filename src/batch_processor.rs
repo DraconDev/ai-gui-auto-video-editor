@@ -1393,6 +1393,28 @@ mod tests {
         assert!(files[0].to_string_lossy().contains("video.mp4"));
     }
 
+    #[test]
+    fn test_find_video_files_nested_dirs() {
+        let dir = tempdir().unwrap();
+        fs::File::create(dir.path().join("video1.mp4")).unwrap();
+        fs::create_dir(dir.path().join("subdir")).unwrap();
+        fs::File::create(dir.path().join("subdir/video2.mov")).unwrap();
+
+        let files = find_video_files(dir.path()).unwrap();
+        assert_eq!(files.len(), 2);
+    }
+
+    #[test]
+    fn test_find_video_files_case_insensitive() {
+        let dir = tempdir().unwrap();
+        fs::File::create(dir.path().join("video1.MP4")).unwrap();
+        fs::File::create(dir.path().join("video2.mOv")).unwrap();
+        fs::File::create(dir.path().join("video3.MKV")).unwrap();
+
+        let files = find_video_files(dir.path()).unwrap();
+        assert_eq!(files.len(), 3);
+    }
+
     struct MockFfmpegAnalyzerFails;
     impl crate::analyzer::VideoAnalyzer for MockFfmpegAnalyzerFails {
         fn detect_silence(

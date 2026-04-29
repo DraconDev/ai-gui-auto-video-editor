@@ -1,10 +1,8 @@
-# Project State
+# ProjectState
 
 ## Current Focus
-Updated test for processing a nonexistent input directory to verify it returns `Ok` instead of `Err`, reflecting graceful handling of missing input paths.
+Add unit tests for `find_video_files` to verify nested directory detection and case‑insensitive file extension handling.
 
 ## Completed
-- [x] Modified test signature to return `Result<()>` and added temporary output directory handling
-- [x] Updated test logic to create `output_dir` and pass its path
-- [x] Added comment explaining that `find_video_files` yields an empty iterator for nonexistent directories
-- [x] Changed assertion from `assert!(result.is_err())` to `assert!(result.is_ok())` and returned `Ok(())`
+- [x] Add `test_find_video_files_nested_dirs` that creates video files in a directory and its subdirectory and asserts that two files are found.
+- [x] Add `test_find_video_files_case_insensitive` that creates video files with mixed‑case extensions and asserts that three files are found.
