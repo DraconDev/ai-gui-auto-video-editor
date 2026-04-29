@@ -343,6 +343,8 @@ impl Toast {
         match self.kind {
             ToastKind::Success => crate::gui::theme::SUCCESS,
             ToastKind::Error => crate::gui::theme::ERROR,
+            ToastKind::Warning => crate::gui::theme::WARNING,
+            ToastKind::Info => crate::gui::theme::PROCESSING,
         }
     }
 
@@ -350,6 +352,8 @@ impl Toast {
         match self.kind {
             ToastKind::Success => "✓",
             ToastKind::Error => "✗",
+            ToastKind::Warning => "⚠",
+            ToastKind::Info => "ℹ",
         }
     }
 }

@@ -2103,8 +2103,10 @@ impl App {
                             }
                         });
                 });
-            // Check if toast was clicked
-            if response.response.interact(egui::Sense::click()).is_pointer_button_down_on() {
+            // Check if toast was clicked (only primary/left button)
+            let clicked = response.response.interact(egui::Sense::click())
+                .is_pointer_button_down_on(egui::PointerButton::Primary);
+            if clicked {
                 dismiss_indices.push(i);
             }
         }
