@@ -1911,6 +1911,7 @@ impl App {
         changed
     }
 
+    #[allow(dead_code)]
     pub(crate) fn draw_validation_warning(ui: &mut egui::Ui, message: &str) {
         egui::Frame::NONE
             .fill(WARNING_BG)
