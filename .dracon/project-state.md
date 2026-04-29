@@ -1,7 +1,7 @@
 # Project State
 
 ## Current Focus
-Dependency updates reflected in Cargo.lock
+Integrate join_mode UI settings by updating imports in the tabs module
 
 ## Completed
-- [x] Updated Cargo.lock with new crate versions
+- [x] Added JoinMode to the imports in src/gui/tabs.rs
