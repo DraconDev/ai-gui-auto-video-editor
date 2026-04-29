@@ -918,25 +918,59 @@ impl App {
             let mut needs_save = false;
             let folder_idx = self.state.selected_folder_idx;
 
+            if self.state.folders.is_empty() {
+                inner_panel().show(ui, |ui| {
+                    ui.add_space(20.0);
+                    ui.vertical_centered(|ui| {
+                        ui.label(
+                            RichText::new("📁 No Folders Configured")
+                                .size(18.0)
+                                .color(TEXT_SECONDARY)
+                                .strong(),
+                        );
+                        ui.add_space(8.0);
+                        ui.label(label_muted("Add a folder in the Folders tab to configure settings"));
+                    });
+                    ui.add_space(20.0);
+                });
+                return;
+            }
+
+            let is_processing = self.state.queue_processing
+                || matches!(self.state.status, ProcessingStatus::Processing(_));
+
             ui.horizontal(|ui| {
                 self.draw_settings_sidebar(ui);
                 ui.add_space(16.0);
                 ui.vertical(|ui| {
-                        match self.state.settings_category {
-                            SettingsCategory::Processing => {
-                                needs_save = self.draw_settings_processing(ui, folder_idx);
-                            }
-                            SettingsCategory::Audio => {
-                                needs_save = self.draw_settings_audio(ui, folder_idx);
-                            }
-                            SettingsCategory::Video => {
-                                needs_save = self.draw_settings_video(ui, folder_idx);
-                            }
-                            SettingsCategory::Exports => {
-                                needs_save = self.draw_settings_exports(ui, folder_idx);
-                            }
-                            SettingsCategory::Advanced => {
-                                needs_save = self.draw_settings_advanced(ui, folder_idx);
+                        if is_processing {
+                            settings_section_frame(false).show(ui, |ui| {
+                                ui.horizontal(|ui| {
+                                    ui.label(
+                                        egui::RichText::new("⚙️")
+                                            .size(14.0),
+                                    );
+                                    ui.add_space(6.0);
+                                    ui.label(label_muted("Settings locked during processing"));
+                                });
+                            });
+                        } else {
+                            match self.state.settings_category {
+                                SettingsCategory::Processing => {
+                                    needs_save = self.draw_settings_processing(ui, folder_idx);
+                                }
+                                SettingsCategory::Audio => {
+                                    needs_save = self.draw_settings_audio(ui, folder_idx);
+                                }
+                                SettingsCategory::Video => {
+                                    needs_save = self.draw_settings_video(ui, folder_idx);
+                                }
+                                SettingsCategory::Exports => {
+                                    needs_save = self.draw_settings_exports(ui, folder_idx);
+                                }
+                                SettingsCategory::Advanced => {
+                                    needs_save = self.draw_settings_advanced(ui, folder_idx);
+                                }
                             }
                         }
                     });
