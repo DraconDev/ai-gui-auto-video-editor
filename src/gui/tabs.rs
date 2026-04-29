@@ -1958,11 +1958,12 @@ impl App {
             let color = toast.color();
             let icon = toast.icon();
 
+            let bg_alpha = ((alpha * 220.0) as u8).min(220);
             let bg_color = match toast.kind {
-                super::ToastKind::Success => egui::Color32::from_rgba_unmultiplied(18, 40, 26, ((alpha * 220.0) as u32).min(220)),
-                super::ToastKind::Error => egui::Color32::from_rgba_unmultiplied(45, 16, 16, ((alpha * 220.0) as u32).min(220)),
-                super::ToastKind::Info => egui::Color32::from_rgba_unmultiplied(20, 30, 50, ((alpha * 220.0) as u32).min(220)),
-                super::ToastKind::Warning => egui::Color32::from_rgba_unmultiplied(50, 35, 10, ((alpha * 220.0) as u32).min(220)),
+                ToastKind::Success => egui::Color32::from_rgba_unmultiplied(18, 40, 26, bg_alpha),
+                ToastKind::Error => egui::Color32::from_rgba_unmultiplied(45, 16, 16, bg_alpha),
+                ToastKind::Info => egui::Color32::from_rgba_unmultiplied(20, 30, 50, bg_alpha),
+                ToastKind::Warning => egui::Color32::from_rgba_unmultiplied(50, 35, 10, bg_alpha),
             };
 
             egui::Area::new(egui::Id::new(format!("toast_{}", i)))
