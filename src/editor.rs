@@ -150,7 +150,8 @@ pub fn calculate_keep_segments_from_transcript(
                     speed: 1.0,
                 });
             }
-            current_pos = (seg.end - padding).max(0.0);
+            let cut_end = (seg.end - padding).max(0.0);
+            current_pos = current_pos.max(keep_end).max(cut_end);
         }
     }
 

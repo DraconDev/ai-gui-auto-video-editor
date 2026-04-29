@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Improve silence handling in `calculate_keep_segments` by ensuring `current_pos` respects `keep_end`, padding, and cut boundaries.
+Fix segment keep positions to ensure they respect `keep_end` and `cut_end` ordering
 
 ## Completed
-- [x] Modify Cut mode to compute `cut_end` and set `current_pos` as the maximum of `current_pos`, `keep_end`, and `cut_end`
-- [x] Update Speedup mode to apply `keep_end` before assigning `current_pos` from `silence_end`
+- [x] Replace `current_pos` assignment with `let cut_end = (seg.end - padding).max(0.0);` and compute `current_pos = current_pos.max(keep_end).max(cut_end);`
+- [x] Ensure non‑negative segment start by using `max(0.0)` for `cut_end` and proper max ordering
