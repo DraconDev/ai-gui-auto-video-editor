@@ -1,6 +1,5 @@
 use anyhow::Result;
 use clap::Parser;
-use std::io::IsTerminal;
 use std::path::PathBuf;
 
 pub mod analyzer;
@@ -369,7 +368,7 @@ fn main() -> Result<()> {
         .iter()
         .any(|f| f.enabled);
 
-    // If no input specified and not a special command, launch GUI or go to watch mode
+    // If no input specified and not a special command, launch GUI or show help
     if cli.input_file.is_none()
         && cli.input_dir.is_none()
         && cli.watch.is_none()
@@ -379,10 +378,7 @@ fn main() -> Result<()> {
         #[cfg(feature = "gui")]
         let start_minimized = cli.start_minimized;
 
-        // Check if running from terminal (TTY) or launched from desktop
-        let is_tty = std::io::stdout().is_terminal();
-
-        // Headless mode: skip GUI even in TTY, go straight to watch mode if configured
+        // Headless mode: go straight to watch mode (daemon mode)
         if cli.headless {
             if has_watch_folders {
                 return run_multi_watch_mode(&preloaded_config, &cli);
@@ -397,25 +393,21 @@ fn main() -> Result<()> {
             return Ok(());
         }
 
+        // Default: always launch GUI (no more TTY-based fallback to watch mode)
         #[cfg(feature = "gui")]
-        if !is_tty || cli.gui {
-            // Launch GUI when: launched from desktop (non-TTY), OR --gui explicitly passed
+        {
+            println!("Launching GUI. Use --headless for watch/daemon mode.");
             return run_gui(start_minimized);
         }
 
-        // From terminal (TTY): if watch folders are configured, go to watch mode
-        if has_watch_folders {
-            return run_multi_watch_mode(&preloaded_config, &cli);
+        #[cfg(not(feature = "gui"))]
+        {
+            use clap::CommandFactory;
+            Cli::command().print_help()?;
+            println!();
+            println!("No GUI support compiled in. Use --input-file, --input-dir, or --headless with watch folders.");
+            return Ok(());
         }
-
-        // Show help and exit
-        use clap::CommandFactory;
-        Cli::command().print_help()?;
-        println!();
-        println!("Run with --gui to launch the graphical interface.");
-        println!("Run with --headless for daemon/watch mode without GUI.");
-
-        return Ok(());
     }
 
     // Handle --generate-config
