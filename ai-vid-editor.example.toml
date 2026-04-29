@@ -599,6 +599,24 @@ stabilize = false
 # CLI equivalent: --color-correct
 color_correct = false
 
+# Hardware acceleration for video encoding
+#
+# OPTIONS:
+#   "none"         = Software encoding (CPU, default)
+#   "nvenc"         = NVIDIA GPU encoding (fastest on NVIDIA hardware)
+#   "amf"           = AMD GPU encoding (for AMD graphics cards)
+#   "vaapi"         = VAAPI (Linux, Intel/AMD integrated graphics)
+#   "videotoolbox"  = VideoToolbox (macOS, Apple Silicon/Intel)
+#   "auto"          = Automatically detect the best available encoder
+#
+# RECOMMENDED:
+#   "auto" for most users — automatically picks the best option
+#   "nvenc" for fastest NVIDIA encoding
+#
+# NOTE: Only affects video ENCODING (output), not decoding
+# CLI equivalent: --gpu
+hw_accel = "auto"
+
 # =============================================================================
 # WATCH MODE - Automatic Processing
 # =============================================================================
@@ -648,8 +666,9 @@ interval = 5
 # =============================================================================
 # PRESETS - Quick Configuration Templates
 # =============================================================================
-# Instead of configuring everything manually, use a preset
-# Presets override settings in this file
+# Instead of configuring everything manually, use a preset.
+# Presets override settings in this file, but only for fields that differ
+# from their defaults. Your explicit config values are preserved.
 #
 # USAGE:
 #   ai-vid-editor --preset youtube
