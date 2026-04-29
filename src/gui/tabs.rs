@@ -700,7 +700,11 @@ impl App {
             enabled: true,
             settings: FolderSettings {
                 enhance_audio: Some(self.state.setup_enhance),
-                remove_silence: Some(self.state.setup_remove_silence),
+                silence_mode: Some(if self.state.setup_remove_silence {
+                    SilenceMode::Cut
+                } else {
+                    SilenceMode::Keep
+                }),
                 ..Default::default()
             },
         };
