@@ -1810,26 +1810,6 @@ impl App {
 
         needs_save
     }
-    pub(crate) fn draw_settings_metric(
-        ui: &mut egui::Ui,
-        label: &str,
-        value: &str,
-        color: egui::Color32,
-    ) {
-        let bg = egui::Color32::from_rgba_unmultiplied(color.r(), color.g(), color.b(), 24);
-        egui::Frame::NONE
-            .fill(bg)
-            .corner_radius(6.0)
-            .inner_margin(egui::vec2(10.0, 9.0))
-            .stroke(egui::Stroke::new(1.0, color))
-            .show(ui, |ui| {
-                ui.vertical(|ui| {
-                    ui.label(RichText::new(label).size(12.0).color(TEXT_MUTED));
-                    ui.label(RichText::new(value).size(15.0).color(TEXT_PRIMARY).strong());
-                });
-            });
-    }
-
     pub(crate) fn draw_settings_toggle(
         ui: &mut egui::Ui,
         label: &str,
@@ -2027,8 +2007,6 @@ impl App {
             let bg_color = match toast.kind {
                 ToastKind::Success => egui::Color32::from_rgba_unmultiplied(18, 40, 26, bg_alpha),
                 ToastKind::Error => egui::Color32::from_rgba_unmultiplied(45, 16, 16, bg_alpha),
-                ToastKind::Info => egui::Color32::from_rgba_unmultiplied(20, 30, 50, bg_alpha),
-                ToastKind::Warning => egui::Color32::from_rgba_unmultiplied(50, 35, 10, bg_alpha),
             };
 
             egui::Area::new(egui::Id::new(format!("toast_{}", i)))

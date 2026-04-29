@@ -311,11 +311,9 @@ enum QueueStatus {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-enum ToastKind {
+pub(crate) enum ToastKind {
     Success,
     Error,
-    Info,
-    Warning,
 }
 
 #[derive(Debug, Clone)]
@@ -342,8 +340,6 @@ impl Toast {
         match self.kind {
             ToastKind::Success => crate::gui::theme::SUCCESS,
             ToastKind::Error => crate::gui::theme::ERROR,
-            ToastKind::Info => crate::gui::theme::ACCENT_PRIMARY,
-            ToastKind::Warning => crate::gui::theme::WARNING,
         }
     }
 
@@ -351,8 +347,6 @@ impl Toast {
         match self.kind {
             ToastKind::Success => "✓",
             ToastKind::Error => "✗",
-            ToastKind::Info => "ℹ",
-            ToastKind::Warning => "⚠",
         }
     }
 }
@@ -363,14 +357,6 @@ impl AppState {
         if self.toasts.len() > 10 {
             self.toasts.remove(0);
         }
-    }
-
-    fn add_info_toast(&mut self, message: impl Into<String>) {
-        self.add_toast(message, ToastKind::Info);
-    }
-
-    fn add_warning_toast(&mut self, message: impl Into<String>) {
-        self.add_toast(message, ToastKind::Warning);
     }
 }
 
@@ -863,7 +849,7 @@ impl eframe::App for App {
 
             if is_ctrl && ctx.input(|i| i.key_pressed(egui::Key::S)) {
                 self.state.auto_save_config();
-                self.state.add_toast("Config saved", ToastKind::Info);
+                self.state.add_toast("Config saved", ToastKind::Success);
             }
 
             if is_ctrl && ctx.input(|i| i.key_pressed(egui::Key::ArrowLeft)) {
