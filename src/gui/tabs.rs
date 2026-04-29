@@ -939,10 +939,55 @@ impl App {
             let is_processing = self.state.queue_processing
                 || matches!(self.state.status, ProcessingStatus::Processing(_));
 
+            let sidebar_width = 160.0;
+            let spacing = 16.0;
+
+            let available = ui.available_width();
+            let content_width = available - sidebar_width - spacing;
+
             ui.horizontal(|ui| {
-                self.draw_settings_sidebar(ui);
-                ui.add_space(16.0);
-                ui.vertical(|ui| {
+                // Fixed-width sidebar using allocate_ui
+                ui.allocate_ui(egui::vec2(sidebar_width, ui.available_height()), |ui| {
+                    ui.with_layout(egui::Layout::top_down(egui::Align::LEFT), |ui| {
+                        let categories = [
+                            SettingsCategory::Processing,
+                            SettingsCategory::Audio,
+                            SettingsCategory::Video,
+                            SettingsCategory::Exports,
+                            SettingsCategory::Advanced,
+                        ];
+                        for cat in categories {
+                            let is_active = self.state.settings_category == cat;
+                            let label = format!("{} {}", cat.icon(), cat.label());
+                            if ui
+                                .add(egui::Button::new(
+                                    egui::RichText::new(&label).size(14.0).color(if is_active {
+                                        TEXT_PRIMARY
+                                    } else {
+                                        TEXT_SECONDARY
+                                    }),
+                                )
+                                .fill(if is_active { PANEL_BG_LIGHTER } else { PANEL_BG })
+                                .stroke(egui::Stroke::new(
+                                    if is_active { 1.5 } else { 0.0 },
+                                    if is_active { ACCENT_PRIMARY } else { egui::Color32::TRANSPARENT },
+                                ))
+                                .corner_radius(CORNER_RADIUS_SMALL)
+                                .min_size(egui::vec2(sidebar_width - 8.0, 40.0)))
+                                .clicked()
+                            {
+                                self.state.settings_category = cat;
+                            }
+                            ui.add_space(4.0);
+                        }
+                    });
+                });
+
+                ui.add_space(spacing);
+
+                // Content area - fills remaining width
+                ui.allocate_ui(egui::vec2(content_width, ui.available_height()), |ui| {
+                    ui.with_layout(egui::Layout::top_down(egui::Align::LEFT), |ui| {
                         if is_processing {
                             settings_section_frame(false).show(ui, |ui| {
                                 ui.horizontal(|ui| {
@@ -974,6 +1019,7 @@ impl App {
                             }
                         }
                     });
+                });
             });
 
             if needs_save {
