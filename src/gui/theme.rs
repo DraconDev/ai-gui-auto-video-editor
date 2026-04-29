@@ -508,6 +508,10 @@ pub fn preset_badge(preset: &str, ui: &mut egui::Ui) {
         "youtube" => egui::Color32::from_rgb(230, 57, 70),
         "shorts" => egui::Color32::from_rgb(255, 140, 0),
         "podcast" => egui::Color32::from_rgb(100, 149, 237),
+        "tiktok" => egui::Color32::from_rgb(0, 242, 234),
+        "reels" => egui::Color32::from_rgb(225, 48, 108),
+        "twitter" => egui::Color32::from_rgb(29, 161, 242),
+        "minimal" => egui::Color32::from_rgb(150, 150, 150),
         _ => ACCENT_PRIMARY,
     };
     egui::Frame::NONE

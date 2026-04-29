@@ -1,9 +1,10 @@
 # Project State
 
 ## Current Focus
-Add more descriptive UI labels for audio loudness slider and file format import toggles
+Add four new preset badge colors to the UI.
 
 ## Completed
-- [x] Updated "Final audio loudness (YouTube = -14 LUFS)" label to "Loudness in decibels relative to full scale - YouTube = -14 LUFS"
-- [x] Updated "Final Cut Pro XML for DaVinci/Premiere" to "XML file for importing into Final Cut Pro, DaVinci Resolve, or Premiere Pro"
-- [x] Updated "Edit Decision List for Avid/Premiere" to "Edit list for importing into Avid Media Composer or other NLEs"
+- [x] Add TikTok badge color (rgb 0,242,234)
+- [x] Add Reels badge color (rgb 225,48,108)
+- [x] Add Twitter badge color (rgb 29,161,242)
+- [x] Add Minimal badge color (rgb 150,150,150)
