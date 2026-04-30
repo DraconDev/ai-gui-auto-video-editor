@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [13.1.0] - 2026-04-30
+## [13.2.0] - 2026-04-30
 
 ### Fixed (GUI)
 - **Emoji icons rendering as empty boxes**: GUI icons (dropdown chevrons ▲/▼, preset icons 🎬, folder icons 📁, checkmarks ✓, remove buttons ✕) were rendering as empty boxes because egui's default font has no emoji support. Added `configure_emoji_fonts()` that loads Noto Color Emoji (Linux), Apple Color Emoji (macOS), or Segoe UI Emoji (Windows) as a fallback font.
