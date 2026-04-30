@@ -149,4 +149,56 @@ mod tests {
         let accel: HwAccel = Default::default();
         assert_eq!(accel, HwAccel::None);
     }
+
+    #[test]
+    fn test_as_str_roundtrip() {
+        for accel in [
+            HwAccel::None,
+            HwAccel::Nvenc,
+            HwAccel::Amf,
+            HwAccel::Vaapi,
+            HwAccel::VideoToolbox,
+        ] {
+            let s = accel.as_str();
+            let parsed = HwAccel::parse_name(s);
+            assert_eq!(parsed, Some(accel), "roundtrip failed for {:?}", accel);
+        }
+    }
+
+    #[test]
+    fn test_display_names() {
+        assert_eq!(HwAccel::None.display_name(), "None (CPU)");
+        assert_eq!(HwAccel::Nvenc.display_name(), "NVIDIA NVENC");
+        assert_eq!(HwAccel::Amf.display_name(), "AMD AMF");
+        assert_eq!(HwAccel::Vaapi.display_name(), "VAAPI (Linux)");
+        assert_eq!(HwAccel::VideoToolbox.display_name(), "VideoToolbox (macOS)");
+    }
+
+    #[test]
+    fn test_input_args() {
+        assert!(HwAccel::None.input_args().is_empty());
+        assert!(HwAccel::Nvenc.input_args().is_empty());
+        assert_eq!(HwAccel::Vaapi.input_args(), vec!["-hwaccel", "vaapi", "-hwaccel_device", "/dev/dri/renderD128"]);
+        assert_eq!(HwAccel::VideoToolbox.input_args(), vec!["-hwaccel", "videotoolbox"]);
+    }
+
+    #[test]
+    fn test_needs_hwaccel_input() {
+        assert!(!HwAccel::None.needs_hwaccel_input());
+        assert!(!HwAccel::Nvenc.needs_hwaccel_input());
+        assert!(!HwAccel::Amf.needs_hwaccel_input());
+        assert!(HwAccel::Vaapi.needs_hwaccel_input());
+        assert!(HwAccel::VideoToolbox.needs_hwaccel_input());
+    }
+
+    #[test]
+    fn test_parse_name_whitespace() {
+        assert_eq!(HwAccel::parse_name("  nvenc  "), Some(HwAccel::Nvenc));
+        assert_eq!(HwAccel::parse_name("\tvaapi\n"), Some(HwAccel::Vaapi));
+    }
+
+    #[test]
+    fn test_parse_name_empty() {
+        assert_eq!(HwAccel::parse_name(""), Some(HwAccel::None));
+    }
 }

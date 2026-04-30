@@ -560,3 +560,136 @@ fn queue_worker_loop(
 
     let _ = tx.send(QueueEvent::Finished);
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::config::{FolderSettings, SilenceMode};
+    use crate::gui::FolderState;
+
+    fn make_test_folder_state() -> FolderState {
+        FolderState {
+            input: std::path::PathBuf::from("/input"),
+            output: std::path::PathBuf::from("/output"),
+            preset: String::new(),
+            enabled: true,
+            settings: FolderSettings::default(),
+        }
+    }
+
+    #[test]
+    fn test_build_folder_config_defaults_preserve_base() {
+        let base_config = Config::default();
+        let folder = make_test_folder_state();
+
+        let merged = build_folder_config(&base_config, &folder);
+
+        // With no folder overrides, merged should equal base
+        assert_eq!(merged.silence.threshold_db, base_config.silence.threshold_db);
+        assert_eq!(merged.silence.mode, base_config.silence.mode);
+        assert_eq!(merged.audio.enhance, base_config.audio.enhance);
+    }
+
+    #[test]
+    fn test_build_folder_config_silence_mode_override() {
+        let base_config = Config::default();
+        let mut folder = make_test_folder_state();
+        folder.settings.silence_mode = Some(SilenceMode::Speedup);
+
+        let merged = build_folder_config(&base_config, &folder);
+        assert_eq!(merged.silence.mode, SilenceMode::Speedup);
+    }
+
+    #[test]
+    fn test_build_folder_config_legacy_remove_silence_true() {
+        let base_config = Config::default();
+        let mut folder = make_test_folder_state();
+        folder.settings.remove_silence = Some(true);
+        folder.settings.silence_mode = None;
+
+        let merged = build_folder_config(&base_config, &folder);
+        assert_eq!(merged.silence.mode, SilenceMode::Cut);
+    }
+
+    #[test]
+    fn test_build_folder_config_legacy_remove_silence_false() {
+        let base_config = Config::default();
+        let mut folder = make_test_folder_state();
+        folder.settings.remove_silence = Some(false);
+        folder.settings.silence_mode = None;
+
+        let merged = build_folder_config(&base_config, &folder);
+        assert_eq!(merged.silence.mode, SilenceMode::Keep);
+    }
+
+    #[test]
+    fn test_build_folder_config_silence_mode_wins_over_legacy() {
+        let base_config = Config::default();
+        let mut folder = make_test_folder_state();
+        folder.settings.silence_mode = Some(SilenceMode::Speedup);
+        folder.settings.remove_silence = Some(true); // Legacy value should be ignored
+
+        let merged = build_folder_config(&base_config, &folder);
+        assert_eq!(merged.silence.mode, SilenceMode::Speedup);
+    }
+
+    #[test]
+    fn test_build_folder_config_watermark_path() {
+        let base_config = Config::default();
+        let mut folder = make_test_folder_state();
+        folder.settings.watermark_path = Some(std::path::PathBuf::from("/path/to/watermark.png"));
+
+        let merged = build_folder_config(&base_config, &folder);
+        assert_eq!(
+            merged.video.watermark,
+            Some(std::path::PathBuf::from("/path/to/watermark.png"))
+        );
+    }
+
+    #[test]
+    fn test_build_folder_config_music_path() {
+        let base_config = Config::default();
+        let mut folder = make_test_folder_state();
+        folder.settings.music_path = Some(std::path::PathBuf::from("/path/to/music.mp3"));
+
+        let merged = build_folder_config(&base_config, &folder);
+        assert_eq!(
+            merged.paths.music,
+            Some(std::path::PathBuf::from("/path/to/music.mp3"))
+        );
+    }
+
+    #[test]
+    fn test_build_folder_config_threshold_override() {
+        let base_config = Config::default();
+        let mut folder = make_test_folder_state();
+        folder.settings.silence_threshold_db = Some(-50.0);
+
+        let merged = build_folder_config(&base_config, &folder);
+        assert_eq!(merged.silence.threshold_db, -50.0);
+    }
+
+    #[test]
+    fn test_build_folder_config_preset_merge() {
+        let base_config = Config::default();
+        let mut folder = make_test_folder_state();
+        folder.preset = "shorts".to_string();
+
+        let merged = build_folder_config(&base_config, &folder);
+        // Shorts preset should change target resolution to vertical
+        assert_eq!(merged.video.target_resolution, crate::config::VideoResolution::Vertical1080p);
+        // Shorts preset should enable reframe
+        assert!(merged.video.reframe);
+    }
+
+    #[test]
+    fn test_build_folder_config_invalid_preset_ignored() {
+        let base_config = Config::default();
+        let mut folder = make_test_folder_state();
+        folder.preset = "nonexistent_preset".to_string();
+
+        let merged = build_folder_config(&base_config, &folder);
+        // Invalid preset should be ignored, config stays the same
+        assert_eq!(merged.video.target_resolution, base_config.video.target_resolution);
+    }
+}
