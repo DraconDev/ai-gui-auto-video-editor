@@ -228,18 +228,15 @@ mod tests {
     #[test]
     fn test_parse_scene_changes_with_malformed_output() {
         // Test that malformed lines are handled gracefully
-        let ffmpeg_output = r#"
-[Parsed_showinfo_0 @ 0x123] n:0 pts:0 pts_time:1.5
-some random text
-[Parsed_showinfo_0 @ 0x123] n:1 pts:25 pts_time:2.5
-no pts_time here
-[Parsed_showinfo_0 @ 0x123] n:2 pts:50 pts_time:4.0
-"#;
+        // Each line has pts_time: followed by a number
+        let ffmpeg_output = "n:0 pts:0 pts_time:1.5\nsome random text\nn:1 pts:25 pts_time:2.5\nno pts_time here\nn:2 pts:50 pts_time:4.0\n";
         let scenes = parse_scene_changes(ffmpeg_output);
 
-        // Should only get the valid timestamps
-        assert_eq!(scenes.len(), 2);
+        // Should get 3 valid timestamps: 1.5, 2.5, 4.0
+        // Malformed lines without pts_time are skipped
+        assert_eq!(scenes.len(), 3, "Should parse all 3 valid timestamps");
         assert_eq!(scenes[0], 1.5);
         assert_eq!(scenes[1], 2.5);
+        assert_eq!(scenes[2], 4.0);
     }
 }
