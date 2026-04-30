@@ -1300,77 +1300,19 @@ fn configure_dark_theme(ctx: &egui::Context) {
 fn configure_emoji_fonts(ctx: &egui::Context) {
     let mut fonts = egui::FontDefinitions::default();
 
-    // Try to find an emoji font dynamically
-    let mut emoji_loaded = false;
-
-    // 1. Try fontconfig (fc-list) to find any emoji font dynamically
-    #[cfg(target_os = "linux")]
-    {
-        if let Ok(output) = std::process::Command::new("fc-list")
-            .args([":family=Noto Color Emoji:file", ":family=Apple Color Emoji:file"])
-            .output()
-        {
-            let stdout = String::from_utf8_lossy(&output.stdout);
-            for line in stdout.lines() {
-                let path = line.trim();
-                if !path.is_empty()
-                    && std::path::Path::new(path).exists()
-                    && let Ok(bytes) = std::fs::read(path)
-                {
-                    fonts.font_data.insert(
-                        "emoji".to_owned(),
-                        egui::FontData::from_owned(bytes).into(),
-                    );
-                    fonts
-                        .families
-                        .entry(egui::FontFamily::Proportional)
-                        .or_default()
-                        .push("emoji".to_owned());
-                    emoji_loaded = true;
-                    break;
-                }
-            }
-        }
-    }
-
-    // 2. Fallback to known system paths
-    if !emoji_loaded {
-        let emoji_font_paths: &[&str] = &[
-            // Linux (common distro paths)
-            "/usr/share/fonts/noto/NotoColorEmoji.ttf",
-            "/usr/share/fonts/truetype/noto/NotoColorEmoji.ttf",
-            "/usr/share/fonts/opentype/noto/NotoColorEmoji.ttf",
-            // macOS
-            "/System/Library/Fonts/Apple Color Emoji.ttc",
-            "/Library/Fonts/Apple Color Emoji.ttc",
-            // Windows
-            "C:/Windows/Fonts/seguiemj.ttf",
-            "C:/Windows/Fonts/NotoColorEmoji.ttf",
-        ];
-
-        for path in emoji_font_paths {
-            if let Ok(bytes) = std::fs::read(path) {
-                fonts.font_data.insert(
-                    "emoji".to_owned(),
-                    egui::FontData::from_owned(bytes).into(),
-                );
-                fonts
-                    .families
-                    .entry(egui::FontFamily::Proportional)
-                    .or_default()
-                    .push("emoji".to_owned());
-                emoji_loaded = true;
-                break;
-            }
-        }
-    }
-
-    if !emoji_loaded {
-        tracing::warn!(
-            "No emoji font found. GUI icons (dropdowns, buttons, etc.) may render as empty boxes. \
-             Install Noto Color Emoji or Apple Color Emoji for best experience."
-        );
-    }
+    // Embed a minimal emoji font (2.2KB) containing only the icons used in the UI.
+    // Characters included: ⚙⚠✂⬜🎉🎙🎬🐦📁📱📸🔧
+    // Basic symbols (▲▼←→✓✕♪) are covered by the default proportional font.
+    let emoji_font_bytes = include_bytes!("../assets/NotoEmojiSubset.ttf");
+    fonts.font_data.insert(
+        "emoji".to_owned(),
+        egui::FontData::from_static(emoji_font_bytes).into(),
+    );
+    fonts
+        .families
+        .entry(egui::FontFamily::Proportional)
+        .or_default()
+        .push("emoji".to_owned());
 
     ctx.set_fonts(fonts);
 }
