@@ -78,24 +78,24 @@ fn test_build_folder_config_shorts_preset() {
 }
 
 #[test]
-fn test_build_folder_config_remove_silence_true() {
+fn test_build_folder_config_silence_mode_cut() {
     let config = Config::default();
     let mut folder = make_folder_state();
-    folder.settings.remove_silence = Some(true);
+    folder.settings.silence_mode = Some(SilenceMode::Cut);
 
     let result = build_folder_config(&config, &folder);
     assert_eq!(result.silence.mode, SilenceMode::Cut);
-    assert_eq!(result.silence.min_duration, f32::MAX);
+    assert_eq!(result.silence.min_duration, config.silence.min_duration);
 }
 
 #[test]
-fn test_build_folder_config_remove_silence_false() {
+fn test_build_folder_config_silence_mode_keep() {
     let config = Config::default();
     let mut folder = make_folder_state();
-    folder.settings.remove_silence = Some(false);
+    folder.settings.silence_mode = Some(SilenceMode::Keep);
 
     let result = build_folder_config(&config, &folder);
-    assert_eq!(result.silence.mode, SilenceMode::Cut);
+    assert_eq!(result.silence.mode, SilenceMode::Keep);
     assert_eq!(result.silence.min_duration, config.silence.min_duration);
 }
 
@@ -255,7 +255,7 @@ fn test_build_folder_config_all_settings_at_once() {
     let mut folder = make_folder_state();
     folder.preset = "youtube".to_string();
     folder.settings.enhance_audio = Some(false);
-    folder.settings.remove_silence = Some(true);
+    folder.settings.silence_mode = Some(SilenceMode::Cut);
     folder.settings.silence_threshold_db = Some(-50.0);
     folder.settings.target_lufs = Some(-15.0);
     folder.settings.stabilize = Some(true);
@@ -274,7 +274,6 @@ fn test_build_folder_config_all_settings_at_once() {
     let result = build_folder_config(&Config::default(), &folder);
 
     assert_eq!(result.silence.mode, SilenceMode::Cut);
-    assert_eq!(result.silence.min_duration, f32::MAX);
     assert_eq!(result.silence.threshold_db, -50.0);
     assert_eq!(result.audio.enhance, false);
     assert_eq!(result.audio.target_lufs, -15.0);
