@@ -1,10 +1,8 @@
 # Project State
 
 ## Current Focus
-Refactor test setup to use explicit struct initialization and clean up string conversion in tests
+Add MockFfmpegEditorFails for test and fix test audio filter string formatting
 
 ## Completed
-- [x] Initialize BatchProgress with explicit total field in progress.rs test
-- [x] Ignore return value of create_test_video in thumbnail.rs test
-- [x] Convert volume filter string to String type in common test helper
-- [x] Remove unused FolderSettings import in pipeline_integration.rs
+- [x] Added MockFfmpegEditorFails struct with dead‑code attribute and VideoEditor impl
+- [x] Removed unnecessary `.to_string()` conversion in the silence filter configuration

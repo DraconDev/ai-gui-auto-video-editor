@@ -25,7 +25,7 @@ pub fn create_test_video_with_silence(output_path: &std::path::Path, duration_se
             "-i",
             &format!("color=c=black:s=320x240:d={}", duration_secs),
             "-af",
-            &"volume=0:enable='between(t,1,2)+between(t,4,5)'".to_string(),
+            "volume=0:enable='between(t,1,2)+between(t,4,5)'",
             "-c:v",
             "libx264",
             "-c:a",

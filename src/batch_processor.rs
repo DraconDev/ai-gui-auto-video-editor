@@ -1427,6 +1427,7 @@ mod tests {
         }
     }
 
+    #[allow(dead_code)]
     struct MockFfmpegEditorFails;
     impl VideoEditor for MockFfmpegEditorFails {
         fn reframe(
