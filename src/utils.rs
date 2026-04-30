@@ -189,4 +189,185 @@ mod tests {
         assert!(!is_video_file(&txt));
         assert!(!is_video_file(&dir.path().join("nonexistent.mp4")));
     }
+
+    #[test]
+    fn test_is_video_file_case_insensitive() {
+        let dir = tempdir().unwrap();
+        let video_mp4 = dir.path().join("video.MP4");
+        let video_mov = dir.path().join("video.mOv");
+        let video_avi = dir.path().join("video.AVI");
+
+        fs::write(&video_mp4, "x").unwrap();
+        fs::write(&video_mov, "x").unwrap();
+        fs::write(&video_avi, "x").unwrap();
+
+        assert!(is_video_file(&video_mp4), "MP4 should be recognized");
+        assert!(is_video_file(&video_mov), "mOv should be recognized");
+        assert!(is_video_file(&video_avi), "AVI should be recognized");
+    }
+
+    #[test]
+    fn test_escape_ffmpeg_filter_path_simple() {
+        // Simple path without special characters
+        let path = Path::new("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf");
+        let escaped = escape_ffmpeg_filter_path(path);
+
+        assert_eq!(escaped, "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf");
+    }
+
+    #[test]
+    fn test_escape_ffmpeg_filter_path_with_single_quotes() {
+        // Path with single quotes should be escaped
+        let path = Path::new("/path/to/file's/font.ttf");
+        let escaped = escape_ffmpeg_filter_path(path);
+
+        // Single quote should become '\''
+        assert!(
+            escaped.contains("\\'"),
+            "Escaped path should contain escaped single quote"
+        );
+        assert!(
+            !escaped.contains("'") || escaped.contains("\\\\'"),
+            "Unescaped single quotes should not appear"
+        );
+    }
+
+    #[test]
+    fn test_escape_ffmpeg_filter_path_with_backslashes() {
+        // Path with backslashes (Windows paths)
+        let path = Path::new("C:\\Users\\Test\\font.ttf");
+        let escaped = escape_ffmpeg_filter_path(path);
+
+        // Backslashes should be doubled
+        assert!(
+            escaped.contains("\\\\"),
+            "Escaped path should contain doubled backslashes"
+        );
+    }
+
+    #[test]
+    fn test_escape_ffmpeg_filter_path_with_both() {
+        // Path with both quotes and backslashes
+        let path = Path::new("C:\\Users\\Test\\file's.ttf");
+        let escaped = escape_ffmpeg_filter_path(path);
+
+        assert!(
+            escaped.contains("\\\\"),
+            "Should escape backslashes"
+        );
+        assert!(
+            escaped.contains("\\'"),
+            "Should escape single quotes"
+        );
+    }
+
+    #[test]
+    fn test_temp_dir_keeps_path_when_not_dropped() {
+        // Test that TempDir creates the directory
+        let temp = TempDir::new("test").unwrap();
+        let path = temp.path.clone();
+
+        assert!(path.exists(), "TempDir should create the directory");
+        assert!(path.to_string_lossy().contains("test"));
+    }
+
+    #[test]
+    fn test_temp_dir_cleanup_on_drop() {
+        // Test that TempDir removes the directory on drop (unless kept)
+        let temp = TempDir::new("cleanup_test").unwrap();
+        let path = temp.path.clone();
+
+        assert!(path.exists(), "Directory should exist before drop");
+
+        drop(temp);
+
+        assert!(
+            !path.exists(),
+            "TempDir should remove directory on drop"
+        );
+    }
+
+    #[test]
+    fn test_temp_dir_keep() {
+        // Test that .keep() prevents cleanup on drop
+        // Note: we use into_path to get ownership without dropping
+        let temp = TempDir::new("keep_test").unwrap();
+        let path = temp.path.clone();
+
+        temp.keep();
+        let _path = temp.into_path();
+
+        // Directory should still exist because we called keep() and then forgot self
+        // Note: This test may leave temp files behind, but is useful for debugging
+        assert!(
+            path.exists(),
+            "keep() should prevent cleanup when into_path is used"
+        );
+
+        // Manual cleanup
+        let _ = std::fs::remove_dir_all(&path);
+    }
+
+    #[test]
+    fn test_temp_file_cleanup_on_drop() {
+        // Test that TempFile removes the file on drop
+        let temp_dir = tempfile::tempdir().unwrap();
+        let file_path = temp_dir.path().join("test.txt");
+
+        {
+            let temp_file = TempFile::new("test", "txt").unwrap();
+            fs::write(&file_path, "test content").unwrap();
+
+            assert!(file_path.exists(), "File should exist before drop");
+        }
+
+        // File should be removed after TempFile is dropped
+        assert!(!file_path.exists(), "TempFile should remove file on drop");
+    }
+
+    #[test]
+    fn test_find_video_files_nested_directories() {
+        // Test that find_video_files handles deeply nested directories
+        let dir = tempdir().unwrap();
+
+        // Create nested structure
+        let nested = dir.path().join("a/b/c/d");
+        std::fs::create_dir_all(&nested).unwrap();
+
+        let video = nested.join("deep_video.mp4");
+        fs::write(&video, "content").unwrap();
+
+        let found = find_video_files(dir.path()).unwrap();
+        assert_eq!(found.len(), 1);
+        assert!(found[0].ends_with("deep_video.mp4"));
+    }
+
+    #[test]
+    fn test_find_video_files_max_depth() {
+        // Test that find_video_files respects max_depth (10)
+        let dir = tempdir().unwrap();
+
+        // Create a file at depth 15 (beyond max_depth of 10)
+        let mut deep_path = dir.path().to_path_buf();
+        for i in 0..15 {
+            deep_path = deep_path.join(format!("level{}", i));
+        }
+        std::fs::create_dir_all(&deep_path).unwrap();
+        let video = deep_path.join("video.mp4");
+        fs::write(&video, "content").unwrap();
+
+        let found = find_video_files(dir.path()).unwrap();
+
+        // File at depth 15 should NOT be found (exceeds max_depth of 10)
+        let found_names: Vec<_> = found
+            .iter()
+            .filter_map(|p| p.file_name())
+            .filter_map(|n| n.to_str())
+            .collect();
+
+        assert!(
+            !found_names.contains(&"video.mp4"),
+            "Files beyond max_depth (10) should not be found"
+        );
+    }
 }
