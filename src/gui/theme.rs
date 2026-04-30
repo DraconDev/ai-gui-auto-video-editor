@@ -401,12 +401,11 @@ pub fn dropdown_selector<T: PartialEq + Copy>(
                     });
             });
 
-        if ui.input(|i| i.pointer.any_pressed()) {
-            if let Some(pos) = ui.input(|i| i.pointer.interact_pos()) {
-                if !response.rect.contains(pos) {
-                    ui.data_mut(|d| d.insert_temp(popup_id, false));
-                }
-            }
+        if ui.input(|i| i.pointer.any_pressed())
+            && let Some(pos) = ui.input(|i| i.pointer.interact_pos())
+            && !response.rect.contains(pos)
+        {
+            ui.data_mut(|d| d.insert_temp(popup_id, false));
         }
     }
 }

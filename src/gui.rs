@@ -422,22 +422,6 @@ fn join_mode_display(mode: &JoinMode) -> String {
     }
 }
 
-#[allow(dead_code)]
-fn notify_complete(filename: &str) {
-    let _ = notify_rust::Notification::new()
-        .summary("Processing Complete")
-        .body(&format!("{} has been processed", filename))
-        .show();
-}
-
-#[allow(dead_code)]
-fn notify_error(filename: &str, error: &str) {
-    let _ = notify_rust::Notification::new()
-        .summary("Processing Error")
-        .body(&format!("Failed to process {}: {}", filename, error))
-        .show();
-}
-
 impl AppState {
     fn new() -> Self {
         let config = Config::default();
