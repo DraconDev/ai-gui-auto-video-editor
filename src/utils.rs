@@ -248,14 +248,8 @@ mod tests {
         let path = Path::new("C:\\Users\\Test\\file's.ttf");
         let escaped = escape_ffmpeg_filter_path(path);
 
-        assert!(
-            escaped.contains("\\\\"),
-            "Should escape backslashes"
-        );
-        assert!(
-            escaped.contains("\\'"),
-            "Should escape single quotes"
-        );
+        assert!(escaped.contains("\\\\"), "Should escape backslashes");
+        assert!(escaped.contains("\\'"), "Should escape single quotes");
     }
 
     #[test]
@@ -278,10 +272,7 @@ mod tests {
 
         drop(temp);
 
-        assert!(
-            !path.exists(),
-            "TempDir should remove directory on drop"
-        );
+        assert!(!path.exists(), "TempDir should remove directory on drop");
     }
 
     #[test]

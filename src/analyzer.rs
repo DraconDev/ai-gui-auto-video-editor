@@ -157,8 +157,20 @@ more noise
 
         let segments = parse_ffmpeg_silence(output);
         assert_eq!(segments.len(), 2);
-        assert_eq!(segments[0], Segment { start: 1.0, end: 4.0 });
-        assert_eq!(segments[1], Segment { start: 10.0, end: 12.0 });
+        assert_eq!(
+            segments[0],
+            Segment {
+                start: 1.0,
+                end: 4.0
+            }
+        );
+        assert_eq!(
+            segments[1],
+            Segment {
+                start: 10.0,
+                end: 12.0
+            }
+        );
     }
 
     #[test]
@@ -175,7 +187,13 @@ more noise
 
         let segments = parse_ffmpeg_silence(output);
         assert_eq!(segments.len(), 1);
-        assert_eq!(segments[0], Segment { start: 5.0, end: 8.0 });
+        assert_eq!(
+            segments[0],
+            Segment {
+                start: 5.0,
+                end: 8.0
+            }
+        );
     }
 
     #[test]
@@ -186,7 +204,13 @@ more noise
 
         let segments = parse_ffmpeg_silence(output);
         assert_eq!(segments.len(), 1);
-        assert_eq!(segments[0], Segment { start: 3600.5, end: 3605.75 });
+        assert_eq!(
+            segments[0],
+            Segment {
+                start: 3600.5,
+                end: 3605.75
+            }
+        );
     }
 
     #[test]
@@ -199,7 +223,13 @@ more noise
         let segments = parse_ffmpeg_silence(output);
         assert_eq!(segments.len(), 1);
         // Second start overwrites the first, so segment is 2.0-3.0
-        assert_eq!(segments[0], Segment { start: 2.0, end: 3.0 });
+        assert_eq!(
+            segments[0],
+            Segment {
+                start: 2.0,
+                end: 3.0
+            }
+        );
     }
 
     #[test]
@@ -211,7 +241,13 @@ more noise
 
         let segments = parse_ffmpeg_silence(output);
         assert_eq!(segments.len(), 1);
-        assert_eq!(segments[0], Segment { start: 10.0, end: 12.0 });
+        assert_eq!(
+            segments[0],
+            Segment {
+                start: 10.0,
+                end: 12.0
+            }
+        );
     }
 
     #[test]
@@ -222,7 +258,13 @@ more noise
 
         let segments = parse_ffmpeg_silence(output);
         assert_eq!(segments.len(), 1);
-        assert_eq!(segments[0], Segment { start: 5.0, end: 10.0 });
+        assert_eq!(
+            segments[0],
+            Segment {
+                start: 5.0,
+                end: 10.0
+            }
+        );
     }
 
     #[test]
@@ -233,6 +275,12 @@ more noise
 
         let segments = parse_ffmpeg_silence(output);
         assert_eq!(segments.len(), 1);
-        assert_eq!(segments[0], Segment { start: 1.5, end: 4.5 });
+        assert_eq!(
+            segments[0],
+            Segment {
+                start: 1.5,
+                end: 4.5
+            }
+        );
     }
 }

@@ -178,8 +178,19 @@ mod tests {
     fn test_input_args() {
         assert!(HwAccel::None.input_args().is_empty());
         assert!(HwAccel::Nvenc.input_args().is_empty());
-        assert_eq!(HwAccel::Vaapi.input_args(), vec!["-hwaccel", "vaapi", "-hwaccel_device", "/dev/dri/renderD128"]);
-        assert_eq!(HwAccel::VideoToolbox.input_args(), vec!["-hwaccel", "videotoolbox"]);
+        assert_eq!(
+            HwAccel::Vaapi.input_args(),
+            vec![
+                "-hwaccel",
+                "vaapi",
+                "-hwaccel_device",
+                "/dev/dri/renderD128"
+            ]
+        );
+        assert_eq!(
+            HwAccel::VideoToolbox.input_args(),
+            vec!["-hwaccel", "videotoolbox"]
+        );
     }
 
     #[test]

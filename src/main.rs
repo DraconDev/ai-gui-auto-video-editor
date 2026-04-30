@@ -1256,6 +1256,7 @@ fn run_gui(start_minimized: bool) -> Result<()> {
         "AI Video Editor",
         options,
         Box::new(|cc| {
+            configure_emoji_fonts(&cc.egui_ctx);
             configure_dark_theme(&cc.egui_ctx);
             Ok(Box::new(gui::App::new(start_minimized)))
         }),
@@ -1293,6 +1294,41 @@ fn configure_dark_theme(ctx: &egui::Context) {
     style.visuals.window_stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(42, 42, 42));
 
     ctx.set_style(style);
+}
+
+#[cfg(feature = "gui")]
+fn configure_emoji_fonts(ctx: &egui::Context) {
+    let mut fonts = egui::FontDefinitions::default();
+
+    // Try to load a system emoji font for proper rendering of icons (▲, ▼, ✓, 🎬, etc.)
+    let emoji_font_paths: &[&str] = &[
+        // Linux (various distros / Nix)
+        "/nix/store/3krdqqryv2wmsqhmkp49pk841hjww0xm-noto-fonts-color-emoji-2.051/share/fonts/noto/NotoColorEmoji.ttf",
+        "/usr/share/fonts/noto/NotoColorEmoji.ttf",
+        "/usr/share/fonts/truetype/noto/NotoColorEmoji.ttf",
+        "/usr/share/fonts/opentype/noto/NotoColorEmoji.ttf",
+        // macOS
+        "/System/Library/Fonts/Apple Color Emoji.ttc",
+        // Windows
+        "C:/Windows/Fonts/seguiemj.ttf",
+    ];
+
+    for path in emoji_font_paths {
+        if let Ok(bytes) = std::fs::read(path) {
+            fonts
+                .font_data
+                .insert("emoji".to_owned(), egui::FontData::from_owned(bytes).into());
+            // Add emoji as a fallback for proportional text (used by default for UI)
+            fonts
+                .families
+                .entry(egui::FontFamily::Proportional)
+                .or_default()
+                .push("emoji".to_owned());
+            break;
+        }
+    }
+
+    ctx.set_fonts(fonts);
 }
 
 #[cfg(test)]

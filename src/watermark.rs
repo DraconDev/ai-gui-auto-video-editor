@@ -362,7 +362,10 @@ mod tests {
     fn test_watermark_position_all_coords() {
         // Test all position coordinate outputs
         assert_eq!(WatermarkPosition::TopLeft.to_ffmpeg_coords(50, 50), "10:10");
-        assert_eq!(WatermarkPosition::TopRight.to_ffmpeg_coords(50, 50), "W-w-10:10");
+        assert_eq!(
+            WatermarkPosition::TopRight.to_ffmpeg_coords(50, 50),
+            "W-w-10:10"
+        );
         assert_eq!(
             WatermarkPosition::BottomLeft.to_ffmpeg_coords(50, 50),
             "10:H-h-10"
@@ -388,7 +391,10 @@ mod tests {
             WatermarkPosition::parse_name("topleft"),
             Some(WatermarkPosition::TopLeft)
         );
-        assert_eq!(WatermarkPosition::parse_name("tl"), Some(WatermarkPosition::TopLeft));
+        assert_eq!(
+            WatermarkPosition::parse_name("tl"),
+            Some(WatermarkPosition::TopLeft)
+        );
 
         assert_eq!(
             WatermarkPosition::parse_name("top-right"),
@@ -433,7 +439,10 @@ mod tests {
             WatermarkPosition::parse_name("center"),
             Some(WatermarkPosition::Center)
         );
-        assert_eq!(WatermarkPosition::parse_name("c"), Some(WatermarkPosition::Center));
+        assert_eq!(
+            WatermarkPosition::parse_name("c"),
+            Some(WatermarkPosition::Center)
+        );
         assert_eq!(
             WatermarkPosition::parse_name("middle"),
             Some(WatermarkPosition::Center)
@@ -449,18 +458,9 @@ mod tests {
             .replace(':', "\\:")
             .replace('\\', "\\\\");
 
-        assert!(
-            escaped.contains("\\'"),
-            "Apostrophe should be escaped"
-        );
-        assert!(
-            escaped.contains(":"),
-            "Colon should be escaped"
-        );
-        assert!(
-            escaped.contains("\\\\"),
-            "Backslash should be escaped"
-        );
+        assert!(escaped.contains("\\'"), "Apostrophe should be escaped");
+        assert!(escaped.contains(":"), "Colon should be escaped");
+        assert!(escaped.contains("\\\\"), "Backslash should be escaped");
     }
 
     #[test]
@@ -469,18 +469,12 @@ mod tests {
         let positions = [
             (WatermarkPosition::TopLeft, "x=10:y=10"),
             (WatermarkPosition::TopRight, "x=w-text_w-10:y=10"),
-            (
-                WatermarkPosition::BottomLeft,
-                "x=10:y=h-text_h-10",
-            ),
+            (WatermarkPosition::BottomLeft, "x=10:y=h-text_h-10"),
             (
                 WatermarkPosition::BottomRight,
                 "x=w-text_w-10:y=h-text_h-10",
             ),
-            (
-                WatermarkPosition::Center,
-                "x=(w-text_w)/2:y=(h-text_h)/2",
-            ),
+            (WatermarkPosition::Center, "x=(w-text_w)/2:y=(h-text_h)/2"),
         ];
 
         for (position, expected_pos) in positions.iter() {
@@ -506,15 +500,11 @@ mod tests {
         create_test_image(&watermark).expect("ffmpeg not found");
 
         // Test with scale = 0.5 (half size)
-        add_watermark(
-            &video,
-            &watermark,
-            &output,
-            WatermarkPosition::TopLeft,
-            0.5,
-        )
-        .unwrap();
-        assert!(output.exists(), "watermarked output with scale should exist");
+        add_watermark(&video, &watermark, &output, WatermarkPosition::TopLeft, 0.5).unwrap();
+        assert!(
+            output.exists(),
+            "watermarked output with scale should exist"
+        );
 
         // Test with scale = 2.0 (double size)
         let output2 = temp_dir.path().join("output2.mp4");
@@ -526,7 +516,10 @@ mod tests {
             2.0,
         )
         .unwrap();
-        assert!(output2.exists(), "watermarked output with 2x scale should exist");
+        assert!(
+            output2.exists(),
+            "watermarked output with 2x scale should exist"
+        );
     }
 
     #[test]
@@ -548,9 +541,6 @@ mod tests {
             0.8,
         )
         .unwrap();
-        assert!(
-            output.exists(),
-            "text watermarked output should exist"
-        );
+        assert!(output.exists(), "text watermarked output should exist");
     }
 }

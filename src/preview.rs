@@ -159,6 +159,9 @@ mod tests {
 
         // Preview of 2s video with max_duration=5s should work
         generate_preview(&video, &preview, 5.0, 240).unwrap();
-        assert!(preview.exists(), "preview should be generated for short video");
+        assert!(
+            preview.exists(),
+            "preview should be generated for short video"
+        );
     }
 }

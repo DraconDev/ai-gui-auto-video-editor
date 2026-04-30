@@ -1283,7 +1283,10 @@ mod tests {
         assert_eq!(processed[0].end, 2.6);
         // Second segment starts at 2.6 (NOT 2.4!) - this is the bug fix
         assert_eq!(processed[1].start, 2.6);
-        assert!(processed[0].end <= processed[1].start, "Segments must not overlap");
+        assert!(
+            processed[0].end <= processed[1].start,
+            "Segments must not overlap"
+        );
     }
 
     #[test]
@@ -1302,7 +1305,10 @@ mod tests {
         // keep_end = 2.9, cut_end = 2.1, current_pos = max(2.9, 2.1) = 2.9
         assert_eq!(processed[0].end, 2.9);
         assert_eq!(processed[1].start, 2.9);
-        assert!(processed[0].end <= processed[1].start, "Segments must not overlap");
+        assert!(
+            processed[0].end <= processed[1].start,
+            "Segments must not overlap"
+        );
     }
 
     #[test]
@@ -1357,7 +1363,10 @@ mod tests {
         assert_eq!(processed.len(), 2);
         assert_eq!(processed[0].end, 2.0); // keep_end = 2.0 + 0 = 2.0
         assert_eq!(processed[1].start, 3.0); // cut_end = 3.0 - 0 = 3.0
-        assert!(processed[0].end <= processed[1].start, "Segments must not overlap");
+        assert!(
+            processed[0].end <= processed[1].start,
+            "Segments must not overlap"
+        );
     }
 
     #[test]
@@ -1376,7 +1385,10 @@ mod tests {
         assert_eq!(processed.len(), 2);
         assert_eq!(processed[0].end, 2.4);
         assert_eq!(processed[1].start, 2.4);
-        assert!(processed[0].end <= processed[1].start, "Segments must not overlap");
+        assert!(
+            processed[0].end <= processed[1].start,
+            "Segments must not overlap"
+        );
     }
 
     #[test]

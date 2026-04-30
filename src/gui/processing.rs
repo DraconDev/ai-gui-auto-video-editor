@@ -585,7 +585,10 @@ mod tests {
         let merged = build_folder_config(&base_config, &folder);
 
         // With no folder overrides, merged should equal base
-        assert_eq!(merged.silence.threshold_db, base_config.silence.threshold_db);
+        assert_eq!(
+            merged.silence.threshold_db,
+            base_config.silence.threshold_db
+        );
         assert_eq!(merged.silence.mode, base_config.silence.mode);
         assert_eq!(merged.audio.enhance, base_config.audio.enhance);
     }
@@ -677,7 +680,10 @@ mod tests {
 
         let merged = build_folder_config(&base_config, &folder);
         // Shorts preset should change target resolution to vertical
-        assert_eq!(merged.video.target_resolution, crate::config::VideoResolution::Vertical1080p);
+        assert_eq!(
+            merged.video.target_resolution,
+            crate::config::VideoResolution::Vertical1080p
+        );
         // Shorts preset should enable reframe
         assert!(merged.video.reframe);
     }
@@ -690,6 +696,9 @@ mod tests {
 
         let merged = build_folder_config(&base_config, &folder);
         // Invalid preset should be ignored, config stays the same
-        assert_eq!(merged.video.target_resolution, base_config.video.target_resolution);
+        assert_eq!(
+            merged.video.target_resolution,
+            base_config.video.target_resolution
+        );
     }
 }

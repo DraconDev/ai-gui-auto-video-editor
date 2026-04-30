@@ -438,7 +438,10 @@ mod tests {
         let mel_high = hz_to_mel(8000.0_f32);
         assert!(mel_high > 100.0, "high freq should map to high mel");
         let hz_from_mel = mel_to_hz(mel_high);
-        assert!((hz_from_mel - 8000.0).abs() < 10.0, "inverse should be close");
+        assert!(
+            (hz_from_mel - 8000.0).abs() < 10.0,
+            "inverse should be close"
+        );
     }
 
     #[test]

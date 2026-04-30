@@ -470,10 +470,7 @@ mod tests {
         );
         // Self-closing video elements
         let self_closing: usize = content.matches("/>").count();
-        assert!(
-            self_closing > 0,
-            "FCPXML should have self-closing tags"
-        );
+        assert!(self_closing > 0, "FCPXML should have self-closing tags");
 
         // Check duration format
         assert!(
@@ -644,10 +641,7 @@ mod tests {
         );
 
         // Verify trailing newline
-        assert!(
-            content.ends_with('\n'),
-            "SRT should end with newline"
-        );
+        assert!(content.ends_with('\n'), "SRT should end with newline");
 
         Ok(())
     }
@@ -676,10 +670,7 @@ mod tests {
         let content = fs::read_to_string(&output_edl)?;
 
         // Check EDL header format
-        assert!(
-            content.starts_with("TITLE:"),
-            "EDL should start with TITLE"
-        );
+        assert!(content.starts_with("TITLE:"), "EDL should start with TITLE");
         assert!(
             content.contains("FCM: NON-DROP FRAME"),
             "EDL should contain FCM statement"
