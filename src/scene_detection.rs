@@ -165,4 +165,75 @@ mod tests {
         assert_eq!(segments[0].start, 0.0);
         assert_eq!(segments[0].end, 10.0);
     }
+
+    #[test]
+    fn test_scenes_to_segments_single_change() {
+        // Single scene change at the beginning
+        let scenes = vec![2.0];
+        let segments = scenes_to_segments(&scenes, 10.0);
+
+        assert_eq!(segments.len(), 2);
+        assert_eq!(segments[0].start, 0.0);
+        assert_eq!(segments[0].end, 2.0);
+        assert_eq!(segments[1].start, 2.0);
+        assert_eq!(segments[1].end, 10.0);
+    }
+
+    #[test]
+    fn test_scenes_to_segments_at_start() {
+        // Scene change at time 0
+        let scenes = vec![0.0, 5.0];
+        let segments = scenes_to_segments(&scenes, 10.0);
+
+        assert_eq!(segments.len(), 3);
+        assert_eq!(segments[0].start, 0.0);
+        assert_eq!(segments[0].end, 0.0); // Zero-length segment at start
+    }
+
+    #[test]
+    fn test_scenes_to_segments_at_end() {
+        // Scene change at the very end
+        let scenes = vec![5.0, 10.0];
+        let segments = scenes_to_segments(&scenes, 10.0);
+
+        assert_eq!(segments.len(), 3);
+        assert_eq!(segments[2].start, 10.0);
+        assert_eq!(segments[2].end, 10.0); // Zero-length segment at end
+    }
+
+    #[test]
+    fn test_parse_scene_changes_from_ffmpeg_output() {
+        // Simulate FFmpeg showinfo output
+        let ffmpeg_output = r#"
+[Parsed_showinfo_0 @ 0x123] n:0 pts:0 pts_time:0.0
+[Parsed_showinfo_0 @ 0x123] n:1 pts:25 pts_time:1.0
+[Parsed_showinfo_0 @ 0x123] n:2 pts:75 pts_time:3.0
+[Parsed_showinfo_0 @ 0x123] n:3 pts:125 pts_time:5.0
+"#;
+        let scenes = parse_scene_changes(ffmpeg_output);
+
+        assert_eq!(scenes.len(), 4);
+        assert_eq!(scenes[0], 0.0);
+        assert_eq!(scenes[1], 1.0);
+        assert_eq!(scenes[2], 3.0);
+        assert_eq!(scenes[3], 5.0);
+    }
+
+    #[test]
+    fn test_parse_scene_changes_with_malformed_output() {
+        // Test that malformed lines are handled gracefully
+        let ffmpeg_output = r#"
+[Parsed_showinfo_0 @ 0x123] n:0 pts:0 pts_time:1.5
+some random text
+[Parsed_showinfo_0 @ 0x123] n:1 pts:25 pts_time:2.5
+no pts_time here
+[Parsed_showinfo_0 @ 0x123] n:2 pts:50 pts_time:4.0
+"#;
+        let scenes = parse_scene_changes(ffmpeg_output);
+
+        // Should only get the valid timestamps
+        assert_eq!(scenes.len(), 2);
+        assert_eq!(scenes[0], 1.5);
+        assert_eq!(scenes[1], 2.5);
+    }
 }
