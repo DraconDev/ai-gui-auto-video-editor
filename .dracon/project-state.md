@@ -1,8 +1,10 @@
 # Project State
 
-## Current Focus
-Refactor emoji font loading logic to use flattened conditional chain with `let Ok` pattern for improved readability
+## CurrentFocus
+Dynamic emoji font detection with cross‑platform fallback paths and warning logging on Linux/macOS/Windows
 
 ## Completed
-- [x] Refactor emoji font file reading condition from nested if-let to flat `let Ok` chain pattern in `configure_emoji_fonts`
-- [x] Update Cargo.lock to reflect current dependency state
+- [x] Added `fc-list`‑based emoji font search on Linux and fallback paths for macOS/Windows
+- [x] Added `tracing::warn!` when no emoji font is found to aid debugging
+- [x] Updated CHANGELOG.md to reflect the fix under "Fixed (GUI)"
+- [x] Updated Cargo.lock (binary change) reflecting dependency rebuild

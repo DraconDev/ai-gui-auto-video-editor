@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed (GUI)
+- **Dynamic emoji font detection**: Replaced hardcoded Nix store path with `fc-list` fontconfig query on Linux for dynamic emoji font discovery. Added cross-platform fallback paths for macOS and Windows. Added `tracing::warn!` log when no emoji font is found to help users diagnose missing icons.
+
 ## [13.2.0] - 2026-04-30
 
 ### Fixed (GUI)
