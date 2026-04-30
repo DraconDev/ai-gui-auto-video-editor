@@ -1,10 +1,9 @@
 # Project State
 
 ## Current Focus
-Add comprehensive regression tests for `calculate_keep_segments` to prevent segment overlap bugs caused by large padding.
+Adjust test to reflect corrected behavior when large padding skips the speedup segment
 
 ## Completed
-- [x] Introduced multiple unit tests covering padding edge‑cases, zero padding, adjacent silences, and speedup mode overlap handling
-- [x] Updated Cargo.lock to reflect new dependency versions
-- [x] Added tests verifying no overlap after applying padding in Cut and Speedup modes
-- [x] Added tests for extreme padding values and silence duration mismatches
+- [x] Updated test expectation to 2 segments instead of 3
+- [x] Removed redundant overlap assertion for the third segment
+- [x] Updated comments to clarify that speedup segment is skipped when `silence_start > silence_end`

@@ -1381,13 +1381,14 @@ mod tests {
 
     #[test]
     fn test_calculate_keep_segments_speedup_large_padding() {
-        // Same overlap bug can occur in speedup mode
+        // When padding is large, silence_start > silence_end, so speedup segment is skipped
+        // This tests that no overlap occurs in speedup mode with large padding
         let silences = vec![Segment {
             start: 2.0,
             end: 3.0, // 1s silence
         }];
         let duration = 10.0;
-        let padding = 0.6; // large padding
+        let padding = 0.6; // large padding: silence_start=2.6, silence_end=2.4
         let processed = calculate_keep_segments(
             &silences,
             duration,
@@ -1397,16 +1398,13 @@ mod tests {
             0.2, // min_silence_for_speedup = 0.2s
         );
 
-        // Should have 3 segments
-        assert_eq!(processed.len(), 3);
+        // With padding=0.6, silence_start(2.6) > silence_end(2.4), so speedup segment is skipped
+        // Should have 2 segments: before and after silence
+        assert_eq!(processed.len(), 2);
         // Check no overlap
         assert!(
             processed[0].end <= processed[1].start,
             "First and second segments must not overlap"
-        );
-        assert!(
-            processed[1].end <= processed[2].start,
-            "Second and third segments must not overlap"
         );
     }
 }
