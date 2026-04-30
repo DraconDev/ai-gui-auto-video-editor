@@ -143,4 +143,96 @@ mod tests {
         let segments = parse_ffmpeg_silence(output);
         assert_eq!(segments.len(), 0);
     }
+
+    #[test]
+    fn test_parse_silence_malformed_lines_mixed() {
+        // Mix of valid and malformed lines
+        let output = r#"random noise here
+[silencedetect] silence_start: 1.0
+more noise
+[silencedetect] silence_end: 4.0 | silence_duration: 3.0
+[silencedetect] invalid_line: xyz
+[silencedetect] silence_start: 10.0
+[silencedetect] silence_end: 12.0"#;
+
+        let segments = parse_ffmpeg_silence(output);
+        assert_eq!(segments.len(), 2);
+        assert_eq!(segments[0], Segment { start: 1.0, end: 4.0 });
+        assert_eq!(segments[1], Segment { start: 10.0, end: 12.0 });
+    }
+
+    #[test]
+    fn test_parse_silence_empty_output() {
+        let segments = parse_ffmpeg_silence("");
+        assert_eq!(segments.len(), 0);
+    }
+
+    #[test]
+    fn test_parse_silence_extra_noise_after_pipe() {
+        // Extra text after silence_duration should not break parsing
+        let output = r#"[silencedetect] silence_start: 5.0
+[silencedetect] silence_end: 8.0 | silence_duration: 3.0 | extra: stuff"#;
+
+        let segments = parse_ffmpeg_silence(output);
+        assert_eq!(segments.len(), 1);
+        assert_eq!(segments[0], Segment { start: 5.0, end: 8.0 });
+    }
+
+    #[test]
+    fn test_parse_silence_large_float_values() {
+        // Very long timestamps (e.g., hour-long videos)
+        let output = r#"[silencedetect] silence_start: 3600.5
+[silencedetect] silence_end: 3605.75 | silence_duration: 5.25"#;
+
+        let segments = parse_ffmpeg_silence(output);
+        assert_eq!(segments.len(), 1);
+        assert_eq!(segments[0], Segment { start: 3600.5, end: 3605.75 });
+    }
+
+    #[test]
+    fn test_parse_silence_multiple_unmatched_starts() {
+        // Multiple starts without ends - only the last unmatched start should be ignored
+        let output = r#"[silencedetect] silence_start: 1.0
+[silencedetect] silence_start: 2.0
+[silencedetect] silence_end: 3.0 | silence_duration: 1.0"#;
+
+        let segments = parse_ffmpeg_silence(output);
+        assert_eq!(segments.len(), 1);
+        // Second start overwrites the first, so segment is 2.0-3.0
+        assert_eq!(segments[0], Segment { start: 2.0, end: 3.0 });
+    }
+
+    #[test]
+    fn test_parse_silence_end_without_start_then_valid() {
+        // Orphan silence_end followed by valid pair
+        let output = r#"[silencedetect] silence_end: 4.0 | silence_duration: 3.0
+[silencedetect] silence_start: 10.0
+[silencedetect] silence_end: 12.0 | silence_duration: 2.0"#;
+
+        let segments = parse_ffmpeg_silence(output);
+        assert_eq!(segments.len(), 1);
+        assert_eq!(segments[0], Segment { start: 10.0, end: 12.0 });
+    }
+
+    #[test]
+    fn test_parse_silence_no_decimal_points() {
+        // Integer timestamps without decimals
+        let output = r#"[silencedetect] silence_start: 5
+[silencedetect] silence_end: 10 | silence_duration: 5"#;
+
+        let segments = parse_ffmpeg_silence(output);
+        assert_eq!(segments.len(), 1);
+        assert_eq!(segments[0], Segment { start: 5.0, end: 10.0 });
+    }
+
+    #[test]
+    fn test_parse_silence_whitespace_variations() {
+        // Extra whitespace around values
+        let output = r#"[silencedetect] silence_start:   1.5  
+[silencedetect] silence_end:   4.5   | silence_duration: 3.0"#;
+
+        let segments = parse_ffmpeg_silence(output);
+        assert_eq!(segments.len(), 1);
+        assert_eq!(segments[0], Segment { start: 1.5, end: 4.5 });
+    }
 }
