@@ -1506,7 +1506,13 @@ mod tests {
         let input_dir = tempdir()?;
         let output_dir = tempdir()?;
 
-        let video_types = ["video1.mp4", "video2.mov", "video3.avi", "video4.mkv", "video5.webm"];
+        let video_types = [
+            "video1.mp4",
+            "video2.mov",
+            "video3.avi",
+            "video4.mkv",
+            "video5.webm",
+        ];
         for name in &video_types {
             fs::File::create(input_dir.path().join(name))?;
         }

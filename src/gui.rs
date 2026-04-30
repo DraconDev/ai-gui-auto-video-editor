@@ -533,7 +533,8 @@ impl AppState {
 
         // Debounce: only save to disk and restart watcher if 1 second has passed
         let now = std::time::Instant::now();
-        let should_flush = self.last_save_time
+        let should_flush = self
+            .last_save_time
             .map(|t| now.duration_since(t).as_secs() >= 1)
             .unwrap_or(true);
 
@@ -637,10 +638,7 @@ impl AppState {
         let watch_folders: Vec<WatchFolder> = serde_json::from_str(&json)
             .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))?;
 
-        self.folders = watch_folders
-            .iter()
-            .map(|f| f.clone().into())
-            .collect();
+        self.folders = watch_folders.iter().map(|f| f.clone().into()).collect();
         self.selected_folder_idx = 0;
         self.activity_log
             .push(ActivityEntry::simple("Imported config from file", true));
@@ -733,8 +731,10 @@ impl AppState {
                         file_size,
                         duration_secs,
                     ));
-                    self.toasts
-                        .push(Toast::new(format!("{} processed", filename), ToastKind::Success));
+                    self.toasts.push(Toast::new(
+                        format!("{} processed", filename),
+                        ToastKind::Success,
+                    ));
                 }
                 WatcherEvent::Failed { filename, message } => {
                     self.status = ProcessingStatus::Error(message.clone());
@@ -798,8 +798,10 @@ impl AppState {
                             break;
                         }
                     }
-                    self.toasts
-                        .push(Toast::new(format!("{} processed", filename), ToastKind::Success));
+                    self.toasts.push(Toast::new(
+                        format!("{} processed", filename),
+                        ToastKind::Success,
+                    ));
                 }
                 QueueEvent::Failed {
                     filename,
@@ -940,10 +942,7 @@ impl eframe::App for App {
         }
 
         // Adaptive repaint: faster when processing (smooth progress), slower when idle (save CPU)
-        let is_processing = matches!(
-            self.state.status,
-            ProcessingStatus::Processing(_)
-        );
+        let is_processing = matches!(self.state.status, ProcessingStatus::Processing(_));
         if is_processing {
             ctx.request_repaint();
         } else {

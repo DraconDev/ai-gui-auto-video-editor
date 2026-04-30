@@ -461,7 +461,8 @@ fn queue_worker_loop(
             path: file.path.clone(),
         });
 
-        let output_ext = file.path
+        let output_ext = file
+            .path
             .extension()
             .and_then(|e| e.to_str())
             .unwrap_or("mp4");

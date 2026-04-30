@@ -1613,6 +1613,9 @@ enhance = false
     #[test]
     fn test_folder_settings_default_is_default() {
         let settings = FolderSettings::default();
-        assert!(settings.is_default(), "FolderSettings::default() should return true for is_default()");
+        assert!(
+            settings.is_default(),
+            "FolderSettings::default() should return true for is_default()"
+        );
     }
 }

@@ -96,9 +96,7 @@ mod tests {
             ]
             .into_iter()
             .collect(),
-            failed: vec![PathBuf::from("/tmp/video3.avi")]
-                .into_iter()
-                .collect(),
+            failed: vec![PathBuf::from("/tmp/video3.avi")].into_iter().collect(),
         };
 
         let dir = tempdir()?;

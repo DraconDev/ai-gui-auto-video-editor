@@ -5,7 +5,10 @@ use std::path::PathBuf;
 use std::sync::mpsc;
 
 use super::theme::*;
-use super::{ActivityEntry, App, EntryStatus, FolderState, ProcessingStatus, SettingsCategory, SetupStep, Tab, ToastKind};
+use super::{
+    ActivityEntry, App, EntryStatus, FolderState, ProcessingStatus, SettingsCategory, SetupStep,
+    Tab, ToastKind,
+};
 use crate::config::{FolderSettings, JoinMode, SilenceMode, VideoResolution};
 use crate::hwaccel::HwAccel;
 
@@ -789,7 +792,9 @@ impl App {
                     ui.label(label_secondary("Preset"));
                     ui.add_space(3.0);
                     ui.horizontal_wrapped(|ui| {
-                        for preset in &["youtube", "shorts", "podcast", "tiktok", "reels", "twitter", "minimal"] {
+                        for preset in &[
+                            "youtube", "shorts", "podcast", "tiktok", "reels", "twitter", "minimal",
+                        ] {
                             if ui
                                 .add(button_pill(self.state.modal.preset == *preset, *preset))
                                 .clicked()
@@ -905,7 +910,9 @@ impl App {
                                 .strong(),
                         );
                         ui.add_space(8.0);
-                        ui.label(label_muted("Add a folder in the Folders tab to configure settings"));
+                        ui.label(label_muted(
+                            "Add a folder in the Folders tab to configure settings",
+                        ));
                     });
                     ui.add_space(20.0);
                 });
@@ -936,20 +943,32 @@ impl App {
                             let is_active = self.state.settings_category == cat;
                             let label = format!("{} {}", cat.icon(), cat.label());
                             if ui
-                                .add(egui::Button::new(
-                                    egui::RichText::new(&label).size(14.0).color(if is_active {
-                                        TEXT_PRIMARY
+                                .add(
+                                    egui::Button::new(
+                                        egui::RichText::new(&label).size(14.0).color(
+                                            if is_active {
+                                                TEXT_PRIMARY
+                                            } else {
+                                                TEXT_SECONDARY
+                                            },
+                                        ),
+                                    )
+                                    .fill(if is_active {
+                                        PANEL_BG_LIGHTER
                                     } else {
-                                        TEXT_SECONDARY
-                                    }),
+                                        PANEL_BG
+                                    })
+                                    .stroke(egui::Stroke::new(
+                                        if is_active { 1.5 } else { 0.0 },
+                                        if is_active {
+                                            ACCENT_PRIMARY
+                                        } else {
+                                            egui::Color32::TRANSPARENT
+                                        },
+                                    ))
+                                    .corner_radius(CORNER_RADIUS_SMALL)
+                                    .min_size(egui::vec2(sidebar_width - 8.0, 40.0)),
                                 )
-                                .fill(if is_active { PANEL_BG_LIGHTER } else { PANEL_BG })
-                                .stroke(egui::Stroke::new(
-                                    if is_active { 1.5 } else { 0.0 },
-                                    if is_active { ACCENT_PRIMARY } else { egui::Color32::TRANSPARENT },
-                                ))
-                                .corner_radius(CORNER_RADIUS_SMALL)
-                                .min_size(egui::vec2(sidebar_width - 8.0, 40.0)))
                                 .clicked()
                             {
                                 self.state.settings_category = cat;
@@ -967,10 +986,7 @@ impl App {
                         if is_processing {
                             settings_section_frame(false).show(ui, |ui| {
                                 ui.horizontal(|ui| {
-                                    ui.label(
-                                        egui::RichText::new("⚙️")
-                                            .size(14.0),
-                                    );
+                                    ui.label(egui::RichText::new("⚙️").size(14.0));
                                     ui.add_space(6.0);
                                     ui.label(label_muted("Settings locked during processing"));
                                 });
@@ -1009,21 +1025,47 @@ impl App {
         let folder = self.state.folders.get(folder_idx);
 
         let stabilize = folder.and_then(|f| f.settings.stabilize).unwrap_or(false);
-        let color_correct = folder.and_then(|f| f.settings.color_correct).unwrap_or(false);
+        let color_correct = folder
+            .and_then(|f| f.settings.color_correct)
+            .unwrap_or(false);
         let reframe = folder.and_then(|f| f.settings.reframe).unwrap_or(false);
-        let blur = folder.and_then(|f| f.settings.blur_background).unwrap_or(false);
-        let scene_detect = folder.and_then(|f| f.settings.scene_detect).unwrap_or(false);
-        let threshold = folder.and_then(|f| f.settings.silence_threshold_db).unwrap_or(-30.0);
-        let silence_mode = folder.and_then(|f| f.settings.silence_mode).unwrap_or(SilenceMode::Cut);
-        let silence_padding = folder.and_then(|f| f.settings.silence_padding).unwrap_or(0.1);
-        let silence_speedup_factor = folder.and_then(|f| f.settings.silence_speedup_factor).unwrap_or(4.0);
-        let silence_min_duration = folder.and_then(|f| f.settings.silence_min_duration).unwrap_or(0.5);
-        let silence_min_for_speedup = folder.and_then(|f| f.settings.silence_min_silence_for_speedup).unwrap_or(0.5);
-        let silence_scene_threshold = folder.and_then(|f| f.settings.silence_scene_threshold).unwrap_or(0.3);
+        let blur = folder
+            .and_then(|f| f.settings.blur_background)
+            .unwrap_or(false);
+        let scene_detect = folder
+            .and_then(|f| f.settings.scene_detect)
+            .unwrap_or(false);
+        let threshold = folder
+            .and_then(|f| f.settings.silence_threshold_db)
+            .unwrap_or(-30.0);
+        let silence_mode = folder
+            .and_then(|f| f.settings.silence_mode)
+            .unwrap_or(SilenceMode::Cut);
+        let silence_padding = folder
+            .and_then(|f| f.settings.silence_padding)
+            .unwrap_or(0.1);
+        let silence_speedup_factor = folder
+            .and_then(|f| f.settings.silence_speedup_factor)
+            .unwrap_or(4.0);
+        let silence_min_duration = folder
+            .and_then(|f| f.settings.silence_min_duration)
+            .unwrap_or(0.5);
+        let silence_min_for_speedup = folder
+            .and_then(|f| f.settings.silence_min_silence_for_speedup)
+            .unwrap_or(0.5);
+        let silence_scene_threshold = folder
+            .and_then(|f| f.settings.silence_scene_threshold)
+            .unwrap_or(0.3);
 
         ui.label(section_title("Processing"));
         ui.add_space(4.0);
-        ui.add(egui::Label::new(egui::RichText::new("Core video editing: silence removal, stabilization, color correction").size(12.0).color(TEXT_SECONDARY)));
+        ui.add(egui::Label::new(
+            egui::RichText::new(
+                "Core video editing: silence removal, stabilization, color correction",
+            )
+            .size(12.0)
+            .color(TEXT_SECONDARY),
+        ));
         ui.add_space(12.0);
 
         let mut stabilize = stabilize;
@@ -1123,9 +1165,23 @@ impl App {
             SilenceMode::Cut => "Cut",
             SilenceMode::Speedup => "Speed Up",
         };
-        dropdown_selector(ui, &format!("silence_mode_{}", folder_idx), &mut selected_mode, &mode_options, mode_label);
-        ui.add(egui::Label::new(egui::RichText::new("Keep All = no changes. Cut = remove silence. Speed Up = keep but play faster").size(11.0).color(TEXT_SECONDARY)));
-        if selected_mode != silence_mode && let Some(f) = self.state.folders.get_mut(folder_idx) {
+        dropdown_selector(
+            ui,
+            &format!("silence_mode_{}", folder_idx),
+            &mut selected_mode,
+            &mode_options,
+            mode_label,
+        );
+        ui.add(egui::Label::new(
+            egui::RichText::new(
+                "Keep All = no changes. Cut = remove silence. Speed Up = keep but play faster",
+            )
+            .size(11.0)
+            .color(TEXT_SECONDARY),
+        ));
+        if selected_mode != silence_mode
+            && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
             f.settings.silence_mode = Some(selected_mode);
             needs_save = true;
         }
@@ -1229,15 +1285,23 @@ impl App {
         let mut needs_save = false;
         let folder = self.state.folders.get(folder_idx);
 
-        let enhance = folder.and_then(|f| f.settings.enhance_audio).unwrap_or(true);
-        let noise_reduction = folder.and_then(|f| f.settings.noise_reduction).unwrap_or(false);
+        let enhance = folder
+            .and_then(|f| f.settings.enhance_audio)
+            .unwrap_or(true);
+        let noise_reduction = folder
+            .and_then(|f| f.settings.noise_reduction)
+            .unwrap_or(false);
         let lufs = folder.and_then(|f| f.settings.target_lufs).unwrap_or(-14.0);
         let duck_volume = folder.and_then(|f| f.settings.duck_volume).unwrap_or(0.2);
         let music_path = folder.and_then(|f| f.settings.music_path.clone());
 
         ui.label(section_title("Audio"));
         ui.add_space(4.0);
-        ui.add(egui::Label::new(egui::RichText::new("Audio enhancement, noise reduction, background music mixing").size(12.0).color(TEXT_SECONDARY)));
+        ui.add(egui::Label::new(
+            egui::RichText::new("Audio enhancement, noise reduction, background music mixing")
+                .size(12.0)
+                .color(TEXT_SECONDARY),
+        ));
         ui.add_space(12.0);
 
         let mut enhance = enhance;
@@ -1339,7 +1403,9 @@ impl App {
         let mut needs_save = false;
         let folder = self.state.folders.get(folder_idx);
 
-        let hw_accel = folder.and_then(|f| f.settings.hw_accel).unwrap_or(HwAccel::None);
+        let hw_accel = folder
+            .and_then(|f| f.settings.hw_accel)
+            .unwrap_or(HwAccel::None);
         let target_res = folder
             .and_then(|f| f.settings.target_resolution)
             .unwrap_or(VideoResolution::Fhd1080p);
@@ -1347,11 +1413,17 @@ impl App {
         let watermark_position = folder
             .and_then(|f| f.settings.watermark_position.clone())
             .unwrap_or_else(|| "bottom-right".to_string());
-        let watermark_scale = folder.and_then(|f| f.settings.watermark_scale).unwrap_or(1.0);
+        let watermark_scale = folder
+            .and_then(|f| f.settings.watermark_scale)
+            .unwrap_or(1.0);
 
         ui.label(section_title("Video Output"));
         ui.add_space(4.0);
-        ui.add(egui::Label::new(egui::RichText::new("Output resolution, GPU encoding, watermark overlay").size(12.0).color(TEXT_SECONDARY)));
+        ui.add(egui::Label::new(
+            egui::RichText::new("Output resolution, GPU encoding, watermark overlay")
+                .size(12.0)
+                .color(TEXT_SECONDARY),
+        ));
         ui.add_space(12.0);
 
         ui.label(label_secondary("GPU Encoding"));
@@ -1387,7 +1459,10 @@ impl App {
             (String::from("1080p Full HD"), VideoResolution::Fhd1080p),
             (String::from("1440p QHD"), VideoResolution::Qhd1440p),
             (String::from("4K UHD"), VideoResolution::Uhd4k),
-            (String::from("1080p Vertical"), VideoResolution::Vertical1080p),
+            (
+                String::from("1080p Vertical"),
+                VideoResolution::Vertical1080p,
+            ),
             (String::from("720p Vertical"), VideoResolution::Vertical720p),
         ];
         let mut selected_res = target_res;
@@ -1421,9 +1496,7 @@ impl App {
             ui.label(label_muted(&watermark_label));
             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                 if ui.add(button_small("Choose PNG...")).clicked()
-                    && let Some(path) = FileDialog::new()
-                        .add_filter("Image", &["png"])
-                        .pick_file()
+                    && let Some(path) = FileDialog::new().add_filter("Image", &["png"]).pick_file()
                     && let Some(f) = self.state.folders.get_mut(folder_idx)
                 {
                     f.settings.watermark_path = Some(path);
@@ -1490,19 +1563,33 @@ impl App {
         let captions = folder.and_then(|f| f.settings.captions).unwrap_or(false);
         let clips = folder.and_then(|f| f.settings.clips).unwrap_or(false);
         let preview = folder.and_then(|f| f.settings.preview).unwrap_or(false);
-        let multi_format = folder.and_then(|f| f.settings.multi_format).unwrap_or(false);
-        let extra_resolutions = folder.and_then(|f| f.settings.extra_resolutions.clone()).unwrap_or_default();
+        let multi_format = folder
+            .and_then(|f| f.settings.multi_format)
+            .unwrap_or(false);
+        let extra_resolutions = folder
+            .and_then(|f| f.settings.extra_resolutions.clone())
+            .unwrap_or_default();
         let fcpxml = folder.and_then(|f| f.settings.fcpxml).unwrap_or(false);
         let edl = folder.and_then(|f| f.settings.edl).unwrap_or(false);
         let thumbnail = folder.and_then(|f| f.settings.thumbnail).unwrap_or(false);
-        let filler_words = folder.and_then(|f| f.settings.filler_words).unwrap_or(false);
+        let filler_words = folder
+            .and_then(|f| f.settings.filler_words)
+            .unwrap_or(false);
         let clip_count = folder.and_then(|f| f.settings.clip_count).unwrap_or(3);
-        let clip_min_duration = folder.and_then(|f| f.settings.clip_min_duration).unwrap_or(15.0);
-        let clip_max_duration = folder.and_then(|f| f.settings.clip_max_duration).unwrap_or(60.0);
+        let clip_min_duration = folder
+            .and_then(|f| f.settings.clip_min_duration)
+            .unwrap_or(15.0);
+        let clip_max_duration = folder
+            .and_then(|f| f.settings.clip_max_duration)
+            .unwrap_or(60.0);
 
         ui.label(section_title("Exports"));
         ui.add_space(4.0);
-        ui.add(egui::Label::new(egui::RichText::new("Generate subtitles, chapters, clips, and additional formats").size(12.0).color(TEXT_SECONDARY)));
+        ui.add(egui::Label::new(
+            egui::RichText::new("Generate subtitles, chapters, clips, and additional formats")
+                .size(12.0)
+                .color(TEXT_SECONDARY),
+        ));
         ui.add_space(12.0);
 
         let mut subtitles = subtitles;
@@ -1729,12 +1816,20 @@ impl App {
 
         let intro_path = folder.and_then(|f| f.settings.intro_path.clone());
         let outro_path = folder.and_then(|f| f.settings.outro_path.clone());
-        let join_mode = folder.and_then(|f| f.settings.join_mode).unwrap_or(JoinMode::Off);
-        let join_after_count = folder.and_then(|f| f.settings.join_after_count).unwrap_or(5);
+        let join_mode = folder
+            .and_then(|f| f.settings.join_mode)
+            .unwrap_or(JoinMode::Off);
+        let join_after_count = folder
+            .and_then(|f| f.settings.join_after_count)
+            .unwrap_or(5);
 
         ui.label(section_title("Advanced"));
         ui.add_space(4.0);
-        ui.add(egui::Label::new(egui::RichText::new("Fine-tune silence detection, add intro/outro videos").size(12.0).color(TEXT_SECONDARY)));
+        ui.add(egui::Label::new(
+            egui::RichText::new("Fine-tune silence detection, add intro/outro videos")
+                .size(12.0)
+                .color(TEXT_SECONDARY),
+        ));
         ui.add_space(12.0);
 
         ui.label(section_title("Intro / Outro"));
@@ -1820,9 +1915,21 @@ impl App {
             JoinMode::ByName => "By Name",
             JoinMode::AfterCount => "After Count",
         };
-        dropdown_selector(ui, &format!("join_mode_{}", folder_idx), &mut selected_mode, &mode_options, mode_label);
-        ui.add(egui::Label::new(egui::RichText::new("Off = no joining. After Count = join every N videos.").size(11.0).color(TEXT_SECONDARY)));
-        if selected_mode != join_mode && let Some(f) = self.state.folders.get_mut(folder_idx) {
+        dropdown_selector(
+            ui,
+            &format!("join_mode_{}", folder_idx),
+            &mut selected_mode,
+            &mode_options,
+            mode_label,
+        );
+        ui.add(egui::Label::new(
+            egui::RichText::new("Off = no joining. After Count = join every N videos.")
+                .size(11.0)
+                .color(TEXT_SECONDARY),
+        ));
+        if selected_mode != join_mode
+            && let Some(f) = self.state.folders.get_mut(folder_idx)
+        {
             f.settings.join_mode = Some(selected_mode);
             needs_save = true;
         }
@@ -1839,7 +1946,8 @@ impl App {
                 2.0..=20.0,
                 count_label,
                 1.0,
-            ) && let Some(f) = self.state.folders.get_mut(folder_idx) {
+            ) && let Some(f) = self.state.folders.get_mut(folder_idx)
+            {
                 f.settings.join_after_count = Some(count as u32);
                 needs_save = true;
             }
@@ -1880,7 +1988,8 @@ impl App {
                 ui.painter()
                     .circle_filled(dot_rect.center(), 3.5, dot_color);
                 ui.add_space(6.0);
-                let label_widget = ui.label(RichText::new(label).color(TEXT_PRIMARY).size(15.0).strong());
+                let label_widget =
+                    ui.label(RichText::new(label).color(TEXT_PRIMARY).size(15.0).strong());
                 label_widget.on_hover_text(help_text);
                 ui.add_space(8.0);
                 let help_widget = ui.label(label_muted(help_text));
@@ -2049,7 +2158,10 @@ impl App {
 
             let toast_id = egui::Id::new(format!("toast_{}", i));
             let response = egui::Area::new(toast_id)
-                .anchor(egui::Align2::RIGHT_BOTTOM, egui::vec2(-20.0, -20.0 - stack_y))
+                .anchor(
+                    egui::Align2::RIGHT_BOTTOM,
+                    egui::vec2(-20.0, -20.0 - stack_y),
+                )
                 .interactable(true)
                 .show(ctx, |ui| {
                     egui::Frame::NONE
@@ -2068,22 +2180,24 @@ impl App {
                         .show(ui, |ui| {
                             ui.set_width(300.0);
                             ui.horizontal(|ui| {
-                                ui.label(
-                                    egui::RichText::new(icon)
-                                        .size(16.0)
-                                        .color(color),
-                                );
+                                ui.label(egui::RichText::new(icon).size(16.0).color(color));
                                 ui.add_space(8.0);
                                 ui.label(
                                     egui::RichText::new(&toast.message)
                                         .size(13.0)
                                         .color(TEXT_PRIMARY),
                                 );
-                                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                                    if ui.add(egui::Button::new("×").small().frame(false)).clicked() {
-                                        dismiss_indices.push(i);
-                                    }
-                                });
+                                ui.with_layout(
+                                    egui::Layout::right_to_left(egui::Align::Center),
+                                    |ui| {
+                                        if ui
+                                            .add(egui::Button::new("×").small().frame(false))
+                                            .clicked()
+                                        {
+                                            dismiss_indices.push(i);
+                                        }
+                                    },
+                                );
                             });
 
                             let remaining = 5.0 - elapsed;
@@ -2131,9 +2245,11 @@ impl App {
                             .pick_file()
                     {
                         if let Err(e) = self.state.import_config_from(&path) {
-                            self.state.add_toast(format!("Import failed: {}", e), ToastKind::Error);
+                            self.state
+                                .add_toast(format!("Import failed: {}", e), ToastKind::Error);
                         } else {
-                            self.state.add_toast("Config imported successfully", ToastKind::Success);
+                            self.state
+                                .add_toast("Config imported successfully", ToastKind::Success);
                         }
                     }
                     if ui.add(button_small("Export")).clicked()
@@ -2142,9 +2258,11 @@ impl App {
                             .save_file()
                     {
                         if let Err(e) = self.state.export_config_to(&path) {
-                            self.state.add_toast(format!("Export failed: {}", e), ToastKind::Error);
+                            self.state
+                                .add_toast(format!("Export failed: {}", e), ToastKind::Error);
                         } else {
-                            self.state.add_toast("Config exported successfully", ToastKind::Success);
+                            self.state
+                                .add_toast("Config exported successfully", ToastKind::Success);
                         }
                     }
                     if ui.add(button_small("Clear")).clicked() {
@@ -2228,9 +2346,8 @@ impl App {
                                 let preset = folder
                                     .map(|f| f.preset.clone())
                                     .unwrap_or_else(|| "youtube".to_string());
-                                let settings = folder
-                                    .map(|f| f.settings.clone())
-                                    .unwrap_or_default();
+                                let settings =
+                                    folder.map(|f| f.settings.clone()).unwrap_or_default();
                                 self.state.batch_queue.push(super::QueuedFile {
                                     path,
                                     output_dir,

@@ -405,7 +405,9 @@ fn main() -> Result<()> {
             use clap::CommandFactory;
             Cli::command().print_help()?;
             println!();
-            println!("No GUI support compiled in. Use --input-file, --input-dir, or --headless with watch folders.");
+            println!(
+                "No GUI support compiled in. Use --input-file, --input-dir, or --headless with watch folders."
+            );
             return Ok(());
         }
     }
