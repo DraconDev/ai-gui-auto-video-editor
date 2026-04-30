@@ -219,7 +219,7 @@ mod tests {
         let temp_dir = tempfile::tempdir().unwrap();
         let video = temp_dir.path().join("input.mp4");
         let frame = temp_dir.path().join("frame.jpg");
-        create_test_video(&video, 3.0);
+        let _ = create_test_video(&video, 3.0);
 
         extract_frame_at_time(&video, &frame, 320, 180, 1.5).unwrap();
         assert!(frame.exists(), "frame should be extracted");

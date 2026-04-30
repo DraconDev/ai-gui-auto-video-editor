@@ -4,7 +4,7 @@ use ai_vid_editor::FfmpegAnalyzer;
 use ai_vid_editor::FfmpegEditor;
 use ai_vid_editor::analyzer::ProcessedSegment;
 use ai_vid_editor::analyzer::VideoAnalyzer;
-use ai_vid_editor::config::{Config, FolderSettings, VideoResolution};
+use ai_vid_editor::config::{Config, VideoResolution};
 use ai_vid_editor::editor::VideoEditor;
 use ai_vid_editor::exporter;
 use ai_vid_editor::preview;

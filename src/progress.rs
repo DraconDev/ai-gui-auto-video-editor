@@ -113,8 +113,7 @@ mod tests {
 
     #[test]
     fn test_progress_remaining_calculation() {
-        let mut progress = BatchProgress::default();
-        progress.total = 10;
+        let mut progress = BatchProgress { total: 10, ..Default::default() };
 
         assert_eq!(progress.remaining(), 10);
 
