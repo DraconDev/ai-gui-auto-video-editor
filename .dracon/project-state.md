@@ -1,12 +1,11 @@
 # Project State
 
 ## Current Focus
-Enhanced audio and scene processing with comprehensive unit tests for edge cases and robustness.
+Add emoji font configuration for GUI and expand test coverage across modules.
 
 ## Completed
-- [x] Added extensive unit tests for `parse_ffmpeg_silence` to handle various edge cases and validate returned segments.
-- [x] Improved test coverage for `merge_silences_and_scenes` by adding cases for empty scenes, overlapping silences, and extending scene boundaries.
-- [x] Refactored test fixtures to ensure comprehensive edge case validation for critical functions.
-- [x] Updated thumbnail parsing and generation tests to accurately reflect edge cases.
-- [x] Corrected unit tests for `merge_silences_and_scenes` to reflect accurate output of merged segments.
-- [x] Expanded unit tests for scene detection functions to handle zero-length segments and other edge cases.
+- [x] fix(gui): render emoji icons by loading platform‑specific emoji fonts via `configure_emoji_fonts()`
+- [x] feat(tests): add 53 new unit tests covering edge cases in analyzer, batch_processor, thumbnail, gui, hwaccel, ml, exporter, watermark, editor, utils, scene_detection, preset_rules, preview, stt_analyzer
+- [x] feat(tests): add integration tests for legacy `remove_silence` → `silence_mode` migration
+- [x] fix(security): escape FFmpeg filter paths to prevent command injection
+- [x] chore(bundler): update Cargo.lock after dependency rebuild

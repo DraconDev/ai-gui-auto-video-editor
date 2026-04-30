@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [13.1.0] - 2026-04-30
+
+### Fixed (GUI)
+- **Emoji icons rendering as empty boxes**: GUI icons (dropdown chevrons ▲/▼, preset icons 🎬, folder icons 📁, checkmarks ✓, remove buttons ✕) were rendering as empty boxes because egui's default font has no emoji support. Added `configure_emoji_fonts()` that loads Noto Color Emoji (Linux), Apple Color Emoji (macOS), or Segoe UI Emoji (Windows) as a fallback font.
+
+### Added (Tests)
+- **Comprehensive test expansion**: Added 53 new tests across previously under-tested modules:
+  - `analyzer.rs` (+8): Silence parser edge cases (malformed lines, empty output, large floats, unmatched starts/ends, integer timestamps, whitespace)
+  - `batch_processor.rs` (+6): `merge_silences_and_scenes` behavior (empty inputs, overlapping, boundary extension, no overlap)
+  - `thumbnail.rs` (+4): `parse_entropy` edge cases (negative values, multiple colons, zero), frame extraction at time 0
+  - `gui/processing.rs` (+10): `build_folder_config` field mapping, legacy `remove_silence` migration, preset merge, watermark/music path resolution
+  - `hwaccel.rs` (+6): Roundtrip parsing, display names, input args, `needs_hwaccel_input`, empty/whitespace edge cases
+  - `ml.rs` (+6): `CropRegion::from_face` guard tests (zero/negative/infinite aspect), `center_crop_9_16` wide/narrow/zero video
+  - `exporter.rs` (+10): FCPXML escaping, SRT timestamps, EDL structure, YouTube chapters
+  - `watermark.rs` (+6): Filter string generation, position math, scaling, font path escaping
+  - `editor.rs` (+7): Padding overlap regression tests
+  - `utils.rs` (+10): Path utilities, escaping, temp RAII cleanup
+  - `scene_detection.rs` (+5): Parsing and threshold sensitivity
+  - `preset_rules.rs` (+8): Filename matching with default rules
+  - `preview.rs` (+5): Resolution and extension handling
+  - `stt_analyzer.rs` (+5): Mel filterbank dimensions and segment handling
+- **Integration tests**: Migration logic tests for legacy `remove_silence` → `silence_mode` transition
+
 ### Security (Critical)
 - **Command injection in FFmpeg filters**: Paths in `subtitles=`, `vidstab=`, and `drawtext=` filter strings were interpolated directly without escaping single quotes. A malicious filename containing `'` could inject arbitrary FFmpeg filter commands. Fixed by adding `escape_ffmpeg_filter_path()` in `utils.rs` that escapes `\`, `'`.
 
