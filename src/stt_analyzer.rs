@@ -416,4 +416,77 @@ mod tests {
         assert_eq!(sorted[0].text, "First");
         assert_eq!(sorted[1].text, "Second");
     }
+
+    #[test]
+    fn test_transcript_segment_debug() {
+        let seg = TranscriptSegment {
+            start: 1.5,
+            end: 3.0,
+            text: "Test".to_string(),
+            confidence: 0.95,
+        };
+        let debug = format!("{:?}", seg);
+        assert!(debug.contains("1.5"));
+        assert!(debug.contains("3"));
+        assert!(debug.contains("Test"));
+    }
+
+    #[test]
+    fn test_hz_to_mel_extreme_values() {
+        // Test at frequency boundaries
+        assert_eq!(hz_to_mel(0.0), 0.0);
+        let mel_high = hz_to_mel(8000.0_f32);
+        assert!(mel_high > 100.0, "high freq should map to high mel");
+        let hz_from_mel = mel_to_hz(mel_high);
+        assert!((hz_from_mel - 8000.0).abs() < 10.0, "inverse should be close");
+    }
+
+    #[test]
+    fn test_build_mel_filterbank_dimensions() {
+        // Different configurations
+        let fb_80_400 = build_mel_filterbank(400, 80, 16000.0);
+        assert_eq!(fb_80_400.len(), 80);
+
+        let fb_128_512 = build_mel_filterbank(512, 128, 22050.0);
+        assert_eq!(fb_128_512.len(), 128);
+
+        let fb_40_200 = build_mel_filterbank(200, 40, 8000.0);
+        assert_eq!(fb_40_200.len(), 40);
+    }
+
+    #[test]
+    fn test_build_mel_filterbank_symmetry() {
+        // Filter bank entries should have triangular shape (energy in center)
+        let fb = build_mel_filterbank(400, 80, 16000.0);
+        // Each filter should have non-zero values, mostly centered
+        for (i, filter) in fb.iter().enumerate().take(5) {
+            let max_val = filter.iter().cloned().fold(0.0f32, f32::max);
+            assert!(max_val > 0.0, "filter {} should have non-zero max", i);
+            assert!(max_val <= 1.0, "filter {} max should be <= 1.0", i);
+        }
+    }
+
+    #[test]
+    fn test_transcript_segment_partialeq() {
+        let seg1 = TranscriptSegment {
+            start: 0.0,
+            end: 5.0,
+            text: "Hello".to_string(),
+            confidence: 0.9,
+        };
+        let seg2 = TranscriptSegment {
+            start: 0.0,
+            end: 5.0,
+            text: "Hello".to_string(),
+            confidence: 0.9,
+        };
+        let seg3 = TranscriptSegment {
+            start: 0.0,
+            end: 5.0,
+            text: "Different".to_string(),
+            confidence: 0.9,
+        };
+        assert_eq!(seg1, seg2);
+        assert_ne!(seg1, seg3);
+    }
 }

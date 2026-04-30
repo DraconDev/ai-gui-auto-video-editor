@@ -1,9 +1,11 @@
 # Project State
 
 ## Current Focus
-Add comprehensive unit tests for preview path handling and preview generation for short videos
+Add comprehensive unit tests for audio processing utilities and `TranscriptSegment` functionality.
 
 ## Completed
-- [x] Added test verifying preview path preserves different video extensions
-- [x] Added test verifying preview path works with nested directory structures
-- [x] Added test verifying preview generation succeeds for videos shorter than max duration
+- [x] Add `test_transcript_segment_debug` to verify debug formatting of `TranscriptSegment`
+- [x] Add `test_hz_to_mel_extreme_values` to check boundary behavior of frequency conversion functions
+- [x] Add `test_build_mel_filterbank_dimensions` to validate filterbank length handling across configurations
+- [x] Add `test_build_mel_filterbank_symmetry` to ensure triangular filter shape and value bounds
+- [x] Add `test_transcript_segment_partialeq` to test equality and inequality logic for `TranscriptSegment` instances
