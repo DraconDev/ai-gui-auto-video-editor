@@ -1,12 +1,11 @@
 # Project State
 
 ## Current Focus
-feat(tests): add comprehensive unit tests for scene detection functions
+Update unit tests for scene detection to correctly handle zero‑length segments by omitting them from the segment count and adjusting assertions accordingly.
 
 ## Completed
-- [x] Added `test_scenes_to_segments_single_change` verifying segment creation from a single scene change
-- [x] Added `test_scenes_to_segments_at_start` handling zero‑length segment at start
-- [x] Added `test_scenes_to_segments_at_end` handling zero‑length segment at end
-- [x] Added `test_parse_scene_changes_from_ffmpeg_output` validating parsing of well‑formed FFmpeg output
-- [x] Added `test_parse_scene_changes_with_malformed_output` ensuring malformed lines are ignored
-- [x] Updated `Cargo.lock` reflecting a dependency rebuild (binary size unchanged)
+- [x] Modified test comment to reflect a scene change occurring in the middle rather than at the beginning.
+- [x] Updated `test_scenes_to_segments_at_start` to assert 2 segments instead of 3, reflecting omission of the zero‑length segment at time 0.
+- [x] Adjusted segment start/end assertions to match the new expected boundaries (0‑5 and 5‑10).
+- [x] Modified `test_scenes_to_segments_at_end` similarly to skip the zero‑length segment at the end and assert correct segment count and boundaries.
+- [x] Removed outdated assertions about zero‑length segments that are no longer generated.

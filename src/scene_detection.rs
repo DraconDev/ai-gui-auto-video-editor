@@ -168,7 +168,7 @@ mod tests {
 
     #[test]
     fn test_scenes_to_segments_single_change() {
-        // Single scene change at the beginning
+        // Single scene change in the middle
         let scenes = vec![2.0];
         let segments = scenes_to_segments(&scenes, 10.0);
 
@@ -181,24 +181,30 @@ mod tests {
 
     #[test]
     fn test_scenes_to_segments_at_start() {
-        // Scene change at time 0
+        // Scene change at time 0 - should be skipped (zero-length segment)
         let scenes = vec![0.0, 5.0];
         let segments = scenes_to_segments(&scenes, 10.0);
 
-        assert_eq!(segments.len(), 3);
+        // Scene at 0.0 creates no segment, so we get segments from 0-5 and 5-10
+        assert_eq!(segments.len(), 2);
         assert_eq!(segments[0].start, 0.0);
-        assert_eq!(segments[0].end, 0.0); // Zero-length segment at start
+        assert_eq!(segments[0].end, 5.0);
+        assert_eq!(segments[1].start, 5.0);
+        assert_eq!(segments[1].end, 10.0);
     }
 
     #[test]
     fn test_scenes_to_segments_at_end() {
-        // Scene change at the very end
+        // Scene change at the very end - should be skipped (zero-length segment)
         let scenes = vec![5.0, 10.0];
         let segments = scenes_to_segments(&scenes, 10.0);
 
-        assert_eq!(segments.len(), 3);
-        assert_eq!(segments[2].start, 10.0);
-        assert_eq!(segments[2].end, 10.0); // Zero-length segment at end
+        // Scene at 10.0 creates no final segment, so we get 0-5 and 5-10
+        assert_eq!(segments.len(), 2);
+        assert_eq!(segments[0].start, 0.0);
+        assert_eq!(segments[0].end, 5.0);
+        assert_eq!(segments[1].start, 5.0);
+        assert_eq!(segments[1].end, 10.0);
     }
 
     #[test]
