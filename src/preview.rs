@@ -120,4 +120,45 @@ mod tests {
         let preview = preview_path(output);
         assert_eq!(preview, PathBuf::from("/tmp/video_preview.mp4"));
     }
+
+    #[test]
+    fn test_preview_path_different_extensions() {
+        // Test with different video extensions - preview keeps original extension
+        assert_eq!(
+            preview_path(Path::new("/tmp/video.mov")),
+            PathBuf::from("/tmp/video_preview.mov")
+        );
+        assert_eq!(
+            preview_path(Path::new("/tmp/video.avi")),
+            PathBuf::from("/tmp/video_preview.avi")
+        );
+        assert_eq!(
+            preview_path(Path::new("/tmp/video.mkv")),
+            PathBuf::from("/tmp/video_preview.mkv")
+        );
+    }
+
+    #[test]
+    fn test_preview_path_nested() {
+        // Test with nested path
+        let output = Path::new("/home/user/videos/project/video.mp4");
+        let preview = preview_path(output);
+        assert_eq!(
+            preview,
+            PathBuf::from("/home/user/videos/project/video_preview.mp4")
+        );
+    }
+
+    #[test]
+    fn test_generate_preview_short_video() {
+        // Test generating preview from a short video (shorter than max_duration)
+        let temp_dir = tempfile::tempdir().unwrap();
+        let video = temp_dir.path().join("input.mp4");
+        let preview = temp_dir.path().join("preview.mp4");
+        create_test_video(&video, 2.0).expect("ffmpeg not found");
+
+        // Preview of 2s video with max_duration=5s should work
+        generate_preview(&video, &preview, 5.0, 240).unwrap();
+        assert!(preview.exists(), "preview should be generated for short video");
+    }
 }
