@@ -69,12 +69,12 @@ fn test_build_folder_config_shorts_preset() {
     let result = build_folder_config(&config, &folder);
     assert_eq!(result.silence.mode, SilenceMode::Speedup);
     assert_eq!(result.silence.speedup_factor, 3.0);
-    assert_eq!(result.video.reframe, true);
+    assert!(result.video.reframe);
     assert_eq!(
         result.video.target_resolution,
         VideoResolution::Vertical1080p
     );
-    assert_eq!(result.export.clips, true);
+    assert!(result.export.clips);
 }
 
 #[test]
@@ -117,7 +117,7 @@ fn test_build_folder_config_enhance_audio_override() {
     folder.settings.enhance_audio = Some(false);
 
     let result = build_folder_config(&Config::default(), &folder);
-    assert_eq!(result.audio.enhance, false);
+    assert!(!result.audio.enhance);
 }
 
 #[test]
@@ -135,7 +135,7 @@ fn test_build_folder_config_stabilize_override() {
     folder.settings.stabilize = Some(true);
 
     let result = build_folder_config(&Config::default(), &folder);
-    assert_eq!(result.video.stabilize, true);
+    assert!(result.video.stabilize);
 }
 
 #[test]
@@ -144,7 +144,7 @@ fn test_build_folder_config_color_correct_override() {
     folder.settings.color_correct = Some(true);
 
     let result = build_folder_config(&Config::default(), &folder);
-    assert_eq!(result.video.color_correct, true);
+    assert!(result.video.color_correct);
 }
 
 #[test]
@@ -153,7 +153,7 @@ fn test_build_folder_config_reframe_override() {
     folder.settings.reframe = Some(true);
 
     let result = build_folder_config(&Config::default(), &folder);
-    assert_eq!(result.video.reframe, true);
+    assert!(result.video.reframe);
 }
 
 #[test]
@@ -162,7 +162,7 @@ fn test_build_folder_config_blur_background_override() {
     folder.settings.blur_background = Some(true);
 
     let result = build_folder_config(&Config::default(), &folder);
-    assert_eq!(result.video.blur_background, true);
+    assert!(result.video.blur_background);
 }
 
 #[test]
@@ -171,7 +171,7 @@ fn test_build_folder_config_noise_reduction_override() {
     folder.settings.noise_reduction = Some(true);
 
     let result = build_folder_config(&Config::default(), &folder);
-    assert_eq!(result.audio.noise_reduction, true);
+    assert!(result.audio.noise_reduction);
 }
 
 #[test]
@@ -234,7 +234,7 @@ fn test_build_folder_config_clips_override() {
     folder.settings.clips = Some(true);
 
     let result = build_folder_config(&Config::default(), &folder);
-    assert_eq!(result.export.clips, true);
+    assert!(result.export.clips);
 }
 
 #[test]
@@ -247,7 +247,7 @@ fn test_build_folder_config_unknown_preset_falls_back() {
     folder.settings.enhance_audio = Some(false);
 
     let result = build_folder_config(&config, &folder);
-    assert_eq!(result.audio.enhance, false);
+    assert!(!result.audio.enhance);
 }
 
 #[test]
@@ -275,20 +275,20 @@ fn test_build_folder_config_all_settings_at_once() {
 
     assert_eq!(result.silence.mode, SilenceMode::Cut);
     assert_eq!(result.silence.threshold_db, -50.0);
-    assert_eq!(result.audio.enhance, false);
+    assert!(!result.audio.enhance);
     assert_eq!(result.audio.target_lufs, -15.0);
-    assert_eq!(result.audio.noise_reduction, true);
-    assert_eq!(result.video.stabilize, true);
-    assert_eq!(result.video.color_correct, true);
-    assert_eq!(result.video.reframe, true);
-    assert_eq!(result.video.blur_background, true);
+    assert!(result.audio.noise_reduction);
+    assert!(result.video.stabilize);
+    assert!(result.video.color_correct);
+    assert!(result.video.reframe);
+    assert!(result.video.blur_background);
     assert_eq!(result.export.preview, true);
     assert_eq!(result.silence.scene_detect, true);
     assert_eq!(result.export.multi_format, true);
     assert_eq!(result.export.subtitles, true);
     assert_eq!(result.export.chapters, true);
     assert_eq!(result.export.captions, true);
-    assert_eq!(result.export.clips, true);
+    assert!(result.export.clips);
     assert_eq!(result.video.target_resolution, VideoResolution::Fhd1080p);
 }
 
@@ -303,5 +303,5 @@ fn test_build_folder_config_preset_then_folder_overrides() {
     let result = build_folder_config(&config, &folder);
 
     assert_eq!(result.silence.mode, SilenceMode::Speedup);
-    assert_eq!(result.audio.enhance, false);
+    assert!(!result.audio.enhance);
 }
