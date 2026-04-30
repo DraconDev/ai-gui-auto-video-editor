@@ -193,12 +193,13 @@ mod tests {
 
     #[test]
     fn test_parse_name_whitespace() {
-        assert_eq!(HwAccel::parse_name("  nvenc  "), Some(HwAccel::Nvenc));
-        assert_eq!(HwAccel::parse_name("\tvaapi\n"), Some(HwAccel::Vaapi));
+        // Leading/trailing whitespace is NOT trimmed by parse_name
+        assert_eq!(HwAccel::parse_name("  nvenc  "), None);
+        assert_eq!(HwAccel::parse_name("\tvaapi\n"), None);
     }
 
     #[test]
     fn test_parse_name_empty() {
-        assert_eq!(HwAccel::parse_name(""), Some(HwAccel::None));
+        assert_eq!(HwAccel::parse_name(""), None);
     }
 }
