@@ -1300,9 +1300,8 @@ fn configure_dark_theme(ctx: &egui::Context) {
 fn configure_emoji_fonts(ctx: &egui::Context) {
     let mut fonts = egui::FontDefinitions::default();
 
-    // Embed a minimal emoji font (2.2KB) containing only the icons used in the UI.
-    // Characters included: ⚙⚠✂⬜🎉🎙🎬🐦📁📱📸🔧
-    // Basic symbols (▲▼←→✓✕♪) are covered by the default proportional font.
+    // Embed a minimal emoji font (2.2KB) containing only the emoji pictographs used in the UI.
+    // Characters included: ⚙⚠✂⬜🎉🎙🎬🎵🐦📁📤📱📸📹🔧ℹ
     let emoji_font_bytes = include_bytes!("../assets/NotoEmojiSubset.ttf");
     fonts.font_data.insert(
         "emoji".to_owned(),
@@ -1313,6 +1312,19 @@ fn configure_emoji_fonts(ctx: &egui::Context) {
         .entry(egui::FontFamily::Proportional)
         .or_default()
         .push("emoji".to_owned());
+
+    // Embed a symbol font (15KB) for basic symbols not in the default font.
+    // Characters included: →←·✓✗✕×▲▼♪
+    let symbol_font_bytes = include_bytes!("../assets/DejaVuSansSymbols.ttf");
+    fonts.font_data.insert(
+        "symbols".to_owned(),
+        egui::FontData::from_static(symbol_font_bytes).into(),
+    );
+    fonts
+        .families
+        .entry(egui::FontFamily::Proportional)
+        .or_default()
+        .push("symbols".to_owned());
 
     ctx.set_fonts(fonts);
 }
