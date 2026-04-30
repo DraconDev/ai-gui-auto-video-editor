@@ -7,8 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [14.4.1] - 2026-04-30
+
 ### Fixed (GUI)
-- **Emoji variation selector causing box glyphs**: Characters with U+FE0F variation selector (⚙️🎙️✂️) were rendering as box+base pairs because the embedded emoji font only has base characters. Stripped variation selectors from all emoji literals in the codebase (gui.rs, tabs.rs).
+- **Emoji variation selector causing box glyphs**: Characters with U+FE0F variation selector (⚙️🎙️✂️) were rendering as box+base pairs because the embedded emoji font only has base characters. Stripped variation selectors from all emoji literals (gui.rs, tabs.rs: 4 locations).
+
+### Added (Tests)
+- **8 new end-to-end pipeline integration tests** (tests/pipeline_integration.rs):
+  - `test_watermark_in_pipeline`: Watermark config through full pipeline
+  - `test_background_music_in_pipeline`: Background music + ducking through full pipeline
+  - `test_scene_detection_in_pipeline`: Scene detection + silence merge through pipeline
+  - `test_full_pipeline_all_features`: All pipeline steps enabled simultaneously
+  - `test_exports_through_pipeline`: SRT/chapters/FCPXML/EDL/thumbnail via process_single_file
+  - `test_multi_format_export`: Multi-resolution output (720p alternate)
+  - `test_clip_extraction`: Highlight clip extraction (requires transcription)
+  - `test_config_precedence_with_preset`: Config file + Shorts preset merge, verifies 1080x1920 vertical output
+- **2 test helpers** (tests/common/mod.rs): `create_test_audio_file()`, `create_test_watermark_png()`
 
 ## [13.2.0] - 2026-04-30
 

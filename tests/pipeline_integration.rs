@@ -12,15 +12,11 @@ use ai_vid_editor::stt_analyzer::TranscriptSegment;
 use ai_vid_editor::thumbnail;
 use common::*;
 
-fn check_ffmpeg() {
-    if !has_ffmpeg() || !has_ffprobe() {
-        eprintln!("Skipping test: ffmpeg/ffprobe not available");
-    }
-}
+use std::path::PathBuf;
 
 #[test]
 fn test_silence_detection() {
-    check_ffmpeg();
+    check_ffmpeg_or_return();
 
     let analyzer = FfmpegAnalyzer;
     let video_path = test_video_path();
@@ -39,7 +35,7 @@ fn test_silence_detection() {
 
 #[test]
 fn test_silence_detection_threshold() {
-    check_ffmpeg();
+    check_ffmpeg_or_return();
 
     let analyzer = FfmpegAnalyzer;
     let video_path = test_video_path();
@@ -66,7 +62,7 @@ fn test_silence_detection_threshold() {
 
 #[test]
 fn test_audio_enhancement() {
-    check_ffmpeg();
+    check_ffmpeg_or_return();
 
     use tempfile::tempdir;
 
@@ -88,7 +84,7 @@ fn test_audio_enhancement() {
 
 #[test]
 fn test_video_stabilization() {
-    check_ffmpeg();
+    check_ffmpeg_or_return();
 
     use tempfile::tempdir;
 
@@ -110,7 +106,7 @@ fn test_video_stabilization() {
 
 #[test]
 fn test_color_correction() {
-    check_ffmpeg();
+    check_ffmpeg_or_return();
 
     use tempfile::tempdir;
 
@@ -132,7 +128,7 @@ fn test_color_correction() {
 
 #[test]
 fn test_auto_reframe() {
-    check_ffmpeg();
+    check_ffmpeg_or_return();
 
     use tempfile::tempdir;
 
@@ -166,7 +162,7 @@ fn test_auto_reframe() {
 
 #[test]
 fn test_noise_reduction() {
-    check_ffmpeg();
+    check_ffmpeg_or_return();
 
     use tempfile::tempdir;
 
@@ -188,7 +184,7 @@ fn test_noise_reduction() {
 
 #[test]
 fn test_blur_background() {
-    check_ffmpeg();
+    check_ffmpeg_or_return();
 
     use tempfile::tempdir;
 
@@ -210,7 +206,7 @@ fn test_blur_background() {
 
 #[test]
 fn test_reframe_all_resolutions() {
-    check_ffmpeg();
+    check_ffmpeg_or_return();
 
     use tempfile::tempdir;
 
@@ -242,7 +238,7 @@ fn test_reframe_all_resolutions() {
 
 #[test]
 fn test_trim_video_with_segments() {
-    check_ffmpeg();
+    check_ffmpeg_or_return();
 
     use tempfile::tempdir;
 
@@ -433,7 +429,7 @@ fn test_export_youtube_chapters() {
 
 #[test]
 fn test_generate_preview() {
-    check_ffmpeg();
+    check_ffmpeg_or_return();
 
     use tempfile::tempdir;
 
@@ -457,7 +453,7 @@ fn test_generate_preview() {
 
 #[test]
 fn test_generate_thumbnail() {
-    check_ffmpeg();
+    check_ffmpeg_or_return();
 
     use tempfile::tempdir;
 
@@ -481,7 +477,7 @@ fn test_generate_thumbnail() {
 
 #[test]
 fn test_full_pipeline_all_features_disabled() {
-    check_ffmpeg();
+    check_ffmpeg_or_return();
 
     use tempfile::tempdir;
 
@@ -518,7 +514,7 @@ fn test_full_pipeline_all_features_disabled() {
 
 #[test]
 fn test_full_pipeline_noise_reduction_and_enhance() {
-    check_ffmpeg();
+    check_ffmpeg_or_return();
 
     use tempfile::tempdir;
 
@@ -558,7 +554,7 @@ fn test_full_pipeline_noise_reduction_and_enhance() {
 
 #[test]
 fn test_full_pipeline_reframe_and_scale() {
-    check_ffmpeg();
+    check_ffmpeg_or_return();
 
     use tempfile::tempdir;
 
@@ -596,7 +592,7 @@ fn test_full_pipeline_reframe_and_scale() {
 
 #[test]
 fn test_full_pipeline_with_preview_export() {
-    check_ffmpeg();
+    check_ffmpeg_or_return();
 
     use tempfile::tempdir;
 
@@ -1018,8 +1014,10 @@ fn test_exports_through_pipeline() {
 
     // At minimum the video file + most exports should exist
     assert!(output_path.exists(), "Main video output should exist");
-    // Note: SRT/chapters require transcription which needs audio content in the test video
-    // (sine tone with silence gaps may produce "no speech detected")
+    assert!(fcpxml_path.exists(), "FCPXML export should exist");
+    assert!(edl_path.exists(), "EDL export should exist");
+    assert!(thumb_path.exists(), "Thumbnail export should exist");
+    // SRT/chapters require transcription; sine-tone test video may produce "no speech detected"
     println!("Export files created: {:?}", created);
 }
 
@@ -1161,7 +1159,8 @@ watermark_position = "top-left"
     f.write_all(config_toml.as_bytes()).unwrap();
 
     // Load config from file, apply shorts preset, run pipeline
-    // Config file fields take priority over preset values
+    // Merge: file config fields override preset defaults on scalar fields;
+    // preset enum fields override file config; vec fields come from file if non-empty
     let file_config = ai_vid_editor::config::Config::from_file(&config_path).ok();
     let preset_config = ai_vid_editor::config::Preset::Shorts.to_config();
     let config = if let Some(fc) = file_config {
@@ -1192,5 +1191,3 @@ watermark_position = "top-left"
     assert_eq!(w, 1080, "Shorts preset should produce 1080p width");
     assert_eq!(h, 1920, "Shorts preset should produce 1920p height (vertical)");
 }
-
-use std::path::PathBuf;
