@@ -1659,4 +1659,95 @@ mod tests {
         assert_eq!(output_files.len(), 2);
         Ok(())
     }
+
+    // Tests for merge_silences_and_scenes
+
+    #[test]
+    fn test_merge_silences_and_scenes_empty_scenes() {
+        let silences = vec![
+            Segment { start: 1.0, end: 3.0 },
+            Segment { start: 5.0, end: 7.0 },
+        ];
+        let scenes: Vec<f32> = vec![];
+        let merged = merge_silences_and_scenes(&silences, &scenes, 10.0);
+        assert_eq!(merged.len(), 2);
+        assert_eq!(merged[0], Segment { start: 1.0, end: 3.0 });
+        assert_eq!(merged[1], Segment { start: 5.0, end: 7.0 });
+    }
+
+    #[test]
+    fn test_merge_silences_and_scenes_empty_silences() {
+        let silences: Vec<Segment> = vec![];
+        let scenes = vec![2.0, 5.0];
+        let merged = merge_silences_and_scenes(&silences, &scenes, 10.0);
+        assert_eq!(merged.len(), 0);
+    }
+
+    #[test]
+    fn test_merge_silences_and_scenes_overlapping_silences() {
+        // Two silences that overlap should be merged into one
+        let silences = vec![
+            Segment { start: 1.0, end: 3.0 },
+            Segment { start: 2.5, end: 5.0 },
+        ];
+        let scenes: Vec<f32> = vec![];
+        let merged = merge_silences_and_scenes(&silences, &scenes, 10.0);
+        assert_eq!(merged.len(), 1);
+        assert_eq!(merged[0], Segment { start: 1.0, end: 5.0 });
+    }
+
+    #[test]
+    fn test_merge_silences_and_scenes_adjacent_silences() {
+        // Two silences that are adjacent (or nearly so) should be merged
+        let silences = vec![
+            Segment { start: 1.0, end: 3.0 },
+            Segment { start: 3.0, end: 5.0 },
+        ];
+        let scenes: Vec<f32> = vec![];
+        let merged = merge_silences_and_scenes(&silences, &scenes, 10.0);
+        assert_eq!(merged.len(), 1);
+        assert_eq!(merged[0], Segment { start: 1.0, end: 5.0 });
+    }
+
+    #[test]
+    fn test_merge_silences_and_scenes_scene_extends_boundary() {
+        // Scene segment close to silence boundary extends it
+        let silences = vec![Segment { start: 1.0, end: 3.0 }];
+        // Scene at 0.7s creates a segment from 0.7 to 1.7 (assuming 1s default)
+        // The scene start (0.7) is within 0.5s of silence start (1.0), so silence start extends to 0.7
+        let scenes = vec![0.7];
+        let merged = merge_silences_and_scenes(&silences, &scenes, 10.0);
+        assert_eq!(merged.len(), 1);
+        // Scene at 0.7 creates segment [0.7, 1.7], which extends silence start from 1.0 to 0.7
+        assert_eq!(merged[0].start, 0.7);
+        assert_eq!(merged[0].end, 3.0);
+    }
+
+    #[test]
+    fn test_merge_silences_and_scenes_no_overlap() {
+        // Silences and scenes with no overlap should not affect each other
+        let silences = vec![Segment { start: 1.0, end: 2.0 }];
+        // Scene at 5.0 is far from silence
+        let scenes = vec![5.0];
+        let merged = merge_silences_and_scenes(&silences, &scenes, 10.0);
+        assert_eq!(merged.len(), 1);
+        assert_eq!(merged[0], Segment { start: 1.0, end: 2.0 });
+    }
+
+    #[test]
+    fn test_merge_silences_and_scenes_complex_overlap() {
+        // Multiple silences and scenes with complex interactions
+        let silences = vec![
+            Segment { start: 1.0, end: 3.0 },
+            Segment { start: 6.0, end: 8.0 },
+        ];
+        // Scenes at 2.5 and 7.5 are close to silence boundaries
+        let scenes = vec![2.5, 7.5];
+        let merged = merge_silences_and_scenes(&silences, &scenes, 10.0);
+        // Scene at 2.5 creates [2.5, 3.5], end (3.5) is close to silence end (3.0), extends to 3.5
+        // Scene at 7.5 creates [7.5, 8.5], end (8.5) is close to silence end (8.0), extends to 8.5
+        assert_eq!(merged.len(), 2);
+        assert_eq!(merged[0], Segment { start: 1.0, end: 3.5 });
+        assert_eq!(merged[1], Segment { start: 6.0, end: 8.5 });
+    }
 }
