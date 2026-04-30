@@ -1,9 +1,10 @@
 # Project State
 
 ## Current Focus
-Replace remove_silence setting with silence_mode across UI and tests to use explicit mode configuration.
+Replace remove_silence boolean with explicit SilenceMode and min_duration settings in test, updating assertions to reflect new values.
 
 ## Completed
-- [x] Renamed and updated `test_build_folder_config_remove_silence_true` to `silence_mode_cut`, adjusting assertions to reflect `SilenceMode::Cut` and default `min_duration`.
-- [x] Renamed and updated `test_build_folder_config_remove_silence_false` to `silence_mode_keep`, verifying correct mode handling.
-- [x] Modified `test_build_folder_config_all_settings_at_once` to use `silence_mode = Some(SilenceMode::Cut)` and removed the redundant `assert_eq!(result.silence.min_duration, f32::MAX)` check.
+- [x] Updated test to directly set `config.silence.mode = SilenceMode::Cut` and `min_duration = 0.5` for cut silence scenario
+- [x] Updated test to set `config2.silence.mode = SilenceMode::Keep` for keep silence scenario
+- [x] Adjusted assertions to verify mode and `min_duration` of 0.5 instead of `f32::MAX`
+- [x] Removed reliance on `remove_silence` option and updated comments to reflect new `silence_mode` semantics

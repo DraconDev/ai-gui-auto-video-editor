@@ -709,31 +709,25 @@ fn test_hwaccel_all_variants() {
 #[test]
 fn test_folder_settings_silences_config_structure() {
     // Verify FolderSettings maps correctly to silence config
-    // When remove_silence = Some(true), it means cut silence
-    // When remove_silence = Some(false), it means keep silence (default)
+    // silence_mode controls how silences are handled:
+    // - SilenceMode::Cut: removes silent segments entirely
+    // - SilenceMode::Speedup: speeds up silent segments
+    // - SilenceMode::Keep: keeps all audio at normal speed
 
     let mut config = Config::default();
 
-    // Simulate: remove_silence = Some(true) -> cut silence
-    // This sets mode to Cut with max min_duration (effectively cut all silence)
-    let remove_silence = Some(true);
-    if let Some(true) = remove_silence {
-        config.silence.mode = ai_vid_editor::config::SilenceMode::Cut;
-        config.silence.min_duration = f32::MAX;
-    }
+    // Cut silence mode
+    config.silence.mode = ai_vid_editor::config::SilenceMode::Cut;
+    config.silence.min_duration = 0.5;
 
     assert_eq!(config.silence.mode, ai_vid_editor::config::SilenceMode::Cut);
-    assert_eq!(config.silence.min_duration, f32::MAX);
+    assert_eq!(config.silence.min_duration, 0.5);
 
-    // Simulate: remove_silence = Some(false) -> keep silence (default mode)
+    // Keep silence mode
     let mut config2 = Config::default();
-    let remove_silence2 = Some(false);
-    if let Some(true) = remove_silence2 {
-        config2.silence.mode = ai_vid_editor::config::SilenceMode::Cut;
-    }
-    // false means don't cut, so mode stays as default (Cut)
+    config2.silence.mode = ai_vid_editor::config::SilenceMode::Keep;
     assert_eq!(
         config2.silence.mode,
-        ai_vid_editor::config::SilenceMode::Cut
+        ai_vid_editor::config::SilenceMode::Keep
     );
 }
