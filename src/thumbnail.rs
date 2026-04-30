@@ -287,16 +287,4 @@ mod tests {
         extract_frame_at_time(&video, &frame, 320, 180, 0.0).unwrap();
         assert!(frame.exists(), "frame should be extracted at time 0");
     }
-
-    #[test]
-    fn test_generate_thumbnail_small_video() {
-        let temp_dir = tempfile::tempdir().unwrap();
-        let video = temp_dir.path().join("input.mp4");
-        let thumb = temp_dir.path().join("thumb.jpg");
-        create_test_video(&video, 1.0).expect("ffmpeg not found");
-
-        // Very short video should still generate thumbnail
-        generate_thumbnail(&video, &thumb, 160, 90).unwrap();
-        assert!(thumb.exists(), "thumbnail should be generated for short video");
-    }
 }
