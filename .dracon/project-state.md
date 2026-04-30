@@ -1,7 +1,6 @@
 # Project State
-
-## Current Focus
-Add minimal emoji font subset for cross-platform icon rendering to support diverse character sets.
+##Current Focus
+Add DejaVuSansSymbols.ttf binary font file to enable cross‑platform emoji icon rendering.
 
 ## Completed
-- [x] Embed Noto Emoji Subset font to enable cross-platform emoji display in GUI
+- [x] Add DejaVuSansSymbols.ttf binary font file for cross‑platform emoji icon rendering.
