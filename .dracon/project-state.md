@@ -1,8 +1,12 @@
-# Project State
+#Project State
 
-## Current FocusAlign Cargo.lock with latest dependency versions (no insertions/deletions)
+## Current Focus
+Remove variation selectors from emoji icons to prevent box‑glyph rendering and improve cross‑platform display
 
-## Completed
-- [x] Updated Cargo.lock to match latest dependency versions (binary file updated)
-- [x] Regenerated lock file after dependency rebuild (same byte count)
-- [x] No new or removed dependencies (0 insertions/deletions)
+## Completed- [x] Replaced `⚙️` with `⚙` in `SettingsCategory
+
+:Advanced` to drop the variation selector
+- [x] Replaced `🎙️` with `🎙` in podcast preset label to drop the variation selector
+- [x] Replaced `✂️ Silence removal: {}` with `✂ Silence removal: {}` to drop the variation selector
+- [x] Replaced `⚙️` with `⚙` in the “Settings locked during processing” label icon to drop the variation selector
+- [x] Updated CHANGELOG to document the fix for “emoji variation selector causing box glyphs”

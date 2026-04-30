@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed (GUI)
-- **Dynamic emoji font detection**: Replaced hardcoded Nix store path with `fc-list` fontconfig query on Linux for dynamic emoji font discovery. Added cross-platform fallback paths for macOS and Windows. Added `tracing::warn!` log when no emoji font is found to help users diagnose missing icons.
+- **Emoji variation selector causing box glyphs**: Characters with U+FE0F variation selector (⚙️🎙️✂️) were rendering as box+base pairs because the embedded emoji font only has base characters. Stripped variation selectors from all emoji literals in the codebase (gui.rs, tabs.rs).
 
 ## [13.2.0] - 2026-04-30
 

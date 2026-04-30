@@ -50,7 +50,7 @@ impl SettingsCategory {
             SettingsCategory::Audio => "🎵",
             SettingsCategory::Video => "📹",
             SettingsCategory::Exports => "📤",
-            SettingsCategory::Advanced => "⚙️",
+            SettingsCategory::Advanced => "⚙",
         }
     }
 }

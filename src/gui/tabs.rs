@@ -449,7 +449,7 @@ impl App {
             for (preset, icon, desc) in [
                 ("youtube", "🎬", "YouTube videos (landscape)"),
                 ("shorts", "📱", "Shorts/Reels/TikTok (vertical)"),
-                ("podcast", "🎙️", "Podcast/audio focus"),
+                ("podcast", "🎙", "Podcast/audio focus"),
                 ("tiktok", "♪", "TikTok-specific style"),
                 ("reels", "📸", "Instagram Reels style"),
                 ("twitter", "🐦", "Twitter/video style"),
@@ -664,7 +664,7 @@ impl App {
                         );
                         ui.label(
                             RichText::new(format!(
-                                "✂️ Silence removal: {}",
+                                "✂ Silence removal: {}",
                                 if self.state.setup_remove_silence {
                                     "ON"
                                 } else {
@@ -986,7 +986,7 @@ impl App {
                         if is_processing {
                             settings_section_frame(false).show(ui, |ui| {
                                 ui.horizontal(|ui| {
-                                    ui.label(egui::RichText::new("⚙️").size(14.0));
+                                    ui.label(egui::RichText::new("⚙").size(14.0));
                                     ui.add_space(6.0);
                                     ui.label(label_muted("Settings locked during processing"));
                                 });
