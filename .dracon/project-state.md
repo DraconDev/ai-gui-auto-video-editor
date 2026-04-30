@@ -1,8 +1,8 @@
-# ProjectState
+# Project State
 
 ## Current Focus
-One line: Update parse_name tests to reflect that whitespace and empty strings are no longer accepted.
+Add robust edge‑case tests for crop region calculations, ensuring safe handling of invalid aspect ratios and extreme video aspect ratios.
 
 ## Completed
-- [x] Revised test_parse_name_whitespace to assert None for inputs with leading/trailing whitespace, confirming parse_name no longer trims whitespace.
-- [x] Revised test_parse_name_empty to assert None for an empty string, confirming empty input is rejected.
+- [x] Added unit tests for `CropRegion::from_face` to verify fallback to center crop when aspect ratio is zero, negative, or infinite.
+- [x] Added unit tests for `CropRegion::center_crop_9_16` to validate behavior with wide, narrow, and zero aspect ratios.

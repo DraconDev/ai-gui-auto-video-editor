@@ -897,4 +897,77 @@ mod tests {
         // x + width should be <= 1.0 due to clamping
         assert!(region.x + region.width <= 1.0);
     }
+
+    #[test]
+    fn test_crop_region_from_face_zero_aspect() {
+        // Zero aspect ratio should fall back to center crop
+        let face = FaceBox {
+            x: 0.4,
+            y: 0.3,
+            width: 0.2,
+            height: 0.3,
+            confidence: 0.9,
+        };
+        let region = CropRegion::from_face(&face, 0.0);
+        // Should use center_crop_9_16 fallback
+        assert!(region.width > 0.0);
+        assert_eq!(region.height, 1.0);
+    }
+
+    #[test]
+    fn test_crop_region_from_face_negative_aspect() {
+        // Negative aspect ratio should fall back to center crop
+        let face = FaceBox {
+            x: 0.4,
+            y: 0.3,
+            width: 0.2,
+            height: 0.3,
+            confidence: 0.9,
+        };
+        let region = CropRegion::from_face(&face, -1.5);
+        // Should use center_crop_9_16 fallback
+        assert!(region.width > 0.0);
+        assert_eq!(region.height, 1.0);
+    }
+
+    #[test]
+    fn test_crop_region_from_face_infinite_aspect() {
+        // Infinite aspect ratio should fall back to center crop
+        let face = FaceBox {
+            x: 0.4,
+            y: 0.3,
+            width: 0.2,
+            height: 0.3,
+            confidence: 0.9,
+        };
+        let region = CropRegion::from_face(&face, f32::INFINITY);
+        // Should use center_crop_9_16 fallback
+        assert!(region.width > 0.0);
+        assert_eq!(region.height, 1.0);
+    }
+
+    #[test]
+    fn test_center_crop_9_16_wide_video() {
+        // Very wide video (21:9) should have a small crop width
+        let region = CropRegion::center_crop_9_16(21.0 / 9.0);
+        assert!(region.width < 0.5); // crop width should be less than half
+        assert_eq!(region.x, (1.0 - region.width) / 2.0); // centered
+        assert_eq!(region.height, 1.0);
+    }
+
+    #[test]
+    fn test_center_crop_9_16_narrow_video() {
+        // Narrow video (4:3) should have crop width close to 1.0
+        let region = CropRegion::center_crop_9_16(4.0 / 3.0);
+        assert!(region.width <= 1.0);
+        assert_eq!(region.height, 1.0);
+    }
+
+    #[test]
+    fn test_center_crop_9_16_zero_aspect() {
+        // Zero aspect should not panic
+        let region = CropRegion::center_crop_9_16(0.0);
+        assert!(region.width > 0.0);
+        assert_eq!(region.height, 1.0);
+    }
 }
