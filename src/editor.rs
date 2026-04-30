@@ -71,18 +71,13 @@ pub fn calculate_keep_segments(
         }
 
         // Handle the silence based on mode
+        // Note: SilenceMode::Keep is handled by early return at function entry
         match mode {
-            SilenceMode::Keep => {
-                // Already handled above - keep all audio at normal speed
-                current_pos = silence.end;
-            }
             SilenceMode::Cut => {
-                // Cut mode: skip the silence entirely
                 let cut_end = (silence.end - padding).max(0.0);
                 current_pos = current_pos.max(keep_end).max(cut_end);
             }
             SilenceMode::Speedup => {
-                // Speedup mode: keep silence but speed it up if long enough
                 let silence_start = (silence.start + padding).max(0.0);
                 let silence_end = (silence.end - padding).min(total_duration);
 
@@ -95,6 +90,7 @@ pub fn calculate_keep_segments(
                 }
                 current_pos = current_pos.max(keep_end).max(silence_end);
             }
+            SilenceMode::Keep => unreachable!(),
         }
     }
 

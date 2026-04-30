@@ -1,8 +1,9 @@
 # Project State
 
 ## Current Focus
-Add SilenceMode import and regenerate Cargo.lock to reflect updated silence handling
+Refactor SilenceMode handling in `calculate_keep_segments` by removing redundant Keep case and relying on early return
 
 ## Completed
-- [x] Import SilenceMode in src/gui/processing.rs to enable explicit silence mode configuration
-- [x] Regenerate Cargo.lock reflecting unchanged dependency versions after rebuild
+- [x] Remove SilenceMode::Keep handling from the match block in `calculate_keep_segments`
+- [x] Add unreachable!() stub for SilenceMode::Keep after the match
+- [x] Regenerate Cargo.lock after dependency rebuild (no version changes)
