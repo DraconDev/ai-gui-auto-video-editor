@@ -42,10 +42,12 @@ pub fn create_test_video_with_silence(output_path: &std::path::Path, duration_se
     status && output_path.exists()
 }
 
+#[allow(dead_code)]
 pub fn has_ffmpeg() -> bool {
     Command::new("ffmpeg").arg("-version").status().is_ok()
 }
 
+#[allow(dead_code)]
 pub fn has_ffprobe() -> bool {
     Command::new("ffprobe").arg("-version").status().is_ok()
 }

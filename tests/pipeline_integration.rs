@@ -15,7 +15,6 @@ use common::*;
 fn check_ffmpeg() {
     if !has_ffmpeg() || !has_ffprobe() {
         eprintln!("Skipping test: ffmpeg/ffprobe not available");
-        return;
     }
 }
 

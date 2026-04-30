@@ -216,7 +216,7 @@ fn test_build_folder_config_chapters_override() {
     folder.settings.chapters = Some(true);
 
     let result = build_folder_config(&Config::default(), &folder);
-    assert_eq!(result.export.chapters, true);
+    assert!(result.export.chapters);
 }
 
 #[test]
@@ -225,7 +225,7 @@ fn test_build_folder_config_captions_override() {
     folder.settings.captions = Some(true);
 
     let result = build_folder_config(&Config::default(), &folder);
-    assert_eq!(result.export.captions, true);
+    assert!(result.export.captions);
 }
 
 #[test]
@@ -286,8 +286,8 @@ fn test_build_folder_config_all_settings_at_once() {
     assert!(result.silence.scene_detect);
     assert!(result.export.multi_format);
     assert!(result.export.subtitles);
-    assert_eq!(result.export.chapters, true);
-    assert_eq!(result.export.captions, true);
+    assert!(result.export.chapters);
+    assert!(result.export.captions);
     assert!(result.export.clips);
     assert_eq!(result.video.target_resolution, VideoResolution::Fhd1080p);
 }
