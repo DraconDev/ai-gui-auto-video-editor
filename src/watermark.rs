@@ -357,4 +357,200 @@ mod tests {
         );
         assert_eq!(WatermarkPosition::parse_name("invalid"), None);
     }
+
+    #[test]
+    fn test_watermark_position_all_coords() {
+        // Test all position coordinate outputs
+        assert_eq!(WatermarkPosition::TopLeft.to_ffmpeg_coords(50, 50), "10:10");
+        assert_eq!(WatermarkPosition::TopRight.to_ffmpeg_coords(50, 50), "W-w-10:10");
+        assert_eq!(
+            WatermarkPosition::BottomLeft.to_ffmpeg_coords(50, 50),
+            "10:H-h-10"
+        );
+        assert_eq!(
+            WatermarkPosition::BottomRight.to_ffmpeg_coords(50, 50),
+            "W-w-10:H-h-10"
+        );
+        assert_eq!(
+            WatermarkPosition::Center.to_ffmpeg_coords(50, 50),
+            "(W-w)/2:(H-h)/2"
+        );
+    }
+
+    #[test]
+    fn test_watermark_position_parse_name_variants() {
+        // Test all parse variants
+        assert_eq!(
+            WatermarkPosition::parse_name("top-left"),
+            Some(WatermarkPosition::TopLeft)
+        );
+        assert_eq!(
+            WatermarkPosition::parse_name("topleft"),
+            Some(WatermarkPosition::TopLeft)
+        );
+        assert_eq!(WatermarkPosition::parse_name("tl"), Some(WatermarkPosition::TopLeft));
+
+        assert_eq!(
+            WatermarkPosition::parse_name("top-right"),
+            Some(WatermarkPosition::TopRight)
+        );
+        assert_eq!(
+            WatermarkPosition::parse_name("topright"),
+            Some(WatermarkPosition::TopRight)
+        );
+        assert_eq!(
+            WatermarkPosition::parse_name("tr"),
+            Some(WatermarkPosition::TopRight)
+        );
+
+        assert_eq!(
+            WatermarkPosition::parse_name("bottom-left"),
+            Some(WatermarkPosition::BottomLeft)
+        );
+        assert_eq!(
+            WatermarkPosition::parse_name("bottomleft"),
+            Some(WatermarkPosition::BottomLeft)
+        );
+        assert_eq!(
+            WatermarkPosition::parse_name("bl"),
+            Some(WatermarkPosition::BottomLeft)
+        );
+
+        assert_eq!(
+            WatermarkPosition::parse_name("bottom-right"),
+            Some(WatermarkPosition::BottomRight)
+        );
+        assert_eq!(
+            WatermarkPosition::parse_name("bottomright"),
+            Some(WatermarkPosition::BottomRight)
+        );
+        assert_eq!(
+            WatermarkPosition::parse_name("br"),
+            Some(WatermarkPosition::BottomRight)
+        );
+
+        assert_eq!(
+            WatermarkPosition::parse_name("center"),
+            Some(WatermarkPosition::Center)
+        );
+        assert_eq!(WatermarkPosition::parse_name("c"), Some(WatermarkPosition::Center));
+        assert_eq!(
+            WatermarkPosition::parse_name("middle"),
+            Some(WatermarkPosition::Center)
+        );
+    }
+
+    #[test]
+    fn test_text_watermark_escaping() {
+        // Test that special characters in text are properly escaped for FFmpeg drawtext
+        let text = "Test's Video: Hello\\World";
+        let escaped = text
+            .replace('\'', "'\\''")
+            .replace(':', "\\:")
+            .replace('\\', "\\\\");
+
+        assert!(
+            escaped.contains("\\'"),
+            "Apostrophe should be escaped"
+        );
+        assert!(
+            escaped.contains(":"),
+            "Colon should be escaped"
+        );
+        assert!(
+            escaped.contains("\\\\"),
+            "Backslash should be escaped"
+        );
+    }
+
+    #[test]
+    fn test_add_text_watermark_positions() {
+        // Test that all positions produce valid filter strings
+        let positions = [
+            (WatermarkPosition::TopLeft, "x=10:y=10"),
+            (WatermarkPosition::TopRight, "x=w-text_w-10:y=10"),
+            (
+                WatermarkPosition::BottomLeft,
+                "x=10:y=h-text_h-10",
+            ),
+            (
+                WatermarkPosition::BottomRight,
+                "x=w-text_w-10:y=h-text_h-10",
+            ),
+            (
+                WatermarkPosition::Center,
+                "x=(w-text_w)/2:y=(h-text_h)/2",
+            ),
+        ];
+
+        for (position, expected_pos) in positions.iter() {
+            let overlay_pos = match position {
+                WatermarkPosition::TopLeft => "x=10:y=10",
+                WatermarkPosition::TopRight => "x=w-text_w-10:y=10",
+                WatermarkPosition::BottomLeft => "x=10:y=h-text_h-10",
+                WatermarkPosition::BottomRight => "x=w-text_w-10:y=h-text_h-10",
+                WatermarkPosition::Center => "x=(w-text_w)/2:y=(h-text_h)/2",
+            };
+            assert_eq!(overlay_pos, *expected_pos);
+        }
+    }
+
+    #[test]
+    fn test_add_watermark_with_scale() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let video = temp_dir.path().join("input.mp4");
+        let watermark = temp_dir.path().join("watermark.png");
+        let output = temp_dir.path().join("output.mp4");
+
+        create_test_video(&video, 2.0).expect("ffmpeg not found");
+        create_test_image(&watermark).expect("ffmpeg not found");
+
+        // Test with scale = 0.5 (half size)
+        add_watermark(
+            &video,
+            &watermark,
+            &output,
+            WatermarkPosition::TopLeft,
+            0.5,
+        )
+        .unwrap();
+        assert!(output.exists(), "watermarked output with scale should exist");
+
+        // Test with scale = 2.0 (double size)
+        let output2 = temp_dir.path().join("output2.mp4");
+        add_watermark(
+            &video,
+            &watermark,
+            &output2,
+            WatermarkPosition::BottomRight,
+            2.0,
+        )
+        .unwrap();
+        assert!(output2.exists(), "watermarked output with 2x scale should exist");
+    }
+
+    #[test]
+    fn test_add_text_watermark_with_special_chars() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let video = temp_dir.path().join("input.mp4");
+        let output = temp_dir.path().join("output.mp4");
+
+        create_test_video(&video, 2.0).expect("ffmpeg not found");
+
+        // Test with special characters that need escaping
+        add_text_watermark(
+            &video,
+            &output,
+            "Hello: World\\n'test",
+            WatermarkPosition::Center,
+            24,
+            "white",
+            0.8,
+        )
+        .unwrap();
+        assert!(
+            output.exists(),
+            "text watermarked output with special chars should exist"
+        );
+    }
 }

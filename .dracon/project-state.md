@@ -1,14 +1,12 @@
 # Project State
 
 ## Current Focus
-Add comprehensive FCPXML export tests
+Added comprehensive unit and integration tests for watermark functionality covering position parsing, coordinate conversion, text escaping, overlay string generation, scaling, and special‑character handling.
 
 ## Completed
-- [x] Added test verifying FCPXML XML declaration, DOCTYPE, version, resources, library, spine, and proper closure
-- [x] Added test checking correct number of video elements and self‑closing tags
-- [x] Added test confirming duration calculation matches segment total time
-- [x] Added test ensuring XML special characters in filenames are escaped
-- [x] Added test ensuring XML special characters in file paths are escaped
-- [x] Added test for single segment export with correct duration and video element count
-- [x] Added test for speed‑up segment handling, verifying duration is based on original time
-- [x] Added multiple auxiliary test helpers using temporary directories and file I/O
+- [x] add unit tests verifying all `WatermarkPosition` variants produce correct FFmpeg coordinate strings
+- [x] add unit tests covering all textual aliases accepted by `parse_name`
+- [x] add unit test ensuring special characters in text watermarks are properly escaped for FFmpeg drawtext
+- [x] add unit tests confirming overlay position strings match expected FFmpeg syntax for each position
+- [x] add integration test exercising `add_watermark` with scaling applied to both input and output videos
+- [x] add integration test validating `add_text_watermark` handles special characters correctly in the generated filter chain
