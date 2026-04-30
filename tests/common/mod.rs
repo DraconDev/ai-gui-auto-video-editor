@@ -1,10 +1,12 @@
 use std::path::PathBuf;
 use std::process::Command;
 
+#[allow(dead_code)]
 pub fn fixtures_dir() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR"))
 }
 
+#[allow(dead_code)]
 pub fn test_video_path() -> PathBuf {
     let path = fixtures_dir().join("test_video_temp.mp4");
     if !path.exists() {

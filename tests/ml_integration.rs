@@ -129,22 +129,22 @@ fn test_face_detection_on_frame() {
     let frames = FrameExtractor::extract_frames(&video_path, output_dir.path(), 1.0);
 
     if let Ok(frames) = frames {
-        if let Some(first_frame) = frames.first() {
-            if let Ok(img) = image::open(first_frame) {
-                let result = detector.detect(&img);
-                match result {
-                    Ok(faces) => {
-                        println!("Detected {} faces", faces.len());
-                        for face in &faces {
-                            println!(
-                                "  Face: x={:.2}, y={:.2}, w={:.2}, h={:.2}, conf={:.2}",
-                                face.x, face.y, face.width, face.height, face.confidence
-                            );
-                        }
+        if let Some(first_frame) = frames.first()
+            && let Ok(img) = image::open(first_frame)
+        {
+            let result = detector.detect(&img);
+            match result {
+                Ok(faces) => {
+                    println!("Detected {} faces", faces.len());
+                    for face in &faces {
+                        println!(
+                            "  Face: x={:.2}, y={:.2}, w={:.2}, h={:.2}, conf={:.2}",
+                            face.x, face.y, face.width, face.height, face.confidence
+                        );
                     }
-                    Err(e) => {
-                        eprintln!("Face detection failed: {}", e);
-                    }
+                }
+                Err(e) => {
+                    eprintln!("Face detection failed: {}", e);
                 }
             }
         }
@@ -222,22 +222,22 @@ fn test_person_segmentation_on_frame() {
     let frames = FrameExtractor::extract_frames(&video_path, output_dir.path(), 1.0);
 
     if let Ok(frames) = frames {
-        if let Some(first_frame) = frames.first() {
-            if let Ok(img) = image::open(first_frame) {
-                let result = segmenter.segment(&img);
-                match result {
-                    Ok(mask) => {
-                        println!("Segmentation mask: {}x{}", mask.width, mask.height);
-                        let person_pixels: usize = mask.data.iter().filter(|&&v| v > 0.5).count();
-                        let total_pixels = mask.data.len();
-                        println!(
-                            "  Person coverage: {:.1}%",
-                            (person_pixels as f32 / total_pixels as f32) * 100.0
-                        );
-                    }
-                    Err(e) => {
-                        eprintln!("Segmentation failed: {}", e);
-                    }
+        if let Some(first_frame) = frames.first()
+            && let Ok(img) = image::open(first_frame)
+        {
+            let result = segmenter.segment(&img);
+            match result {
+                Ok(mask) => {
+                    println!("Segmentation mask: {}x{}", mask.width, mask.height);
+                    let person_pixels: usize = mask.data.iter().filter(|&&v| v > 0.5).count();
+                    let total_pixels = mask.data.len();
+                    println!(
+                        "  Person coverage: {:.1}%",
+                        (person_pixels as f32 / total_pixels as f32) * 100.0
+                    );
+                }
+                Err(e) => {
+                    eprintln!("Segmentation failed: {}", e);
                 }
             }
         }
