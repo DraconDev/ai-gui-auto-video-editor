@@ -114,4 +114,64 @@ mod tests {
             Preset::Tiktok
         );
     }
+
+    #[test]
+    fn test_preset_for_file_all_default_rules() {
+        let rules = default_preset_rules();
+
+        // Test each default rule
+        assert_eq!(
+            preset_for_file(Path::new("video_short.mp4"), &rules, Preset::Youtube),
+            Preset::Shorts
+        );
+        assert_eq!(
+            preset_for_file(Path::new("my_tiktok.mp4"), &rules, Preset::Youtube),
+            Preset::Tiktok
+        );
+        assert_eq!(
+            preset_for_file(Path::new("insta_reel.mp4"), &rules, Preset::Youtube),
+            Preset::Reels
+        );
+        assert_eq!(
+            preset_for_file(Path::new("podcast_audio.mp4"), &rules, Preset::Youtube),
+            Preset::Podcast
+        );
+        assert_eq!(
+            preset_for_file(Path::new("twitter_video.mp4"), &rules, Preset::Youtube),
+            Preset::Twitter
+        );
+        assert_eq!(
+            preset_for_file(Path::new("x_video.mp4"), &rules, Preset::Youtube),
+            Preset::Twitter
+        );
+    }
+
+    #[test]
+    fn test_preset_for_file_empty_rules() {
+        // With no rules, always returns default
+        assert_eq!(
+            preset_for_file(Path::new("anything.mp4"), &[], Preset::Minimal),
+            Preset::Minimal
+        );
+    }
+
+    #[test]
+    fn test_preset_for_file_path_without_stem() {
+        // Path with no file stem should return default
+        let rules = vec![PresetRule::new("test", Preset::Shorts)];
+        assert_eq!(
+            preset_for_file(Path::new("/"), &rules, Preset::Youtube),
+            Preset::Youtube
+        );
+    }
+
+    #[test]
+    fn test_preset_for_file_no_extension() {
+        // File without extension - stem is the full filename
+        let rules = vec![PresetRule::new("short", Preset::Shorts)];
+        assert_eq!(
+            preset_for_file(Path::new("my_short_video"), &rules, Preset::Youtube),
+            Preset::Shorts
+        );
+    }
 }
