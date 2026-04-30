@@ -1,8 +1,10 @@
 # Project State
 
 ## Current Focus
-Add comprehensive edge case unit tests for `merge_silences_and_scenes`.
+Add comprehensive edge case unit tests for the `merge_silences_and_scenes` functionality in batch_processor.
 
 ## Completed
-- [x] Added comprehensive unit tests for `merge_silences_and_scenes` covering empty scenes, empty silences, overlapping silences, adjacent silences, scene boundary extension, non‑overlapping silences, and complex overlap scenarios.
-- [x] Regenerated `Cargo.lock` after dependency rebuild (no version changes).
+- Analyzed changes to `Cargo.lock` and `src/batch_processor.rs`
+- Introduced unit tests for `merge_silences_and_scenes` to improve reliability
+- Refactored test coverage for audio processing and preview path handling
+- Updated tests to reflect new behavior and removed redundant/test cases

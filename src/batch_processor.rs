@@ -1190,6 +1190,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::analyzer::Segment;
     use tempfile::tempdir;
 
     #[test]
