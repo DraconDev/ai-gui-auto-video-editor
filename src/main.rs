@@ -1313,20 +1313,21 @@ fn configure_emoji_fonts(ctx: &egui::Context) {
             let stdout = String::from_utf8_lossy(&output.stdout);
             for line in stdout.lines() {
                 let path = line.trim();
-                if !path.is_empty() && std::path::Path::new(path).exists() {
-                    if let Ok(bytes) = std::fs::read(path) {
-                        fonts.font_data.insert(
-                            "emoji".to_owned(),
-                            egui::FontData::from_owned(bytes).into(),
-                        );
-                        fonts
-                            .families
-                            .entry(egui::FontFamily::Proportional)
-                            .or_default()
-                            .push("emoji".to_owned());
-                        emoji_loaded = true;
-                        break;
-                    }
+                if !path.is_empty()
+                    && std::path::Path::new(path).exists()
+                    && let Ok(bytes) = std::fs::read(path)
+                {
+                    fonts.font_data.insert(
+                        "emoji".to_owned(),
+                        egui::FontData::from_owned(bytes).into(),
+                    );
+                    fonts
+                        .families
+                        .entry(egui::FontFamily::Proportional)
+                        .or_default()
+                        .push("emoji".to_owned());
+                    emoji_loaded = true;
+                    break;
                 }
             }
         }
