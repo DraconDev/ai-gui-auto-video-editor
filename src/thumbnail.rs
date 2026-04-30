@@ -255,4 +255,48 @@ mod tests {
         let output6 = "something entropy:5.0 more";
         assert_eq!(parse_entropy(output6), None);
     }
+
+    #[test]
+    fn test_parse_entropy_negative_value() {
+        // Negative entropy should parse fine
+        let output = "entropy:-3.5";
+        assert_eq!(parse_entropy(output), Some(-3.5));
+    }
+
+    #[test]
+    fn test_parse_entropy_multiple_colons() {
+        // Multiple colons - takes the last one
+        let output = "info:entropy:value:7.5";
+        assert_eq!(parse_entropy(output), Some(7.5));
+    }
+
+    #[test]
+    fn test_parse_entropy_zero() {
+        let output = "entropy:0.0";
+        assert_eq!(parse_entropy(output), Some(0.0));
+    }
+
+    #[test]
+    fn test_extract_frame_at_time_zero() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let video = temp_dir.path().join("input.mp4");
+        let frame = temp_dir.path().join("frame.jpg");
+        let _ = create_test_video(&video, 3.0);
+
+        // Extract at time 0 (start of video)
+        extract_frame_at_time(&video, &frame, 320, 180, 0.0).unwrap();
+        assert!(frame.exists(), "frame should be extracted at time 0");
+    }
+
+    #[test]
+    fn test_generate_thumbnail_small_video() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let video = temp_dir.path().join("input.mp4");
+        let thumb = temp_dir.path().join("thumb.jpg");
+        create_test_video(&video, 1.0).expect("ffmpeg not found");
+
+        // Very short video should still generate thumbnail
+        generate_thumbnail(&video, &thumb, 160, 90).unwrap();
+        assert!(thumb.exists(), "thumbnail should be generated for short video");
+    }
 }
