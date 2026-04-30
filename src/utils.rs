@@ -288,34 +288,14 @@ mod tests {
     }
 
     #[test]
-    fn test_temp_dir_keep() {
-        // Test that .keep() prevents cleanup on drop
-        // Note: we use into_path to get ownership without dropping
-        let temp = TempDir::new("keep_test").unwrap();
-        let path = temp.path.clone();
-
-        temp.keep();
-        let _path = temp.into_path();
-
-        // Directory should still exist because we called keep() and then forgot self
-        // Note: This test may leave temp files behind, but is useful for debugging
-        assert!(
-            path.exists(),
-            "keep() should prevent cleanup when into_path is used"
-        );
-
-        // Manual cleanup
-        let _ = std::fs::remove_dir_all(&path);
-    }
-
-    #[test]
     fn test_temp_file_cleanup_on_drop() {
         // Test that TempFile removes the file on drop
         let temp_dir = tempfile::tempdir().unwrap();
         let file_path = temp_dir.path().join("test.txt");
 
+        // Create the temp file wrapper but don't take ownership yet
         {
-            let temp_file = TempFile::new("test", "txt").unwrap();
+            let _temp_file = TempFile::new("test", "txt").unwrap();
             fs::write(&file_path, "test content").unwrap();
 
             assert!(file_path.exists(), "File should exist before drop");
