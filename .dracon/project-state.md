@@ -1,7 +1,7 @@
 # Project State
 
 ## Current Focus
-Regenerate Cargo.lock after dependency rebuild (no version changes)
+Migrate legacy `remove_silence` boolean to explicit `SilenceMode` with Cut/Keep semantics.
 
 ## Completed
-- [x] chore(deps): regenerate Cargo.lock after dependency rebuild (no version changes)
+- [x] Added migration logic to map `remove_silence` to `SilenceMode::Cut` or `SilenceMode::Keep` in `build_folder_config`

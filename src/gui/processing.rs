@@ -257,6 +257,15 @@ pub fn build_folder_config(config: &Config, folder: &FolderState) -> Config {
     // Silence settings
     if let Some(silence_mode) = folder.settings.silence_mode {
         merged.silence.mode = silence_mode;
+    } else if let Some(legacy_remove) = folder.settings.remove_silence {
+        // Migration: legacy remove_silence field → silence_mode
+        // remove_silence = true  → Cut mode
+        // remove_silence = false → Keep mode
+        merged.silence.mode = if legacy_remove {
+            SilenceMode::Cut
+        } else {
+            SilenceMode::Keep
+        };
     }
     if let Some(threshold) = folder.settings.silence_threshold_db {
         merged.silence.threshold_db = threshold;
