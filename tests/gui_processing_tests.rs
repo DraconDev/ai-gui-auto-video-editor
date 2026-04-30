@@ -180,7 +180,7 @@ fn test_build_folder_config_preview_override() {
     folder.settings.preview = Some(true);
 
     let result = build_folder_config(&Config::default(), &folder);
-    assert_eq!(result.export.preview, true);
+    assert!(result.export.preview);
 }
 
 #[test]
@@ -189,7 +189,7 @@ fn test_build_folder_config_scene_detect_override() {
     folder.settings.scene_detect = Some(true);
 
     let result = build_folder_config(&Config::default(), &folder);
-    assert_eq!(result.silence.scene_detect, true);
+    assert!(result.silence.scene_detect);
 }
 
 #[test]
@@ -198,7 +198,7 @@ fn test_build_folder_config_multi_format_override() {
     folder.settings.multi_format = Some(true);
 
     let result = build_folder_config(&Config::default(), &folder);
-    assert_eq!(result.export.multi_format, true);
+    assert!(result.export.multi_format);
 }
 
 #[test]
@@ -207,7 +207,7 @@ fn test_build_folder_config_subtitles_override() {
     folder.settings.subtitles = Some(true);
 
     let result = build_folder_config(&Config::default(), &folder);
-    assert_eq!(result.export.subtitles, true);
+    assert!(result.export.subtitles);
 }
 
 #[test]
@@ -282,10 +282,10 @@ fn test_build_folder_config_all_settings_at_once() {
     assert!(result.video.color_correct);
     assert!(result.video.reframe);
     assert!(result.video.blur_background);
-    assert_eq!(result.export.preview, true);
-    assert_eq!(result.silence.scene_detect, true);
-    assert_eq!(result.export.multi_format, true);
-    assert_eq!(result.export.subtitles, true);
+    assert!(result.export.preview);
+    assert!(result.silence.scene_detect);
+    assert!(result.export.multi_format);
+    assert!(result.export.subtitles);
     assert_eq!(result.export.chapters, true);
     assert_eq!(result.export.captions, true);
     assert!(result.export.clips);
