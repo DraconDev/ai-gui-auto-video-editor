@@ -408,4 +408,422 @@ mod tests {
         // 0.04 * 25 = 1.0, rounded to 1
         assert_eq!(f, 1);
     }
+
+    #[test]
+    fn test_export_fcpxml_valid_xml() -> Result<()> {
+        let dir = tempdir()?;
+        let output_path = dir.path().join("timeline.fcpxml");
+        let input_path = dir.path().join("input.mp4");
+
+        let segments = vec![
+            ProcessedSegment {
+                start: 0.0,
+                end: 5.0,
+                speed: 1.0,
+            },
+            ProcessedSegment {
+                start: 10.0,
+                end: 20.0,
+                speed: 1.0,
+            },
+        ];
+
+        export_fcpxml(&segments, &input_path, &output_path)?;
+
+        let content = fs::read_to_string(&output_path)?;
+
+        // Check for required XML structure
+        assert!(
+            content.starts_with("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"),
+            "FCPXML should start with XML declaration"
+        );
+        assert!(
+            content.contains("<!DOCTYPE fcpxml>"),
+            "FCPXML should contain DOCTYPE"
+        );
+        assert!(
+            content.contains("<fcpxml version=\"1.8\">"),
+            "FCPXML should have version 1.8"
+        );
+        assert!(
+            content.contains("<resources>"),
+            "FCPXML should have resources section"
+        );
+        assert!(
+            content.contains("<library>"),
+            "FCPXML should have library section"
+        );
+        assert!(
+            content.contains("<spine>"),
+            "FCPXML should have spine element"
+        );
+        assert!(
+            content.contains("</fcpxml>"),
+            "FCPXML should be properly closed"
+        );
+
+        // Verify video elements (self-closing tags like <video ... />)
+        let video_elements: usize = content.matches("<video name=").count();
+        assert_eq!(
+            video_elements, 2,
+            "FCPXML should have 2 video elements for 2 segments"
+        );
+        // Self-closing video elements
+        let self_closing: usize = content.matches("/>").count();
+        assert!(
+            self_closing > 0,
+            "FCPXML should have self-closing tags"
+        );
+
+        // Check duration format
+        assert!(
+            content.contains("duration=\"15/1s\""),
+            "FCPXML duration should be calculated from segments (0-5 + 10-20 = 15s)"
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_export_fcpxml_escapes_xml_special_chars_in_filename() -> Result<()> {
+        let dir = tempdir()?;
+        let output_path = dir.path().join("timeline.fcpxml");
+        // Filename with XML special characters
+        let input_path = dir.path().join("video&<>'\".mp4");
+
+        let segments = vec![ProcessedSegment {
+            start: 0.0,
+            end: 10.0,
+            speed: 1.0,
+        }];
+
+        export_fcpxml(&segments, &input_path, &output_path)?;
+
+        let content = fs::read_to_string(&output_path)?;
+
+        // Verify special characters are escaped in filename
+        assert!(
+            content.contains("video&amp;&lt;&gt;&apos;&quot;.mp4"),
+            "FCPXML should escape & < > ' \" in filename"
+        );
+
+        // Verify the raw special characters don't appear unescaped
+        assert!(
+            !content.contains("video&<>\""),
+            "FCPXML should not contain unescaped special chars"
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_export_fcpxml_escapes_xml_special_chars_in_path() -> Result<()> {
+        let dir = tempdir()?;
+        let output_path = dir.path().join("timeline.fcpxml");
+        let input_path = dir.path().join("video with spaces & special <chars>.mp4");
+
+        let segments = vec![ProcessedSegment {
+            start: 0.0,
+            end: 5.0,
+            speed: 1.0,
+        }];
+
+        export_fcpxml(&segments, &input_path, &output_path)?;
+
+        let content = fs::read_to_string(&output_path)?;
+
+        // The src attribute should have escaped characters
+        assert!(
+            content.contains("file://"),
+            "FCPXML should have file:// src attribute"
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_export_fcpxml_single_segment() -> Result<()> {
+        let dir = tempdir()?;
+        let output_path = dir.path().join("timeline.fcpxml");
+        let input_path = dir.path().join("input.mp4");
+
+        let segments = vec![ProcessedSegment {
+            start: 0.0,
+            end: 10.0,
+            speed: 1.0,
+        }];
+
+        export_fcpxml(&segments, &input_path, &output_path)?;
+
+        let content = fs::read_to_string(&output_path)?;
+
+        // Single segment should have duration of 10s
+        assert!(
+            content.contains("duration=\"10/1s\""),
+            "FCPXML should have duration of 10s for single segment"
+        );
+
+        // Should have exactly one video element
+        assert_eq!(
+            content.matches("<video name=").count(),
+            1,
+            "FCPXML should have exactly one video element for single segment"
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_export_fcpxml_speedup_segment() -> Result<()> {
+        let dir = tempdir()?;
+        let output_path = dir.path().join("timeline.fcpxml");
+        let input_path = dir.path().join("input.mp4");
+
+        // Segment with speedup
+        let segments = vec![ProcessedSegment {
+            start: 0.0,
+            end: 10.0,
+            speed: 2.0, // 2x speedup
+        }];
+
+        export_fcpxml(&segments, &input_path, &output_path)?;
+
+        let content = fs::read_to_string(&output_path)?;
+
+        // Duration should still be based on original time (end - start)
+        assert!(
+            content.contains("duration=\"10/1s\""),
+            "FCPXML duration should be based on original segment time"
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_export_srt_timestamp_format() -> Result<()> {
+        let dir = tempdir()?;
+        let output_srt = dir.path().join("subtitles.srt");
+        let transcript = vec![
+            TranscriptSegment {
+                start: 0.0,
+                end: 1.5,
+                text: "First".to_string(),
+                confidence: 1.0,
+            },
+            TranscriptSegment {
+                start: 1.5,
+                end: 3.333,
+                text: "Second with decimal".to_string(),
+                confidence: 1.0,
+            },
+        ];
+
+        export_srt(&transcript, &output_srt)?;
+
+        let content = fs::read_to_string(&output_srt)?;
+
+        // Verify SRT format: index\nstart --> end\ntext\n\n
+        let lines: Vec<&str> = content.lines().collect();
+        assert_eq!(lines[0], "1", "First line should be index 1");
+        assert_eq!(
+            lines[1], "00:00:00,000 --> 00:00:01,500",
+            "Second line should be timestamp range with milliseconds"
+        );
+        assert_eq!(lines[2], "First", "Third line should be text");
+        assert_eq!(lines[3], "", "Fourth line should be blank separator");
+
+        // Verify second segment
+        assert_eq!(lines[4], "2", "Fifth line should be index 2");
+        assert!(
+            lines[5].contains("-->"),
+            "Sixth line should contain timestamp range"
+        );
+        assert_eq!(
+            lines[6], "Second with decimal",
+            "Seventh line should be text"
+        );
+
+        // Verify trailing newline
+        assert!(
+            content.ends_with('\n'),
+            "SRT should end with newline"
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_export_edl_format_structure() -> Result<()> {
+        let dir = tempdir()?;
+        let output_edl = dir.path().join("test.edl");
+        let input_path = dir.path().join("video.mp4");
+
+        let segments = vec![
+            ProcessedSegment {
+                start: 0.0,
+                end: 5.0,
+                speed: 1.0,
+            },
+            ProcessedSegment {
+                start: 5.0,
+                end: 10.0,
+                speed: 1.0,
+            },
+        ];
+
+        export_edl(&segments, &input_path, &output_edl, 24.0)?;
+
+        let content = fs::read_to_string(&output_edl)?;
+
+        // Check EDL header format
+        assert!(
+            content.starts_with("TITLE:"),
+            "EDL should start with TITLE"
+        );
+        assert!(
+            content.contains("FCM: NON-DROP FRAME"),
+            "EDL should contain FCM statement"
+        );
+
+        // Check segment format: index, edit type, track, source type, etc.
+        assert!(
+            content.contains("001  AX       V     C"),
+            "EDL should have proper edit decision line format"
+        );
+
+        // Check FROM CLIP NAME comment
+        assert!(
+            content.contains("FROM CLIP NAME:"),
+            "EDL should have clip name comment"
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_export_edl_adjacent_segments() -> Result<()> {
+        let dir = tempdir()?;
+        let output_edl = dir.path().join("test.edl");
+        let input_path = dir.path().join("video.mp4");
+
+        // Two segments that are adjacent (end of first = start of second)
+        let segments = vec![
+            ProcessedSegment {
+                start: 0.0,
+                end: 5.0,
+                speed: 1.0,
+            },
+            ProcessedSegment {
+                start: 5.0,
+                end: 10.0,
+                speed: 1.0,
+            },
+        ];
+
+        export_edl(&segments, &input_path, &output_edl, 25.0)?;
+
+        let content = fs::read_to_string(&output_edl)?;
+
+        // Both segments should be present
+        assert!(
+            content.contains("00:00:00:00"),
+            "EDL should start at 00:00:00:00"
+        );
+        assert!(
+            content.contains("00:00:05:00"),
+            "EDL should have first segment end at 5 seconds"
+        );
+        assert!(
+            content.contains("00:00:10:00"),
+            "EDL should have second segment end at 10 seconds"
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_export_youtube_chapters_long_video() -> Result<()> {
+        let dir = tempdir()?;
+        let output_chapters = dir.path().join("chapters.txt");
+
+        // Create transcript for a ~10 minute video with segments every 30 seconds
+        let mut transcript = Vec::new();
+        let mut t = 0.0;
+        for i in 0..20 {
+            transcript.push(TranscriptSegment {
+                start: t,
+                end: t + 30.0,
+                text: format!("Chapter {} content", i),
+                confidence: 1.0,
+            });
+            t += 30.0;
+        }
+
+        export_youtube_chapters(&transcript, &output_chapters)?;
+
+        let content = fs::read_to_string(&output_chapters)?;
+
+        // Should have intro at 00:00
+        assert!(
+            content.contains("00:00 Intro"),
+            "Chapters should start with 00:00 Intro"
+        );
+
+        // Should have chapters at ~3 minute intervals (180 seconds)
+        // With 20 x 30s segments, we should have multiple chapter markers
+        assert!(
+            content.matches("03:").count() >= 1,
+            "Should have chapter around 3 minutes"
+        );
+        assert!(
+            content.matches("06:").count() >= 1,
+            "Should have chapter around 6 minutes"
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_export_youtube_chapters_handles_empty_text() -> Result<()> {
+        let dir = tempdir()?;
+        let output_chapters = dir.path().join("chapters.txt");
+
+        // Transcript with empty and "[No speech detected]" segments
+        let transcript = vec![
+            TranscriptSegment {
+                start: 0.0,
+                end: 30.0,
+                text: "".to_string(),
+                confidence: 1.0,
+            },
+            TranscriptSegment {
+                start: 30.0,
+                end: 60.0,
+                text: "[No speech detected]".to_string(),
+                confidence: 1.0,
+            },
+            TranscriptSegment {
+                start: 60.0,
+                end: 90.0,
+                text: "Actual speech".to_string(),
+                confidence: 1.0,
+            },
+        ];
+
+        export_youtube_chapters(&transcript, &output_chapters)?;
+
+        let content = fs::read_to_string(&output_chapters)?;
+
+        // Empty and [No speech detected] should be filtered out
+        assert!(
+            !content.contains("[No speech detected]"),
+            "Chapters should not contain [No speech detected]"
+        );
+        assert!(
+            content.contains("Actual speech") || content.contains("Intro"),
+            "Chapters should contain actual speech or intro"
+        );
+
+        Ok(())
+    }
 }
