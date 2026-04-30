@@ -1160,19 +1160,15 @@ watermark_position = "top-left"
     let mut f = std::fs::File::create(&config_path).unwrap();
     f.write_all(config_toml.as_bytes()).unwrap();
 
-    // Load config from file, apply preset, run pipeline
-    let config = ai_vid_editor::config::Config::from_file(&config_path).ok();
-    let config = config.map(|c| {
-        let mut c = c;
-        if let Ok(preset) = ai_vid_editor::config::Preset::from_name("shorts") {
-            c.apply_preset(&preset);
-        }
-        c
-    }).unwrap_or_else(|| {
-        let mut c = Config::default();
-        c.apply_preset(&ai_vid_editor::config::Preset::from_name("shorts").unwrap());
-        c
-    });
+    // Load config from file, apply shorts preset, run pipeline
+    // Config file fields take priority over preset values
+    let file_config = ai_vid_editor::config::Config::from_file(&config_path).ok();
+    let preset_config = ai_vid_editor::config::Preset::Shorts.to_config();
+    let config = if let Some(fc) = file_config {
+        fc.merge(preset_config)
+    } else {
+        preset_config
+    };
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
