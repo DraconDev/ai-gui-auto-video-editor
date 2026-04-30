@@ -305,3 +305,80 @@ fn test_build_folder_config_preset_then_folder_overrides() {
     assert_eq!(result.silence.mode, SilenceMode::Keep);
     assert!(!result.audio.enhance);
 }
+
+#[test]
+fn test_build_folder_config_legacy_remove_silence_true_migrates_to_cut() {
+    // Legacy config: remove_silence = true should map to SilenceMode::Cut
+    let config = Config::default();
+    let mut folder = make_folder_state();
+    folder.settings.remove_silence = Some(true);
+    // silence_mode is not set
+
+    let result = build_folder_config(&config, &folder);
+
+    assert_eq!(
+        result.silence.mode,
+        SilenceMode::Cut,
+        "remove_silence=true should migrate to SilenceMode::Cut"
+    );
+}
+
+#[test]
+fn test_build_folder_config_legacy_remove_silence_false_migrates_to_keep() {
+    // Legacy config: remove_silence = false should map to SilenceMode::Keep
+    let config = Config::default();
+    let mut folder = make_folder_state();
+    folder.settings.remove_silence = Some(false);
+    // silence_mode is not set
+
+    let result = build_folder_config(&config, &folder);
+
+    assert_eq!(
+        result.silence.mode,
+        SilenceMode::Keep,
+        "remove_silence=false should migrate to SilenceMode::Keep"
+    );
+}
+
+#[test]
+fn test_build_folder_config_silence_mode_wins_over_legacy_remove_silence() {
+    // When both silence_mode and remove_silence are set, silence_mode takes priority
+    let config = Config::default();
+    let mut folder = make_folder_state();
+    folder.settings.silence_mode = Some(SilenceMode::Cut);
+    folder.settings.remove_silence = Some(false); // Legacy would map to Keep
+
+    let result = build_folder_config(&config, &folder);
+
+    assert_eq!(
+        result.silence.mode,
+        SilenceMode::Cut,
+        "silence_mode should take priority over remove_silence"
+    );
+}
+
+#[test]
+fn test_build_folder_config_no_silence_settings_uses_default() {
+    // When neither silence_mode nor remove_silence is set, use config default
+    let config = Config::default();
+    let mut folder = make_folder_state();
+    // Both silence_mode and remove_silence are None
+
+    let result = build_folder_config(&config, &folder);
+
+    // Default mode is SilenceMode::Cut
+    assert_eq!(result.silence.mode, SilenceMode::Cut);
+}
+
+#[test]
+fn test_build_folder_config_remove_silence_none_does_not_override() {
+    // When remove_silence is explicitly None, it should not affect the mode
+    let config = Config::default();
+    let mut folder = make_folder_state();
+    folder.settings.remove_silence = None;
+    // config has default Cut mode
+
+    let result = build_folder_config(&config, &folder);
+
+    assert_eq!(result.silence.mode, SilenceMode::Cut);
+}

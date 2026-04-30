@@ -1,9 +1,11 @@
 # Project State
 
 ## Current Focus
-Adjust test to reflect corrected behavior when large padding skips the speedup segment
+Add comprehensive regression tests for legacy `remove_silence` boolean migration to explicit `SilenceMode` enum and enforce precedence rules.
 
 ## Completed
-- [x] Updated test expectation to 2 segments instead of 3
-- [x] Removed redundant overlap assertion for the third segment
-- [x] Updated comments to clarify that speedup segment is skipped when `silence_start > silence_end`
+- [x] Added test for migrating `remove_silence = true` to `SilenceMode::Cut`
+- [x] Added test for migrating `remove_silence = false` to `SilenceMode::Keep`
+- [x] Added test ensuring `silence_mode` takes priority over `remove_silence`
+- [x] Added test verifying default behavior when no settings are provided
+- [x] Added test confirming explicit `None` on `remove_silence` does not override mode
