@@ -298,10 +298,10 @@ fn test_build_folder_config_preset_then_folder_overrides() {
     let mut folder = make_folder_state();
     folder.preset = "shorts".to_string();
     folder.settings.enhance_audio = Some(false);
-    folder.settings.remove_silence = Some(false);
+    folder.settings.silence_mode = Some(SilenceMode::Keep);
 
     let result = build_folder_config(&config, &folder);
 
-    assert_eq!(result.silence.mode, SilenceMode::Speedup);
+    assert_eq!(result.silence.mode, SilenceMode::Keep);
     assert!(!result.audio.enhance);
 }

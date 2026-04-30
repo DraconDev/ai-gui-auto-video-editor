@@ -1,10 +1,9 @@
 # Project State
 
 ## Current Focus
-Add FFmpeg/FFprobe availability checks and refactor test assertions
+Replace `remove_silence` boolean with explicit `SilenceMode` enum in test and update related assertion
 
 ## Completed
-- [x] Added `has_ffmpeg()` and `has_ffprobe()` helper functions in `tests/common/mod.rs`.
-- [x] Refactored chapter and captions assertions in `tests/gui_processing_tests.rs` to use boolean checks.
-- [x] Updated `tests/pipeline_integration.rs` to remove early return after availability check.
-- [x] Cargo.lock updated with new dependency versions.
+- [x] Switched `folder.settings.remove_silence` to `folder.settings.silence_mode = Some(SilenceMode::Keep)` in `tests/gui_processing_tests.rs`
+- [x] Updated test assertion to expect `SilenceMode::Keep` instead of `SilenceMode::Speedup`
+- [x] Regenerated `Cargo.lock` to reflect updated SilenceMode handling and dependency changes
