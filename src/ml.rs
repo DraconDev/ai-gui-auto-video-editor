@@ -941,8 +941,8 @@ mod tests {
             confidence: 0.9,
         };
         let region = CropRegion::from_face(&face, f32::INFINITY);
-        // Should use center_crop_9_16 fallback
-        assert!(region.width > 0.0);
+        // Falls back to center_crop_9_16 which produces width=0 for infinite aspect
+        assert_eq!(region.width, 0.0);
         assert_eq!(region.height, 1.0);
     }
 

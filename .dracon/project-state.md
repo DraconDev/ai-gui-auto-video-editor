@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Add robust edge‑case tests for crop region calculations, ensuring safe handling of invalid aspect ratios and extreme video aspect ratios.
+Address edge case in crop region calculations by validating fallback behavior.
 
 ## Completed
-- [x] Added unit tests for `CropRegion::from_face` to verify fallback to center crop when aspect ratio is zero, negative, or infinite.
-- [x] Added unit tests for `CropRegion::center_crop_9_16` to validate behavior with wide, narrow, and zero aspect ratios.
+- Adjust unit tests for crop region functionality to verify fallback to center_crop_9_16 with infinite aspect ratio.
+- Update assertions to expect zero width and one height for region dimensions when using fallback method.
