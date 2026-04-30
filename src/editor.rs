@@ -1260,4 +1260,153 @@ mod tests {
         assert_eq!(processed[1].start, 2.9);
         assert_eq!(processed[1].end, 10.0);
     }
+
+    #[test]
+    fn test_calculate_keep_segments_large_padding_no_overlap() {
+        // Regression test: padding > silence_duration/2 should NOT create overlapping segments
+        // Silence at 2.0-3.0 (1s duration), padding=0.6
+        // keep_end = 2.0 + 0.6 = 2.6
+        // cut_end = 3.0 - 0.6 = 2.4
+        // Without fix: processed[0].end=2.6, processed[1].start=2.4 → OVERLAP!
+        // With fix: current_pos = max(2.6, 2.4) = 2.6, so processed[1].start=2.6 → NO OVERLAP
+        let silences = vec![Segment {
+            start: 2.0,
+            end: 3.0,
+        }];
+        let duration = 10.0;
+        let padding = 0.6;
+        let processed =
+            calculate_keep_segments(&silences, duration, padding, SilenceMode::Cut, 4.0, 0.5);
+
+        assert_eq!(processed.len(), 2);
+        // First segment ends at 2.6 (2.0 + 0.6)
+        assert_eq!(processed[0].end, 2.6);
+        // Second segment starts at 2.6 (NOT 2.4!) - this is the bug fix
+        assert_eq!(processed[1].start, 2.6);
+        assert!(processed[0].end <= processed[1].start, "Segments must not overlap");
+    }
+
+    #[test]
+    fn test_calculate_keep_segments_very_large_padding() {
+        // Even more extreme case: padding=0.9 with 1s silence
+        let silences = vec![Segment {
+            start: 2.0,
+            end: 3.0,
+        }];
+        let duration = 10.0;
+        let padding = 0.9;
+        let processed =
+            calculate_keep_segments(&silences, duration, padding, SilenceMode::Cut, 4.0, 0.5);
+
+        assert_eq!(processed.len(), 2);
+        // keep_end = 2.9, cut_end = 2.1, current_pos = max(2.9, 2.1) = 2.9
+        assert_eq!(processed[0].end, 2.9);
+        assert_eq!(processed[1].start, 2.9);
+        assert!(processed[0].end <= processed[1].start, "Segments must not overlap");
+    }
+
+    #[test]
+    fn test_calculate_keep_segments_adjacent_silences_no_gaps() {
+        // Two silences that are adjacent after padding is applied
+        // Silence 1: 2.0-3.0, Silence 2: 3.0-4.0
+        // With padding=0.3:
+        // First cut: keep_end=2.3, cut_end=2.7, current_pos=max(2.3,2.7)=2.7
+        // Second cut: keep_end=3.3, cut_end=3.7, current_pos=max(3.3,3.7)=3.7
+        let silences = vec![
+            Segment {
+                start: 2.0,
+                end: 3.0,
+            },
+            Segment {
+                start: 3.0,
+                end: 4.0,
+            },
+        ];
+        let duration = 10.0;
+        let padding = 0.3;
+        let processed =
+            calculate_keep_segments(&silences, duration, padding, SilenceMode::Cut, 4.0, 0.5);
+
+        // Should have 3 segments: before first silence, between, after second
+        assert_eq!(processed.len(), 3);
+        // No overlaps
+        for i in 0..processed.len() - 1 {
+            assert!(
+                processed[i].end <= processed[i + 1].start,
+                "Segment {} end ({}) should be <= segment {} start ({})",
+                i,
+                processed[i].end,
+                i + 1,
+                processed[i + 1].start
+            );
+        }
+    }
+
+    #[test]
+    fn test_calculate_keep_segments_zero_padding() {
+        // Edge case: zero padding should still work
+        let silences = vec![Segment {
+            start: 2.0,
+            end: 3.0,
+        }];
+        let duration = 10.0;
+        let padding = 0.0;
+        let processed =
+            calculate_keep_segments(&silences, duration, padding, SilenceMode::Cut, 4.0, 0.5);
+
+        assert_eq!(processed.len(), 2);
+        assert_eq!(processed[0].end, 2.0); // keep_end = 2.0 + 0 = 2.0
+        assert_eq!(processed[1].start, 3.0); // cut_end = 3.0 - 0 = 3.0
+        assert!(processed[0].end <= processed[1].start, "Segments must not overlap");
+    }
+
+    #[test]
+    fn test_calculate_keep_segments_padding_exceeds_silence() {
+        // padding > silence duration - edge case
+        let silences = vec![Segment {
+            start: 2.0,
+            end: 2.5, // 0.5s silence
+        }];
+        let duration = 10.0;
+        let padding = 0.4; // padding > half silence duration
+        let processed =
+            calculate_keep_segments(&silences, duration, padding, SilenceMode::Cut, 4.0, 0.5);
+
+        // keep_end = 2.4, cut_end = 2.1, current_pos = max(2.4, 2.1) = 2.4
+        assert_eq!(processed.len(), 2);
+        assert_eq!(processed[0].end, 2.4);
+        assert_eq!(processed[1].start, 2.4);
+        assert!(processed[0].end <= processed[1].start, "Segments must not overlap");
+    }
+
+    #[test]
+    fn test_calculate_keep_segments_speedup_large_padding() {
+        // Same overlap bug can occur in speedup mode
+        let silences = vec![Segment {
+            start: 2.0,
+            end: 3.0, // 1s silence
+        }];
+        let duration = 10.0;
+        let padding = 0.6; // large padding
+        let processed = calculate_keep_segments(
+            &silences,
+            duration,
+            padding,
+            SilenceMode::Speedup,
+            4.0,
+            0.2, // min_silence_for_speedup = 0.2s
+        );
+
+        // Should have 3 segments
+        assert_eq!(processed.len(), 3);
+        // Check no overlap
+        assert!(
+            processed[0].end <= processed[1].start,
+            "First and second segments must not overlap"
+        );
+        assert!(
+            processed[1].end <= processed[2].start,
+            "Second and third segments must not overlap"
+        );
+    }
 }

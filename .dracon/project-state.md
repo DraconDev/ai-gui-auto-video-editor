@@ -1,9 +1,10 @@
 # Project State
 
 ## Current Focus
-Simplify text watermark test by removing special character handling and updating assertions
+Add comprehensive regression tests for `calculate_keep_segments` to prevent segment overlap bugs caused by large padding.
 
 ## Completed
-- [x] Renamed test function from `test_add_text_watermark_with_special_chars` to `test_add_text_watermark_with_simple_special_chars`
-- [x] Replaced complex watermark string `"Hello: World\\n'test"` with simpler `"Hello World"`
-- [x] Updated assertion message from `"text watermarked output with special chars should exist"` to `"text watermarked output should exist"`
+- [x] Introduced multiple unit tests covering padding edge‑cases, zero padding, adjacent silences, and speedup mode overlap handling
+- [x] Updated Cargo.lock to reflect new dependency versions
+- [x] Added tests verifying no overlap after applying padding in Cut and Speedup modes
+- [x] Added tests for extreme padding values and silence duration mismatches
