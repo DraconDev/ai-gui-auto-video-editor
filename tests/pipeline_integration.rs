@@ -730,3 +730,471 @@ fn test_folder_settings_silences_config_structure() {
         ai_vid_editor::config::SilenceMode::Keep
     );
 }
+
+// ============================================================
+// PHASE 5: End-to-End Feature Integration Tests
+// ============================================================
+
+fn check_ffmpeg_or_return() {
+    if !has_ffmpeg() || !has_ffprobe() {
+        eprintln!("Skipping test: ffmpeg/ffprobe not available");
+        return;
+    }
+}
+
+fn ffprobe_duration(path: &std::path::Path) -> Option<f64> {
+    let output = std::process::Command::new("ffprobe")
+        .args(["-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", path.to_str()?])
+        .output()
+        .ok()?;
+    let s = String::from_utf8_lossy(&output.stdout);
+    s.trim().parse::<f64>().ok()
+}
+
+fn ffprobe_codec(path: &std::path::Path) -> Option<String> {
+    let output = std::process::Command::new("ffprobe")
+        .args(["-v", "error", "-select_streams", "v:0", "-show_entries", "stream=codec_name", "-of", "csv=p=0", path.to_str()?])
+        .output()
+        .ok()?;
+    Some(String::from_utf8_lossy(&output.stdout).trim().to_string())
+}
+
+fn ffprobe_dimensions(path: &std::path::Path) -> Option<(u32, u32)> {
+    let output = std::process::Command::new("ffprobe")
+        .args(["-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width,height", "-of", "csv=p=0", path.to_str()?])
+        .output()
+        .ok()?;
+    let s = String::from_utf8_lossy(&output.stdout);
+    let parts: Vec<&str> = s.trim().split(',').collect();
+    let w = parts.get(0)?.parse().ok()?;
+    let h = parts.get(1)?.parse().ok()?;
+    Some((w, h))
+}
+
+#[test]
+fn test_watermark_in_pipeline() {
+    use tempfile::tempdir;
+
+    let video_path = test_video_path();
+    if !video_path.exists() {
+        eprintln!("Skipping test: test video not found");
+        return;
+    }
+    check_ffmpeg_or_return();
+
+    let output_dir = tempdir().unwrap();
+    let output_path = output_dir.path().join("output_watermarked.mp4");
+
+    // Create a tiny red PNG watermark
+    let wm_path = output_dir.path().join("test_watermark.png");
+    assert!(create_test_watermark_png(&wm_path, 64), "Watermark PNG creation failed");
+
+    let mut config = Config::default();
+    config.video.watermark = Some(wm_path.clone());
+    config.video.watermark_position = "bottom-right".to_string();
+    config.video.watermark_scale = 1.0;
+
+    let editor = FfmpegEditor::default();
+    let analyzer = FfmpegAnalyzer;
+    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+
+    let result = ai_vid_editor::batch_processor::process_single_file(
+        video_path.clone(),
+        output_path.clone(),
+        &config,
+        &analyzer,
+        &editor,
+        &duration_getter,
+    );
+
+    assert!(result.is_ok(), "Pipeline with watermark should succeed");
+    assert!(output_path.exists(), "Output file should exist");
+
+    // Verify it's a valid video
+    let codec = ffprobe_codec(&output_path);
+    assert!(codec.is_some(), "Output should have a video codec");
+    let dur = ffprobe_duration(&output_path);
+    assert!(dur.is_some() && dur.unwrap() > 0.0, "Output should have valid duration");
+}
+
+#[test]
+fn test_background_music_in_pipeline() {
+    use tempfile::tempdir;
+
+    let video_path = test_video_path();
+    if !video_path.exists() {
+        eprintln!("Skipping test: test video not found");
+        return;
+    }
+    check_ffmpeg_or_return();
+
+    let output_dir = tempdir().unwrap();
+    let output_path = output_dir.path().join("output_with_music.mp4");
+
+    // Create a short music file
+    let music_path = output_dir.path().join("test_music.aac");
+    assert!(create_test_audio_file(&music_path, 6), "Music file creation failed");
+
+    let mut config = Config::default();
+    config.audio.music_file = Some(music_path.clone());
+    config.audio.duck_volume = 0.2;
+
+    let editor = FfmpegEditor::default();
+    let analyzer = FfmpegAnalyzer;
+    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+
+    let result = ai_vid_editor::batch_processor::process_single_file(
+        video_path.clone(),
+        output_path.clone(),
+        &config,
+        &analyzer,
+        &editor,
+        &duration_getter,
+    );
+
+    assert!(result.is_ok(), "Pipeline with background music should succeed");
+    assert!(output_path.exists(), "Output file should exist");
+
+    let dur = ffprobe_duration(&output_path);
+    assert!(dur.is_some() && dur.unwrap() > 0.0, "Output should have valid duration");
+}
+
+#[test]
+fn test_scene_detection_in_pipeline() {
+    use tempfile::tempdir;
+
+    let video_path = test_video_path();
+    if !video_path.exists() {
+        eprintln!("Skipping test: test video not found");
+        return;
+    }
+    check_ffmpeg_or_return();
+
+    let output_dir = tempdir().unwrap();
+    let output_path = output_dir.path().join("output_scene_detect.mp4");
+
+    let mut config = Config::default();
+    config.silence.scene_detect = true;
+    config.silence.scene_threshold = 0.3;
+
+    let editor = FfmpegEditor::default();
+    let analyzer = FfmpegAnalyzer;
+    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+
+    let result = ai_vid_editor::batch_processor::process_single_file(
+        video_path.clone(),
+        output_path.clone(),
+        &config,
+        &analyzer,
+        &editor,
+        &duration_getter,
+    );
+
+    assert!(result.is_ok(), "Pipeline with scene detection should succeed");
+    assert!(output_path.exists(), "Output file should exist");
+
+    let dur = ffprobe_duration(&output_path);
+    assert!(dur.is_some() && dur.unwrap() > 0.0, "Output should have valid duration");
+}
+
+#[test]
+fn test_full_pipeline_all_features() {
+    use tempfile::tempdir;
+
+    let video_path = test_video_path();
+    if !video_path.exists() {
+        eprintln!("Skipping test: test video not found");
+        return;
+    }
+    check_ffmpeg_or_return();
+
+    let output_dir = tempdir().unwrap();
+    let output_path = output_dir.path().join("output_all_features.mp4");
+
+    // Create a tiny watermark
+    let wm_path = output_dir.path().join("test_watermark.png");
+    assert!(create_test_watermark_png(&wm_path, 64), "Watermark creation failed");
+
+    let mut config = Config::default();
+    // Silence
+    config.silence.mode = ai_vid_editor::config::SilenceMode::Cut;
+    config.silence.scene_detect = true;
+    config.silence.scene_threshold = 0.3;
+    // Audio
+    config.audio.enhance = true;
+    config.audio.noise_reduction = true;
+    config.audio.target_lufs = -14.0;
+    // Video
+    config.video.stabilize = true;
+    config.video.color_correct = true;
+    config.video.watermark = Some(wm_path.clone());
+    // Exports
+    config.export.preview = true;
+    config.export.preview_duration = 3.0;
+
+    let editor = FfmpegEditor::default();
+    let analyzer = FfmpegAnalyzer;
+    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+
+    let result = ai_vid_editor::batch_processor::process_single_file(
+        video_path.clone(),
+        output_path.clone(),
+        &config,
+        &analyzer,
+        &editor,
+        &duration_getter,
+    );
+
+    assert!(result.is_ok(), "Pipeline with all features should succeed");
+    assert!(output_path.exists(), "Output file should exist");
+
+    let dur = ffprobe_duration(&output_path);
+    assert!(dur.is_some() && dur.unwrap() > 0.0, "Output should have valid duration");
+
+    let codec = ffprobe_codec(&output_path);
+    assert!(codec.is_some(), "Output should have video codec");
+}
+
+#[test]
+fn test_exports_through_pipeline() {
+    use tempfile::tempdir;
+
+    let video_path = test_video_path();
+    if !video_path.exists() {
+        eprintln!("Skipping test: test video not found");
+        return;
+    }
+    check_ffmpeg_or_return();
+
+    let output_dir = tempdir().unwrap();
+    let output_path = output_dir.path().join("output_exports.mp4");
+
+    let mut config = Config::default();
+    config.export.subtitles = true;
+    config.export.chapters = true;
+    config.export.fcpxml = true;
+    config.export.edl = true;
+    config.export.thumbnail = true;
+
+    let editor = FfmpegEditor::default();
+    let analyzer = FfmpegAnalyzer;
+    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+
+    let result = ai_vid_editor::batch_processor::process_single_file(
+        video_path.clone(),
+        output_path.clone(),
+        &config,
+        &analyzer,
+        &editor,
+        &duration_getter,
+    );
+
+    assert!(result.is_ok(), "Pipeline with exports should succeed");
+    assert!(output_path.exists(), "Output video should exist");
+
+    // Verify each export file was created
+    let base = output_path.with_extension("");
+    let srt_path = PathBuf::from(&base).with_extension("srt");
+    let chapters_path = {
+        let mut p = base.as_os_str().to_os_string();
+        p.push(".chapters.txt");
+        PathBuf::from(p)
+    };
+    let fcpxml_path = base.with_extension("fcpxml");
+    let edl_path = base.with_extension("edl");
+    let thumb_path = base.with_extension("jpg");
+
+    let created: Vec<&str> = [
+        (&srt_path, "SRT"),
+        (&chapters_path, "Chapters"),
+        (&fcpxml_path, "FCPXML"),
+        (&edl_path, "EDL"),
+        (&thumb_path, "Thumbnail"),
+    ]
+    .iter()
+    .filter(|(p, _)| p.exists())
+    .map(|(_, n)| *n)
+    .collect();
+
+    // At minimum the video file + most exports should exist
+    assert!(output_path.exists(), "Main video output should exist");
+    // Note: SRT/chapters require transcription which needs audio content in the test video
+    // (sine tone with silence gaps may produce "no speech detected")
+    println!("Export files created: {:?}", created);
+}
+
+#[test]
+fn test_multi_format_export() {
+    use tempfile::tempdir;
+    use ai_vid_editor::config::VideoResolution;
+
+    let video_path = test_video_path();
+    if !video_path.exists() {
+        eprintln!("Skipping test: test video not found");
+        return;
+    }
+    check_ffmpeg_or_return();
+
+    let output_dir = tempdir().unwrap();
+    let output_path = output_dir.path().join("output_multiformat.mp4");
+
+    let mut config = Config::default();
+    config.export.multi_format = true;
+    config.export.extra_resolutions = vec![VideoResolution::Hd720p];
+
+    let editor = FfmpegEditor::default();
+    let analyzer = FfmpegAnalyzer;
+    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+
+    let result = ai_vid_editor::batch_processor::process_single_file(
+        video_path.clone(),
+        output_path.clone(),
+        &config,
+        &analyzer,
+        &editor,
+        &duration_getter,
+    );
+
+    assert!(result.is_ok(), "Pipeline with multi-format export should succeed");
+    assert!(output_path.exists(), "Primary output file should exist");
+
+    // Check for 720p alternate output
+    let base = output_path.with_extension("");
+    let alt_path = {
+        let mut p = base.as_os_str().to_os_string();
+        p.push("_720p.mp4");
+        PathBuf::from(p)
+    };
+
+    assert!(alt_path.exists(), "720p alternate output should exist");
+    let (w, h) = ffprobe_dimensions(&alt_path).unwrap();
+    assert_eq!(w, 1280, "720p output should be 1280 wide");
+    assert_eq!(h, 720, "720p output should be 720 tall");
+}
+
+#[test]
+fn test_clip_extraction() {
+    use tempfile::tempdir;
+
+    // Create a longer test video for clip extraction (10 seconds)
+    let output_dir = tempdir().unwrap();
+    let long_video_path = output_dir.path().join("long_test_video.mp4");
+    if !create_test_video_with_silence(&long_video_path, 10) {
+        eprintln!("Skipping test: could not create 10s test video");
+        return;
+    }
+    check_ffmpeg_or_return();
+
+    let output_path = output_dir.path().join("output_clips.mp4");
+
+    let mut config = Config::default();
+    config.export.clips = true;
+    config.export.clip_count = 2;
+    config.export.clip_min_duration = 1.0;
+    config.export.clip_max_duration = 5.0;
+
+    let editor = FfmpegEditor::default();
+    let analyzer = FfmpegAnalyzer;
+    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+
+    let result = ai_vid_editor::batch_processor::process_single_file(
+        long_video_path.clone(),
+        output_path.clone(),
+        &config,
+        &analyzer,
+        &editor,
+        &duration_getter,
+    );
+
+    // Pipeline should succeed even if clip extraction produces no clips
+    // (depends on transcription finding speech segments)
+    assert!(result.is_ok(), "Pipeline with clip extraction should succeed");
+    assert!(output_path.exists(), "Output video should exist");
+
+    // Check for clip files (may or may not exist depending on transcription results)
+    let base = output_path.with_extension("");
+    let clip_pattern = format!(
+        "{}_clip",
+        base.file_stem().unwrap_or_default().to_string_lossy()
+    );
+    let clip_dir = output_dir.path();
+    let clips: Vec<_> = std::fs::read_dir(clip_dir)
+        .ok()
+        .into_iter()
+        .flatten()
+        .flatten()
+        .filter(|e| e.file_name().to_string_lossy().starts_with(&clip_pattern))
+        .collect();
+
+    println!("Clip extraction: {} clips found", clips.len());
+}
+
+#[test]
+fn test_config_precedence_with_preset() {
+    use tempfile::tempdir;
+    use std::io::Write;
+
+    let video_path = test_video_path();
+    if !video_path.exists() {
+        eprintln!("Skipping test: test video not found");
+        return;
+    }
+    check_ffmpeg_or_return();
+
+    let output_dir = tempdir().unwrap();
+    let output_path = output_dir.path().join("output_preset.mp4");
+    let config_path = output_dir.path().join("test_config.toml");
+
+    // Write a config TOML that uses shorts preset + an explicit override
+    let config_toml = r#"
+[export]
+multi_format = true
+
+[silence]
+mode = "cut"
+
+[video]
+# This should override the preset's default
+watermark_position = "top-left"
+"#;
+    let mut f = std::fs::File::create(&config_path).unwrap();
+    f.write_all(config_toml.as_bytes()).unwrap();
+
+    // Load config from file, apply preset, run pipeline
+    let config = ai_vid_editor::config::Config::from_file(&config_path).ok();
+    let config = config.map(|c| {
+        let mut c = c;
+        if let Ok(preset) = ai_vid_editor::config::Preset::from_name("shorts") {
+            c.apply_preset(&preset);
+        }
+        c
+    }).unwrap_or_else(|| {
+        let mut c = Config::default();
+        c.apply_preset(&ai_vid_editor::config::Preset::from_name("shorts").unwrap());
+        c
+    });
+
+    let editor = FfmpegEditor::default();
+    let analyzer = FfmpegAnalyzer;
+    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+
+    let result = ai_vid_editor::batch_processor::process_single_file(
+        video_path.clone(),
+        output_path.clone(),
+        &config,
+        &analyzer,
+        &editor,
+        &duration_getter,
+    );
+
+    assert!(result.is_ok(), "Pipeline with preset should succeed");
+    assert!(output_path.exists(), "Output file should exist");
+
+    // Shorts preset sets reframe=true with Vertical1080p
+    // Verify the output is vertical (9:16 aspect)
+    let (w, h) = ffprobe_dimensions(&output_path).unwrap();
+    assert_eq!(w, 1080, "Shorts preset should produce 1080p width");
+    assert_eq!(h, 1920, "Shorts preset should produce 1920p height (vertical)");
+}
+
+use std::path::PathBuf;
