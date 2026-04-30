@@ -1,7 +1,8 @@
 # Project State
 
 ## Current Focus
-Migrate legacy `remove_silence` boolean to explicit `SilenceMode` with Cut/Keep semantics.
+Add SilenceMode import and regenerate Cargo.lock to reflect updated silence handling
 
 ## Completed
-- [x] Added migration logic to map `remove_silence` to `SilenceMode::Cut` or `SilenceMode::Keep` in `build_folder_config`
+- [x] Import SilenceMode in src/gui/processing.rs to enable explicit silence mode configuration
+- [x] Regenerate Cargo.lock reflecting unchanged dependency versions after rebuild

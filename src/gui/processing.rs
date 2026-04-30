@@ -8,6 +8,7 @@ use std::sync::{
 use std::time::{Duration, Instant};
 
 use super::{FolderState, ProcessingStatus, QueueEvent, WatcherEvent};
+use crate::config::SilenceMode;
 use crate::Config;
 use crate::FfmpegAnalyzer;
 use crate::FfmpegDurationGetter;
