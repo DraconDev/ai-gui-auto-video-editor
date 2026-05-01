@@ -163,7 +163,7 @@ pub fn calculate_keep_segments_from_transcript(
                     if let Some(prev) = processed.last_mut() {
                         prev.end = current_pos + padding;
                     }
-                    current_pos = seg.end - padding;
+                    current_pos = seg.end;
                     prev_is_filler = false;
                 }
             }
@@ -1177,11 +1177,15 @@ mod tests {
 
 let processed = calculate_keep_segments_from_transcript(&transcript, 10.0, &["um"], 0.1);
 
+        for (i, p) in processed.iter().enumerate() {
+            eprintln!("RESULT[{}]: ({:.1}, {:.1})", i, p.start, p.end);
+        }
+
         assert_eq!(processed.len(), 2);
         assert_eq!(processed[0].start, 0.0);
         assert_eq!(processed[0].end, 2.0);
-        assert_eq!(processed[1].start, 2.0);
-        assert_eq!(processed[1].end, 2.1);
+        assert_eq!(processed[1].start, 3.0);
+        assert_eq!(processed[1].end, 10.0);
     }
 
     #[test]
