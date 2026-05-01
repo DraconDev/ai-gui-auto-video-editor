@@ -832,6 +832,23 @@ impl AppState {
                 }
             }
         }
+
+        const MAX_BATCH_QUEUE: usize = 100;
+        let now = chrono::Local::now();
+        self.batch_queue.retain(|f| {
+            if f.status == QueueStatus::Done || f.status == QueueStatus::Error {
+                if let Some(completed) = f.completed_at {
+                    let elapsed = now.signed_duration_since(completed);
+                    if elapsed.num_seconds() > 60 {
+                        return false;
+                    }
+                }
+            }
+            true
+        });
+        if self.batch_queue.len() > MAX_BATCH_QUEUE {
+            self.batch_queue.drain(0..self.batch_queue.len() - MAX_BATCH_QUEUE);
+        }
     }
 
     fn upsert_processing_entry(
