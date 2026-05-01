@@ -132,13 +132,53 @@ pub fn calculate_keep_segments_from_transcript(
     let mut current_pos = 0.0;
     let mut prev_is_filler = false;
 
-    let processed = calculate_keep_segments_from_transcript(&transcript, 10.0, &["um"], 0.1);
+    for seg in transcript {
+        let is_filler = filler_words
+            .iter()
+            .any(|&f| seg.text.to_lowercase().contains(f));
 
-        for (i, s) in processed.iter().enumerate() {
-            eprintln!("RESULT: processed[{}] = ({{start: {:.1}, end: {:.1}}})", i, s.start, s.end);
+        if is_filler {
+            let keep_end = (seg.start + padding).min(total_duration);
+            let cut_end = (seg.end - padding).max(0.0);
+
+            if keep_end > current_pos {
+                if prev_is_filler {
+                    if let Some(prev) = processed.last_mut() {
+                        prev.end = keep_end;
+                    }
+                } else {
+                    processed.push(ProcessedSegment {
+                        start: current_pos,
+                        end: keep_end,
+                        speed: 1.0,
+                    });
+                }
+            }
+            current_pos = cut_end;
+            prev_is_filler = true;
+        } else {
+            if current_pos < seg.start {
+                let gap = seg.start - current_pos;
+                if prev_is_filler && (gap - padding).abs() < 0.001 {
+                    if let Some(prev) = processed.last_mut() {
+                        prev.end = seg.start;
+                    }
+                    current_pos = seg.end;
+                    prev_is_filler = false;
+                    continue;
+                }
+            }
+            if current_pos < seg.end {
+                processed.push(ProcessedSegment {
+                    start: current_pos,
+                    end: seg.end,
+                    speed: 1.0,
+                });
+            }
+            current_pos = seg.end;
+            prev_is_filler = false;
         }
-
-        assert_eq!(processed.len(), 2);
+    }
 
     if current_pos < total_duration {
         processed.push(ProcessedSegment {
