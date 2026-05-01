@@ -1,22 +1,23 @@
 # Project State
 
 ## Current Focus
-Added retry functionality for failed file processing operations in the GUI.
+Added a "Re-run Setup Wizard" button to the GUI sidebar
 
 ## Context
-This change addresses a user pain point where failed file processing operations would require manual intervention to retry. The addition of a "Retry" button provides immediate feedback and reduces friction in the workflow.
+This change provides users with a direct way to restart the application's setup process from the sidebar, improving usability for configuration adjustments.
 
 ## Completed
-- [x] Added retry button for files with `QueueStatus::Error` state
-- [x] Reset file status to `Queued` and progress to 0.0 when retry is clicked
-- [x] Clear completed timestamp when retrying
+- [x] Added a visually distinct button with a refresh icon (🔄) in the sidebar
+- [x] Implemented button styling with consistent theme colors and sizing
+- [x] Added proper spacing around the button and separator
+- [x] Connected button click to reset setup state and show the first setup step
 
 ## In Progress
-- [x] Implementation of retry functionality for failed operations
+- [x] Button implementation and functionality
 
 ## Blockers
 - None identified
 
 ## Next Steps
-1. Test retry functionality with various error scenarios
-2. Consider adding visual indicators for retry attempts
+1. Test button behavior in different UI states
+2. Consider adding visual feedback when setup is re-run

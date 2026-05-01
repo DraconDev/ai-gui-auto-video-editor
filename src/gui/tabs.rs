@@ -975,6 +975,26 @@ impl App {
                             }
                             ui.add_space(4.0);
                         }
+
+                        ui.add_space(16.0);
+                        ui.separator();
+                        ui.add_space(8.0);
+                        if ui
+                            .add(
+                                egui::Button::new(
+                                    egui::RichText::new("🔄 Re-run Setup Wizard")
+                                        .size(13.0)
+                                        .color(TEXT_SECONDARY),
+                                )
+                                .fill(PANEL_BG)
+                                .corner_radius(CORNER_RADIUS_SMALL)
+                                .min_size(egui::vec2(sidebar_width - 8.0, 32.0)),
+                            )
+                            .clicked()
+                        {
+                            self.state.show_setup = true;
+                            self.state.setup_step = super::SetupStep::Folder;
+                        }
                     });
                 });
 
