@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [19.26.2] - 2026-05-01
+
+### UX Improvements
+- **Left sidebar navigation**: Replaced top tab bar with vertical icon+label sidebar (72px wide) for easier navigation and better screen utilization
+
 ## [19.25.2] - 2026-05-01
 
 ### UX Improvements
