@@ -300,6 +300,7 @@ pub(crate) struct QueuedFile {
     status: QueueStatus,
     progress: f32,
     output_path: Option<PathBuf>,
+    completed_at: Option<chrono::Local>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
