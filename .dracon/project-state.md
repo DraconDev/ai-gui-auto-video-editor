@@ -1,18 +1,7 @@
 # Project State
 
 ## Current Focus
-Refactor Transcript Segmentation Logic to Handle Filler Words
+Updated test expectations in `src/editor.rs` to reflect new segment boundaries after refactoring filler‑word aware transcript segmentation.
 
 ## Completed
-- Removed debug logging and simplified filler-word detection logic
-- Merged consecutive filler segments by extending previous segment end
-- Adjusted segment start/end calculations to handle filler words properly
-- Corrected to apply padding when merging filler segments
-- Ensured alignment of `current_pos` with segment end for filler detection
-- Refactored logic to correctly handle filler words and padding in transcript segmentation
-
-## In Progress
-No notes
-
-## Future Tasks
-No notes
+- [x] Adjusted `assert_eq!` statements in `src/editor.rs` to set `processed[0].end` to 2.0, `processed[1].start` to 2.0, and `processed[1].end` to 2.1, matching the revised segmentation logic.
