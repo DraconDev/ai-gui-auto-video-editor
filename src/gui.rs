@@ -2,6 +2,8 @@ pub mod processing;
 pub mod tabs;
 pub mod theme;
 
+use self::theme::*;
+
 use eframe::egui;
 use std::path::{Path, PathBuf};
 use std::sync::{
