@@ -1,9 +1,7 @@
 # Project State
 
 ## Current Focus
-The CHANGELOG.md was updated to reflect the v19.1.5 release and added new version comparison links for recent releases.
+The CHANGELOG.md was updated to reflect the v19.1.8 release, documenting internal Cargo.lock updates with no functional changes since v19.1.5.
 
 ## Completed
-- [x] Updated CHANGELOG.md with new version links for v19.1.5, v14.4.1, v13.2.0, and v0.76.0
-- [x] Updated the [Unreleased] link to compare against v19.1.5 instead of v0.68.8
-```
+- [x] docs(changelog): Added v19.1.8 release entry noting Cargo.lock updates (no functional changes)
