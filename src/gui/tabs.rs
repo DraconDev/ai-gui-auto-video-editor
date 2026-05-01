@@ -993,7 +993,7 @@ impl App {
                             .clicked()
                         {
                             self.state.show_setup = true;
-                            self.state.setup_step = super::SetupStep::Folder;
+                            self.state.setup_step = super::SetupStep::ChooseFolder;
                         }
                     });
                 });

@@ -1,23 +1,20 @@
 # Project State
 
 ## Current Focus
-Added a "Re-run Setup Wizard" button to the GUI sidebar
+Renamed setup step from "Folder" to "ChooseFolder" in the GUI setup flow
 
 ## Context
-This change provides users with a direct way to restart the application's setup process from the sidebar, improving usability for configuration adjustments.
+This change aligns with the recent "Re-run Setup Wizard" button addition, making the setup step naming more consistent with the user interface terminology
 
 ## Completed
-- [x] Added a visually distinct button with a refresh icon (🔄) in the sidebar
-- [x] Implemented button styling with consistent theme colors and sizing
-- [x] Added proper spacing around the button and separator
-- [x] Connected button click to reset setup state and show the first setup step
+- [x] Renamed `SetupStep::Folder` to `SetupStep::ChooseFolder` in the GUI tab implementation
 
 ## In Progress
-- [x] Button implementation and functionality
+- [x] No active work in progress related to this change
 
 ## Blockers
-- None identified
+- None identified for this specific change
 
 ## Next Steps
-1. Test button behavior in different UI states
-2. Consider adding visual feedback when setup is re-run
+1. Verify the new naming appears correctly in the setup wizard UI
+2. Ensure all related documentation and tests are updated to reflect the new naming
