@@ -75,7 +75,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ai-vid-editor-${{ matrix.target }}
-          path: target/${{ matrix.target }}/release/ai-vid-editor-*.tar.gz
+          path: |
+            target/${{ matrix.target }}/release/ai-vid-editor-*.tar.gz
+            target/${{ matrix.target }}/release/ai-vid-editor-*.zip
 
   release:
     name: Create Release

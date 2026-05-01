@@ -65,7 +65,7 @@ jobs:
             ${{ runner.os }}-test-target-
 
       - name: Run tests
-        run: cargo test --lib
+        run: cargo test --all-features
 
   clippy:
     name: Clippy

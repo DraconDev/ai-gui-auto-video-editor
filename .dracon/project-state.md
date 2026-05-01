@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Update dependency lockfile to reflect updated crate versions after the v19.1.5 release.
+The commit updates CI/CD workflows to improve test coverage and release artifact handling.
 
 ## Completed
-- [x] Refresh Cargo.lock to lock updated crate versions
-- [x] Preserve binary lockfile size while applying version changes
+- [x] Expanded test coverage in CI by adding `--all-features` flag to test command
+- [x] Enhanced release workflow to include both .tar.gz and .zip artifacts in release packages
