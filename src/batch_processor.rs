@@ -285,14 +285,42 @@ where
 
     report_progress(&mut progress, 0.1, "Planning edits");
 
-    let processed_segments = calculate_keep_segments(
-        &silences,
-        video_duration,
-        config.silence.padding,
-        config.silence.mode,
-        config.silence.speedup_factor,
-        config.silence.min_silence_for_speedup,
-    );
+    let processed_segments = if config.filler_words.enabled {
+        report_progress(&mut progress, 0.1, "Transcribing for filler-word removal");
+        match maybe_transcribe_for_filler_words(&input_file, config) {
+            Some(transcript) => {
+                let filler_words: Vec<&str> = config
+                    .filler_words
+                    .words
+                    .iter()
+                    .map(|s| s.as_str())
+                    .collect();
+                calculate_keep_segments_from_transcript(
+                    &transcript,
+                    video_duration,
+                    &filler_words,
+                    config.filler_words.padding,
+                )
+            }
+            None => calculate_keep_segments(
+                &silences,
+                video_duration,
+                config.silence.padding,
+                config.silence.mode,
+                config.silence.speedup_factor,
+                config.silence.min_silence_for_speedup,
+            ),
+        }
+    } else {
+        calculate_keep_segments(
+            &silences,
+            video_duration,
+            config.silence.padding,
+            config.silence.mode,
+            config.silence.speedup_factor,
+            config.silence.min_silence_for_speedup,
+        )
+    };
     debug!(count = processed_segments.len(), "Segments to process");
 
     let trimmed_file = if config.audio.enhance

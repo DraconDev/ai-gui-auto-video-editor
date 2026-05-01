@@ -1,9 +1,9 @@
 # Project State
 
 ## Current Focus
-Add optional speech-to-text transcription for filler-word removal planning in batch processing
+feat(filler-words): Add optional speech-to-text transcription path for filler-word removal
 
 ## Completed
-- [x] Add `maybe_transcribe_for_filler_words` function that transcribes input files when `config.filler_words.enabled` is true
-- [x] Import `calculate_keep_segments_from_transcript` from the editor module for transcript-based segment calculation
-- [x] Implement graceful fallback: log warning and return `None` on transcription failure, allowing silence-based processing to proceed
+- [x] Add conditional filler-word removal using speech-to-text transcription when enabled
+- [x] Implement fallback to silence-based processing when transcription unavailable
+- [x] Extract filler words list from config for transcript-based segment calculation
