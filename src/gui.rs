@@ -970,7 +970,7 @@ impl eframe::App for App {
         }
 
         // Ctrl+1-5 for tab navigation (skip when shift is held, reserved for category access)
-        if is_ctrl && !modifiers.shift {
+        if is_ctrl && !modifiers.shift && !skip_shortcuts {
             let tab_keys = [
                 (egui::Key::Num1, Tab::All),
                 (egui::Key::Num2, Tab::Folders),
@@ -987,13 +987,13 @@ impl eframe::App for App {
         }
 
         // Ctrl+S: Save config (also works in settings tab)
-        if is_ctrl && ctx.input(|i| i.key_pressed(egui::Key::S)) {
+        if is_ctrl && !skip_shortcuts && ctx.input(|i| i.key_pressed(egui::Key::S)) {
             self.state.auto_save_config();
             self.state.add_toast("Config saved", ToastKind::Success);
         }
 
         // Keyboard shortcuts for settings navigation
-        if self.state.current_tab == Tab::Settings || self.state.current_tab == Tab::All {
+        if !skip_shortcuts && (self.state.current_tab == Tab::Settings || self.state.current_tab == Tab::All) {
             if is_ctrl && ctx.input(|i| i.key_pressed(egui::Key::ArrowLeft)) {
                 self.navigate_settings_category(-1);
             }
@@ -1002,7 +1002,7 @@ impl eframe::App for App {
             }
 
             // Ctrl+Shift+1-5 for category access
-            if is_ctrl && ctx.input(|i| i.modifiers.shift) {
+            if is_ctrl && modifiers.shift {
                 let categories = [
                     SettingsCategory::Processing,
                     SettingsCategory::Audio,

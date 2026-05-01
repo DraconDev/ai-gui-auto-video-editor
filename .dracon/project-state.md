@@ -1,25 +1,23 @@
 # Project State
 
 ## Current Focus
-Added keyboard shortcut handling conditions to prevent conflicts during setup, text input, and file drops
+Added conditional keyboard shortcut handling to prevent conflicts with existing UI interactions.
 
 ## Context
-Prevented global keyboard shortcuts from interfering with critical user interactions during:
-- Setup wizard display
-- Text input focus
-- Active file drop operations
+The changes address keyboard shortcut conflicts by introducing a `skip_shortcuts` condition to prevent shortcuts from triggering when they shouldn't, particularly in contexts where category access is needed.
 
 ## Completed
-- [x] Added condition to skip shortcuts when setup wizard is shown
-- [x] Added condition to skip shortcuts when text input is focused
-- [x] Added condition to skip shortcuts during active file drops
+- [x] Added `skip_shortcuts` condition to tab navigation shortcuts (Ctrl+1-5)
+- [x] Added `skip_shortcuts` condition to save config shortcut (Ctrl+S)
+- [x] Added `skip_shortcuts` condition to settings navigation shortcuts
+- [x] Simplified shift modifier check for category access (Ctrl+Shift+1-5)
 
 ## In Progress
-- [x] Implementation of keyboard shortcut conflict prevention
+- [ ] Verify no unintended side effects from shortcut suppression
 
 ## Blockers
-- None identified
+- Need to confirm if `skip_shortcuts` is properly set in all relevant UI contexts
 
 ## Next Steps
-1. Test shortcut behavior during all three conflict scenarios
-2. Verify no regressions in existing shortcut functionality
+1. Test shortcut behavior in different UI states
+2. Document the new `skip_shortcuts` mechanism for future maintainers
