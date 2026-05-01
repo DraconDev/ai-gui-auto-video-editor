@@ -128,7 +128,7 @@ pub fn calculate_keep_segments_from_transcript(
     filler_words: &[&str],
     padding: f32,
 ) -> Vec<ProcessedSegment> {
-    let mut processed = Vec::new();
+    let mut processed: Vec<ProcessedSegment> = Vec::new();
     let mut current_pos = 0.0;
     let mut prev_is_filler = false;
 

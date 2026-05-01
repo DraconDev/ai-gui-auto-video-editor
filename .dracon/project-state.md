@@ -1,7 +1,7 @@
 # Project State
 
 ## Current Focus
-Align project dependencies by updating Cargo.lock to the latest versions
+Explicitly annotate the type of the `processed` vector within `calculate_keep_segments_from_transcript`.
 
 ## Completed
-- [x] Updated Cargo.lock to reflect the latest dependency versions, ensuring dependency alignment without any code changes.
+- [x] refactor(editor.rs): Add explicit type annotation `Vec<ProcessedSegment>` to `processed` to improve compile-time clarity.
