@@ -169,6 +169,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Preset profiles: YouTube, Shorts, Podcast, Minimal
 - Whisper-based speech-to-text and filler word removal
 
-[Unreleased]: https://github.com/DraconDev/ai-vid-editor/compare/v0.68.8...HEAD
+[Unreleased]: https://github.com/DraconDev/ai-vid-editor/compare/v19.1.5...HEAD
+[19.1.5]: https://github.com/DraconDev/ai-vid-editor/compare/v14.4.1...v19.1.5
+[14.4.1]: https://github.com/DraconDev/ai-vid-editor/compare/v13.2.0...v14.4.1
+[13.2.0]: https://github.com/DraconDev/ai-vid-editor/compare/v0.76.0...v13.2.0
+[0.76.0]: https://github.com/DraconDev/ai-vid-editor/compare/v0.68.8...v0.76.0
 [0.68.8]: https://github.com/DraconDev/ai-vid-editor/compare/v0.38.0...v0.68.8
 [0.38.0]: https://github.com/DraconDev/ai-vid-editor/compare/v0.21.4...v0.38.0
