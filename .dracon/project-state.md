@@ -1,9 +1,9 @@
 # Project State
 
 ## Current Focus
-Refactor audio ducking configuration API and update integration tests to use the new fields.
+Enhanced integration tests and simplified export configuration handling for video processing pipeline features.
 
 ## Completed
-- [x] Update pipeline integration test to set `config.audio.duck_volume` and `config.audio.music_file` instead of the previous `ducking` struct fields
-- [x] Adjust test assertions to match the new configuration structure
-- [x] Align Cargo.lock with the latest dependency versions to ensure consistent builds
+- [x] Aligned Cargo.lock dependencies to latest versions (no binary content changes, size reduced by 1 byte)
+- [x] Added new integration tests for SRT caption export and chapters/clips extraction via config.export flags
+- [x] Refactored test configurations to streamline settings management using simplified struct access patterns

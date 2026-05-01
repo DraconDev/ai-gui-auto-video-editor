@@ -1331,14 +1331,8 @@ fn test_intro_outro_in_pipeline() {
     assert!(silence_video(&outro_path, 2.0), "Outro video creation failed");
 
     let mut config = Config::default();
-    config.intro = Some(ai_vid_editor::config::IntroConfig {
-        path: intro_path.clone(),
-        transition_ms: 500,
-    });
-    config.outro = Some(ai_vid_editor::config::IntroConfig {
-        path: outro_path.clone(),
-        transition_ms: 500,
-    });
+    config.paths.intro = Some(intro_path);
+    config.paths.outro = Some(outro_path);
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
@@ -1513,8 +1507,41 @@ fn test_captions_in_pipeline_with_speech() {
     let output_path = output_dir.path().join("output_captions.mp4");
 
     let mut config = Config::default();
-    config.captions.enabled = true;
-    config.captions.burn_in = true;
+    config.export.captions = true;
+
+    let editor = FfmpegEditor::default();
+    let analyzer = FfmpegAnalyzer;
+    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+
+    let result = ai_vid_editor::batch_processor::process_single_file(
+        video_path.clone(),
+        output_path.clone(),
+        &config,
+        &analyzer,
+        &editor,
+        &duration_getter,
+    );
+
+    assert!(result.is_ok(), "Pipeline with captions should succeed");
+    assert!(output_path.exists(), "Output file should exist");
+}
+
+#[test]
+fn test_srt_export_with_speech() {
+    use tempfile::tempdir;
+
+    let video_path = test_speech_video_path();
+    if !video_path.exists() {
+        eprintln!("Skipping test: speech test video not found");
+        return;
+    }
+    check_ffmpeg_or_return();
+
+    let output_dir = tempdir().unwrap();
+    let output_path = output_dir.path().join("output_srt.mp4");
+
+    let mut config = Config::default();
+    config.export.subtitles = true;
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
@@ -1589,7 +1616,6 @@ fn test_chapters_with_speech() {
     let output_path = output_dir.path().join("output_chapters.mp4");
 
     let mut config = Config::default();
-    config.transcription.enabled = true;
     config.export.chapters = true;
 
     let editor = FfmpegEditor::default();
@@ -1624,8 +1650,7 @@ fn test_clips_extraction_with_speech() {
     let output_path = output_dir.path().join("output_clips.mp4");
 
     let mut config = Config::default();
-    config.transcription.enabled = true;
-    config.clips.enabled = true;
+    config.export.clips = true;
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
