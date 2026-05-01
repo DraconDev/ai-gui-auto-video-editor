@@ -801,6 +801,7 @@ impl AppState {
                             file.status = QueueStatus::Done;
                             file.progress = 1.0;
                             file.output_path = Some(output_path);
+                            file.completed_at = Some(chrono::Local::now());
                             break;
                         }
                     }

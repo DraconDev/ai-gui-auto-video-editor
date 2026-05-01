@@ -4,17 +4,17 @@
 Add timestamp tracking for completed file processing operations
 
 ## Context
-This change enables tracking when file processing operations complete by adding a `completed_at` field to the `QueuedFile` struct. This supports better activity logging and monitoring of processing completion times.
+This change adds a timestamp to track when file processing operations are completed, which will help with activity logging and debugging.
 
 ## Completed
-- [x] Added `completed_at` field to `QueuedFile` struct with `Option<chrono::Local>` type
+- [x] Added `completed_at` field to file processing records with current local timestamp
 
 ## In Progress
-- [x] Implementation of timestamp population during file processing completion
+- [x] Implementation of timestamp tracking for completed operations
 
 ## Blockers
-- None identified for this specific change
+- None identified
 
 ## Next Steps
-1. Implement timestamp population during file processing completion
-2. Update activity logging to display completion timestamps
+1. Verify timestamp accuracy in different timezones
+2. Integrate with existing activity logging system
