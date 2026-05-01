@@ -922,19 +922,38 @@ impl eframe::App for App {
         self.state.drain_watcher_events();
         self.state.drain_queue_events();
 
+        // Global keyboard shortcuts (work on all tabs)
+        let modifiers = ctx.input(|i| i.modifiers);
+        #[cfg(target_os = "macos")]
+        let is_ctrl = modifiers.ctrl || modifiers.mac_cmd;
+        #[cfg(not(target_os = "macos"))]
+        let is_ctrl = modifiers.ctrl;
+
+        // Ctrl+1-5 for tab navigation
+        if is_ctrl {
+            let tab_keys = [
+                (egui::Key::Num1, Tab::All),
+                (egui::Key::Num2, Tab::Folders),
+                (egui::Key::Num3, Tab::Queue),
+                (egui::Key::Num4, Tab::Settings),
+                (egui::Key::Num5, Tab::Activity),
+            ];
+            for (key, tab) in tab_keys {
+                if ctx.input(|i| i.key_pressed(key)) {
+                    self.state.current_tab = tab;
+                    break;
+                }
+            }
+        }
+
+        // Ctrl+S: Save config (also works in settings tab)
+        if is_ctrl && ctx.input(|i| i.key_pressed(egui::Key::S)) {
+            self.state.auto_save_config();
+            self.state.add_toast("Config saved", ToastKind::Success);
+        }
+
         // Keyboard shortcuts for settings navigation
         if self.state.current_tab == Tab::Settings || self.state.current_tab == Tab::All {
-            let modifiers = ctx.input(|i| i.modifiers);
-            #[cfg(target_os = "macos")]
-            let is_ctrl = modifiers.ctrl || modifiers.mac_cmd;
-            #[cfg(not(target_os = "macos"))]
-            let is_ctrl = modifiers.ctrl;
-
-            if is_ctrl && ctx.input(|i| i.key_pressed(egui::Key::S)) {
-                self.state.auto_save_config();
-                self.state.add_toast("Config saved", ToastKind::Success);
-            }
-
             if is_ctrl && ctx.input(|i| i.key_pressed(egui::Key::ArrowLeft)) {
                 self.navigate_settings_category(-1);
             }
@@ -942,25 +961,27 @@ impl eframe::App for App {
                 self.navigate_settings_category(1);
             }
 
-            // Ctrl+1-5 for direct category access
-            let categories = [
-                SettingsCategory::Processing,
-                SettingsCategory::Audio,
-                SettingsCategory::Video,
-                SettingsCategory::Exports,
-                SettingsCategory::Advanced,
-            ];
-            let num_keys = [
-                (egui::Key::Num1, 0),
-                (egui::Key::Num2, 1),
-                (egui::Key::Num3, 2),
-                (egui::Key::Num4, 3),
-                (egui::Key::Num5, 4),
-            ];
-            for (key, idx) in num_keys {
-                if is_ctrl && ctx.input(|i| i.key_pressed(key)) {
-                    self.state.settings_category = categories[idx];
-                    break;
+            // Ctrl+Shift+1-5 for category access
+            if is_ctrl && ctx.input(|i| i.modifiers.shift) {
+                let categories = [
+                    SettingsCategory::Processing,
+                    SettingsCategory::Audio,
+                    SettingsCategory::Video,
+                    SettingsCategory::Exports,
+                    SettingsCategory::Advanced,
+                ];
+                let num_keys = [
+                    (egui::Key::Num1, 0),
+                    (egui::Key::Num2, 1),
+                    (egui::Key::Num3, 2),
+                    (egui::Key::Num4, 3),
+                    (egui::Key::Num5, 4),
+                ];
+                for (key, idx) in num_keys {
+                    if ctx.input(|i| i.key_pressed(key)) {
+                        self.state.settings_category = categories[idx];
+                        break;
+                    }
                 }
             }
         }
