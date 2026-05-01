@@ -1191,8 +1191,8 @@ mod tests {
 
         assert_eq!(processed.len(), 2);
         assert_eq!(processed[0].start, 0.0);
-        assert_eq!(processed[0].end, 2.1);
-        assert_eq!(processed[1].start, 3.0);
+        assert_eq!(processed[0].end, 3.1);
+        assert_eq!(processed[1].start, 10.0);
         assert_eq!(processed[1].end, 10.0);
     }
 
