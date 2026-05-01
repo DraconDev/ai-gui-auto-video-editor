@@ -411,6 +411,8 @@ pub struct AppState {
     settings_category: SettingsCategory,
     // Debounced config save
     last_save_time: Option<std::time::Instant>,
+    // Recent outputs (quick access)
+    recent_outputs: Vec<PathBuf>,
 }
 
 #[allow(dead_code)]

@@ -1,21 +1,20 @@
 # Project State
 
 ## Current Focus
-Improved drag-and-drop file handling for video files in the Queue tab
+Added recent outputs tracking to the GUI state for quick access.
 
 ## Context
-This change enhances the file handling system by properly accessing dropped files through the raw input interface, which provides more reliable access to file paths during drag-and-drop operations.
+This change supports a feature that allows users to quickly access recently processed outputs without navigating through file dialogs. It complements the existing drag-and-drop functionality for video files in the Queue tab.
 
 ## Completed
-- [x] Updated drag-and-drop file handling to use `i.raw.dropped_files` instead of direct `i.dropped_files` access
-- [x] Maintained video file filtering for Queue tab operations
+- [x] Added `recent_outputs` field to `AppState` to store paths of recently processed outputs
 
 ## In Progress
-- [x] Implementation of improved drag-and-drop file processing
+- [x] Implementation of UI components to display and interact with recent outputs
 
 ## Blockers
-- No blockers identified for this specific change
+- UI component implementation for displaying recent outputs needs to be completed
 
 ## Next Steps
-1. Verify the new implementation works consistently across different platforms
-2. Test edge cases like multiple simultaneous file drops
+1. Implement UI components to display and interact with recent outputs
+2. Add functionality to populate the recent outputs list when files are processed
