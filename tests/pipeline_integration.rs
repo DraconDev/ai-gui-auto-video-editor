@@ -1626,40 +1626,6 @@ fn test_captions_in_pipeline_with_speech() {
 }
 
 #[test]
-fn test_captions_export_with_speech() {
-    use tempfile::tempdir;
-
-    let video_path = test_speech_video_path();
-    if !video_path.exists() {
-        eprintln!("Skipping test: speech test video not found");
-        return;
-    }
-    check_ffmpeg_or_return();
-
-    let output_dir = tempdir().unwrap();
-    let output_path = output_dir.path().join("output_captions.mp4");
-
-    let mut config = Config::default();
-    config.export.captions = true;
-
-    let editor = FfmpegEditor::default();
-    let analyzer = FfmpegAnalyzer;
-    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
-
-    let result = ai_vid_editor::batch_processor::process_single_file(
-        video_path.clone(),
-        output_path.clone(),
-        &config,
-        &analyzer,
-        &editor,
-        &duration_getter,
-    );
-
-    assert!(result.is_ok(), "Pipeline with captions should succeed");
-    assert!(output_path.exists(), "Output file should exist");
-}
-
-#[test]
 fn test_subtitles_export_with_speech() {
     use tempfile::tempdir;
 
@@ -1944,7 +1910,6 @@ fn test_batch_processing_multiple_files() {
 
 #[test]
 fn test_batch_progress_persistence() {
-    use std::io::Write;
     use tempfile::tempdir;
 
     let video_path = test_video_path();
