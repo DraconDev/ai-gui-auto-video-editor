@@ -1,23 +1,21 @@
 # Project State
 
 ## Current Focus
-Added recent outputs section to the GUI tabs for quick access to processed files
+Improved hover behavior for file labels in the GUI tabs
 
 ## Context
-This change implements a feature to display recently processed files in the GUI, allowing users to quickly access their outputs without navigating to file locations manually.
+The previous implementation of file labels in tabs had inconsistent hover behavior where the tooltip would only appear when hovering over the label text, not the entire label area. This change makes the hover behavior more intuitive by ensuring tooltips appear when hovering anywhere over the file label.
 
 ## Completed
-- [x] Added "Recent Outputs" section to the GUI tabs
-- [x] Display up to 5 most recent output files with hover tooltips showing full paths
-- [x] Styled section with appropriate spacing and visual hierarchy
-- [x] Implemented path display with filename and directory separation
+- [x] Refactored file label hover behavior to use `on_hover_text` for consistent tooltip display
+- [x] Simplified the label rendering logic by removing conditional branching
 
 ## In Progress
-- [x] Recent outputs tracking functionality is complete
+- [x] No active work in progress
 
 ## Blockers
-- None identified for this specific change
+- None
 
 ## Next Steps
-1. Verify recent outputs tracking is properly updating the state
-2. Consider adding clear functionality for the recent outputs section
+1. Verify the new hover behavior works as expected across different platforms
+2. Consider adding similar hover improvements to other GUI elements

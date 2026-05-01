@@ -223,11 +223,9 @@ impl App {
                     .map(|p| p.display().to_string())
                     .unwrap_or_default();
                 ui.horizontal_wrapped(|ui| {
-                    if ui.add(egui::Label::new(format!("📄 {}", filename)).hovered {
-                        ui.tooltip_text(dir.clone());
-                    } else {
-                        ui.label(label_muted(&filename));
-                    }
+                    let label = egui::Label::new(format!("📄 {}", filename));
+                    let resp = ui.add(label);
+                    resp.on_hover_text(dir.clone());
                 });
             }
         }
