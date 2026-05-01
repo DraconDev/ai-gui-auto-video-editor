@@ -1,21 +1,22 @@
 # Project State
 
 ## Current Focus
-Update dependency lockfile to reflect updated crate versions
+Update CHANGELOG.md to document recent UX improvements and bug fixes for version 19.25.2
 
 ## Context
-This change ensures the project uses the latest compatible versions of dependencies, maintaining stability while incorporating security patches and new features.
+This commit documents the recent improvements made to keyboard shortcut handling, dropdown popups, and setup wizard behavior, which were implemented in prior commits.
 
 ## Completed
-- [x] Updated Cargo.lock to reflect current dependency versions
+- [x] Documented keyboard shortcut fixes for modifier collisions and text input prevention
+- [x] Documented dropdown popup improvements with scroll support and dynamic positioning
+- [x] Documented Escape key handling for setup wizard closure
 
 ## In Progress
-- [x] Verifying all dependencies are compatible with the new versions
+- [x] CHANGELOG.md update is complete
 
 ## Blockers
-- None identified
+- None
 
 ## Next Steps
-1. Verify build passes with updated dependencies
-2. Test application functionality with new dependency versions
-```
+1. Prepare for version 19.25.2 release
+2. Begin work on upcoming features for the next release cycle

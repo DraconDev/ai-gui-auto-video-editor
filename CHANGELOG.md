@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [19.25.2] - 2026-05-01
+
+### UX Improvements
+- **Keyboard shortcut fixes**: Added `!modifiers.shift` guard to prevent Ctrl+1-5 and Ctrl+Shift+1-5 collision; added `ctx.wants_keyboard_input()` guard to prevent shortcuts firing during text input; skip all shortcuts when setup wizard is shown
+- **Dropdown popup fixes**: Added `ScrollArea` to dropdown popup for long lists, removed hard 200px cap, added upward-flip when popup would render off-screen
+
+### Bug Fixes
+- **Escape key handling**: Escape key now closes the setup wizard
+
 ## [19.19.0] - 2026-05-01
 
 ### UX Improvements
