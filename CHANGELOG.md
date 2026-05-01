@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [19.14.2] - 2026-05-01
+
+### UX Improvements
+- **Memory leak fixes**: Capped `activity_log` to 500 entries (FIFO eviction), replaced unbounded `HashSet` in watcher with bounded `VecDeque` (max 10,000), auto-clear completed batch queue items after 60s (max 100 items)
+- **Keyboard shortcuts**: Added global Ctrl+1-5 for tab navigation, Ctrl+S for save, Ctrl+ArrowLeft/Right for settings category navigation, Ctrl+Shift+1-5 for direct category access
+- **Retry button**: Failed batch queue items now show a "Retry" button to re-queue them
+- **Re-run Setup Wizard**: Added button in Settings sidebar to re-launch the first-run wizard
+
+### Refactor
+- Moved `use clap::Parser` under `#[cfg(feature = "cli")]` guard in main.rs
+- Removed duplicate `VIDEO_EXTENSIONS` constant from `analyzer.rs`
+
 ## [19.3.10] - 2026-05-01
 
 ### Refactor
