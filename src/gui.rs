@@ -922,20 +922,13 @@ impl eframe::App for App {
         self.state.drain_watcher_events();
         self.state.drain_queue_events();
 
-        // Handle dropped files (drag-and-drop)
-        let dropped = ctx.input(|i| i.files.clone());
+        // Handle dropped files (drag-and-drop onto queue tab)
         if !dropped.is_empty() && self.state.current_tab == Tab::Queue {
             for path in dropped {
                 if crate::utils::is_video_file(&path) {
-                    let output_dir = self.state.folders.first()
-                        .map(|f| f.settings.output_dir.clone())
-                        .unwrap_or_else(|| PathBuf::from("output"));
-                    let preset = self.state.folders.first()
-                        .map(|f| f.preset.clone())
-                        .unwrap_or_else(|| "youtube".to_string());
-                    let settings = self.state.folders.first()
-                        .map(|f| f.settings.clone())
-                        .unwrap_or_default();
+                    let output_dir = PathBuf::from("output");
+                    let preset = "youtube".to_string();
+                    let settings = FolderSettings::default();
                     self.state.batch_queue.push(QueuedFile {
                         path,
                         output_dir,
