@@ -1,20 +1,21 @@
 # Project State
 
 ## Current Focus
-Improved scroll bar behavior in GUI tabs by removing offset
+Added Escape key support to close the setup wizard in the GUI
 
 ## Context
-The change addresses visual consistency in the scroll area of GUI tabs by removing the scroll bar offset, which was previously causing misalignment in the scroll bar positioning.
+This change improves user experience by allowing quick dismissal of the setup wizard without requiring mouse interaction
 
 ## Completed
-- [x] Removed scroll bar offset in GUI tabs scroll area for consistent visual alignment
+- [x] Added Escape key handler to close setup wizard when visible
+- [x] Only triggers when setup wizard is active
 
 ## In Progress
-- [x] No active work in progress related to this change
+- [x] Implemented basic keyboard interaction for setup flow
 
 ## Blockers
-- None
+- None identified
 
 ## Next Steps
-1. Verify visual consistency across different tab configurations
-2. Test with various content sizes to ensure scroll behavior remains smooth
+1. Test Escape key behavior across different platforms
+2. Consider adding similar keyboard shortcuts for other dialogs

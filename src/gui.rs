@@ -942,6 +942,11 @@ impl eframe::App for App {
             || ctx.wants_keyboard_input()
             || ctx.input(|i| i.raw.dropped_files.len() > 0);
 
+        // Escape key closes setup wizard
+        if self.state.show_setup && ctx.input(|i| i.key_pressed(egui::Key::Escape)) {
+            self.state.show_setup = false;
+        }
+
         // Handle file drops onto the Queue tab
         if self.state.current_tab == Tab::Queue {
             let dropped = ctx.input(|i| {
