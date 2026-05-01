@@ -1,24 +1,20 @@
 # Project State
 
 ## Current Focus
-Improved dropdown selector behavior with better positioning and scroll support
+Improved scroll bar behavior in GUI tabs by removing offset
 
 ## Context
-The dropdown selector in the GUI needed improvements to handle edge cases where the dropdown would appear off-screen. The changes also add scroll support for long lists of options.
+The change addresses visual consistency in the scroll area of GUI tabs by removing the scroll bar offset, which was previously causing misalignment in the scroll bar positioning.
 
 ## Completed
-- [x] Added screen boundary detection to prevent dropdowns from appearing off-screen
-- [x] Implemented dynamic positioning (above/below button based on available space)
-- [x] Added scroll support for dropdown lists with many items
-- [x] Improved visual feedback for selected items with proper text coloring
-- [x] Enhanced dropdown styling with consistent corner radius and margins
+- [x] Removed scroll bar offset in GUI tabs scroll area for consistent visual alignment
 
 ## In Progress
-- [ ] None (changes are complete)
+- [x] No active work in progress related to this change
 
 ## Blockers
 - None
 
 ## Next Steps
-1. Verify dropdown behavior with various screen sizes and resolutions
-2. Test with different numbers of dropdown items to ensure scroll works as expected
+1. Verify visual consistency across different tab configurations
+2. Test with various content sizes to ensure scroll behavior remains smooth
