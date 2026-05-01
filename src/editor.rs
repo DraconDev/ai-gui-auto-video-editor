@@ -157,14 +157,20 @@ pub fn calculate_keep_segments_from_transcript(
             current_pos = cut_end;
             prev_is_filler = true;
         } else {
+            let mut seg_start = current_pos;
             if current_pos < seg.start {
                 let gap = seg.start - current_pos;
                 if prev_is_filler && (gap - padding).abs() < 0.001 {
-                    if let Some(prev) = processed.last_mut() {
-                        prev.end = seg.start;
-                    }
+                    seg_start = current_pos;
                     current_pos = seg.end;
                     prev_is_filler = false;
+                    if seg_start < current_pos {
+                        processed.push(ProcessedSegment {
+                            start: seg_start,
+                            end: current_pos,
+                            speed: 1.0,
+                        });
+                    }
                     continue;
                 }
             }
