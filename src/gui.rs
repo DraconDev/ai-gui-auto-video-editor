@@ -922,27 +922,6 @@ impl eframe::App for App {
         self.state.drain_watcher_events();
         self.state.drain_queue_events();
 
-        // Handle dropped files (drag-and-drop onto queue tab)
-        if !dropped.is_empty() && self.state.current_tab == Tab::Queue {
-            for path in dropped {
-                if crate::utils::is_video_file(&path) {
-                    let output_dir = PathBuf::from("output");
-                    let preset = "youtube".to_string();
-                    let settings = FolderSettings::default();
-                    self.state.batch_queue.push(QueuedFile {
-                        path,
-                        output_dir,
-                        preset,
-                        settings,
-                        status: QueueStatus::Queued,
-                        progress: 0.0,
-                        output_path: None,
-                        completed_at: None,
-                    });
-                }
-            }
-        }
-
         // Global keyboard shortcuts (work on all tabs)
         let modifiers = ctx.input(|i| i.modifiers);
         #[cfg(target_os = "macos")]

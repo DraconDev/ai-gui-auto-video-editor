@@ -1,22 +1,20 @@
 # Project State
 
 ## Current Focus
-Improved drag-and-drop handling for video files in the Queue tab
+Removed drag-and-drop file handling for video files in the Queue tab
 
 ## Context
-The previous implementation of drag-and-drop file handling was too generic. This change makes it more specific to the Queue tab and simplifies the default values used when processing dropped files.
+This change removes the functionality that allowed users to drag-and-drop video files directly into the Queue tab. The feature was previously added to improve user workflow but is now being removed as part of a refactoring effort.
 
 ## Completed
-- [x] Restricted drag-and-drop file handling to only work on the Queue tab
-- [x] Simplified default values for output directory, preset, and settings when processing dropped files
-- [x] Updated comment to reflect the more specific functionality
+- [x] Removed drag-and-drop file handling for video files in the Queue tab
 
 ## In Progress
-- [ ] No active work in progress
+- [x] No active work in progress related to this change
 
 ## Blockers
 - None identified
 
 ## Next Steps
-1. Verify the new behavior works as expected with various file types
-2. Consider adding visual feedback when files are successfully dropped onto the Queue tab
+1. Verify no regression in queue management functionality
+2. Update documentation to reflect the removal of this feature
