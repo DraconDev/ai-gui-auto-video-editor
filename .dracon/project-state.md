@@ -1,8 +1,11 @@
-# ProjectState
+# Project State
 
 ## Current Focus
-Adjust transcript segmentation to apply padding when merging segments near filler words.
+Resolve merge issue by aligning `current_pos` with segment end instead of end minus padding.
 
 ## Completed
-- [x] Modified `calculate_keep_segments_from_transcript` to set `prev.end = seg.start - padding` and `current_pos = seg.end - padding` for gap handling
-- [x] Updated test assertion expecting `processed[1].start` to be `3.0` instead of `2.9` to match new padding logic
+- [x] Fix inconsistency in segment merger by eliminating extra padding from `current_pos`.
+
+## Future Work
+- Review and integrate the fix into automated testing to catch similar issues in the future.
+- Investigate whether the padding requirement should still be enforced in other scenarios.

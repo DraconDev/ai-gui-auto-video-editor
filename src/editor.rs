@@ -163,7 +163,7 @@ pub fn calculate_keep_segments_from_transcript(
                     if let Some(prev) = processed.last_mut() {
                         prev.end = seg.start - padding;
                     }
-                    current_pos = seg.end - padding;
+                    current_pos = seg.end;
                     prev_is_filler = false;
                     continue;
                 }
