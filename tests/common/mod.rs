@@ -89,3 +89,60 @@ pub fn has_ffmpeg() -> bool {
 pub fn has_ffprobe() -> bool {
     Command::new("ffprobe").arg("-version").status().is_ok()
 }
+
+#[allow(dead_code)]
+pub fn test_speech_video_path() -> std::path::PathBuf {
+    let path = fixtures_dir().join("test_speech_video.mp4");
+    if !path.exists() {
+        create_speech_video(&path, "Hello world. This is a test. Um, let me think. Ah yes, okay.", 8);
+    }
+    path
+}
+
+#[allow(dead_code)]
+pub fn create_speech_video(output_path: &std::path::Path, text: &str, duration_secs: u32) -> bool {
+    use std::process::Command;
+    use std::fs;
+    use std::io::Write;
+
+    let temp_dir = output_path.parent().map(|p| p.to_path_buf()).unwrap_or_else(|| std::path::PathBuf::from("."));
+    let wav_path = temp_dir.join("temp_speech.wav");
+    let mp3_path = temp_dir.join("temp_speech.mp3");
+
+    let espeak_ok = Command::new("espeak")
+        .args(["-w", wav_path.to_str().unwrap(), text])
+        .status()
+        .map(|s| s.success())
+        .unwrap_or(false);
+
+    if !espeak_ok || !wav_path.exists() {
+        let _ = fs::remove_file(&wav_path);
+        let _ = fs::remove_file(&mp3_path);
+        return false;
+    }
+
+    let ffmpeg_ok = Command::new("ffmpeg")
+        .args([
+            "-f",
+            "lavfi",
+            "-i",
+            &format!("color=c=black:s=320x240:d={}", duration_secs),
+            "-i",
+            wav_path.to_str().unwrap(),
+            "-c:v",
+            "libx264",
+            "-c:a",
+            "aac",
+            "-shortest",
+            "-y",
+            output_path.to_str().unwrap(),
+        ])
+        .status()
+        .map(|s| s.success())
+        .unwrap_or(false);
+
+    let _ = fs::remove_file(&wav_path);
+    let _ = fs::remove_file(&mp3_path);
+
+    ffmpeg_ok && output_path.exists()
+}
