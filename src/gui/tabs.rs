@@ -2356,6 +2356,7 @@ impl App {
                                     status: super::QueueStatus::Queued,
                                     progress: 0.0,
                                     output_path: None,
+                                    completed_at: None,
                                 });
                             }
                         }
