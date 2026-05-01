@@ -11,6 +11,7 @@ use crate::analyzer::VideoAnalyzer;
 use crate::config::Config;
 use crate::editor::VideoEditor;
 use crate::editor::calculate_keep_segments;
+use crate::editor::calculate_keep_segments_from_transcript;
 use crate::exporter;
 use crate::progress::BatchProgress;
 use crate::stt_analyzer::{CandleSttAnalyzer, TranscriptSegment, VideoSttAnalyzer};
@@ -532,6 +533,28 @@ where
     report_progress(&mut progress, 1.0, "Done");
     info!(file = ?output_file, "Successfully saved video");
     Ok(())
+}
+
+/// Transcribe the input file for filler-word removal planning.
+/// Returns `Some(transcript)` if filler_words removal is enabled, `None` otherwise.
+fn maybe_transcribe_for_filler_words(
+    input_file: &Path,
+    config: &Config,
+) -> Option<Vec<TranscriptSegment>> {
+    if !config.filler_words.enabled {
+        return None;
+    }
+
+    match CandleSttAnalyzer.transcribe(input_file) {
+        Ok(t) => {
+            info!(segments = t.len(), "Transcription for filler-word removal complete");
+            Some(t)
+        }
+        Err(e) => {
+            warn!(error = %e, "Transcription for filler-word removal failed, falling back to silence-based processing");
+            None
+        }
+    }
 }
 
 /// Merge silence segments with scene-change boundaries.
