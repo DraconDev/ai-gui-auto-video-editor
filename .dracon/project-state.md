@@ -1,20 +1,20 @@
 # Project State
 
 ## Current Focus
-Update dependency lockfile to reflect updated crate versions
+Fixed sidebar layout to properly fill available height using egui's SidePanel API
 
 ## Context
-This change was triggered by recent refactoring work in the sidebar navigation system and other GUI components. The lockfile needs to be updated to ensure all dependencies are properly versioned after these changes.
+The previous manual `Frame::show()` approach caused the sidebar to appear too narrow, with content only appearing beside it. This change improves the visual layout and user experience.
 
 ## Completed
-- [x] Updated Cargo.lock to reflect current dependency versions
+- [x] Fixed sidebar height issue by using `SidePanel::left()` instead of manual frame management
 
 ## In Progress
-- [x] No active work in progress beyond the lockfile update
+- [x] Sidebar layout improvements
 
 ## Blockers
-- None identified
+- None
 
 ## Next Steps
-1. Verify that all dependencies are correctly resolved
-2. Continue with ongoing GUI refactoring work
+1. Verify the new layout works across different screen sizes
+2. Document the new sidebar implementation in the GUI documentation
