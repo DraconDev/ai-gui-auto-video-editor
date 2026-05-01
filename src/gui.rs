@@ -300,7 +300,7 @@ pub(crate) struct QueuedFile {
     status: QueueStatus,
     progress: f32,
     output_path: Option<PathBuf>,
-    completed_at: Option<chrono::Local>,
+    completed_at: Option<chrono::DateTime<chrono::Local>>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -838,7 +838,7 @@ impl AppState {
         self.batch_queue.retain(|f| {
             if f.status == QueueStatus::Done || f.status == QueueStatus::Error {
                 if let Some(completed) = f.completed_at {
-                    let elapsed = now.signed_duration_since(completed.into());
+                    let elapsed = now.signed_duration_since(completed);
                     if elapsed.num_seconds() > 60 {
                         return false;
                     }
