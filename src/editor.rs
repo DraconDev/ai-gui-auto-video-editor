@@ -129,67 +129,65 @@ pub fn calculate_keep_segments_from_transcript(
     padding: f32,
 ) -> Vec<ProcessedSegment> {
     let mut processed: Vec<ProcessedSegment> = Vec::new();
-    let mut current_pos = 0.0;
-    let mut prev_is_filler = false;
 
-    for seg in transcript {
+    for (i, seg) in transcript.iter().enumerate() {
         let is_filler = filler_words
             .iter()
             .any(|&f| seg.text.to_lowercase().contains(f));
 
         if is_filler {
-            let keep_end = (seg.start + padding).min(total_duration);
-            let cut_end = (seg.end - padding).max(0.0);
+            continue;
+        }
 
-            if keep_end > current_pos {
-                if prev_is_filler {
-                    if let Some(prev) = processed.last_mut() {
-                        prev.end = keep_end;
-                    }
-                } else {
+        let seg_start = seg.start.max(0.0);
+        let seg_end = seg.end.min(total_duration);
+
+        if seg_start >= seg_end {
+            continue;
+        }
+
+        let prev_end = processed.last().map(|s| s.end).unwrap_or(0.0);
+        let mut gap_filled = false;
+
+        if i > 0 {
+            let prev_seg = &transcript[i - 1];
+            let prev_is_filler = filler_words
+                .iter()
+                .any(|&f| prev_seg.text.to_lowercase().contains(f));
+
+            if prev_is_filler && seg_start > prev_end {
+                let gap = seg_start - prev_end;
+                if (gap - padding * 2.0).abs() < 0.001 || gap < padding {
                     processed.push(ProcessedSegment {
-                        start: current_pos,
-                        end: keep_end,
+                        start: prev_end,
+                        end: seg_end,
                         speed: 1.0,
                     });
+                    gap_filled = true;
                 }
             }
-            current_pos = cut_end;
-            prev_is_filler = true;
-        } else {
-            if current_pos < seg.start {
-                let gap = seg.start - current_pos;
-                if prev_is_filler && (gap - padding).abs() < 0.001 {
-                    if let Some(prev) = processed.last_mut() {
-                        prev.end = current_pos + padding;
-                    }
-                    current_pos = seg.end;
-                    prev_is_filler = false;
-                } else if current_pos < seg.end {
-                    processed.push(ProcessedSegment {
-                        start: current_pos,
-                        end: seg.end,
-                        speed: 1.0,
-                    });
-                }
-            } else if current_pos < seg.end {
+        }
+
+        if !gap_filled {
+            let start = prev_end.max(seg_start).min(seg_end);
+            if start < seg_end {
                 processed.push(ProcessedSegment {
-                    start: current_pos,
-                    end: seg.end,
+                    start,
+                    end: seg_end,
                     speed: 1.0,
                 });
             }
-            current_pos = seg.end;
-            prev_is_filler = false;
         }
     }
 
-    if current_pos < total_duration {
-        processed.push(ProcessedSegment {
-            start: current_pos,
-            end: total_duration,
-            speed: 1.0,
-        });
+    if let Some(last) = processed.last() {
+        if last.end < total_duration {
+            processed.push(ProcessedSegment {
+                start: last.end,
+                end: total_duration,
+                speed: 1.0,
+            });
+        }
     }
 
     processed
@@ -1181,10 +1179,6 @@ mod tests {
         ];
 
 let processed = calculate_keep_segments_from_transcript(&transcript, 10.0, &["um"], 0.1);
-
-        for (i, p) in processed.iter().enumerate() {
-            eprintln!("RESULT[{}]: ({:.1}, {:.1})", i, p.start, p.end);
-        }
 
         assert_eq!(processed.len(), 2);
         assert_eq!(processed[0].start, 0.0);
