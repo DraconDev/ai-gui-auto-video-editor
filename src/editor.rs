@@ -162,16 +162,42 @@ pub fn calculate_keep_segments_from_transcript(
             }
             current_pos = cut_end;
             prev_is_filler = true;
-        } else {
+} else {
             if current_pos < seg.start {
                 let gap = seg.start - current_pos;
-                eprintln!("  non-filler gap={:.1} padding={:.1}", gap, padding);
                 if prev_is_filler && (gap - padding).abs() < 0.001 {
-                    eprintln!("  MATCH! gap==padding, extend prev to current_pos={:.1}, then continue", current_pos);
                     if let Some(prev) = processed.last_mut() {
-                        eprintln!("  prev end was {:.1}, setting to current_pos={:.1}", prev.end, current_pos);
-                        prev.end = current_pos;
+                        prev.end = current_pos + padding;
                     }
+                    current_pos = seg.end - padding;
+                    prev_is_filler = false;
+                }
+            }
+            if current_pos < seg.end {
+                processed.push(ProcessedSegment {
+                    start: current_pos,
+                    end: seg.end,
+                    speed: 1.0,
+                });
+            }
+            current_pos = seg.end;
+            prev_is_filler = false;
+        }
+    }
+                    current_pos = seg.end - padding;
+                    prev_is_filler = false;
+                }
+            }
+            if current_pos < seg.end {
+                processed.push(ProcessedSegment {
+                    start: current_pos,
+                    end: seg.end,
+                    speed: 1.0,
+                });
+            }
+            current_pos = seg.end;
+            prev_is_filler = false;
+        }
                     current_pos = seg.end;
                     prev_is_filler = false;
                     continue;
