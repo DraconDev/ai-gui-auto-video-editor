@@ -1,22 +1,21 @@
 # Project State
 
 ## Current Focus
-Added drag-and-drop file handling for video files in the Queue tab
+Improved drag-and-drop file handling for video files in the Queue tab
 
 ## Context
-This implements the previously removed drag-and-drop functionality for video files, allowing users to directly add video files to the processing queue by dragging them onto the Queue tab interface.
+This change enhances the file handling system by properly accessing dropped files through the raw input interface, which provides more reliable access to file paths during drag-and-drop operations.
 
 ## Completed
-- [x] Added drag-and-drop handling for video files in the Queue tab
-- [x] Files are automatically validated as video files before being added to the queue
-- [x] Added default output directory and preset settings for dropped files
+- [x] Updated drag-and-drop file handling to use `i.raw.dropped_files` instead of direct `i.dropped_files` access
+- [x] Maintained video file filtering for Queue tab operations
 
 ## In Progress
-- [x] Drag-and-drop file handling implementation
+- [x] Implementation of improved drag-and-drop file processing
 
 ## Blockers
-- None identified
+- No blockers identified for this specific change
 
 ## Next Steps
-1. Test drag-and-drop functionality with various file types
-2. Add visual feedback for successful file drops
+1. Verify the new implementation works consistently across different platforms
+2. Test edge cases like multiple simultaneous file drops

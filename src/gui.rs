@@ -932,7 +932,8 @@ impl eframe::App for App {
         // Handle file drops onto the Queue tab
         if self.state.current_tab == Tab::Queue {
             let dropped = ctx.input(|i| {
-                i.dropped_files
+                i.raw
+                    .dropped_files
                     .iter()
                     .filter_map(|f| f.path.clone())
                     .filter(|p| crate::utils::is_video_file(p))
