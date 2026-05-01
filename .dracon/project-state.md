@@ -1,5 +1,7 @@
 # Project State
-This commit adjusts segment processing logic to handle filler words more accurately. It involves refining a test case, updating assertions, and improving segmentation handling in the editor module.
+
+## Current Focus
+Update dependency lockfile to reflect updated crate versions
 
 ## Completed
-- Updated _transcript_ processing to correctly identify and retain segments with minimal deviation (new length 2).
+- [x] chore(deps): update Cargo.lock dependency lockfile
