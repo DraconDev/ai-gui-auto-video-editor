@@ -1,8 +1,10 @@
 # Project State
 
 ## Current Focus
-Added 8 new pipeline integration tests to validate core features of the video processing application.
+Refactored batch progress persistence test to use simplified API with `to_file`/`from_file` methods
 
 ## Completed
-- [x] Added 8 new pipeline integration tests for core functionality
-- [x] Updated `Cargo.lock` to reflect latest dependency versions
+- [x] Changed `BatchProgress::new()` initialization to `BatchProgress::default()` with manual `total` field assignment
+- [x] Renamed `save()` method to `to_file()` for consistency with file I/O naming convention
+- [x] Renamed `load()` method to `from_file()` for consistency with file I/O naming convention
+- [x] Updated assertions to verify `total` field directly and check `is_completed()` status instead of `total_files()` method

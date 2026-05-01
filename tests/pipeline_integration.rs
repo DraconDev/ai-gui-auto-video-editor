@@ -1789,13 +1789,13 @@ fn test_batch_progress_persistence() {
     let output_dir = tempdir().unwrap();
     let state_path = output_dir.path().join("test_progress.json");
 
-    let progress = ai_vid_editor::progress::BatchProgress::new(
-        vec![video_path.clone()],
-        output_dir.path().join("outputs"),
-    );
+    let mut progress = ai_vid_editor::progress::BatchProgress::default();
+    progress.total = 1;
+    progress.mark_completed(&video_path);
 
-    progress.save(&state_path).unwrap();
+    progress.to_file(&state_path).unwrap();
 
-    let loaded = ai_vid_editor::progress::BatchProgress::load(&state_path).unwrap();
-    assert_eq!(loaded.total_files(), progress.total_files());
+    let loaded = ai_vid_editor::progress::BatchProgress::from_file(&state_path).unwrap();
+    assert_eq!(loaded.total, progress.total);
+    assert!(loaded.is_completed(&video_path));
 }
