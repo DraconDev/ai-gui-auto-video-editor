@@ -965,8 +965,8 @@ impl eframe::App for App {
             }
         }
 
-        // Ctrl+1-5 for tab navigation
-        if is_ctrl {
+        // Ctrl+1-5 for tab navigation (skip when shift is held, reserved for category access)
+        if is_ctrl && !modifiers.shift {
             let tab_keys = [
                 (egui::Key::Num1, Tab::All),
                 (egui::Key::Num2, Tab::Folders),
