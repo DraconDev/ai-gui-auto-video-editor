@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [19.1.5] - 2026-05-01
+
+### Fixed (Pipeline)
+- **Dead `filler_words` code now functional**: `calculate_keep_segments_from_transcript` in `editor.rs` was rewritten to correctly handle filler word segments with padding. Previously the function was never wired into the pipeline — now `maybe_transcribe_for_filler_words()` in `batch_processor.rs` runs Whisper transcription when `config.filler_words.enabled` and passes transcript to the segment calculator.
+
+### Added (Tests)
+- **16 new pipeline integration tests** (tests/pipeline_integration.rs):
+  - Tier 1 (8): `test_speedup_in_pipeline`, `test_keep_mode_in_pipeline`, `test_scaling_in_pipeline`, `test_intro_outro_in_pipeline`, `test_multi_resolution_output`, `test_thumbnail_dimensions_in_pipeline`, `test_watermark_in_pipeline_image`, `test_preview_duration_in_pipeline`
+  - Tier 2 (6): `test_captions_in_pipeline_with_speech`, `test_subtitles_export_with_speech`, `test_chapters_with_speech`, `test_clips_extraction_with_speech`, `test_audio_ducking_with_speech`, `test_filler_word_removal_pipeline`
+  - Tier 3 (2): `test_batch_processing_multiple_files`, `test_batch_progress_persistence`
+- **Speech test video helper** (tests/common/mod.rs): `create_speech_video()` and `test_speech_video_path()` using espeak + ffmpeg to generate real speech content for speech-driven pipeline tests
+
 ## [14.4.1] - 2026-04-30
 
 ### Fixed (GUI)
