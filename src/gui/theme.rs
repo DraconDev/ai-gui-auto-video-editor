@@ -257,6 +257,37 @@ pub fn button_tab(is_active: bool, text: impl Into<String>) -> egui::Button<'sta
         .min_size(egui::vec2(85.0, 36.0))
 }
 
+pub fn sidebar_button(
+    is_active: bool,
+    icon: &str,
+    label: &str,
+) -> egui::Button<'static> {
+    let text = format!("{}  {}", icon, label);
+    let btn = if is_active {
+        egui::Button::new(
+            egui::RichText::new(text)
+                .color(TEXT_PRIMARY)
+                .size(13.0)
+                .strong(),
+        )
+        .fill(PANEL_BG_LIGHTER)
+        .stroke(egui::Stroke::new(1.0, ACCENT_PRIMARY))
+        .corner_radius(CORNER_RADIUS_SMALL)
+        .min_size(egui::vec2(140.0, 44.0))
+    } else {
+        egui::Button::new(
+            egui::RichText::new(text)
+                .color(TEXT_SECONDARY)
+                .size(13.0),
+        )
+        .fill(PANEL_BG)
+        .stroke(egui::Stroke::new(0.0, egui::Color32::TRANSPARENT))
+        .corner_radius(CORNER_RADIUS_SMALL)
+        .min_size(egui::vec2(140.0, 44.0))
+    };
+    btn
+}
+
 pub fn button_pill(is_active: bool, text: impl Into<String>) -> egui::Button<'static> {
     let btn = if is_active {
         egui::Button::new(
