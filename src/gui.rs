@@ -1050,14 +1050,14 @@ impl eframe::App for App {
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.horizontal(|ui| {
                 // Left sidebar with navigation
-                ui.add_space(8.0);
-                egui::Frame::NONE
-                    .fill(PANEL_BG_LIGHT)
-                    .corner_radius(CORNER_RADIUS_SMALL)
-                    .inner_margin(egui::vec2(4.0, 8.0))
-                    .show(ui, |ui| {
-                        ui.set_width(72.0);
-                        ui.vertical(|ui| {
+                egui::SidePanel::left("sidebar_nav")
+                    .resizable(false)
+                    .default_width(72.0)
+                    .max_width(72.0)
+                    .frame(egui::Frame::NONE.fill(PANEL_BG_LIGHT).corner_radius(CORNER_RADIUS_SMALL).inner_margin(egui::vec2(4.0, 8.0)))
+                    .show_inside(ui, |ui| {
+                        ui.set_width(64.0);
+                        ui.vertical_centered(|ui| {
                             let sidebar_items = [
                                 (Tab::All, "🏠", "All"),
                                 (Tab::Folders, "📁", "Folders"),
@@ -1098,7 +1098,7 @@ impl eframe::App for App {
                         });
                     });
 
-                ui.add_space(8.0);
+                ui.add_space(4.0);
 
                 // Main content area
                 ui.vertical(|ui| {
