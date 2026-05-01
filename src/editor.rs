@@ -129,74 +129,64 @@ pub fn calculate_keep_segments_from_transcript(
     padding: f32,
 ) -> Vec<ProcessedSegment> {
     let mut processed: Vec<ProcessedSegment> = Vec::new();
+    let mut current_pos = 0.0;
+    let mut prev_is_filler = false;
 
-    for (i, seg) in transcript.iter().enumerate() {
+    for seg in transcript {
         let is_filler = filler_words
             .iter()
             .any(|&f| seg.text.to_lowercase().contains(f));
 
         if is_filler {
-            continue;
-        }
+            let keep_end = (seg.start + padding).min(total_duration);
+            let cut_end = (seg.end - padding).max(0.0);
 
-        let seg_start = seg.start.max(0.0);
-        let seg_end = seg.end.min(total_duration);
-
-        if seg_start >= seg_end {
-            continue;
-        }
-
-        let prev_end = processed.last().map(|s| s.end).unwrap_or(0.0);
-
-        if i > 0 {
-            let prev_seg = &transcript[i - 1];
-            let prev_is_filler = filler_words
-                .iter()
-                .any(|&f| prev_seg.text.to_lowercase().contains(f));
-            if prev_is_filler {
-                if let Some(last) = processed.last_mut() {
-                    let keep_end = (prev_seg.end + padding).min(total_duration);
-                    last.end = keep_end;
-                }
-                let gap_start = (prev_seg.end - padding).max(0.0);
-                if gap_start > prev_end && gap_start < seg_end {
+            if keep_end > current_pos {
+                if prev_is_filler {
+                    if let Some(prev) = processed.last_mut() {
+                        prev.end = keep_end;
+                    }
+                } else {
                     processed.push(ProcessedSegment {
-                        start: gap_start,
-                        end: seg_end,
+                        start: current_pos,
+                        end: keep_end,
                         speed: 1.0,
                     });
-                    continue;
                 }
             }
-        }
-
-        if prev_end < seg_end {
-            processed.push(ProcessedSegment {
-                start: prev_end.max(seg_start),
-                end: seg_end,
-                speed: 1.0,
-            });
+            current_pos = cut_end;
+            prev_is_filler = true;
+        } else {
+            if current_pos < seg.start {
+                let gap = seg.start - current_pos;
+                if prev_is_filler && (gap - padding).abs() < 0.001 {
+                    current_pos = seg.start;
+                }
+            }
+            if current_pos < seg.end {
+                processed.push(ProcessedSegment {
+                    start: current_pos,
+                    end: seg.end,
+                    speed: 1.0,
+                });
+            }
+            current_pos = seg.end;
+            prev_is_filler = false;
         }
     }
 
-    if let Some(last) = processed.last() {
-        if last.end < total_duration {
-            processed.push(ProcessedSegment {
-                start: last.end,
-                end: total_duration,
-                speed: 1.0,
-            });
-        }
-    } else if total_duration > 0.0 {
+    if current_pos < total_duration {
         processed.push(ProcessedSegment {
-            start: 0.0,
+            start: current_pos,
             end: total_duration,
             speed: 1.0,
         });
     }
 
-    if let Some(last) = processed.last_mut() {
-        last.end = last.end.max(total_duration);
+    if prev_is_filler {
+        if let Some(prev) = processed.last_mut() {
+            prev.end = total_duration;
+        }
     }
 
     processed
