@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [19.27.2] - 2026-05-01
+
+### Bug Fixes
+- **Sidebar layout fix**: Used `SidePanel::left()` instead of manual `Frame::show()` to properly fill available height, fixing thin sidebar with content only appearing beside it
+
 ## [19.26.2] - 2026-05-01
 
 ### UX Improvements
