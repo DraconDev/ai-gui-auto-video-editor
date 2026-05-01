@@ -130,6 +130,7 @@ pub fn calculate_keep_segments_from_transcript(
 ) -> Vec<ProcessedSegment> {
     let mut processed = Vec::new();
     let mut current_pos = 0.0;
+    let mut prev_is_filler = false;
 
     for seg in transcript {
         let is_filler = filler_words
@@ -137,17 +138,39 @@ pub fn calculate_keep_segments_from_transcript(
             .any(|&f| seg.text.to_lowercase().contains(f));
 
         if is_filler {
-            // Cut this segment with padding
             let keep_end = (seg.start + padding).min(total_duration);
+            let cut_end = (seg.end - padding).max(0.0);
+
             if keep_end > current_pos {
+                if prev_is_filler {
+                    if let Some(prev) = processed.last_mut() {
+                        prev.end = keep_end;
+                    }
+                } else {
+                    processed.push(ProcessedSegment {
+                        start: current_pos,
+                        end: keep_end,
+                        speed: 1.0,
+                    });
+                }
+            }
+            current_pos = cut_end;
+            prev_is_filler = true;
+        } else {
+            if current_pos < seg.start {
+                if prev_is_filler && (seg.start - current_pos - padding).abs() < 0.001 {
+                    current_pos = seg.start;
+                }
+            }
+            if current_pos < seg.end {
                 processed.push(ProcessedSegment {
                     start: current_pos,
-                    end: keep_end,
+                    end: seg.end,
                     speed: 1.0,
                 });
             }
-            let cut_end = (seg.end - padding).max(0.0);
-            current_pos = current_pos.max(keep_end).max(cut_end);
+            current_pos = seg.end;
+            prev_is_filler = false;
         }
     }
 
@@ -157,6 +180,12 @@ pub fn calculate_keep_segments_from_transcript(
             end: total_duration,
             speed: 1.0,
         });
+    }
+
+    if prev_is_filler {
+        if let Some(prev) = processed.last_mut() {
+            prev.end = total_duration;
+        }
     }
 
     processed
@@ -1149,11 +1178,10 @@ mod tests {
 
         let processed = calculate_keep_segments_from_transcript(&transcript, 10.0, &["um"], 0.1);
 
-        // Should have 2 segments: before "um" and after "um"
         assert_eq!(processed.len(), 2);
         assert_eq!(processed[0].start, 0.0);
-        assert_eq!(processed[0].end, 2.1); // 2.0 + padding
-        assert_eq!(processed[1].start, 2.9); // 3.0 - padding
+        assert_eq!(processed[0].end, 2.1);
+        assert_eq!(processed[1].start, 2.9);
         assert_eq!(processed[1].end, 10.0);
     }
 
