@@ -158,8 +158,20 @@ pub fn calculate_keep_segments_from_transcript(
             prev_is_filler = true;
         } else {
             if current_pos < seg.start {
-                if prev_is_filler && (seg.start - current_pos - padding).abs() < 0.001 {
+                let gap = seg.start - current_pos;
+                if prev_is_filler && (gap - padding).abs() < 0.001 {
                     current_pos = seg.start;
+                    if current_pos < seg.end {
+                        let mut new_seg = ProcessedSegment {
+                            start: current_pos,
+                            end: seg.end,
+                            speed: 1.0,
+                        };
+                        current_pos = seg.end;
+                        prev_is_filler = false;
+                        processed.push(new_seg);
+                    }
+                    continue;
                 }
             }
             if current_pos < seg.end {
