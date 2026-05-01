@@ -1178,7 +1178,7 @@ mod tests {
             },
         ];
 
-let processed = calculate_keep_segments_from_transcript(&transcript, 10.0, &["um"], 0.1);
+        let processed = calculate_keep_segments_from_transcript(&transcript, 10.0, &["um"], 0.1);
 
         assert_eq!(processed.len(), 2);
         assert_eq!(processed[0].start, 0.0);
