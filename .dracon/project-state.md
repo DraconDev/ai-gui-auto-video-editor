@@ -1,7 +1,7 @@
 # Project State
 
 ## Current Focus
-Update Cargo.lock to capture the latest dependency versions after recent transcript segmentation and audio ducking changes.
+Adjust transcript segment end calculation to correctly apply padding during merging.
 
 ## Completed
-- [x] bump Cargo.lock (size change from 192973 B to 192974 B) to record updated dependency resolutions.
+- [x] Modified `prev.end` assignment in `calculate_keep_segments_from_transcript` to add padding instead of subtracting it, fixing incorrect segment boundaries.
