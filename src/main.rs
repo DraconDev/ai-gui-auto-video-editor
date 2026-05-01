@@ -1,6 +1,8 @@
 use anyhow::Result;
-use clap::Parser;
 use std::path::PathBuf;
+
+#[cfg(feature = "cli")]
+use clap::Parser;
 
 pub mod analyzer;
 pub mod batch_processor;

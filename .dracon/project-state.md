@@ -1,14 +1,14 @@
 # Project State
 
 ## Current Focus
-Removed duplicate `PathBuf` import in `main.rs`
+Refactor conditional compilation for CLI feature in `main.rs`
 
 ## Context
-The duplicate import was causing a compiler warning, and the code was simplified to remove redundancy.
+The change simplifies the conditional compilation for the CLI feature by moving the `clap::Parser` import inside the `#[cfg(feature = "cli")]` attribute. This improves code organization and makes the feature flag more explicit.
 
 ## Completed
-- [x] Removed duplicate `use std::path::PathBuf` import
-- [x] Kept only the necessary `use clap::Parser` under feature flag
+- [x] Moved `clap::Parser` import inside `#[cfg(feature = "cli")]` block
+- [x] Updated Cargo.lock to reflect dependency changes
 
 ## In Progress
 - [x] No active work in progress
@@ -17,5 +17,5 @@ The duplicate import was causing a compiler warning, and the code was simplified
 - None
 
 ## Next Steps
-1. Verify no runtime impact from the import removal
-2. Ensure all feature flags are properly tested
+1. Verify the change doesn't break non-CLI builds
+2. Update documentation to reflect the new conditional compilation pattern
