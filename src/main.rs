@@ -1,4 +1,5 @@
 use anyhow::Result;
+#[cfg(feature = "cli")]
 use clap::Parser;
 use std::path::PathBuf;
 
@@ -52,6 +53,7 @@ use crate::editor::FfmpegEditor;
           ai-vid-editor --project ./my-project           # Project mode\n\n\
         See ai-vid-editor.example.toml for full documentation."
 )]
+#[cfg_attr(feature = "cli", derive(clap::Parser))]
 pub struct Cli {
     /// Input video file
     #[arg(group = "input_group", short, long)]
