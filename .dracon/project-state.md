@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Implement filler-word aware transcript segmentation to properly handle adjacent segments around filler words by skipping overlapping sections.
+Simplify transcript segment tail handling by dropping unreachable post-loop logic and fixing brace alignment.
 
 ## Completed
-- [x] Refactored segment processing logic to skip overlapping filler segments and reset boundaries when filler words are encountered
-- [x] Updated transition handling to directly advance to non-filler segment boundaries instead of padding previous segments
+- [x] Fix misaligned closing brace in `calculate_keep_segments_from_transcript` to ensure correct control flow.
+- [x] Remove dead code after return in `calculate_keep_segments_from_transcript` (unreachable segment appends and tail handling).
