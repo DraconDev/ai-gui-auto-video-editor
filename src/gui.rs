@@ -1046,32 +1046,86 @@ impl eframe::App for App {
         }
 
         egui::CentralPanel::default().show(ctx, |ui| {
-            ui.vertical(|ui| {
-                self.draw_header(ui);
+            ui.horizontal(|ui| {
+                // Left sidebar with navigation
+                ui.add_space(8.0);
+                egui::Frame::NONE
+                    .fill(PANEL_BG_LIGHT)
+                    .corner_radius(CORNER_RADIUS_SMALL)
+                    .inner_margin(egui::vec2(4.0, 8.0))
+                    .show(ui, |ui| {
+                        ui.set_width(72.0);
+                        ui.vertical(|ui| {
+                            let sidebar_items = [
+                                (Tab::All, "🏠", "All"),
+                                (Tab::Folders, "📁", "Folders"),
+                                (Tab::Queue, "📋", "Queue"),
+                                (Tab::Settings, "⚙", "Settings"),
+                                (Tab::Activity, "📊", "Activity"),
+                            ];
+                            for (tab, icon, label) in sidebar_items {
+                                let is_active = self.state.current_tab == tab;
+                                let text = format!("{}\n{}", icon, label);
+                                let btn = if is_active {
+                                    egui::Button::new(
+                                        egui::RichText::new(text)
+                                            .color(TEXT_PRIMARY)
+                                            .size(11.0)
+                                            .strong(),
+                                    )
+                                    .fill(PANEL_BG_LIGHTER)
+                                    .stroke(egui::Stroke::new(0.0, egui::Color32::TRANSPARENT))
+                                    .corner_radius(CORNER_RADIUS_SMALL)
+                                    .min_size(egui::vec2(60.0, 56.0))
+                                } else {
+                                    egui::Button::new(
+                                        egui::RichText::new(text)
+                                            .color(TEXT_SECONDARY)
+                                            .size(11.0),
+                                    )
+                                    .fill(PANEL_BG)
+                                    .stroke(egui::Stroke::new(0.0, egui::Color32::TRANSPARENT))
+                                    .corner_radius(CORNER_RADIUS_SMALL)
+                                    .min_size(egui::vec2(60.0, 56.0))
+                                };
+                                if ui.add(btn).clicked() {
+                                    self.state.current_tab = tab;
+                                }
+                                ui.add_space(4.0);
+                            }
+                        });
+                    });
+
                 ui.add_space(8.0);
 
-                egui::ScrollArea::vertical().show(ui, |ui| match self.state.current_tab {
-                    Tab::All => {
-                        self.draw_summary_card(ui);
-                        ui.add_space(12.0);
-                        self.draw_folders_panel(ui);
-                        ui.add_space(12.0);
-                        self.draw_settings_panel(ui);
-                        ui.add_space(12.0);
-                        self.draw_activity_log(ui, false);
-                    }
-                    Tab::Folders => {
-                        self.draw_folders_panel(ui);
-                    }
-                    Tab::Queue => {
-                        self.draw_queue_panel(ui);
-                    }
-                    Tab::Settings => {
-                        self.draw_settings_panel(ui);
-                    }
-                    Tab::Activity => {
-                        self.draw_activity_log(ui, true);
-                    }
+                // Main content area
+                ui.vertical(|ui| {
+                    self.draw_header(ui);
+                    ui.add_space(4.0);
+
+                    egui::ScrollArea::vertical().show(ui, |ui| match self.state.current_tab {
+                        Tab::All => {
+                            self.draw_summary_card(ui);
+                            ui.add_space(12.0);
+                            self.draw_folders_panel(ui);
+                            ui.add_space(12.0);
+                            self.draw_settings_panel(ui);
+                            ui.add_space(12.0);
+                            self.draw_activity_log(ui, false);
+                        }
+                        Tab::Folders => {
+                            self.draw_folders_panel(ui);
+                        }
+                        Tab::Queue => {
+                            self.draw_queue_panel(ui);
+                        }
+                        Tab::Settings => {
+                            self.draw_settings_panel(ui);
+                        }
+                        Tab::Activity => {
+                            self.draw_activity_log(ui, true);
+                        }
+                    });
                 });
             });
         });
