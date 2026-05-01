@@ -1,20 +1,22 @@
 # Project State
 
 ## Current Focus
-Renamed setup step from "Folder" to "ChooseFolder" in the GUI setup flow
+Added drag-and-drop file handling for video files in the Queue tab
 
 ## Context
-This change aligns with the recent "Re-run Setup Wizard" button addition, making the setup step naming more consistent with the user interface terminology
+This change enables users to drag video files directly into the application's Queue tab, simplifying the workflow for adding files to the processing queue.
 
 ## Completed
-- [x] Renamed `SetupStep::Folder` to `SetupStep::ChooseFolder` in the GUI tab implementation
+- [x] Added drag-and-drop file handling for video files in Queue tab
+- [x] Files are automatically added to the batch queue with default settings
+- [x] Only video files (based on extension check) are processed
 
 ## In Progress
-- [x] No active work in progress related to this change
+- [ ] None
 
 ## Blockers
-- None identified for this specific change
+- None
 
 ## Next Steps
-1. Verify the new naming appears correctly in the setup wizard UI
-2. Ensure all related documentation and tests are updated to reflect the new naming
+1. Test drag-and-drop functionality with various file types
+2. Add visual feedback for successful file drops
