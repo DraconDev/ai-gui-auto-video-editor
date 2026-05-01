@@ -162,12 +162,10 @@ pub fn calculate_keep_segments_from_transcript(
                 if prev_is_filler && (gap - padding).abs() < 0.001 {
                     current_pos = seg.start;
                     if let Some(prev) = processed.last_mut() {
-                        if prev.end == current_pos {
-                            prev.end = seg.end;
-                            current_pos = seg.end;
-                            prev_is_filler = false;
-                            continue;
-                        }
+                        prev.end = seg.end;
+                        current_pos = seg.end;
+                        prev_is_filler = false;
+                        continue;
                     }
                 }
             }

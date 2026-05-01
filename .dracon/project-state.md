@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Fix merging of adjacent segments around filler words by ensuring gap alignment and preventing incorrect end extension.
+Fix adjacent segment merging around filler words by extending previous segment end
 
 ## Completed
-- [x] Correctly align current position to segment start when a filler gap matches padding to avoid false merges.
-- [x] Only extend previous segment end when it exactly matches current position, then advance position and reset filler state.
+- [x] Updated project dependencies to latest versions via Cargo.lock
+- [x] Fixed adjacent segment merging around filler words by extending previous segment end when gap is minimal (handled in `calculate_keep_segments_from_transcript` function)
