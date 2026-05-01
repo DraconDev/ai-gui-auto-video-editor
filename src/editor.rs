@@ -165,9 +165,14 @@ pub fn calculate_keep_segments_from_transcript(
                     }
                     current_pos = seg.end;
                     prev_is_filler = false;
+                } else if current_pos < seg.end {
+                    processed.push(ProcessedSegment {
+                        start: current_pos,
+                        end: seg.end,
+                        speed: 1.0,
+                    });
                 }
-            }
-            if current_pos < seg.end {
+            } else if current_pos < seg.end {
                 processed.push(ProcessedSegment {
                     start: current_pos,
                     end: seg.end,
