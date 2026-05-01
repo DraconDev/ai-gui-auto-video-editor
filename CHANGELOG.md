@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [19.3.10] - 2026-05-01
+
+### Refactor
+- Moved `use clap::Parser` under `#[cfg(feature = "cli")]` guard in main.rs so `--no-default-features --features gui` compiles correctly
+- Removed duplicate `VIDEO_EXTENSIONS` constant from `analyzer.rs` (already defined in `utils.rs`)
+
 ## [19.2.2] - 2026-05-01
 
 ### Maintenance
