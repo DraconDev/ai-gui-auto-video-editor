@@ -1,21 +1,25 @@
 # Project State
 
 ## Current Focus
-Modified tab navigation behavior to support category access when Shift is held
+Added keyboard shortcut handling conditions to prevent conflicts during setup, text input, and file drops
 
 ## Context
-The change improves keyboard navigation by adding a new modifier key combination (Ctrl+Shift+1-5) for accessing category tabs while preserving the existing Ctrl+1-5 for standard tab navigation
+Prevented global keyboard shortcuts from interfering with critical user interactions during:
+- Setup wizard display
+- Text input focus
+- Active file drop operations
 
 ## Completed
-- [x] Added Shift modifier check to tab navigation logic
-- [x] Updated comment to document the new behavior
+- [x] Added condition to skip shortcuts when setup wizard is shown
+- [x] Added condition to skip shortcuts when text input is focused
+- [x] Added condition to skip shortcuts during active file drops
 
 ## In Progress
-- [ ] Testing the new category access behavior across different platforms
+- [x] Implementation of keyboard shortcut conflict prevention
 
 ## Blockers
-- Need to verify if this conflicts with any existing keyboard shortcuts
+- None identified
 
 ## Next Steps
-1. Complete testing of the new category access behavior
-2. Document the new keyboard shortcut in user documentation
+1. Test shortcut behavior during all three conflict scenarios
+2. Verify no regressions in existing shortcut functionality

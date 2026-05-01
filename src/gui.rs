@@ -932,11 +932,15 @@ impl eframe::App for App {
         self.state.drain_queue_events();
 
         // Global keyboard shortcuts (work on all tabs)
+        // Skip shortcuts when setup wizard is shown, text input is focused, or file drop is active
         let modifiers = ctx.input(|i| i.modifiers);
         #[cfg(target_os = "macos")]
         let is_ctrl = modifiers.ctrl || modifiers.mac_cmd;
         #[cfg(not(target_os = "macos"))]
         let is_ctrl = modifiers.ctrl;
+        let skip_shortcuts = self.state.show_setup
+            || ctx.wants_keyboard_input()
+            || ctx.input(|i| i.raw.dropped_files.len() > 0);
 
         // Handle file drops onto the Queue tab
         if self.state.current_tab == Tab::Queue {
