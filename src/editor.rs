@@ -156,15 +156,40 @@ pub fn calculate_keep_segments_from_transcript(
             }
             current_pos = cut_end;
             prev_is_filler = true;
-        } else {
+} else {
             if current_pos < seg.start {
                 let gap = seg.start - current_pos;
                 if prev_is_filler && (gap - padding).abs() < 0.001 {
                     if let Some(prev) = processed.last_mut() {
-                        prev.end = current_pos + padding;
+                        prev.end = seg.end;
                     }
-                    processed.push(ProcessedSegment {
-                        start: seg.start - padding,
+                    current_pos = seg.end;
+                    prev_is_filler = false;
+                    continue;
+                }
+            }
+            if current_pos < seg.end {
+                processed.push(ProcessedSegment {
+                    start: current_pos,
+                    end: seg.end,
+                    speed: 1.0,
+                });
+            }
+            current_pos = seg.end;
+            prev_is_filler = false;
+        }
+    }
+
+    if current_pos < total_duration {
+        processed.push(ProcessedSegment {
+            start: current_pos,
+            end: total_duration,
+            speed: 1.0,
+        });
+    }
+
+    processed
+}
                         end: seg.end,
                         speed: 1.0,
                     });
