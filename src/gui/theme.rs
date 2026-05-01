@@ -329,16 +329,29 @@ pub fn dropdown_selector<T: PartialEq + Copy>(
     }
 
     if is_popup_open {
+        let screen_height = ui.ctx().screen_rect().max.y;
         let button_bottom = response.rect.max.y + 4.0;
-        let popup_height = (options.len() as f32 * 36.0).min(200.0);
+        let button_top = response.rect.min.y - 4.0;
+
+        let max_item_height = 36.0_f32;
+        let total_content_height = options.len() as f32 * max_item_height;
+        let max_popup_height = 300.0_f32;
+        let popup_height = total_content_height.min(max_popup_height);
         let popup_width = desired_width;
+
+        let flip_up = button_bottom + popup_height > screen_height - 20.0;
+        let popup_y = if flip_up {
+            button_top - popup_height
+        } else {
+            button_bottom
+        };
 
         egui::Area::new(popup_id)
             .order(egui::Order::Foreground)
-            .fixed_pos(egui::pos2(response.rect.min.x, button_bottom))
+            .fixed_pos(egui::pos2(response.rect.min.x, popup_y))
             .show(ui.ctx(), |ui| {
                 let popup_rect = egui::Rect::from_min_size(
-                    egui::pos2(response.rect.min.x, button_bottom),
+                    egui::pos2(response.rect.min.x, popup_y),
                     egui::vec2(popup_width, popup_height),
                 );
                 ui.set_clip_rect(popup_rect);
@@ -350,54 +363,59 @@ pub fn dropdown_selector<T: PartialEq + Copy>(
                     .inner_margin(egui::vec2(4.0, 4.0))
                     .show(ui, |ui| {
                         ui.set_min_size(popup_rect.size());
-                        for (label, value) in options {
-                            let is_selected = *value == *selected;
-                            let item_bg = if is_selected {
-                                egui::Color32::from_rgb(42, 18, 26)
-                            } else if ui.input(|i| i.pointer.any_down()) {
-                                egui::Color32::from_rgb(38, 38, 46)
-                            } else {
-                                PANEL_BG_LIGHTER
-                            };
+                        egui::ScrollArea::vertical()
+                            .max_height(popup_height - 8.0)
+                            .auto_shrink([false; 2])
+                            .show(ui, |ui| {
+                                for (label, value) in options {
+                                    let is_selected = *value == *selected;
+                                    let item_bg = if is_selected {
+                                        egui::Color32::from_rgb(42, 18, 26)
+                                    } else if ui.input(|i| i.pointer.any_down()) {
+                                        egui::Color32::from_rgb(38, 38, 46)
+                                    } else {
+                                        PANEL_BG_LIGHTER
+                                    };
 
-                            let item_response = egui::Frame::NONE
-                                .fill(item_bg)
-                                .corner_radius(CORNER_RADIUS_SMALL)
-                                .inner_margin(egui::vec2(12.0, 10.0))
-                                .show(ui, |ui| {
-                                    ui.set_width(ui.available_width());
-                                    ui.horizontal_wrapped(|ui| {
-                                        ui.set_width(ui.available_width());
-                                        ui.label(
-                                            egui::RichText::new(label.as_str()).size(14.0).color(
+                                    let item_response = egui::Frame::NONE
+                                        .fill(item_bg)
+                                        .corner_radius(CORNER_RADIUS_SMALL)
+                                        .inner_margin(egui::vec2(12.0, 10.0))
+                                        .show(ui, |ui| {
+                                            ui.set_width(ui.available_width());
+                                            ui.horizontal_wrapped(|ui| {
+                                                ui.set_width(ui.available_width());
+                                                ui.label(
+                                                    egui::RichText::new(label.as_str()).size(14.0).color(
+                                                        if is_selected {
+                                                            ACCENT_PRIMARY
+                                                        } else {
+                                                            TEXT_PRIMARY
+                                                        },
+                                                    ),
+                                                );
                                                 if is_selected {
-                                                    ACCENT_PRIMARY
-                                                } else {
-                                                    TEXT_PRIMARY
-                                                },
-                                            ),
-                                        );
-                                        if is_selected {
-                                            ui.with_layout(
-                                                egui::Layout::right_to_left(egui::Align::Center),
-                                                |ui| {
-                                                    ui.label(
-                                                        egui::RichText::new("✓")
-                                                            .size(13.0)
-                                                            .color(ACCENT_PRIMARY),
+                                                    ui.with_layout(
+                                                        egui::Layout::right_to_left(egui::Align::Center),
+                                                        |ui| {
+                                                            ui.label(
+                                                                egui::RichText::new("✓")
+                                                                    .size(13.0)
+                                                                    .color(ACCENT_PRIMARY),
+                                                            );
+                                                        },
                                                     );
-                                                },
-                                            );
-                                        }
-                                    });
-                                    ui.response()
-                                });
+                                                }
+                                            });
+                                            ui.response()
+                                        });
 
-                            if item_response.inner.clicked() {
-                                *selected = *value;
-                                ui.data_mut(|d| d.insert_temp(popup_id, false));
-                            }
-                        }
+                                    if item_response.inner.clicked() {
+                                        *selected = *value;
+                                        ui.data_mut(|d| d.insert_temp(popup_id, false));
+                                    }
+                                }
+                            });
                     });
             });
 

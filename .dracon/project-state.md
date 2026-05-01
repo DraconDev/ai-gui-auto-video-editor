@@ -1,23 +1,24 @@
 # Project State
 
 ## Current Focus
-Added conditional keyboard shortcut handling to prevent conflicts with existing UI interactions.
+Improved dropdown selector behavior with better positioning and scroll support
 
 ## Context
-The changes address keyboard shortcut conflicts by introducing a `skip_shortcuts` condition to prevent shortcuts from triggering when they shouldn't, particularly in contexts where category access is needed.
+The dropdown selector in the GUI needed improvements to handle edge cases where the dropdown would appear off-screen. The changes also add scroll support for long lists of options.
 
 ## Completed
-- [x] Added `skip_shortcuts` condition to tab navigation shortcuts (Ctrl+1-5)
-- [x] Added `skip_shortcuts` condition to save config shortcut (Ctrl+S)
-- [x] Added `skip_shortcuts` condition to settings navigation shortcuts
-- [x] Simplified shift modifier check for category access (Ctrl+Shift+1-5)
+- [x] Added screen boundary detection to prevent dropdowns from appearing off-screen
+- [x] Implemented dynamic positioning (above/below button based on available space)
+- [x] Added scroll support for dropdown lists with many items
+- [x] Improved visual feedback for selected items with proper text coloring
+- [x] Enhanced dropdown styling with consistent corner radius and margins
 
 ## In Progress
-- [ ] Verify no unintended side effects from shortcut suppression
+- [ ] None (changes are complete)
 
 ## Blockers
-- Need to confirm if `skip_shortcuts` is properly set in all relevant UI contexts
+- None
 
 ## Next Steps
-1. Test shortcut behavior in different UI states
-2. Document the new `skip_shortcuts` mechanism for future maintainers
+1. Verify dropdown behavior with various screen sizes and resolutions
+2. Test with different numbers of dropdown items to ensure scroll works as expected
