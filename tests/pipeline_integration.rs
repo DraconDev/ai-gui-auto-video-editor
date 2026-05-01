@@ -1191,3 +1191,611 @@ watermark_position = "top-left"
     assert_eq!(w, 1080, "Shorts preset should produce 1080p width");
     assert_eq!(h, 1920, "Shorts preset should produce 1920p height (vertical)");
 }
+
+// ============================================================
+// Tier 1: Core pipeline tests (8)
+// ============================================================
+
+#[test]
+fn test_speedup_in_pipeline() {
+    use tempfile::tempdir;
+
+    let video_path = test_video_path();
+    if !video_path.exists() {
+        eprintln!("Skipping test: test video not found");
+        return;
+    }
+    check_ffmpeg_or_return();
+
+    let output_dir = tempdir().unwrap();
+    let output_path = output_dir.path().join("output_speedup.mp4");
+
+    let mut config = Config::default();
+    config.speedup.enabled = true;
+    config.speedup.target_ratio = 1.5;
+
+    let editor = FfmpegEditor::default();
+    let analyzer = FfmpegAnalyzer;
+    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+
+    let result = ai_vid_editor::batch_processor::process_single_file(
+        video_path.clone(),
+        output_path.clone(),
+        &config,
+        &analyzer,
+        &editor,
+        &duration_getter,
+    );
+
+    assert!(result.is_ok(), "Pipeline with speedup should succeed");
+    assert!(output_path.exists(), "Output file should exist");
+}
+
+#[test]
+fn test_keep_mode_in_pipeline() {
+    use tempfile::tempdir;
+
+    let video_path = test_video_path();
+    if !video_path.exists() {
+        eprintln!("Skipping test: test video not found");
+        return;
+    }
+    check_ffmpeg_or_return();
+
+    let output_dir = tempdir().unwrap();
+    let output_path = output_dir.path().join("output_keep_mode.mp4");
+
+    let mut config = Config::default();
+    config.silence.mode = ai_vid_editor::config::SilenceMode::Keep;
+
+    let editor = FfmpegEditor::default();
+    let analyzer = FfmpegAnalyzer;
+    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+
+    let result = ai_vid_editor::batch_processor::process_single_file(
+        video_path.clone(),
+        output_path.clone(),
+        &config,
+        &analyzer,
+        &editor,
+        &duration_getter,
+    );
+
+    assert!(result.is_ok(), "Pipeline with keep mode should succeed");
+    assert!(output_path.exists(), "Output file should exist");
+}
+
+#[test]
+fn test_scaling_in_pipeline() {
+    use tempfile::tempdir;
+
+    let video_path = test_video_path();
+    if !video_path.exists() {
+        eprintln!("Skipping test: test video not found");
+        return;
+    }
+    check_ffmpeg_or_return();
+
+    let output_dir = tempdir().unwrap();
+    let output_path = output_dir.path().join("output_scaled.mp4");
+
+    let mut config = Config::default();
+    config.video.resolution = Some(VideoResolution::HD720);
+
+    let editor = FfmpegEditor::default();
+    let analyzer = FfmpegAnalyzer;
+    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+
+    let result = ai_vid_editor::batch_processor::process_single_file(
+        video_path.clone(),
+        output_path.clone(),
+        &config,
+        &analyzer,
+        &editor,
+        &duration_getter,
+    );
+
+    assert!(result.is_ok(), "Pipeline with scaling should succeed");
+    assert!(output_path.exists(), "Output file should exist");
+
+    let (w, h) = ffprobe_dimensions(&output_path).unwrap();
+    assert_eq!(w, 1280, "720p should produce 1280 width");
+    assert_eq!(h, 720, "720p should produce 720 height");
+}
+
+#[test]
+fn test_intro_outro_in_pipeline() {
+    use tempfile::tempdir;
+    use std::io::Write;
+
+    let video_path = test_video_path();
+    if !video_path.exists() {
+        eprintln!("Skipping test: test video not found");
+        return;
+    }
+    check_ffmpeg_or_return();
+
+    let output_dir = tempdir().unwrap();
+    let output_path = output_dir.path().join("output_intro_outro.mp4");
+
+    let intro_path = output_dir.path().join("intro.mp4");
+    let outro_path = output_dir.path().join("outro.mp4");
+
+    let silence_video = |path: &std::path::Path, dur: f64| {
+        let cmd = std::process::Command::new("ffmpeg")
+            .args(["-f", "lavfi", "-i", "color=black:s=320x240:d=1", "-t", &dur.to_string(), "-c:v", "libx264", "-pix_fmt", "yuv420p", "-y", path.to_str().unwrap()])
+            .output();
+        cmd.is_ok()
+    };
+    assert!(silence_video(&intro_path, 2.0), "Intro video creation failed");
+    assert!(silence_video(&outro_path, 2.0), "Outro video creation failed");
+
+    let mut config = Config::default();
+    config.intro = Some(ai_vid_editor::config::IntroConfig {
+        path: intro_path.clone(),
+        transition_ms: 500,
+    });
+    config.outro = Some(ai_vid_editor::config::IntroConfig {
+        path: outro_path.clone(),
+        transition_ms: 500,
+    });
+
+    let editor = FfmpegEditor::default();
+    let analyzer = FfmpegAnalyzer;
+    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+
+    let result = ai_vid_editor::batch_processor::process_single_file(
+        video_path.clone(),
+        output_path.clone(),
+        &config,
+        &analyzer,
+        &editor,
+        &duration_getter,
+    );
+
+    assert!(result.is_ok(), "Pipeline with intro/outro should succeed");
+    assert!(output_path.exists(), "Output file should exist");
+}
+
+#[test]
+fn test_multi_resolution_output() {
+    use tempfile::tempdir;
+
+    let video_path = test_video_path();
+    if !video_path.exists() {
+        eprintln!("Skipping test: test video not found");
+        return;
+    }
+    check_ffmpeg_or_return();
+
+    let output_dir = tempdir().unwrap();
+
+    let mut config = Config::default();
+    config.export.multi_format = true;
+
+    let editor = FfmpegEditor::default();
+    let analyzer = FfmpegAnalyzer;
+    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+
+    let result = ai_vid_editor::batch_processor::process_single_file(
+        video_path.clone(),
+        output_dir.path().join("output.mp4").clone(),
+        &config,
+        &analyzer,
+        &editor,
+        &duration_getter,
+    );
+
+    assert!(result.is_ok(), "Pipeline with multi-format export should succeed");
+}
+
+#[test]
+fn test_thumbnail_dimensions_in_pipeline() {
+    use tempfile::tempdir;
+
+    let video_path = test_video_path();
+    if !video_path.exists() {
+        eprintln!("Skipping test: test video not found");
+        return;
+    }
+    check_ffmpeg_or_return();
+
+    let output_dir = tempdir().unwrap();
+    let output_path = output_dir.path().join("output_thumb.mp4");
+
+    let mut config = Config::default();
+    config.thumbnail.enabled = true;
+    config.thumbnail.width = 320;
+    config.thumbnail.height = 180;
+
+    let editor = FfmpegEditor::default();
+    let analyzer = FfmpegAnalyzer;
+    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+
+    let result = ai_vid_editor::batch_processor::process_single_file(
+        video_path.clone(),
+        output_path.clone(),
+        &config,
+        &analyzer,
+        &editor,
+        &duration_getter,
+    );
+
+    assert!(result.is_ok(), "Pipeline with thumbnail should succeed");
+}
+
+#[test]
+fn test_text_watermark_in_pipeline() {
+    use tempfile::tempdir;
+
+    let video_path = test_video_path();
+    if !video_path.exists() {
+        eprintln!("Skipping test: test video not found");
+        return;
+    }
+    check_ffmpeg_or_return();
+
+    let output_dir = tempdir().unwrap();
+    let output_path = output_dir.path().join("output_text_wm.mp4");
+
+    let mut config = Config::default();
+    config.video.text_watermark = Some("TEST".to_string());
+    config.video.watermark_position = "top-left".to_string();
+
+    let editor = FfmpegEditor::default();
+    let analyzer = FfmpegAnalyzer;
+    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+
+    let result = ai_vid_editor::batch_processor::process_single_file(
+        video_path.clone(),
+        output_path.clone(),
+        &config,
+        &analyzer,
+        &editor,
+        &duration_getter,
+    );
+
+    assert!(result.is_ok(), "Pipeline with text watermark should succeed");
+    assert!(output_path.exists(), "Output file should exist");
+}
+
+#[test]
+fn test_preview_duration_in_pipeline() {
+    use tempfile::tempdir;
+
+    let video_path = test_video_path();
+    if !video_path.exists() {
+        eprintln!("Skipping test: test video not found");
+        return;
+    }
+    check_ffmpeg_or_return();
+
+    let output_dir = tempdir().unwrap();
+    let output_path = output_dir.path().join("output_preview.mp4");
+
+    let mut config = Config::default();
+    config.preview.enabled = true;
+    config.preview.duration_secs = 5.0;
+
+    let editor = FfmpegEditor::default();
+    let analyzer = FfmpegAnalyzer;
+    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+
+    let result = ai_vid_editor::batch_processor::process_single_file(
+        video_path.clone(),
+        output_path.clone(),
+        &config,
+        &analyzer,
+        &editor,
+        &duration_getter,
+    );
+
+    assert!(result.is_ok(), "Pipeline with preview duration should succeed");
+    assert!(output_path.exists(), "Output file should exist");
+}
+
+// ============================================================
+// Tier 2: Speech-driven pipeline tests (6) — require speech video
+// ============================================================
+
+#[test]
+fn test_captions_in_pipeline_with_speech() {
+    use tempfile::tempdir;
+
+    let video_path = test_speech_video_path();
+    if !video_path.exists() {
+        eprintln!("Skipping test: speech test video not found (run create_speech_video first)");
+        return;
+    }
+    check_ffmpeg_or_return();
+
+    let output_dir = tempdir().unwrap();
+    let output_path = output_dir.path().join("output_captions.mp4");
+
+    let mut config = Config::default();
+    config.captions.enabled = true;
+    config.captions.burn_in = true;
+
+    let editor = FfmpegEditor::default();
+    let analyzer = FfmpegAnalyzer;
+    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+
+    let result = ai_vid_editor::batch_processor::process_single_file(
+        video_path.clone(),
+        output_path.clone(),
+        &config,
+        &analyzer,
+        &editor,
+        &duration_getter,
+    );
+
+    assert!(result.is_ok(), "Pipeline with captions should succeed");
+    assert!(output_path.exists(), "Output file should exist");
+}
+
+#[test]
+fn test_srt_export_with_speech() {
+    use tempfile::tempdir;
+
+    let video_path = test_speech_video_path();
+    if !video_path.exists() {
+        eprintln!("Skipping test: speech test video not found");
+        return;
+    }
+    check_ffmpeg_or_return();
+
+    let output_dir = tempdir().unwrap();
+    let output_path = output_dir.path().join("output_srt.mp4");
+
+    let mut config = Config::default();
+    config.transcription.enabled = true;
+    config.export.srt = true;
+
+    let editor = FfmpegEditor::default();
+    let analyzer = FfmpegAnalyzer;
+    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+
+    let result = ai_vid_editor::batch_processor::process_single_file(
+        video_path.clone(),
+        output_path.clone(),
+        &config,
+        &analyzer,
+        &editor,
+        &duration_getter,
+    );
+
+    assert!(result.is_ok(), "Pipeline with SRT export should succeed");
+    assert!(output_path.exists(), "Output file should exist");
+
+    let srt_path = output_dir.path().join("output_srt.srt");
+    if srt_path.exists() {
+        let content = std::fs::read_to_string(&srt_path).unwrap();
+        assert!(content.contains("WEBVTT"), "SRT should have WebVTT header");
+    }
+}
+
+#[test]
+fn test_chapters_with_speech() {
+    use tempfile::tempdir;
+
+    let video_path = test_speech_video_path();
+    if !video_path.exists() {
+        eprintln!("Skipping test: speech test video not found");
+        return;
+    }
+    check_ffmpeg_or_return();
+
+    let output_dir = tempdir().unwrap();
+    let output_path = output_dir.path().join("output_chapters.mp4");
+
+    let mut config = Config::default();
+    config.transcription.enabled = true;
+    config.export.chapters = true;
+
+    let editor = FfmpegEditor::default();
+    let analyzer = FfmpegAnalyzer;
+    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+
+    let result = ai_vid_editor::batch_processor::process_single_file(
+        video_path.clone(),
+        output_path.clone(),
+        &config,
+        &analyzer,
+        &editor,
+        &duration_getter,
+    );
+
+    assert!(result.is_ok(), "Pipeline with chapters export should succeed");
+    assert!(output_path.exists(), "Output file should exist");
+}
+
+#[test]
+fn test_clips_extraction_with_speech() {
+    use tempfile::tempdir;
+
+    let video_path = test_speech_video_path();
+    if !video_path.exists() {
+        eprintln!("Skipping test: speech test video not found");
+        return;
+    }
+    check_ffmpeg_or_return();
+
+    let output_dir = tempdir().unwrap();
+    let output_path = output_dir.path().join("output_clips.mp4");
+
+    let mut config = Config::default();
+    config.transcription.enabled = true;
+    config.clips.enabled = true;
+
+    let editor = FfmpegEditor::default();
+    let analyzer = FfmpegAnalyzer;
+    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+
+    let result = ai_vid_editor::batch_processor::process_single_file(
+        video_path.clone(),
+        output_path.clone(),
+        &config,
+        &analyzer,
+        &editor,
+        &duration_getter,
+    );
+
+    assert!(result.is_ok(), "Pipeline with clip extraction should succeed");
+    assert!(output_path.exists(), "Output video should exist");
+}
+
+#[test]
+fn test_audio_ducking_with_speech() {
+    use tempfile::tempdir;
+
+    let video_path = test_speech_video_path();
+    if !video_path.exists() {
+        eprintln!("Skipping test: speech test video not found");
+        return;
+    }
+    check_ffmpeg_or_return();
+
+    let output_dir = tempdir().unwrap();
+    let output_path = output_dir.path().join("output_ducked.mp4");
+
+    let bg_path = output_dir.path().join("background.wav");
+    let noise_cmd = std::process::Command::new("ffmpeg")
+        .args(["-f", "lavfi", "-i", "anoisesrc=d=2:c=pink", "-c:a", "pcm_s16le", "-y", bg_path.to_str().unwrap()])
+        .output()
+        .unwrap();
+    if !noise_cmd.status.success() {
+        eprintln!("Skipping: could not generate background noise");
+        return;
+    }
+
+    let mut config = Config::default();
+    config.audio.ducking.enabled = true;
+    config.audio.ducking.background_music = Some(bg_path);
+    config.audio.ducking.duck_level_db = -15.0;
+
+    let editor = FfmpegEditor::default();
+    let analyzer = FfmpegAnalyzer;
+    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+
+    let result = ai_vid_editor::batch_processor::process_single_file(
+        video_path.clone(),
+        output_path.clone(),
+        &config,
+        &analyzer,
+        &editor,
+        &duration_getter,
+    );
+
+    assert!(result.is_ok(), "Pipeline with audio ducking should succeed");
+    assert!(output_path.exists(), "Output file should exist");
+}
+
+#[test]
+fn test_filler_word_removal_pipeline() {
+    use tempfile::tempdir;
+
+    let video_path = test_speech_video_path();
+    if !video_path.exists() {
+        eprintln!("Skipping test: speech test video not found");
+        return;
+    }
+    check_ffmpeg_or_return();
+
+    let output_dir = tempdir().unwrap();
+    let output_path = output_dir.path().join("output_filler_removed.mp4");
+
+    let mut config = Config::default();
+    config.filler_words.enabled = true;
+    config.filler_words.words = vec!["um".to_string(), "uh".to_string(), "like".to_string()];
+    config.filler_words.padding = 0.1;
+
+    let editor = FfmpegEditor::default();
+    let analyzer = FfmpegAnalyzer;
+    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+
+    let result = ai_vid_editor::batch_processor::process_single_file(
+        video_path.clone(),
+        output_path.clone(),
+        &config,
+        &analyzer,
+        &editor,
+        &duration_getter,
+    );
+
+    assert!(result.is_ok(), "Pipeline with filler word removal should succeed");
+    assert!(output_path.exists(), "Output file should exist");
+}
+
+// ============================================================
+// Tier 3: Batch processing tests (2)
+// ============================================================
+
+#[test]
+fn test_batch_processing_multiple_files() {
+    use tempfile::tempdir;
+
+    let video_path = test_video_path();
+    if !video_path.exists() {
+        eprintln!("Skipping test: test video not found");
+        return;
+    }
+    check_ffmpeg_or_return();
+
+    let output_dir = tempdir().unwrap();
+    let output_path1 = output_dir.path().join("batch1.mp4");
+    let output_path2 = output_dir.path().join("batch2.mp4");
+
+    let config = Config::default();
+    let editor = FfmpegEditor::default();
+    let analyzer = FfmpegAnalyzer;
+    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+
+    let result1 = ai_vid_editor::batch_processor::process_single_file(
+        video_path.clone(),
+        output_path1.clone(),
+        &config,
+        &analyzer,
+        &editor,
+        &duration_getter,
+    );
+
+    let result2 = ai_vid_editor::batch_processor::process_single_file(
+        video_path.clone(),
+        output_path2.clone(),
+        &config,
+        &analyzer,
+        &editor,
+        &duration_getter,
+    );
+
+    assert!(result1.is_ok(), "Batch file 1 should succeed");
+    assert!(result2.is_ok(), "Batch file 2 should succeed");
+    assert!(output_path1.exists(), "Batch output 1 should exist");
+    assert!(output_path2.exists(), "Batch output 2 should exist");
+}
+
+#[test]
+fn test_batch_progress_persistence() {
+    use tempfile::tempdir;
+    use std::io::Write;
+
+    let video_path = test_video_path();
+    if !video_path.exists() {
+        eprintln!("Skipping test: test video not found");
+        return;
+    }
+    check_ffmpeg_or_return();
+
+    let output_dir = tempdir().unwrap();
+    let state_path = output_dir.path().join("test_progress.json");
+
+    let progress = ai_vid_editor::progress::BatchProgress::new(
+        vec![video_path.clone()],
+        output_dir.path().join("outputs"),
+    );
+
+    progress.save(&state_path).unwrap();
+
+    let loaded = ai_vid_editor::progress::BatchProgress::load(&state_path).unwrap();
+    assert_eq!(loaded.total_files(), progress.total_files());
+}

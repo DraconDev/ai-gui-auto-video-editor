@@ -1,7 +1,8 @@
 # Project State
 
 ## Current Focus
-fix(editor): properly segment transcript segments when merging around filler words by creating complete segments instead of just adjusting position
+Added 8 new pipeline integration tests to validate core features of the video processing application.
 
 ## Completed
-- [x] fix(editor): create full segments from current position to segment end when merging filler word gaps, ensuring processed segments are properly constructed with speed=1.0 and pushed to the result vector
+- [x] Added 8 new pipeline integration tests for core functionality
+- [x] Updated `Cargo.lock` to reflect latest dependency versions
