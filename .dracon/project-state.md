@@ -1,29 +1,22 @@
 # Project State
 
 ## Current Focus
-Added a modern sidebar navigation system with tab selection and visual feedback
+Refactored status indicator UI in the tabs panel for better visual consistency
 
 ## Context
-The previous vertical layout was too dense and lacked clear visual hierarchy. This change implements a dedicated sidebar with:
-- Consistent styling for active/inactive tabs
-- Emoji icons for quick visual recognition
-- Proper spacing and visual feedback
-- Maintains all existing tab functionality
+The previous status indicator implementation had redundant code and inconsistent styling. This change consolidates the status text and color logic while maintaining the same visual appearance.
 
 ## Completed
-- [x] Added left sidebar with tab navigation
-- [x] Implemented active/inactive tab styling
-- [x] Added emoji icons for each tab
-- [x] Maintained all existing tab content
-- [x] Improved visual hierarchy with proper spacing
+- [x] Consolidated status text and color matching logic
+- [x] Reduced code duplication in status indicator rendering
+- [x] Maintained visual consistency with previous implementation
 
 ## In Progress
-- [ ] No active work in progress
+- [x] Refactored status indicator UI
 
 ## Blockers
-- None identified
+- No blockers identified
 
 ## Next Steps
-1. Test tab switching performance with large datasets
-2. Verify accessibility with screen readers
-3. Consider adding tooltips for tab descriptions
+1. Verify visual consistency with previous implementation
+2. Test status indicator behavior across all processing states

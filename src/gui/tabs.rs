@@ -20,55 +20,35 @@ impl App {
         ui.horizontal_wrapped(|ui| {
             ui.label(
                 RichText::new("AI Video Processor")
-                    .size(22.0)
+                    .size(20.0)
                     .color(ACCENT_PRIMARY)
                     .strong(),
             );
 
-            let status_text = match &self.state.status {
-                ProcessingStatus::Idle => ("Idle", TEXT_MUTED),
-                ProcessingStatus::Watching => ("Watching", SUCCESS_DIM),
-                ProcessingStatus::Processing(stage) => (stage.as_str(), PROCESSING),
-                ProcessingStatus::Error(err) => (err.as_str(), ERROR),
-            };
             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                ui.add_space(8.0);
                 let (rect, _) = ui.allocate_exact_size(egui::vec2(8.0, 8.0), egui::Sense::hover());
-                let dot_color = status_text.1;
+                let dot_color = match &self.state.status {
+                    ProcessingStatus::Idle => TEXT_MUTED,
+                    ProcessingStatus::Watching => SUCCESS_DIM,
+                    ProcessingStatus::Processing(_) => PROCESSING,
+                    ProcessingStatus::Error(_) => ERROR,
+                };
                 ui.painter().circle_filled(rect.center(), 3.5, dot_color);
                 ui.add_space(6.0);
+                let status_text = match &self.state.status {
+                    ProcessingStatus::Idle => "Idle",
+                    ProcessingStatus::Watching => "Watching",
+                    ProcessingStatus::Processing(stage) => stage.as_str(),
+                    ProcessingStatus::Error(err) => err.as_str(),
+                };
                 ui.label(
-                    egui::RichText::new(status_text.0)
+                    egui::RichText::new(status_text)
                         .size(13.0)
-                        .color(status_text.1),
+                        .color(dot_color),
                 );
             });
         });
-
-        ui.add_space(10.0);
-
-        egui::Frame::NONE
-            .fill(PANEL_BG_LIGHT)
-            .corner_radius(CORNER_RADIUS_SMALL)
-            .inner_margin(egui::vec2(6.0, 4.0))
-            .show(ui, |ui| {
-                ui.horizontal(|ui| {
-                    let tabs = [
-                        (Tab::All, "All"),
-                        (Tab::Folders, "Folders"),
-                        (Tab::Queue, "Queue"),
-                        (Tab::Settings, "Settings"),
-                        (Tab::Activity, "Activity"),
-                    ];
-                    for (tab, name) in tabs {
-                        if ui
-                            .add(button_tab(self.state.current_tab == tab, name))
-                            .clicked()
-                        {
-                            self.state.current_tab = tab;
-                        }
-                    }
-                });
-            });
     }
 
     pub(crate) fn draw_folders_panel(&mut self, ui: &mut egui::Ui) {
