@@ -1,21 +1,22 @@
 # Project State
 
 ## Current Focus
-Add conditional compilation for CLI feature in `main.rs`
+Simplify CLI feature conditional compilation in `main.rs`
 
 ## Context
-The change enables the CLI feature to be optionally compiled using the `#[cfg(feature = "cli")]` attribute, which is a common pattern for feature flags in Rust projects.
+The change removes conditional compilation for the CLI feature in `main.rs`, making the `Cli` struct always derive from `clap::Parser` regardless of feature flags. This simplifies the codebase by removing unnecessary feature gating for a core component.
 
 ## Completed
-- [x] Added `#[cfg(feature = "cli")]` attribute to `use clap::Parser`
-- [x] Added `#[cfg_attr(feature = "cli", derive(clap::Parser))]` to the `Cli` struct
+- [x] Removed `#[cfg(feature = "cli")]` attribute from `Cli` struct
+- [x] Added direct `#[derive(Debug, Parser)]` attribute
+- [x] Updated Cargo.lock to reflect dependency changes
 
 ## In Progress
-- [ ] None
+- [ ] Verify no runtime behavior changes occur due to this simplification
 
 ## Blockers
-- None
+- None identified
 
 ## Next Steps
-1. Verify the feature flag works as expected in build configurations
-2. Update documentation to reflect the new feature flag usage
+1. Verify CLI functionality remains consistent across all feature configurations
+2. Update documentation to reflect the simplified CLI implementation
