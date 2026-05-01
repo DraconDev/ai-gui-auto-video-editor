@@ -1,7 +1,7 @@
 # Project State
 
 ## Current Focus
-Add test_speech_video.mp4 binary file to support speech segment processing tests
+Remove incorrect WebVTT header assertion from SRT export integration test
 
 ## Completed
-- [x] Add test_speech_video.mp4 binary asset
+- [x] Remove invalid assertion in `test_srt_export_with_speech` that checked for WebVTT content in generated SRT output files, as SRT format does not use WebVTT headers

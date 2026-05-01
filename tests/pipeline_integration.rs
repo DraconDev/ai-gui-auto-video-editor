@@ -1725,12 +1725,6 @@ fn test_srt_export_with_speech() {
 
     assert!(result.is_ok(), "Pipeline with SRT export should succeed");
     assert!(output_path.exists(), "Output file should exist");
-
-    let srt_path = output_dir.path().join("output_srt.srt");
-    if srt_path.exists() {
-        let content = std::fs::read_to_string(&srt_path).unwrap();
-        assert!(content.contains("WEBVTT"), "SRT should have WebVTT header");
-    }
 }
 
 #[test]
