@@ -1,21 +1,22 @@
 # Project State
 
 ## Current Focus
-Update dependency lockfile to reflect updated crate versions after recent refactoring
+Added drag-and-drop file handling for video files in the Queue tab
 
 ## Context
-This change was triggered by recent refactoring work that modified dependencies in the project. The lockfile needs to be updated to ensure consistent builds across environments.
+This implements the previously removed drag-and-drop functionality for video files, allowing users to directly add video files to the processing queue by dragging them onto the Queue tab interface.
 
 ## Completed
-- [x] Updated Cargo.lock to reflect current dependency versions
-- [x] Synchronized lockfile with latest dependency changes
+- [x] Added drag-and-drop handling for video files in the Queue tab
+- [x] Files are automatically validated as video files before being added to the queue
+- [x] Added default output directory and preset settings for dropped files
 
 ## In Progress
-- [x] Dependency lockfile update complete
+- [x] Drag-and-drop file handling implementation
 
 ## Blockers
 - None identified
 
 ## Next Steps
-1. Verify build consistency across development environments
-2. Prepare for next release cycle with updated dependencies
+1. Test drag-and-drop functionality with various file types
+2. Add visual feedback for successful file drops
