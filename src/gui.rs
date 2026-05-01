@@ -474,6 +474,7 @@ impl AppState {
             last_seen_activity_len: 0,
             settings_category: SettingsCategory::default(),
             last_save_time: None,
+            recent_outputs: Vec::new(),
         };
 
         if !is_first_run {

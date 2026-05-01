@@ -4,17 +4,17 @@
 Added recent outputs tracking to the GUI state for quick access.
 
 ## Context
-This change supports a feature that allows users to quickly access recently processed outputs without navigating through file dialogs. It complements the existing drag-and-drop functionality for video files in the Queue tab.
+This change supports the recent outputs feature, allowing users to quickly access previously generated outputs without navigating through the full history.
 
 ## Completed
-- [x] Added `recent_outputs` field to `AppState` to store paths of recently processed outputs
+- [x] Added `recent_outputs` field to `AppState` to store recent outputs
 
 ## In Progress
-- [x] Implementation of UI components to display and interact with recent outputs
+- [x] Implementation of recent outputs tracking
 
 ## Blockers
-- UI component implementation for displaying recent outputs needs to be completed
+- None identified
 
 ## Next Steps
-1. Implement UI components to display and interact with recent outputs
-2. Add functionality to populate the recent outputs list when files are processed
+1. Implement UI components to display recent outputs
+2. Add functionality to populate and update the recent outputs list
