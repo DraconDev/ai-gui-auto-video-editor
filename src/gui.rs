@@ -838,7 +838,7 @@ impl AppState {
         self.batch_queue.retain(|f| {
             if f.status == QueueStatus::Done || f.status == QueueStatus::Error {
                 if let Some(completed) = f.completed_at {
-                    let elapsed = now.signed_duration_since(completed);
+                    let elapsed = now.signed_duration_since(completed.into());
                     if elapsed.num_seconds() > 60 {
                         return false;
                     }
