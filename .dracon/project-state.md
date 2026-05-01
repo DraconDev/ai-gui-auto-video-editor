@@ -1,21 +1,20 @@
 # Project State
 
 ## Current Focus
-Added Escape key support to close the setup wizard in the GUI
+Improved scroll bar behavior in GUI tabs by removing offset
 
 ## Context
-This change improves user experience by allowing quick dismissal of the setup wizard without requiring mouse interaction
+This change was prompted by a need to simplify the scroll bar behavior in the GUI tabs, particularly in the vertical scroll area. The previous implementation had an unnecessary scroll bar offset that was removed to create a cleaner user experience.
 
 ## Completed
-- [x] Added Escape key handler to close setup wizard when visible
-- [x] Only triggers when setup wizard is active
+- [x] Removed `scroll_bar_offset(egui::ScrollBarOffset::ZERO)` from the vertical scroll area in `tabs.rs`
 
 ## In Progress
-- [x] Implemented basic keyboard interaction for setup flow
+- [x] No active work in progress related to this change
 
 ## Blockers
-- None identified
+- None
 
 ## Next Steps
-1. Test Escape key behavior across different platforms
-2. Consider adding similar keyboard shortcuts for other dialogs
+1. Verify the visual appearance of scroll bars in the GUI tabs
+2. Ensure no unintended side effects from removing the scroll bar offset

@@ -2340,7 +2340,6 @@ impl App {
 
                 egui::ScrollArea::vertical()
                     .max_height(if full_height { 800.0 } else { 200.0 })
-                    .scroll_bar_offset(egui::ScrollBarOffset::ZERO)
                     .show(ui, |ui| {
                         for entry in entries {
                             ui.add_space(4.0);
