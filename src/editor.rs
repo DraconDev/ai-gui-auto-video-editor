@@ -161,9 +161,9 @@ pub fn calculate_keep_segments_from_transcript(
                 let gap = seg.start - current_pos;
                 if prev_is_filler && (gap - padding).abs() < 0.001 {
                     if let Some(prev) = processed.last_mut() {
-                        prev.end = seg.end;
+                        prev.end = seg.start - padding;
                     }
-                    current_pos = seg.end;
+                    current_pos = seg.end - padding;
                     prev_is_filler = false;
                     continue;
                 }
@@ -1187,7 +1187,7 @@ mod tests {
         assert_eq!(processed.len(), 2);
         assert_eq!(processed[0].start, 0.0);
         assert_eq!(processed[0].end, 2.1);
-        assert_eq!(processed[1].start, 2.9);
+        assert_eq!(processed[1].start, 3.0);
         assert_eq!(processed[1].end, 10.0);
     }
 
