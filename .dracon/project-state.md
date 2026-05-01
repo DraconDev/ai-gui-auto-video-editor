@@ -1,10 +1,7 @@
 # Project State
 
-## Current Focus
-Adjust test for calculate_keep_segments_from_transcript to remove debug output and update expected segment start value
+## Current FocusAdd debug logging and merge consecutive filler segments by extending the previous filler segment's end, preventing gaps in segment transitions.
 
 ## Completed
-- [x] removed debug eprintln loop that printed processed segment lengths and details
-- [x] updated assertion for processed[1].start from 10.0 to 3.0 reflecting corrected calculation
-- [x] removed assertion for processed[0].end that was no longer needed
-- [x] updated Cargo.lock dependency lock file (binary change)
+- [x] Added enumeration and debug `eprintln!` statements to log each segment's index, text, filler status, current position, and previous filler flag.
+- [x] Implemented filler‑segment merging logic that computes `keep_end` and `cut_end` and updates the previous filler segment's end when consecutive filler segments are detected.

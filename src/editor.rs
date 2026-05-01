@@ -132,16 +132,20 @@ pub fn calculate_keep_segments_from_transcript(
     let mut current_pos = 0.0;
     let mut prev_is_filler = false;
 
-    for seg in transcript {
+    for (i, seg) in transcript.iter().enumerate() {
         let is_filler = filler_words
             .iter()
             .any(|&f| seg.text.to_lowercase().contains(f));
 
+        eprintln!("DEBUG seg[{}] text={:?} is_filler={} current_pos={:.1} prev_is_filler={}", i, seg.text, is_filler, current_pos, prev_is_filler);
+
         if is_filler {
             let keep_end = (seg.start + padding).min(total_duration);
             let cut_end = (seg.end - padding).max(0.0);
+            eprintln!("  filler: keep_end={:.1} cut_end={:.1}", keep_end, cut_end);
 
             if keep_end > current_pos {
+                eprintln!("  pushing filler segment [{:.1}, {:.1})", current_pos, keep_end);
                 if prev_is_filler {
                     if let Some(prev) = processed.last_mut() {
                         prev.end = keep_end;
