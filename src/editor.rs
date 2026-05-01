@@ -132,25 +132,52 @@ pub fn calculate_keep_segments_from_transcript(
     let mut current_pos = 0.0;
     let mut prev_is_filler = false;
 
-    for seg in transcript {
+for seg in transcript {
         let is_filler = filler_words
             .iter()
             .any(|&f| seg.text.to_lowercase().contains(f));
-
-        eprintln!("LOOP: text={:?} is_filler={} current_pos={:.1} prev_is_filler={} processed_len={}", seg.text, is_filler, current_pos, prev_is_filler, processed.len());
 
         if is_filler {
             let keep_end = (seg.start + padding).min(total_duration);
             let cut_end = (seg.end - padding).max(0.0);
 
-            eprintln!("  filler: keep_end={:.1} cut_end={:.1}", keep_end, cut_end);
-
             if keep_end > current_pos {
                 if prev_is_filler {
                     if let Some(prev) = processed.last_mut() {
-                        eprintln!("  extending prev from {:.1} to {:.1}", prev.end, keep_end);
                         prev.end = keep_end;
                     }
+                } else {
+                    processed.push(ProcessedSegment {
+                        start: current_pos,
+                        end: keep_end,
+                        speed: 1.0,
+                    });
+                }
+            }
+            current_pos = cut_end;
+            prev_is_filler = true;
+        } else {
+            if current_pos < seg.start {
+                let gap = seg.start - current_pos;
+                if prev_is_filler && (gap - padding).abs() < 0.001 {
+                    if let Some(prev) = processed.last_mut() {
+                        prev.end = current_pos + padding;
+                    }
+                    current_pos = seg.end - padding;
+                    prev_is_filler = false;
+                }
+            }
+            if current_pos < seg.end {
+                processed.push(ProcessedSegment {
+                    start: current_pos,
+                    end: seg.end,
+                    speed: 1.0,
+                });
+            }
+            current_pos = seg.end;
+            prev_is_filler = false;
+        }
+    }
                 } else {
                     eprintln!("  pushing [{:.1}, {:.1})", current_pos, keep_end);
                     processed.push(ProcessedSegment {
