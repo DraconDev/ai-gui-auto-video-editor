@@ -803,8 +803,14 @@ impl AppState {
                         if file.path == path {
                             file.status = QueueStatus::Done;
                             file.progress = 1.0;
-                            file.output_path = Some(output_path);
+                            file.output_path = Some(output_path.clone());
                             file.completed_at = Some(chrono::Local::now());
+                            if output_path.exists() {
+                                self.recent_outputs.insert(0, output_path.clone());
+                                if self.recent_outputs.len() > 10 {
+                                    self.recent_outputs.pop();
+                                }
+                            }
                             break;
                         }
                     }
