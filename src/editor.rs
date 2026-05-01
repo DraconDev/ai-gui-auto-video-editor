@@ -175,11 +175,20 @@ pub fn calculate_keep_segments_from_transcript(
                 }
             }
             if current_pos < seg.end {
-                processed.push(ProcessedSegment {
+                let seg_to_add = ProcessedSegment {
                     start: current_pos,
                     end: seg.end,
                     speed: 1.0,
-                });
+                };
+                if let Some(prev) = processed.last_mut() {
+                    if (prev.end - seg_to_add.start).abs() < 0.001 {
+                        prev.end = seg_to_add.end;
+                    } else {
+                        processed.push(seg_to_add);
+                    }
+                } else {
+                    processed.push(seg_to_add);
+                }
             }
             current_pos = seg.end;
             prev_is_filler = false;
@@ -192,12 +201,6 @@ pub fn calculate_keep_segments_from_transcript(
             end: total_duration,
             speed: 1.0,
         });
-    }
-
-    if prev_is_filler {
-        if let Some(prev) = processed.last_mut() {
-            prev.end = total_duration;
-        }
     }
 
     processed
