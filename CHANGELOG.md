@@ -7,10 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [19.1.9] - 2026-05-01
+## [19.2.1] - 2026-05-01
 
 ### Maintenance
 - Internal Cargo.lock updates (no functional changes since v19.1.5)
+- Fixed release workflow Windows artifact upload path (.tar.gz → also .zip)
+- Enabled integration tests in CI (`cargo test --all-features`)
+- Added CHANGELOG comparison links for v13.2.0, v14.4.1, v19.1.5, v19.1.8
 
 ## [19.1.5] - 2026-05-01
 
