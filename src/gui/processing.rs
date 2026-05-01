@@ -153,7 +153,10 @@ fn watch_folders_loop(
 
                 let output_path = folder.output.join(&file_name);
                 if output_path.exists() {
-                    attempted.insert(path);
+                    attempted.push_back(path);
+                    if attempted.len() > MAX_ATTEMPTED {
+                        attempted.pop_front();
+                    }
                     continue;
                 }
 
@@ -191,7 +194,10 @@ fn watch_folders_loop(
                     },
                 );
 
-                attempted.insert(path);
+                attempted.push_back(path);
+                if attempted.len() > MAX_ATTEMPTED {
+                    attempted.pop_front();
+                }
 
                 match result {
                     Ok(()) => {

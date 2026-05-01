@@ -1,21 +1,22 @@
 # Project State
 
 ## Current Focus
-Refactor folder watcher to limit attempted operations and improve memory management
+Refactor folder watcher to limit attempted operations and prevent memory growth
 
 ## Context
-The folder watcher was using a HashSet to track attempted operations, which could grow indefinitely. This change replaces it with a VecDeque to enforce a maximum size limit (10,000 items) to prevent memory bloat.
+The folder watcher was previously using an unbounded data structure to track attempted operations, which could lead to memory issues over time. This change aligns with the recent activity log size limit implementation and follows the same pattern of preventing unbounded memory growth.
 
 ## Completed
-- [x] Added MAX_ATTEMPTED constant to limit tracked operations
-- [x] Replaced HashSet with VecDeque for bounded tracking
+- [x] Changed `attempted.insert(path)` to `attempted.push_back(path)` to use a queue-like structure
+- [x] Added size limit check with `MAX_ATTEMPTED` constant
+- [x] Added `pop_front()` to maintain a fixed-size queue
 
 ## In Progress
-- [ ] None
+- [x] Implementation of the attempted operations tracking with size limits
 
 ## Blockers
-- None
+- None identified
 
 ## Next Steps
-1. Verify memory usage with large numbers of files
-2. Consider adding metrics to monitor attempted operations
+1. Verify the new implementation doesn't affect existing functionality
+2. Consider adding metrics to track queue usage
