@@ -197,6 +197,40 @@ impl App {
                 self.state.modal.set_for_edit(idx, folder);
             }
         });
+
+        // Recent outputs section
+        if !self.state.recent_outputs.is_empty() {
+            ui.add_space(16.0);
+            ui.separator();
+            ui.add_space(8.0);
+            ui.horizontal(|ui| {
+                ui.label(
+                    RichText::new("Recent Outputs")
+                        .size(12.0)
+                        .color(TEXT_SECONDARY)
+                        .strong(),
+                );
+            });
+            ui.add_space(4.0);
+            for (idx, path) in self.state.recent_outputs.iter().enumerate().take(5) {
+                if idx > 0 {
+                    ui.add_space(4.0);
+                }
+                let filename = path.file_name()
+                    .map(|n| n.to_string_lossy().to_string())
+                    .unwrap_or_else(|| path.display().to_string());
+                let dir = path.parent()
+                    .map(|p| p.display().to_string())
+                    .unwrap_or_default();
+                ui.horizontal_wrapped(|ui| {
+                    if ui.add(egui::Label::new(format!("📄 {}", filename)).hovered {
+                        ui.tooltip_text(dir.clone());
+                    } else {
+                        ui.label(label_muted(&filename));
+                    }
+                });
+            }
+        }
     }
 
     pub(crate) fn draw_delete_confirm_modal(&mut self, ctx: &egui::Context) {
