@@ -1,6 +1,6 @@
 pub mod processing;
-mod tabs;
-mod theme;
+pub mod tabs;
+pub mod theme;
 
 use eframe::egui;
 use std::path::{Path, PathBuf};
