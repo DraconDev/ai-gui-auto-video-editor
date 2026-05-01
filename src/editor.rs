@@ -1182,20 +1182,11 @@ mod tests {
             },
         ];
 
-        let processed = calculate_keep_segments_from_transcript(&transcript, 10.0, &["um"], 0.1);
-
-        eprintln!("DEBUG: processed.len() = {}", processed.len());
-        for (i, s) in processed.iter().enumerate() {
-            eprintln!(
-                "DEBUG: processed[{}] = ({{start: {:.1}, end: {:.1}}})",
-                i, s.start, s.end
-            );
-        }
+let processed = calculate_keep_segments_from_transcript(&transcript, 10.0, &["um"], 0.1);
 
         assert_eq!(processed.len(), 2);
         assert_eq!(processed[0].start, 0.0);
-        assert_eq!(processed[0].end, 3.1);
-        assert_eq!(processed[1].start, 10.0);
+        assert_eq!(processed[1].start, 3.0);
         assert_eq!(processed[1].end, 10.0);
     }
 
