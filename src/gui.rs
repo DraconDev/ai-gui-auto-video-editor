@@ -929,6 +929,30 @@ impl eframe::App for App {
         #[cfg(not(target_os = "macos"))]
         let is_ctrl = modifiers.ctrl;
 
+        // Handle file drops onto the Queue tab
+        if self.state.current_tab == Tab::Queue {
+            let raw = ctx.input(|i| i.raw.clone());
+            if !raw.files.is_empty() {
+                for path in raw.files {
+                    if crate::utils::is_video_file(&path) {
+                        let output_dir = PathBuf::from("output");
+                        let preset = "youtube".to_string();
+                        let settings = FolderSettings::default();
+                        self.state.batch_queue.push(QueuedFile {
+                            path,
+                            output_dir,
+                            preset,
+                            settings,
+                            status: QueueStatus::Queued,
+                            progress: 0.0,
+                            output_path: None,
+                            completed_at: None,
+                        });
+                    }
+                }
+            }
+        }
+
         // Ctrl+1-5 for tab navigation
         if is_ctrl {
             let tab_keys = [
