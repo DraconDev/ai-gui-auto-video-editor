@@ -1,21 +1,21 @@
 # Project State
 
 ## Current Focus
-Added activity log size limit to prevent unbounded memory growth
+Refactor folder watcher to limit attempted operations and improve memory management
 
 ## Context
-The application was previously collecting watcher events without any size limit, which could lead to memory exhaustion over time. This change prevents the activity log from growing indefinitely.
+The folder watcher was using a HashSet to track attempted operations, which could grow indefinitely. This change replaces it with a VecDeque to enforce a maximum size limit (10,000 items) to prevent memory bloat.
 
 ## Completed
-- [x] Added constant `MAX_ACTIVITY_LOG` to limit log size
-- [x] Implemented log truncation when exceeding size limit
+- [x] Added MAX_ATTEMPTED constant to limit tracked operations
+- [x] Replaced HashSet with VecDeque for bounded tracking
 
 ## In Progress
-- [x] Activity log size management implementation
+- [ ] None
 
 ## Blockers
-- None identified
+- None
 
 ## Next Steps
-1. Verify log truncation works as expected in testing
-2. Consider adding configuration option for log size limit
+1. Verify memory usage with large numbers of files
+2. Consider adding metrics to monitor attempted operations

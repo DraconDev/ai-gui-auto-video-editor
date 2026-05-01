@@ -52,8 +52,9 @@ fn watch_folders_loop(
     stop: Arc<AtomicBool>,
     notify: bool,
 ) {
+    const MAX_ATTEMPTED: usize = 10_000;
     let poll_interval = Duration::from_secs(config.watch.interval.max(1));
-    let mut attempted = HashSet::new();
+    let mut attempted = VecDeque::new();
     let intro = config.paths.intro.clone();
     let outro = config.paths.outro.clone();
     let analyzer = FfmpegAnalyzer;
