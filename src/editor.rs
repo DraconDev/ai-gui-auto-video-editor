@@ -1186,7 +1186,10 @@ mod tests {
 
         eprintln!("DEBUG: processed.len() = {}", processed.len());
         for (i, s) in processed.iter().enumerate() {
-            eprintln!("DEBUG: processed[{}] = ({{start: {:.1}, end: {:.1}}})", i, s.start, s.end);
+            eprintln!(
+                "DEBUG: processed[{}] = ({{start: {:.1}, end: {:.1}}})",
+                i, s.start, s.end
+            );
         }
 
         assert_eq!(processed.len(), 2);

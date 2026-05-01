@@ -740,7 +740,15 @@ fn check_ffmpeg_or_return() {
 
 fn ffprobe_duration(path: &std::path::Path) -> Option<f64> {
     let output = std::process::Command::new("ffprobe")
-        .args(["-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", path.to_str()?])
+        .args([
+            "-v",
+            "error",
+            "-show_entries",
+            "format=duration",
+            "-of",
+            "csv=p=0",
+            path.to_str()?,
+        ])
         .output()
         .ok()?;
     let s = String::from_utf8_lossy(&output.stdout);
@@ -749,7 +757,17 @@ fn ffprobe_duration(path: &std::path::Path) -> Option<f64> {
 
 fn ffprobe_codec(path: &std::path::Path) -> Option<String> {
     let output = std::process::Command::new("ffprobe")
-        .args(["-v", "error", "-select_streams", "v:0", "-show_entries", "stream=codec_name", "-of", "csv=p=0", path.to_str()?])
+        .args([
+            "-v",
+            "error",
+            "-select_streams",
+            "v:0",
+            "-show_entries",
+            "stream=codec_name",
+            "-of",
+            "csv=p=0",
+            path.to_str()?,
+        ])
         .output()
         .ok()?;
     Some(String::from_utf8_lossy(&output.stdout).trim().to_string())
@@ -757,7 +775,17 @@ fn ffprobe_codec(path: &std::path::Path) -> Option<String> {
 
 fn ffprobe_dimensions(path: &std::path::Path) -> Option<(u32, u32)> {
     let output = std::process::Command::new("ffprobe")
-        .args(["-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width,height", "-of", "csv=p=0", path.to_str()?])
+        .args([
+            "-v",
+            "error",
+            "-select_streams",
+            "v:0",
+            "-show_entries",
+            "stream=width,height",
+            "-of",
+            "csv=p=0",
+            path.to_str()?,
+        ])
         .output()
         .ok()?;
     let s = String::from_utf8_lossy(&output.stdout);
@@ -783,7 +811,10 @@ fn test_watermark_in_pipeline() {
 
     // Create a tiny red PNG watermark
     let wm_path = output_dir.path().join("test_watermark.png");
-    assert!(create_test_watermark_png(&wm_path, 64), "Watermark PNG creation failed");
+    assert!(
+        create_test_watermark_png(&wm_path, 64),
+        "Watermark PNG creation failed"
+    );
 
     let mut config = Config::default();
     config.video.watermark = Some(wm_path.clone());
@@ -810,7 +841,10 @@ fn test_watermark_in_pipeline() {
     let codec = ffprobe_codec(&output_path);
     assert!(codec.is_some(), "Output should have a video codec");
     let dur = ffprobe_duration(&output_path);
-    assert!(dur.is_some() && dur.unwrap() > 0.0, "Output should have valid duration");
+    assert!(
+        dur.is_some() && dur.unwrap() > 0.0,
+        "Output should have valid duration"
+    );
 }
 
 #[test]
@@ -829,7 +863,10 @@ fn test_background_music_in_pipeline() {
 
     // Create a short music file
     let music_path = output_dir.path().join("test_music.aac");
-    assert!(create_test_audio_file(&music_path, 6), "Music file creation failed");
+    assert!(
+        create_test_audio_file(&music_path, 6),
+        "Music file creation failed"
+    );
 
     let mut config = Config::default();
     config.audio.music_file = Some(music_path.clone());
@@ -848,11 +885,17 @@ fn test_background_music_in_pipeline() {
         &duration_getter,
     );
 
-    assert!(result.is_ok(), "Pipeline with background music should succeed");
+    assert!(
+        result.is_ok(),
+        "Pipeline with background music should succeed"
+    );
     assert!(output_path.exists(), "Output file should exist");
 
     let dur = ffprobe_duration(&output_path);
-    assert!(dur.is_some() && dur.unwrap() > 0.0, "Output should have valid duration");
+    assert!(
+        dur.is_some() && dur.unwrap() > 0.0,
+        "Output should have valid duration"
+    );
 }
 
 #[test]
@@ -886,11 +929,17 @@ fn test_scene_detection_in_pipeline() {
         &duration_getter,
     );
 
-    assert!(result.is_ok(), "Pipeline with scene detection should succeed");
+    assert!(
+        result.is_ok(),
+        "Pipeline with scene detection should succeed"
+    );
     assert!(output_path.exists(), "Output file should exist");
 
     let dur = ffprobe_duration(&output_path);
-    assert!(dur.is_some() && dur.unwrap() > 0.0, "Output should have valid duration");
+    assert!(
+        dur.is_some() && dur.unwrap() > 0.0,
+        "Output should have valid duration"
+    );
 }
 
 #[test]
@@ -909,7 +958,10 @@ fn test_full_pipeline_all_features() {
 
     // Create a tiny watermark
     let wm_path = output_dir.path().join("test_watermark.png");
-    assert!(create_test_watermark_png(&wm_path, 64), "Watermark creation failed");
+    assert!(
+        create_test_watermark_png(&wm_path, 64),
+        "Watermark creation failed"
+    );
 
     let mut config = Config::default();
     // Silence
@@ -945,7 +997,10 @@ fn test_full_pipeline_all_features() {
     assert!(output_path.exists(), "Output file should exist");
 
     let dur = ffprobe_duration(&output_path);
-    assert!(dur.is_some() && dur.unwrap() > 0.0, "Output should have valid duration");
+    assert!(
+        dur.is_some() && dur.unwrap() > 0.0,
+        "Output should have valid duration"
+    );
 
     let codec = ffprobe_codec(&output_path);
     assert!(codec.is_some(), "Output should have video codec");
@@ -1023,8 +1078,8 @@ fn test_exports_through_pipeline() {
 
 #[test]
 fn test_multi_format_export() {
-    use tempfile::tempdir;
     use ai_vid_editor::config::VideoResolution;
+    use tempfile::tempdir;
 
     let video_path = test_video_path();
     if !video_path.exists() {
@@ -1053,7 +1108,10 @@ fn test_multi_format_export() {
         &duration_getter,
     );
 
-    assert!(result.is_ok(), "Pipeline with multi-format export should succeed");
+    assert!(
+        result.is_ok(),
+        "Pipeline with multi-format export should succeed"
+    );
     assert!(output_path.exists(), "Primary output file should exist");
 
     // Check for 720p alternate output
@@ -1106,7 +1164,10 @@ fn test_clip_extraction() {
 
     // Pipeline should succeed even if clip extraction produces no clips
     // (depends on transcription finding speech segments)
-    assert!(result.is_ok(), "Pipeline with clip extraction should succeed");
+    assert!(
+        result.is_ok(),
+        "Pipeline with clip extraction should succeed"
+    );
     assert!(output_path.exists(), "Output video should exist");
 
     // Check for clip files (may or may not exist depending on transcription results)
@@ -1129,8 +1190,8 @@ fn test_clip_extraction() {
 
 #[test]
 fn test_config_precedence_with_preset() {
-    use tempfile::tempdir;
     use std::io::Write;
+    use tempfile::tempdir;
 
     let video_path = test_video_path();
     if !video_path.exists() {
@@ -1189,7 +1250,10 @@ watermark_position = "top-left"
     // Verify the output is vertical (9:16 aspect)
     let (w, h) = ffprobe_dimensions(&output_path).unwrap();
     assert_eq!(w, 1080, "Shorts preset should produce 1080p width");
-    assert_eq!(h, 1920, "Shorts preset should produce 1920p height (vertical)");
+    assert_eq!(
+        h, 1920,
+        "Shorts preset should produce 1920p height (vertical)"
+    );
 }
 
 // ============================================================
@@ -1305,8 +1369,8 @@ fn test_scaling_in_pipeline() {
 
 #[test]
 fn test_intro_outro_in_pipeline() {
-    use tempfile::tempdir;
     use std::io::Write;
+    use tempfile::tempdir;
 
     let video_path = test_video_path();
     if !video_path.exists() {
@@ -1323,12 +1387,31 @@ fn test_intro_outro_in_pipeline() {
 
     let silence_video = |path: &std::path::Path, dur: f64| {
         let cmd = std::process::Command::new("ffmpeg")
-            .args(["-f", "lavfi", "-i", "color=black:s=320x240:d=1", "-t", &dur.to_string(), "-c:v", "libx264", "-pix_fmt", "yuv420p", "-y", path.to_str().unwrap()])
+            .args([
+                "-f",
+                "lavfi",
+                "-i",
+                "color=black:s=320x240:d=1",
+                "-t",
+                &dur.to_string(),
+                "-c:v",
+                "libx264",
+                "-pix_fmt",
+                "yuv420p",
+                "-y",
+                path.to_str().unwrap(),
+            ])
             .output();
         cmd.is_ok()
     };
-    assert!(silence_video(&intro_path, 2.0), "Intro video creation failed");
-    assert!(silence_video(&outro_path, 2.0), "Outro video creation failed");
+    assert!(
+        silence_video(&intro_path, 2.0),
+        "Intro video creation failed"
+    );
+    assert!(
+        silence_video(&outro_path, 2.0),
+        "Outro video creation failed"
+    );
 
     let mut config = Config::default();
     config.paths.intro = Some(intro_path);
@@ -1380,7 +1463,10 @@ fn test_multi_resolution_output() {
         &duration_getter,
     );
 
-    assert!(result.is_ok(), "Pipeline with multi-format export should succeed");
+    assert!(
+        result.is_ok(),
+        "Pipeline with multi-format export should succeed"
+    );
 }
 
 #[test]
@@ -1433,7 +1519,10 @@ fn test_watermark_in_pipeline_image() {
     let output_path = output_dir.path().join("output_img_wm.mp4");
 
     let wm_path = output_dir.path().join("test_watermark.png");
-    assert!(create_test_watermark_png(&wm_path, 64), "Watermark PNG creation failed");
+    assert!(
+        create_test_watermark_png(&wm_path, 64),
+        "Watermark PNG creation failed"
+    );
 
     let mut config = Config::default();
     config.video.watermark = Some(wm_path.clone());
@@ -1453,7 +1542,10 @@ fn test_watermark_in_pipeline_image() {
         &duration_getter,
     );
 
-    assert!(result.is_ok(), "Pipeline with image watermark should succeed");
+    assert!(
+        result.is_ok(),
+        "Pipeline with image watermark should succeed"
+    );
     assert!(output_path.exists(), "Output file should exist");
 }
 
@@ -1488,7 +1580,10 @@ fn test_preview_duration_in_pipeline() {
         &duration_getter,
     );
 
-    assert!(result.is_ok(), "Pipeline with preview duration should succeed");
+    assert!(
+        result.is_ok(),
+        "Pipeline with preview duration should succeed"
+    );
     assert!(output_path.exists(), "Output file should exist");
 }
 
@@ -1668,7 +1763,10 @@ fn test_chapters_with_speech() {
         &duration_getter,
     );
 
-    assert!(result.is_ok(), "Pipeline with chapters export should succeed");
+    assert!(
+        result.is_ok(),
+        "Pipeline with chapters export should succeed"
+    );
     assert!(output_path.exists(), "Output file should exist");
 }
 
@@ -1702,7 +1800,10 @@ fn test_clips_extraction_with_speech() {
         &duration_getter,
     );
 
-    assert!(result.is_ok(), "Pipeline with clip extraction should succeed");
+    assert!(
+        result.is_ok(),
+        "Pipeline with clip extraction should succeed"
+    );
     assert!(output_path.exists(), "Output video should exist");
 }
 
@@ -1722,7 +1823,16 @@ fn test_audio_ducking_with_speech() {
 
     let bg_path = output_dir.path().join("background.wav");
     let noise_cmd = std::process::Command::new("ffmpeg")
-        .args(["-f", "lavfi", "-i", "anoisesrc=d=2:c=pink", "-c:a", "pcm_s16le", "-y", bg_path.to_str().unwrap()])
+        .args([
+            "-f",
+            "lavfi",
+            "-i",
+            "anoisesrc=d=2:c=pink",
+            "-c:a",
+            "pcm_s16le",
+            "-y",
+            bg_path.to_str().unwrap(),
+        ])
         .output()
         .unwrap();
     if !noise_cmd.status.success() {
@@ -1783,7 +1893,10 @@ fn test_filler_word_removal_pipeline() {
         &duration_getter,
     );
 
-    assert!(result.is_ok(), "Pipeline with filler word removal should succeed");
+    assert!(
+        result.is_ok(),
+        "Pipeline with filler word removal should succeed"
+    );
     assert!(output_path.exists(), "Output file should exist");
 }
 
@@ -1837,8 +1950,8 @@ fn test_batch_processing_multiple_files() {
 
 #[test]
 fn test_batch_progress_persistence() {
-    use tempfile::tempdir;
     use std::io::Write;
+    use tempfile::tempdir;
 
     let video_path = test_video_path();
     if !video_path.exists() {

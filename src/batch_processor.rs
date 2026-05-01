@@ -575,7 +575,10 @@ fn maybe_transcribe_for_filler_words(
 
     match CandleSttAnalyzer.transcribe(input_file) {
         Ok(t) => {
-            info!(segments = t.len(), "Transcription for filler-word removal complete");
+            info!(
+                segments = t.len(),
+                "Transcription for filler-word removal complete"
+            );
             Some(t)
         }
         Err(e) => {

@@ -94,18 +94,25 @@ pub fn has_ffprobe() -> bool {
 pub fn test_speech_video_path() -> std::path::PathBuf {
     let path = fixtures_dir().join("test_speech_video.mp4");
     if !path.exists() {
-        create_speech_video(&path, "Hello world. This is a test. Um, let me think. Ah yes, okay.", 8);
+        create_speech_video(
+            &path,
+            "Hello world. This is a test. Um, let me think. Ah yes, okay.",
+            8,
+        );
     }
     path
 }
 
 #[allow(dead_code)]
 pub fn create_speech_video(output_path: &std::path::Path, text: &str, duration_secs: u32) -> bool {
-    use std::process::Command;
     use std::fs;
     use std::io::Write;
+    use std::process::Command;
 
-    let temp_dir = output_path.parent().map(|p| p.to_path_buf()).unwrap_or_else(|| std::path::PathBuf::from("."));
+    let temp_dir = output_path
+        .parent()
+        .map(|p| p.to_path_buf())
+        .unwrap_or_else(|| std::path::PathBuf::from("."));
     let wav_path = temp_dir.join("temp_speech.wav");
     let mp3_path = temp_dir.join("temp_speech.mp3");
 
