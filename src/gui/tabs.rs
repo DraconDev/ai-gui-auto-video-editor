@@ -2416,6 +2416,13 @@ impl App {
                             ui.with_layout(
                                 egui::Layout::right_to_left(egui::Align::Center),
                                 |ui| {
+                                    if file.status == super::QueueStatus::Error
+                                        && ui.add(button_small("Retry")).clicked()
+                                    {
+                                        file.status = super::QueueStatus::Queued;
+                                        file.progress = 0.0;
+                                        file.completed_at = None;
+                                    }
                                     if file.status == super::QueueStatus::Queued
                                         && ui.add(button_small("Remove")).clicked()
                                     {

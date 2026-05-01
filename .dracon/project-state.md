@@ -1,23 +1,22 @@
 # Project State
 
 ## Current Focus
-Enhanced keyboard navigation and global shortcuts for the GUI application
+Added retry functionality for failed file processing operations in the GUI.
 
 ## Context
-Improving user experience by adding consistent keyboard shortcuts across all tabs and refining settings navigation
+This change addresses a user pain point where failed file processing operations would require manual intervention to retry. The addition of a "Retry" button provides immediate feedback and reduces friction in the workflow.
 
 ## Completed
-- [x] Added global Ctrl+1-5 shortcuts for tab navigation (works on all tabs)
-- [x] Made Ctrl+S config save work globally (previously only in Settings tab)
-- [x] Changed Ctrl+1-5 in Settings tab to Ctrl+Shift+1-5 for category access
-- [x] Improved keyboard shortcut organization and readability
+- [x] Added retry button for files with `QueueStatus::Error` state
+- [x] Reset file status to `Queued` and progress to 0.0 when retry is clicked
+- [x] Clear completed timestamp when retrying
 
 ## In Progress
-- [x] Keyboard shortcut implementation and testing
+- [x] Implementation of retry functionality for failed operations
 
 ## Blockers
 - None identified
 
 ## Next Steps
-1. Test keyboard shortcuts across all platforms
-2. Document new shortcuts in user documentation
+1. Test retry functionality with various error scenarios
+2. Consider adding visual indicators for retry attempts
