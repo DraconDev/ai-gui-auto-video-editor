@@ -1,9 +1,11 @@
 # Project State
 
 ## Current Focus
-Enhanced integration tests and simplified export configuration handling for video processing pipeline features.
+refactor(integration tests): Migrate pipeline configuration to simplified export namespace and switch watermark implementation from text to image
 
 ## Completed
-- [x] Aligned Cargo.lock dependencies to latest versions (no binary content changes, size reduced by 1 byte)
-- [x] Added new integration tests for SRT caption export and chapters/clips extraction via config.export flags
-- [x] Refactored test configurations to streamline settings management using simplified struct access patterns
+- [x] Migrated silence/speedup configuration from `config.speedup` to `config.silence` with new `SilenceMode` enum
+- [x] Moved thumbnail export settings under `config.export` namespace (thumbnail_width, thumbnail_height)
+- [x] Replaced text watermark with image watermark implementation using PNG file
+- [x] Consolidated preview export configuration under `config.export` namespace
+- [x] Simplified subtitle export to single `config.export.subtitles` boolean

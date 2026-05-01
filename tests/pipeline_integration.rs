@@ -1211,8 +1211,8 @@ fn test_speedup_in_pipeline() {
     let output_path = output_dir.path().join("output_speedup.mp4");
 
     let mut config = Config::default();
-    config.speedup.enabled = true;
-    config.speedup.target_ratio = 1.5;
+    config.silence.mode = ai_vid_editor::config::SilenceMode::Speedup;
+    config.silence.speedup_factor = 1.5;
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
@@ -1398,9 +1398,9 @@ fn test_thumbnail_dimensions_in_pipeline() {
     let output_path = output_dir.path().join("output_thumb.mp4");
 
     let mut config = Config::default();
-    config.thumbnail.enabled = true;
-    config.thumbnail.width = 320;
-    config.thumbnail.height = 180;
+    config.export.thumbnail = true;
+    config.export.thumbnail_width = 320;
+    config.export.thumbnail_height = 180;
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
@@ -1419,7 +1419,7 @@ fn test_thumbnail_dimensions_in_pipeline() {
 }
 
 #[test]
-fn test_text_watermark_in_pipeline() {
+fn test_watermark_in_pipeline_image() {
     use tempfile::tempdir;
 
     let video_path = test_video_path();
@@ -1430,11 +1430,15 @@ fn test_text_watermark_in_pipeline() {
     check_ffmpeg_or_return();
 
     let output_dir = tempdir().unwrap();
-    let output_path = output_dir.path().join("output_text_wm.mp4");
+    let output_path = output_dir.path().join("output_img_wm.mp4");
+
+    let wm_path = output_dir.path().join("test_watermark.png");
+    assert!(create_test_watermark_png(&wm_path, 64), "Watermark PNG creation failed");
 
     let mut config = Config::default();
-    config.video.text_watermark = Some("TEST".to_string());
-    config.video.watermark_position = "top-left".to_string();
+    config.video.watermark = Some(wm_path.clone());
+    config.video.watermark_position = "bottom-right".to_string();
+    config.video.watermark_scale = 1.0;
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
@@ -1449,7 +1453,7 @@ fn test_text_watermark_in_pipeline() {
         &duration_getter,
     );
 
-    assert!(result.is_ok(), "Pipeline with text watermark should succeed");
+    assert!(result.is_ok(), "Pipeline with image watermark should succeed");
     assert!(output_path.exists(), "Output file should exist");
 }
 
@@ -1468,8 +1472,8 @@ fn test_preview_duration_in_pipeline() {
     let output_path = output_dir.path().join("output_preview.mp4");
 
     let mut config = Config::default();
-    config.preview.enabled = true;
-    config.preview.duration_secs = 5.0;
+    config.export.preview = true;
+    config.export.preview_duration = 5.0;
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
@@ -1575,8 +1579,7 @@ fn test_srt_export_with_speech() {
     let output_path = output_dir.path().join("output_srt.mp4");
 
     let mut config = Config::default();
-    config.transcription.enabled = true;
-    config.export.srt = true;
+    config.export.subtitles = true;
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
