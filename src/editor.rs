@@ -147,7 +147,6 @@ pub fn calculate_keep_segments_from_transcript(
         }
 
         let prev_end = processed.last().map(|s| s.end).unwrap_or(0.0);
-        let mut segment_start = seg_start;
 
         if i > 0 {
             let prev_seg = &transcript[i - 1];
@@ -155,14 +154,25 @@ pub fn calculate_keep_segments_from_transcript(
                 .iter()
                 .any(|&f| prev_seg.text.to_lowercase().contains(f));
             if prev_is_filler {
-                segment_start = seg_start - padding;
+                if let Some(last) = processed.last_mut() {
+                    let keep_end = (prev_seg.end + padding).min(total_duration);
+                    last.end = keep_end;
+                }
+                let gap_start = (prev_seg.end - padding).max(0.0);
+                if gap_start > prev_end && gap_start < seg_end {
+                    processed.push(ProcessedSegment {
+                        start: gap_start,
+                        end: seg_end,
+                        speed: 1.0,
+                    });
+                    continue;
+                }
             }
         }
 
-        let actual_start = segment_start.max(prev_end);
-        if actual_start < seg_end {
+        if prev_end < seg_end {
             processed.push(ProcessedSegment {
-                start: actual_start,
+                start: prev_end.max(seg_start),
                 end: seg_end,
                 speed: 1.0,
             });
