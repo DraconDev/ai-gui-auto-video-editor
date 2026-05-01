@@ -689,6 +689,7 @@ impl AppState {
     }
 
     fn drain_watcher_events(&mut self) {
+        const MAX_ACTIVITY_LOG: usize = 500;
         let Some(rx) = self.watcher_rx.as_ref() else {
             return;
         };
@@ -746,6 +747,10 @@ impl AppState {
                     ));
                 }
             }
+        }
+
+        if self.activity_log.len() > MAX_ACTIVITY_LOG {
+            self.activity_log.drain(0..self.activity_log.len() - MAX_ACTIVITY_LOG);
         }
     }
 

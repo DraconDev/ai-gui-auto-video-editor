@@ -1,21 +1,21 @@
 # Project State
 
 ## Current Focus
-Update dependency lockfile to reflect updated crate versions after recent refactoring
+Added activity log size limit to prevent unbounded memory growth
 
 ## Context
-The `Cargo.lock` file was modified to reflect changes in crate versions, likely triggered by recent refactoring work in the codebase. This ensures the project uses the correct versions of dependencies after structural improvements.
+The application was previously collecting watcher events without any size limit, which could lead to memory exhaustion over time. This change prevents the activity log from growing indefinitely.
 
 ## Completed
-- [x] Updated `Cargo.lock` to reflect current dependency versions
-- [x] Synchronized lockfile with recent refactoring changes
+- [x] Added constant `MAX_ACTIVITY_LOG` to limit log size
+- [x] Implemented log truncation when exceeding size limit
 
 ## In Progress
-- [ ] Verifying all dependencies are properly resolved
+- [x] Activity log size management implementation
 
 ## Blockers
-- No blockers identified
+- None identified
 
 ## Next Steps
-1. Verify the updated lockfile works with the current codebase
-2. Prepare for the next release cycle if this is part of a version update
+1. Verify log truncation works as expected in testing
+2. Consider adding configuration option for log size limit
