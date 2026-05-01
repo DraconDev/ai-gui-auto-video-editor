@@ -1,8 +1,8 @@
 # Project State
 
 ## Current Focus
-Fix adjacent segment merging around filler words by extending previous segment end
+Prevent gaps in segment transitions around filler words by adjusting boundary calculations
 
 ## Completed
-- [x] Updated project dependencies to latest versions via Cargo.lock
-- [x] Fixed adjacent segment merging around filler words by extending previous segment end when gap is minimal (handled in `calculate_keep_segments_from_transcript` function)
+- [x] Modify segment boundary handling: Adjust previous segment end to include padding before merging with new segment start (`prev.end = current_pos + padding`)
+- [x] Refine filler word merger logic: Create new segment with adjusted start (`start: seg.start - padding`) while maintaining end position to ensure continuous alignment
