@@ -1,10 +1,9 @@
 # Project State
 
 ## Current Focus
-Refactored batch progress persistence test to use simplified API with `to_file`/`from_file` methods
+Refactor audio ducking configuration API and update integration tests to use the new fields.
 
 ## Completed
-- [x] Changed `BatchProgress::new()` initialization to `BatchProgress::default()` with manual `total` field assignment
-- [x] Renamed `save()` method to `to_file()` for consistency with file I/O naming convention
-- [x] Renamed `load()` method to `from_file()` for consistency with file I/O naming convention
-- [x] Updated assertions to verify `total` field directly and check `is_completed()` status instead of `total_files()` method
+- [x] Update pipeline integration test to set `config.audio.duck_volume` and `config.audio.music_file` instead of the previous `ducking` struct fields
+- [x] Adjust test assertions to match the new configuration structure
+- [x] Align Cargo.lock with the latest dependency versions to ensure consistent builds

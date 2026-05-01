@@ -1669,9 +1669,8 @@ fn test_audio_ducking_with_speech() {
     }
 
     let mut config = Config::default();
-    config.audio.ducking.enabled = true;
-    config.audio.ducking.background_music = Some(bg_path);
-    config.audio.ducking.duck_level_db = -15.0;
+    config.audio.duck_volume = 0.3;
+    config.audio.music_file = Some(bg_path);
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
