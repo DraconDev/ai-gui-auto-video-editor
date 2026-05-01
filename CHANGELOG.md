@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [19.2.1] - 2026-05-01
+## [19.2.2] - 2026-05-01
 
 ### Maintenance
 - Internal Cargo.lock updates (no functional changes since v19.1.5)
@@ -177,8 +177,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Preset profiles: YouTube, Shorts, Podcast, Minimal
 - Whisper-based speech-to-text and filler word removal
 
-[Unreleased]: https://github.com/DraconDev/ai-vid-editor/compare/v19.2.1...HEAD
-[19.2.1]: https://github.com/DraconDev/ai-vid-editor/compare/v19.1.8...v19.2.1
+[Unreleased]: https://github.com/DraconDev/ai-vid-editor/compare/v19.2.2...HEAD
+[19.2.2]: https://github.com/DraconDev/ai-vid-editor/compare/v19.1.8...v19.2.2
 [19.1.8]: https://github.com/DraconDev/ai-vid-editor/compare/v19.1.5...v19.1.8
 [19.1.5]: https://github.com/DraconDev/ai-vid-editor/compare/v14.4.1...v19.1.5
 [14.4.1]: https://github.com/DraconDev/ai-vid-editor/compare/v13.2.0...v14.4.1
