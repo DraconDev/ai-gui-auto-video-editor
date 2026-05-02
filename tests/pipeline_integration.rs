@@ -160,6 +160,12 @@ fn test_auto_reframe() {
         "Auto-reframe should succeed (with or without ML)"
     );
     assert!(output_path.exists(), "Output file should exist");
+
+    // Verify dimensions changed to vertical (9:16)
+    let dims = ffprobe_dimensions(&output_path);
+    if let Some((w, h)) = dims {
+        assert!(h > w, "Reframed video should be vertical (height > width)");
+    }
 }
 
 // ============================================================

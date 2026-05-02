@@ -1,21 +1,21 @@
 # Project State
 
 ## Current Focus
-Added comprehensive validation of audio enhancement pipeline output
+Added dimension validation for auto-reframed videos to ensure vertical orientation (9:16 aspect ratio)
 
 ## Context
-The recent addition of audio enhancement functionality needed verification to ensure it produces valid output files with proper duration and codec information.
+This change extends the existing auto-reframe test to verify that the output video maintains the correct vertical orientation after processing. It addresses a need to ensure consistent output dimensions for vertical video content.
 
 ## Completed
-- [x] Added duration validation to ensure output has positive duration
-- [x] Added codec detection to verify output has a detectable video codec
+- [x] Added dimension validation for auto-reframed videos
+- [x] Verifies height > width to confirm vertical orientation
 
 ## In Progress
-- [x] Comprehensive validation of audio enhancement pipeline output
+- [x] Comprehensive validation of video dimensions
 
 ## Blockers
 - None identified
 
 ## Next Steps
-1. Expand test coverage for other audio processing pipelines
-2. Add validation for audio quality metrics
+1. Expand test coverage for other aspect ratios
+2. Add validation for minimum/maximum dimension constraints
