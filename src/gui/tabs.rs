@@ -2322,9 +2322,9 @@ impl App {
                     let summary_items = [
                         ("Silence", folder.settings.silence_mode.map(|m| m.display_name()).unwrap_or_default().as_str()),
                         ("Resolution", folder.settings.target_resolution.map(|r| r.display_name()).unwrap_or_default().as_str()),
-                        ("Stabilize", yes_no(folder.settings.stabilize)),
-                        ("Color", yes_no(folder.settings.color_correct)),
-                        ("Reframe", yes_no(folder.settings.reframe)),
+                        ("Stabilize", Self::yes_no(folder.settings.stabilize)),
+                        ("Color", Self::yes_no(folder.settings.color_correct)),
+                        ("Reframe", Self::yes_no(folder.settings.reframe)),
                     ];
                     for (label, value) in summary_items {
                         ui.add_space(2.0);

@@ -1,22 +1,21 @@
 # Project State
 
 ## Current Focus
-Refactored tab-related imports in the GUI module to improve organization and reduce redundancy.
+Refactored `yes_no` helper method to be called via `Self` for consistency in the tabs module.
 
 ## Context
-The change was prompted by the need to streamline the tab-related imports in the GUI module. The previous imports were spread across multiple lines and included redundant entries.
+The change improves code consistency by ensuring the `yes_no` helper is called consistently through the `App` struct rather than as a standalone function.
 
 ## Completed
-- [x] Consolidated tab-related imports into a single, organized block
-- [x] Added `Tab` and `QueueStatus` to the import list for future use
-- [x] Removed redundant imports to reduce visual clutter
+- [x] Changed `yes_no(folder.settings.stabilize)` to `Self::yes_no(folder.settings.stabilize)`
+- [x] Applied same change to `color_correct` and `reframe` settings for uniformity
 
 ## In Progress
-- [ ] None
+- [x] Verified no functional changes were introduced
 
 ## Blockers
-- None
+- None identified
 
 ## Next Steps
-1. Verify the refactored imports work correctly with existing code
-2. Ensure all tab-related functionality remains intact after the changes
+1. Review other similar calls in the module for consistency
+2. Ensure no other refactoring opportunities exist in the tabs module
