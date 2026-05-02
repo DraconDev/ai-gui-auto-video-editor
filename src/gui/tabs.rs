@@ -2064,6 +2064,301 @@ impl App {
         changed
     }
 
+    pub(crate) fn draw_dashboard(&mut self, ui: &mut egui::Ui) {
+        // Stats row
+        let folder_count = self.state.folders.len();
+        let enabled_count = self.state.folders.iter().filter(|f| f.enabled).count();
+        let queued_count = self.state
+            .batch_queue
+            .iter()
+            .filter(|f| f.status == QueueStatus::Queued)
+            .count();
+        let processing_count = self.state
+            .batch_queue
+            .iter()
+            .filter(|f| matches!(f.status, QueueStatus::Processing | QueueStatus::Queued))
+            .count();
+
+        let today_success = self
+            .state
+            .activity_log
+            .iter()
+            .rev()
+            .filter(|e| {
+                e.status == EntryStatus::Success
+                    && e.timestamp.starts_with(
+                        &chrono::Local::now().format("%H:%M:%S").to_string()[..2],
+                    )
+            })
+            .count();
+
+        panel_frame().show(ui, |ui| {
+            ui.horizontal_wrapped(|ui| {
+                ui.set_width(ui.available_width());
+                let stat_items = [
+                    ("Folders", format!("{}/{}", enabled_count, folder_count)),
+                    ("Queue", format!("{}", queued_count)),
+                    ("Processing", format!("{}", processing_count)),
+                ];
+                for (label, value) in stat_items {
+                    ui.horizontal(|ui| {
+                        ui.label(
+                            egui::RichText::new(label)
+                                .size(12.0)
+                                .color(TEXT_MUTED),
+                        );
+                        ui.add_space(4.0);
+                        ui.label(
+                            egui::RichText::new(&value)
+                                .size(16.0)
+                                .color(ACCENT_PRIMARY)
+                                .strong(),
+                        );
+                    });
+                    ui.add_space(24.0);
+                }
+            });
+        });
+
+        ui.add_space(12.0);
+
+        // Quick actions
+        panel_frame().show(ui, |ui| {
+            ui.horizontal_wrapped(|ui| {
+                ui.set_width(ui.available_width());
+                ui.label(
+                    RichText::new("Quick Actions")
+                        .size(14.0)
+                        .color(TEXT_PRIMARY)
+                        .strong(),
+                );
+                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                    if ui.add(button_primary("Process All")).clicked() {
+                        // Queue all enabled folders
+                        for folder in &self.state.folders {
+                            if folder.enabled {
+                                // Would trigger batch processing
+                            }
+                        }
+                    }
+                    if ui.add(button_secondary("+ Add Folder")).clicked() {
+                        self.state.modal.reset_for_add();
+                    }
+                });
+            });
+        });
+
+        ui.add_space(12.0);
+
+        // Recent activity
+        panel_frame().show(ui, |ui| {
+            ui.vertical(|ui| {
+                ui.horizontal_wrapped(|ui| {
+                    ui.set_width(ui.available_width());
+                    ui.label(
+                        RichText::new("Recent Activity")
+                            .size(14.0)
+                            .color(TEXT_PRIMARY)
+                            .strong(),
+                    );
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                        if ui.add(button_small("View All")).clicked() {
+                            self.state.current_tab = Tab::Activity;
+                        }
+                    });
+                });
+
+                ui.add_space(8.0);
+
+                let recent: Vec<_> = self
+                    .state
+                    .activity_log
+                    .iter()
+                    .rev()
+                    .take(6)
+                    .collect();
+
+                if recent.is_empty() || recent.iter().all(|e| e.filename.is_empty()) {
+                    ui.add_space(8.0);
+                    ui.label(label_muted("No recent activity"));
+                } else {
+                    for entry in recent {
+                        ui.add_space(4.0);
+                        ui.horizontal_wrapped(|ui| {
+                            ui.set_width(ui.available_width());
+                            let dot = match entry.status {
+                                EntryStatus::Success => "●",
+                                EntryStatus::Processing => "◐",
+                                EntryStatus::Error => "✕",
+                            };
+                            let dot_color = match entry.status {
+                                EntryStatus::Success => SUCCESS,
+                                EntryStatus::Processing => PROCESSING,
+                                EntryStatus::Error => ERROR,
+                            };
+                            ui.label(
+                                egui::RichText::new(dot)
+                                    .size(10.0)
+                                    .color(dot_color),
+                            );
+                            ui.add_space(6.0);
+                            ui.label(
+                                egui::RichText::new(&entry.timestamp)
+                                    .size(11.0)
+                                    .color(TEXT_MUTED),
+                            );
+                            if !entry.filename.is_empty() {
+                                ui.add_space(8.0);
+                                ui.label(
+                                    egui::RichText::new(truncate_path(&entry.filename, 32))
+                                        .size(12.0)
+                                        .color(TEXT_PRIMARY),
+                                );
+                            } else if !entry.message.is_empty() {
+                                ui.add_space(8.0);
+                                ui.label(
+                                    egui::RichText::new(&entry.message)
+                                        .size(12.0)
+                                        .color(TEXT_SECONDARY),
+                                );
+                            }
+                        });
+                    }
+                }
+            });
+        });
+
+        ui.add_space(12.0);
+
+        // Watch folders summary (compact)
+        panel_frame().show(ui, |ui| {
+            ui.vertical(|ui| {
+                ui.horizontal_wrapped(|ui| {
+                    ui.set_width(ui.available_width());
+                    ui.label(
+                        RichText::new("Watch Folders")
+                            .size(14.0)
+                            .color(TEXT_PRIMARY)
+                            .strong(),
+                    );
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                        if ui.add(button_small("Manage →")).clicked() {
+                            self.state.current_tab = Tab::Folders;
+                        }
+                    });
+                });
+
+                ui.add_space(8.0);
+
+                if self.state.folders.is_empty() {
+                    ui.label(label_muted("No folders configured"));
+                } else {
+                    for folder in self.state.folders.iter().take(3) {
+                        ui.add_space(4.0);
+                        ui.horizontal_wrapped(|ui| {
+                            ui.set_width(ui.available_width());
+                            let status_icon = if folder.enabled { "●" } else { "○" };
+                            let status_color = if folder.enabled { SUCCESS } else { TEXT_MUTED };
+                            ui.label(
+                                egui::RichText::new(status_icon)
+                                    .size(10.0)
+                                    .color(status_color),
+                            );
+                            ui.add_space(4.0);
+                            ui.label(
+                                egui::RichText::new(truncate_path(&folder.input.to_string_lossy(), 36))
+                                    .size(12.0)
+                                    .color(if folder.enabled {
+                                        TEXT_PRIMARY
+                                    } else {
+                                        TEXT_MUTED
+                                    }),
+                            );
+                            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                                ui.label(
+                                    egui::RichText::new(&folder.preset)
+                                        .size(10.0)
+                                        .color(TEXT_MUTED),
+                                );
+                            });
+                        });
+                    }
+                    if self.state.folders.len() > 3 {
+                        ui.add_space(4.0);
+                        ui.label(
+                            egui::RichText::new(&format!("+{} more", self.state.folders.len() - 3))
+                                .size(11.0)
+                                .color(TEXT_MUTED),
+                        );
+                    }
+                }
+            });
+        });
+
+        ui.add_space(12.0);
+
+        // Settings summary
+        panel_frame().show(ui, |ui| {
+            ui.vertical(|ui| {
+                ui.horizontal_wrapped(|ui| {
+                    ui.set_width(ui.available_width());
+                    ui.label(
+                        RichText::new("Settings")
+                            .size(14.0)
+                            .color(TEXT_PRIMARY)
+                            .strong(),
+                    );
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                        if ui.add(button_small("Edit →")).clicked() {
+                            self.state.current_tab = Tab::Settings;
+                        }
+                    });
+                });
+
+                ui.add_space(8.0);
+
+                if let Some(folder) = self.state.folders.get(self.state.selected_folder_idx) {
+                    let summary_items = [
+                        ("Silence", folder.settings.silence_mode.map(|m| m.display_name()).unwrap_or_default().as_str()),
+                        ("Resolution", folder.settings.target_resolution.map(|r| r.display_name()).unwrap_or_default().as_str()),
+                        ("Stabilize", yes_no(folder.settings.stabilize)),
+                        ("Color", yes_no(folder.settings.color_correct)),
+                        ("Reframe", yes_no(folder.settings.reframe)),
+                    ];
+                    for (label, value) in summary_items {
+                        ui.add_space(2.0);
+                        ui.horizontal_wrapped(|ui| {
+                            ui.set_width(ui.available_width());
+                            ui.add_space(4.0);
+                            ui.label(
+                                egui::RichText::new(label)
+                                    .size(12.0)
+                                    .color(TEXT_MUTED),
+                            );
+                            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                                ui.label(
+                                    egui::RichText::new(value)
+                                        .size(12.0)
+                                        .color(TEXT_PRIMARY),
+                                );
+                            });
+                        });
+                    }
+                } else {
+                    ui.label(label_muted("No folder selected"));
+                }
+            });
+        });
+    }
+
+    fn yes_no(val: Option<bool>) -> &'static str {
+        match val {
+            Some(true) => "On",
+            Some(false) => "Off",
+            None => "—",
+        }
+    }
+
     pub(crate) fn draw_summary_card(&mut self, ui: &mut egui::Ui) {
         let new_entries = self
             .state
