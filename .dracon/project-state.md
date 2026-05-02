@@ -1,21 +1,21 @@
 # Project State
 
 ## Current Focus
-Refactored temporary file handling in video concatenation by removing direct dependency on `utils::TempFile`
+Improved JSON error output formatting in CLI mode
 
 ## Context
-This change simplifies the video concatenation process by removing an unnecessary module dependency. The `TempFile` utility was previously accessed through the `utils` module, but since it's used directly in the batch processor, we can directly reference it.
+The previous error output in JSON mode was using string interpolation with curly braces, which could lead to formatting issues. This change switches to using `serde_json` for proper JSON serialization.
 
 ## Completed
-- [x] Removed `utils::TempFile` dependency in favor of direct `TempFile` reference
-- [x] Maintained same functionality for temporary file creation in video concatenation
+- [x] Replaced raw string interpolation with `serde_json::to_string` for JSON error output
+- [x] Added proper JSON serialization of error messages in CLI JSON mode
 
 ## In Progress
 - [x] No active work in progress for this change
 
 ## Blockers
-- None
+- None identified
 
 ## Next Steps
-1. Verify no regression in video concatenation functionality
-2. Consider if other parts of the codebase can similarly reduce module dependencies
+1. Verify JSON output formatting works correctly in all error cases
+2. Consider adding more structured error information in JSON output

@@ -4,7 +4,7 @@ use std::path::PathBuf;
 #[cfg(feature = "cli")]
 use clap::Parser;
 
-pub mod analyzer;
+use serde_json::json;
 pub mod batch_processor;
 pub mod config;
 pub mod editor;
@@ -314,7 +314,7 @@ fn main() -> Result<()> {
     // Check FFmpeg and ffprobe availability early
     if let Err(e) = crate::utils::check_ffmpeg() {
         if cli.json {
-            println!("{{\"error\": \"{}\"}}", e);
+            println!("{}", serde_json::to_string(&json!({"error": e.to_string()})).unwrap());
         } else {
             eprintln!("Error: {}", e);
         }
@@ -323,7 +323,7 @@ fn main() -> Result<()> {
 
     if let Err(e) = crate::utils::check_ffprobe() {
         if cli.json {
-            println!("{{\"error\": \"{}\"}}", e);
+            println!("{}", serde_json::to_string(&json!({"error": e.to_string()})).unwrap());
         } else {
             eprintln!("Error: {}", e);
         }
