@@ -1,26 +1,21 @@
 # Project State
 
 ## Current Focus
-Enhanced batch processing functionality for enabled folders in the GUI
+Added `QueuedFile` type to the GUI tabs module for better queue management.
 
 ## Context
-The previous implementation of "Process All" only queued folders without verifying file existence or type. This change improves reliability by:
-1. Scanning each enabled folder for valid video files
-2. Adding only valid files to the queue
-3. Providing user feedback about how many files were added
+This change was prompted by the need to improve queue handling in the batch processing functionality, which was previously missing a dedicated type for queued files.
 
 ## Completed
-- [x] Added file scanning for enabled folders
-- [x] Filtered for valid video files only
-- [x] Implemented queue population with proper metadata
-- [x] Added success notification with count of added files
+- [x] Added `QueuedFile` type to the module imports for better queue management
+- [x] Removed redundant `QueueStatus` import (no longer needed with the new type)
 
 ## In Progress
-- [ ] None (this is a complete feature implementation)
+- [x] Implementation of queue management using the new `QueuedFile` type
 
 ## Blockers
-- None (feature is complete)
+- None identified at this stage
 
 ## Next Steps
-1. Test with various folder structures and file types
-2. Verify queue processing works correctly with the new entries
+1. Implement queue management logic using the `QueuedFile` type
+2. Update related GUI components to use the new type
