@@ -2128,8 +2128,9 @@ impl App {
                                 if let Ok(entries) = std::fs::read_dir(&folder.input) {
                                     for entry in entries.flatten() {
                                         let path = entry.path();
-                                        if Self::is_video_file(&path) {
-                                            self.state.batch_queue.push(QueuedFile {
+                                        let ext = path.extension().and_then(|e| e.to_str());
+                                        if ext.map(|e| matches!(e.to_ascii_lowercase().as_str(), "mp4" | "mov" | "avi" | "mkv" | "webm")).unwrap_or(false) {
+                                            self.state.batch_queue.push(super::QueuedFile {
                                                 path: path.clone(),
                                                 output_dir: folder.output.clone(),
                                                 preset: folder.preset.clone(),
@@ -2146,10 +2147,10 @@ impl App {
                             }
                         }
                         if added > 0 {
-                            self.state.toasts.push(Toast::new(
+                            self.state.add_toast(
                                 format!("Added {} files to queue", added),
                                 ToastKind::Success,
-                            ));
+                            );
                         }
                     }
                     if ui.add(button_secondary("+ Add Folder")).clicked() {

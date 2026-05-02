@@ -1,21 +1,21 @@
 # Project State
 
 ## Current Focus
-Added `ToastKind` to the GUI tabs module for improved notification handling.
+Improved video file detection and toast notification handling in batch processing
 
 ## Context
-This change was prompted by the need to enhance user feedback in the GUI by introducing standardized notification types.
+The previous video file detection was too simplistic, potentially including non-video files. The toast notification system was also being called directly rather than using the centralized method.
 
 ## Completed
-- [x] Added `ToastKind` enum to the GUI tabs module imports
-- [x] Maintained all existing imports while adding the new type
+- [x] Enhanced video file detection to explicitly check for supported extensions (mp4, mov, avi, mkv, webm)
+- [x] Refactored toast notification to use the centralized `add_toast` method instead of direct vector push
 
 ## In Progress
-- [x] Integration of `ToastKind` into notification display logic
+- [x] No active work in progress beyond these changes
 
 ## Blockers
-- None identified at this stage
+- None identified
 
 ## Next Steps
-1. Implement notification display logic using `ToastKind`
-2. Add unit tests for the new notification system
+1. Verify the new file detection works correctly with various file types
+2. Test toast notifications appear consistently across different operations
