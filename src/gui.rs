@@ -1050,53 +1050,108 @@ impl eframe::App for App {
         // Left sidebar with navigation
         egui::SidePanel::left("sidebar_nav")
             .resizable(false)
-            .default_width(72.0)
-            .max_width(72.0)
-            .min_width(72.0)
+            .default_width(160.0)
+            .max_width(160.0)
+            .min_width(160.0)
             .frame(
                 egui::Frame::NONE
                     .fill(PANEL_BG_LIGHT)
-                    .corner_radius(CORNER_RADIUS_SMALL)
-                    .inner_margin(egui::vec2(6.0, 12.0)),
+                    .inner_margin(egui::vec2(0.0, 0.0)),
             )
             .show(ctx, |ui| {
-                ui.set_width(60.0);
-                ui.vertical_centered(|ui| {
-                    let sidebar_items = [
+                ui.set_width(160.0);
+                ui.vertical(|ui| {
+                    // App title area
+                    ui.add_space(12.0);
+                    ui.horizontal(|ui| {
+                        ui.add_space(12.0);
+                        ui.label(
+                            egui::RichText::new("AI Video")
+                                .size(14.0)
+                                .color(ACCENT_PRIMARY)
+                                .strong(),
+                        );
+                        ui.label(
+                            egui::RichText::new("Processor")
+                                .size(14.0)
+                                .color(TEXT_SECONDARY),
+                        );
+                    });
+                    ui.add_space(16.0);
+
+                    // Section: Process
+                    ui.horizontal_wrapped(|ui| {
+                        ui.add_space(12.0);
+                        ui.label(
+                            egui::RichText::new("PROCESS")
+                                .size(10.0)
+                                .color(TEXT_MUTED)
+                                .strong(),
+                        );
+                    });
+                    ui.add_space(4.0);
+
+                    let process_items = [
                         (Tab::All, "🏠", "All"),
                         (Tab::Folders, "📁", "Folders"),
                         (Tab::Queue, "📋", "Queue"),
+                    ];
+                    for tab in process_items {
+                        let (_, icon, label) = tab;
+                        let is_active = self.state.current_tab == tab.0;
+                        sidebar_item(ui, is_active, icon, label, tab.0, &mut self.state.current_tab);
+                    }
+
+                    ui.add_space(12.0);
+
+                    // Section: Config
+                    ui.horizontal_wrapped(|ui| {
+                        ui.add_space(12.0);
+                        ui.label(
+                            egui::RichText::new("CONFIG")
+                                .size(10.0)
+                                .color(TEXT_MUTED)
+                                .strong(),
+                        );
+                    });
+                    ui.add_space(4.0);
+
+                    let config_items = [
                         (Tab::Settings, "⚙", "Settings"),
                         (Tab::Activity, "📊", "Activity"),
                     ];
-                    for (tab, icon, label) in sidebar_items {
-                        let is_active = self.state.current_tab == tab;
-                        let text = format!("{}\n{}", icon, label);
-                        let btn = if is_active {
-                            egui::Button::new(
-                                egui::RichText::new(text)
-                                    .color(TEXT_PRIMARY)
-                                    .size(11.0)
-                                    .strong(),
-                            )
-                            .fill(PANEL_BG_LIGHTER)
-                            .stroke(egui::Stroke::new(0.0, egui::Color32::TRANSPARENT))
-                            .corner_radius(CORNER_RADIUS_SMALL)
-                            .min_size(egui::vec2(60.0, 56.0))
-                        } else {
-                            egui::Button::new(
-                                egui::RichText::new(text).color(TEXT_SECONDARY).size(11.0),
-                            )
-                            .fill(PANEL_BG)
-                            .stroke(egui::Stroke::new(0.0, egui::Color32::TRANSPARENT))
-                            .corner_radius(CORNER_RADIUS_SMALL)
-                            .min_size(egui::vec2(60.0, 56.0))
-                        };
-                        if ui.add(btn).clicked() {
-                            self.state.current_tab = tab;
-                        }
-                        ui.add_space(4.0);
+                    for tab in config_items {
+                        let (_, icon, label) = tab;
+                        let is_active = self.state.current_tab == tab.0;
+                        sidebar_item(ui, is_active, icon, label, tab.0, &mut self.state.current_tab);
                     }
+
+                    // Spacer and status at bottom
+                    ui.add_space(16.0);
+                    ui.separator();
+                    ui.add_space(8.0);
+
+                    // Status indicator
+                    ui.horizontal(|ui| {
+                        ui.add_space(12.0);
+                        let (status_text, status_color) = match &self.state.status {
+                            ProcessingStatus::Idle => ("Idle", TEXT_MUTED),
+                            ProcessingStatus::Watching => ("Watching", SUCCESS_DIM),
+                            ProcessingStatus::Processing(stage) => (stage.as_str(), PROCESSING),
+                            ProcessingStatus::Error(err) => (err.as_str(), ERROR),
+                        };
+                        let (rect, _) =
+                            ui.allocate_exact_size(egui::vec2(6.0, 6.0), egui::Sense::hover());
+                        ui.painter().circle_filled(rect.center(), 3.0, status_color);
+                        ui.add_space(6.0);
+                        ui.label(
+                            egui::RichText::new(status_text)
+                                .size(11.0)
+                                .color(status_color),
+                        );
+                    });
+
+                    ui.add_space(8.0);
                 });
             });
 
