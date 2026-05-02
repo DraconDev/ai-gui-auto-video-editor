@@ -4,19 +4,19 @@
 Added support for empty FCPXML file generation when no segments are detected
 
 ## Context
-When processing video files with no detected segments (empty cuts), the system previously failed to generate a valid FCPXML file. This change ensures the exporter creates a properly formatted empty FCPXML template with the required structure.
+The previous implementation didn't handle cases where no segments were detected during EDL export, potentially causing errors or incomplete files. This change ensures a valid empty EDL file is created when no segments exist.
 
 ## Completed
-- [x] Added empty FCPXML template generation when segments.is_empty()
-- [x] Included proper XML declaration and FCPXML root structure
-- [x] Added basic project structure with empty sequence spine
+- [x] Added empty EDL file generation when segments list is empty
+- [x] Included basic EDL header with title and frame rate information
+- [x] Maintained consistent error handling with context for file operations
 
 ## In Progress
-- [x] Empty FCPXML generation for edge cases
+- [x] Implemented empty file case handling
 
 ## Blockers
 - None identified
 
 ## Next Steps
-1. Verify empty FCPXML compatibility with downstream processing
-2. Consider adding more metadata to empty templates if needed
+1. Verify empty EDL file compatibility with downstream processing
+2. Consider adding more detailed empty file documentation
