@@ -2123,25 +2123,35 @@ impl App {
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                     if ui.add(button_primary("Process All")).clicked() {
                         let mut added = 0;
+                        let mut errors = 0;
+                        // Collect already-queued paths to avoid duplicates
+                        let existing_paths: std::collections::HashSet<_> = self.state.batch_queue
+                            .iter()
+                            .map(|f| f.path.clone())
+                            .collect();
                         for folder in &self.state.folders {
                             if folder.enabled {
-                                if let Ok(entries) = std::fs::read_dir(&folder.input) {
-                                    for entry in entries.flatten() {
-                                        let path = entry.path();
-                                        let ext = path.extension().and_then(|e| e.to_str());
-                                        if ext.map(|e| matches!(e.to_ascii_lowercase().as_str(), "mp4" | "mov" | "avi" | "mkv" | "webm")).unwrap_or(false) {
-                                            self.state.batch_queue.push(super::QueuedFile {
-                                                path: path.clone(),
-                                                output_dir: folder.output.clone(),
-                                                preset: folder.preset.clone(),
-                                                settings: folder.settings.clone(),
-                                                status: QueueStatus::Queued,
-                                                progress: 0.0,
-                                                output_path: None,
-                                                completed_at: None,
-                                            });
-                                            added += 1;
+                                match crate::utils::find_video_files(&folder.input) {
+                                    Ok(video_files) => {
+                                        for path in video_files {
+                                            if !existing_paths.contains(&path) {
+                                                self.state.batch_queue.push(super::QueuedFile {
+                                                    path: path.clone(),
+                                                    output_dir: folder.output.clone(),
+                                                    preset: folder.preset.clone(),
+                                                    settings: folder.settings.clone(),
+                                                    status: QueueStatus::Queued,
+                                                    progress: 0.0,
+                                                    output_path: None,
+                                                    completed_at: None,
+                                                });
+                                                added += 1;
+                                            }
                                         }
+                                    }
+                                    Err(e) => {
+                                        warn!(error = %e, folder = ?folder.input, "Failed to read folder");
+                                        errors += 1;
                                     }
                                 }
                             }
@@ -2150,6 +2160,12 @@ impl App {
                             self.state.add_toast(
                                 format!("Added {} files to queue", added),
                                 ToastKind::Success,
+                            );
+                        }
+                        if errors > 0 {
+                            self.state.add_toast(
+                                format!("Failed to read {} folders", errors),
+                                ToastKind::Error,
                             );
                         }
                     }

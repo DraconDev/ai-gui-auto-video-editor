@@ -1,21 +1,26 @@
 # Project State
 
 ## Current Focus
-Added path escaping for single quotes in video concatenation list generation
+Improved batch processing error handling and duplicate prevention in folder scanning
 
 ## Context
-The video concatenation process was failing when paths contained single quotes. This change ensures proper escaping of single quotes in file paths when generating the FFmpeg concat demuxer list file.
+The previous implementation of "Process All" had several issues:
+1. No error handling for folder reading failures
+2. No duplicate prevention when re-scanning folders
+3. No user feedback about processing errors
 
 ## Completed
-- [x] Added path escaping for single quotes in video concatenation list generation
-- [x] Maintained backward compatibility with existing path handling
+- [x] Added error tracking for failed folder reads
+- [x] Implemented duplicate prevention using HashSet
+- [x] Added user feedback for both successful additions and errors
+- [x] Refactored video file detection into reusable utility function
 
 ## In Progress
-- [x] Testing the fix with various path formats containing special characters
+- [x] Comprehensive error handling implementation
 
 ## Blockers
 - None identified
 
 ## Next Steps
-1. Verify the fix works with edge cases (paths with multiple single quotes)
-2. Update related documentation if needed
+1. Add unit tests for the new error handling logic
+2. Consider adding retry mechanism for temporarily unavailable folders
