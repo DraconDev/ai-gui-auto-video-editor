@@ -151,6 +151,11 @@ pub fn export_srt(transcript: &[TranscriptSegment], output_path: &Path) -> Resul
 }
 
 pub fn export_youtube_chapters(transcript: &[TranscriptSegment], output_path: &Path) -> Result<()> {
+    if transcript.is_empty() {
+        fs::write(output_path, "00:00 Intro\n").context("failed to write chapters file")?;
+        return Ok(());
+    }
+
     let mut chapters = String::new();
     chapters.push_str("00:00 Intro\n");
 
