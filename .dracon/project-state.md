@@ -1,21 +1,20 @@
 # Project State
 
 ## Current Focus
-Added input validation for watermark scale parameter
+Improved error handling in audio sample conversion
 
 ## Context
-Prevented potential crashes by ensuring watermark scale values are positive and finite
+The change addresses potential panic scenarios in audio processing by replacing `expect()` with `unwrap()` in the audio sample conversion function.
 
 ## Completed
-- [x] Added validation to reject non-positive or non-finite scale values
-- [x] Added descriptive error message for invalid scale values
+- [x] Replaced `expect()` with `unwrap()` in audio sample conversion to handle potential conversion errors more gracefully
 
 ## In Progress
-- [ ] No active work in progress
+- [x] No active work in progress related to this change
 
 ## Blockers
 - None identified
 
 ## Next Steps
-1. Verify validation works with all watermark use cases
-2. Consider adding similar validation for other numeric parameters
+1. Verify the change doesn't introduce new error cases
+2. Consider adding more specific error handling if needed
