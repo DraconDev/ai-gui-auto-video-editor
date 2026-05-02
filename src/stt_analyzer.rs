@@ -120,11 +120,10 @@ fn load_audio_as_f32(path: &Path) -> Result<Vec<f32>> {
     }
 
     let bytes = &output.stdout;
+    // chunks_exact(4) guarantees each chunk is exactly 4 bytes, so try_into() always succeeds
     let samples: Vec<f32> = bytes
         .chunks_exact(4)
-        .map(|chunk| {
-            f32::from_le_bytes(chunk.try_into().unwrap())
-        })
+        .map(|chunk| f32::from_le_bytes(chunk.try_into().unwrap()))
         .collect();
 
     Ok(samples)
