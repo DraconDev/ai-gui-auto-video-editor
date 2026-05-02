@@ -6,7 +6,7 @@ use std::sync::mpsc;
 
 use super::theme::*;
 use super::{
-    ActivityEntry, App, EntryStatus, FolderState, ProcessingStatus, QueuedFile, QueueStatus, SettingsCategory, SetupStep,
+    ActivityEntry, App, EntryStatus, FolderState, ProcessingStatus, QueueStatus, SettingsCategory, SetupStep,
     Tab, ToastKind,
 };
 use crate::config::{FolderSettings, JoinMode, SilenceMode, VideoResolution};
