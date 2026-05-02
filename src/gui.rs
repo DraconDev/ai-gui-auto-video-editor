@@ -1214,13 +1214,7 @@ impl eframe::App for App {
 
                 egui::ScrollArea::vertical().show(ui, |ui| match self.state.current_tab {
                     Tab::All => {
-                        self.draw_summary_card(ui);
-                        ui.add_space(12.0);
-                        self.draw_folders_panel(ui);
-                        ui.add_space(12.0);
-                        self.draw_settings_panel(ui);
-                        ui.add_space(12.0);
-                        self.draw_activity_log(ui, false);
+                        self.draw_dashboard(ui);
                     }
                     Tab::Folders => {
                         self.draw_folders_panel(ui);
