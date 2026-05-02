@@ -1,20 +1,20 @@
 # Project State
 
 ## Current Focus
-Update dependency lockfile to reflect updated crate versions
+Add completion timestamp to batch queue items when they fail
 
 ## Context
-This change was triggered by recent updates to project dependencies, which required the lockfile to be regenerated to ensure consistent builds across environments.
+When a batch processing item fails, we need to track when the failure occurred for auditing purposes. This helps with debugging and monitoring the processing pipeline.
 
 ## Completed
-- [x] Updated Cargo.lock to reflect current dependency versions
+- [x] Added `completed_at` timestamp to batch queue items when their status changes to `Error`
 
 ## In Progress
-- [x] No active work in progress related to this change
+- [x] This change is complete
 
 ## Blockers
 - None
 
 ## Next Steps
-1. Verify build consistency across development environments
-2. Prepare for any potential dependency conflicts in upcoming features
+1. Verify the timestamp is properly displayed in the UI
+2. Consider adding similar timestamps for other status transitions

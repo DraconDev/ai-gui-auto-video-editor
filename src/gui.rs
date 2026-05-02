@@ -889,6 +889,7 @@ impl AppState {
                     for file in &mut self.batch_queue {
                         if file.path == path {
                             file.status = QueueStatus::Error;
+                            file.completed_at = Some(chrono::Local::now());
                             break;
                         }
                     }
