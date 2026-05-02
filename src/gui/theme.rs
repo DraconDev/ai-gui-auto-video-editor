@@ -238,25 +238,6 @@ pub fn button_toggle(is_active: bool, text: impl Into<String>) -> egui::Button<'
         .min_size(egui::vec2(55.0, 30.0))
 }
 
-pub fn button_tab(is_active: bool, text: impl Into<String>) -> egui::Button<'static> {
-    let btn = if is_active {
-        egui::Button::new(
-            egui::RichText::new(text)
-                .color(TEXT_PRIMARY)
-                .size(15.0)
-                .strong(),
-        )
-        .fill(PANEL_BG_LIGHTER)
-        .stroke(egui::Stroke::new(0.0, egui::Color32::TRANSPARENT))
-    } else {
-        egui::Button::new(egui::RichText::new(text).color(TEXT_SECONDARY).size(15.0))
-            .fill(PANEL_BG)
-            .stroke(egui::Stroke::new(0.0, egui::Color32::TRANSPARENT))
-    };
-    btn.corner_radius(CORNER_RADIUS_SMALL)
-        .min_size(egui::vec2(85.0, 36.0))
-}
-
 pub fn button_pill(is_active: bool, text: impl Into<String>) -> egui::Button<'static> {
     let btn = if is_active {
         egui::Button::new(
