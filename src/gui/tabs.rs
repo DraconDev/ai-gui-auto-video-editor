@@ -2080,19 +2080,6 @@ impl App {
             .filter(|f| matches!(f.status, QueueStatus::Processing | QueueStatus::Queued))
             .count();
 
-        let today_success = self
-            .state
-            .activity_log
-            .iter()
-            .rev()
-            .filter(|e| {
-                e.status == EntryStatus::Success
-                    && e.timestamp.starts_with(
-                        &chrono::Local::now().format("%H:%M:%S").to_string()[..2],
-                    )
-            })
-            .count();
-
         panel_frame().show(ui, |ui| {
             ui.horizontal_wrapped(|ui| {
                 ui.set_width(ui.available_width());
