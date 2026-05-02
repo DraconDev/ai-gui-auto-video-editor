@@ -1,14 +1,14 @@
 # Project State
 
 ## Current Focus
-Refactored silence mode display in folder settings to use a dedicated helper method.
+Refactored resolution display in folder settings to improve consistency with other settings.
 
 ## Context
-The change improves consistency by using `Self::silence_mode_name()` instead of directly calling `display_name()` on the silence mode variant.
+The change aligns the resolution display format with other settings in the folder summary panel, ensuring uniform handling of optional values.
 
 ## Completed
-- [x] Replaced direct `display_name()` call with `Self::silence_mode_name()` for silence mode display
-- [x] Updated fallback value from `unwrap_or_default()` to `unwrap_or("—")` for clearer empty state representation
+- [x] Updated resolution display to use `unwrap_or_default()` consistently with other settings
+- [x] Maintained the same fallback behavior ("—") for missing values
 
 ## In Progress
 - [x] No active work in progress beyond this change
@@ -17,5 +17,5 @@ The change improves consistency by using `Self::silence_mode_name()` instead of 
 - None identified
 
 ## Next Steps
-1. Verify the new silence mode display matches expected behavior in UI
-2. Consider if similar refactoring should be applied to other settings displays
+1. Verify the change doesn't affect any existing resolution display logic
+2. Check for any related settings that might need similar formatting updates

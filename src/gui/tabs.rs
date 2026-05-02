@@ -2321,7 +2321,7 @@ impl App {
                 if let Some(folder) = self.state.folders.get(self.state.selected_folder_idx) {
                     let summary_items = [
                         ("Silence", folder.settings.silence_mode.map(|m| Self::silence_mode_name(m)).unwrap_or("—")),
-                        ("Resolution", folder.settings.target_resolution.map(|r| r.display_name()).unwrap_or_default().as_str()),
+                        ("Resolution", folder.settings.target_resolution.map(|r| r.display_name()).unwrap_or_default()),
                         ("Stabilize", Self::yes_no(folder.settings.stabilize)),
                         ("Color", Self::yes_no(folder.settings.color_correct)),
                         ("Reframe", Self::yes_no(folder.settings.reframe)),
