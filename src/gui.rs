@@ -584,11 +584,11 @@ impl AppState {
             })
             .collect();
 
-        // Debounce: only save to disk and restart watcher if 1 second has passed
+        // Debounce: only save to disk if 500ms have passed since last save
         let now = std::time::Instant::now();
         let should_flush = self
             .last_save_time
-            .map(|t| now.duration_since(t).as_secs() >= 1)
+            .map(|t| now.duration_since(t).as_millis() >= 500)
             .unwrap_or(true);
 
         if should_flush {
@@ -607,9 +607,11 @@ impl AppState {
                 ));
             }
 
-            self.restart_watcher();
             self.last_save_time = Some(now);
         }
+
+        // Always restart watcher when config changes (debounced internally)
+        self.restart_watcher();
     }
 
     fn add_folder_from_modal(&mut self) {
