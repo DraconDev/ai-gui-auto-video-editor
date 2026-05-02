@@ -119,7 +119,9 @@ fn load_audio_as_f32(path: &Path) -> Result<Vec<f32>> {
     let bytes = &output.stdout;
     let samples: Vec<f32> = bytes
         .chunks_exact(4)
-        .map(|chunk| f32::from_le_bytes(chunk.try_into().expect("chunks_exact(4)")))
+        .map(|chunk| {
+            f32::from_le_bytes(chunk.try_into().expect("FFmpeg output should be valid f32 samples"))
+        })
         .collect();
 
     Ok(samples)
