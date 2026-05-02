@@ -112,7 +112,19 @@ pub struct TempFile {
 
 impl TempFile {
     pub fn new(prefix: &str, ext: &str) -> std::io::Result<Self> {
-        let path = std::env::temp_dir().join(format!("{}-{}.{}", prefix, std::process::id(), ext));
+        use std::time::{SystemTime, UNIX_EPOCH};
+        let now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_nanos();
+        let thread_id = std::thread::current().id().as_u64().unwrap_or(0);
+        let path = std::env::temp_dir().join(format!(
+            "{}-{}-{}-{:.0}.",
+            prefix,
+            std::process::id(),
+            thread_id,
+            now as f64
+        ));
         Ok(Self { path })
     }
 
