@@ -1,5 +1,6 @@
 use crate::analyzer::{ProcessedSegment, Segment};
 use crate::config::SilenceMode;
+use crate::ml::AutoReframeProcessor;
 use crate::stt_analyzer::TranscriptSegment;
 use anyhow::{Context, Result};
 use std::fs;

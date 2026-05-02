@@ -1,20 +1,20 @@
 # Project State
 
 ## Current Focus
-Refactored `smooth_crop_regions` function call to use `Self::` syntax for method invocation.
+Added dependency on `AutoReframeProcessor` for video cropping functionality.
 
 ## Context
-This change aligns with recent refactoring efforts to standardize method calls within the `AutoReframeProcessor` implementation, ensuring consistent syntax and reducing redundant `self` references.
+This change prepares the editor module to utilize the new `AutoReframeProcessor` for automated video cropping, which was recently refactored in related commits.
 
 ## Completed
-- [x] Changed `smooth_crop_regions(crop_regions, 5)` to `Self::smooth_crop_regions(crop_regions, 5)` for consistent method invocation syntax
+- [x] Added import for `AutoReframeProcessor` to enable future video cropping features
 
 ## In Progress
-- [x] No active work in progress for this commit
+- [x] Implementation of video cropping functionality using the new processor
 
 ## Blockers
-- None
+- Implementation of the actual cropping logic using `AutoReframeProcessor` is pending
 
 ## Next Steps
-1. Verify the refactored code maintains the same functionality through existing tests
-2. Continue with other pending refactoring tasks in the `ml.rs` module
+1. Implement video cropping using `AutoReframeProcessor`
+2. Add corresponding test cases for the new functionality
