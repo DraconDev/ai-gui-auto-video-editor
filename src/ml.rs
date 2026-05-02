@@ -631,7 +631,7 @@ impl AutoReframeProcessor {
             );
         }
 
-        let smoothed = smooth_crop_regions(crop_regions, 5);
+        let smoothed = Self::smooth_crop_regions(crop_regions, 5);
         let first_time = smoothed[0].0;
         let last_time = smoothed[smoothed.len() - 1].0;
         let duration = last_time - first_time;

@@ -1,21 +1,20 @@
 # Project State
 
 ## Current Focus
-Refactored `generate_crop_filter` method to use `AutoReframeProcessor` directly
+Refactored `smooth_crop_regions` function call to use `Self::` syntax for method invocation.
 
 ## Context
-This change removes the dependency on the `processor` instance by making the method static, aligning with recent refactoring of the face detection module
+This change aligns with recent refactoring efforts to standardize method calls within the `AutoReframeProcessor` implementation, ensuring consistent syntax and reducing redundant `self` references.
 
 ## Completed
-- [x] Made `generate_crop_filter` a static method of `AutoReframeProcessor`
-- [x] Removed redundant `&self` parameter from method signature
+- [x] Changed `smooth_crop_regions(crop_regions, 5)` to `Self::smooth_crop_regions(crop_regions, 5)` for consistent method invocation syntax
 
 ## In Progress
-- [x] No active work in progress
+- [x] No active work in progress for this commit
 
 ## Blockers
-- None identified
+- None
 
 ## Next Steps
-1. Verify test coverage for the refactored method
-2. Update any dependent code that might need adjustment for this change
+1. Verify the refactored code maintains the same functionality through existing tests
+2. Continue with other pending refactoring tasks in the `ml.rs` module
