@@ -267,10 +267,17 @@ where
 
     report_progress(&mut progress, 0.1, "Planning edits");
 
+    // Fetch transcript if needed for filler-word removal or audio ducking
+    let transcript = if config.filler_words.enabled || config.audio.music_file.is_some() {
+        report_progress(&mut progress, 0.1, "Transcribing audio");
+        maybe_transcribe_for_filler_words(&input_file, config)
+    } else {
+        None
+    };
+
     let processed_segments = if config.filler_words.enabled {
-        report_progress(&mut progress, 0.1, "Transcribing for filler-word removal");
-        match maybe_transcribe_for_filler_words(&input_file, config) {
-            Some(transcript) => {
+        match &transcript {
+            Some(t) => {
                 let filler_words: Vec<&str> = config
                     .filler_words
                     .words
@@ -278,7 +285,7 @@ where
                     .map(|s| s.as_str())
                     .collect();
                 calculate_keep_segments_from_transcript(
-                    &transcript,
+                    t,
                     video_duration,
                     &filler_words,
                     config.filler_words.padding,

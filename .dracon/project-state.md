@@ -1,21 +1,22 @@
 # Project State
 
 ## Current Focus
-Update dependency lockfile to reflect updated crate versions
+Optimize audio processing by caching transcriptions when needed for multiple features
 
 ## Context
-This change was triggered by recent dependency updates across the project, particularly in the video processing and GUI modules. The lockfile needs to be synchronized to ensure consistent builds and avoid version conflicts.
+The batch processor now needs to handle both filler-word removal and audio ducking, which both require audio transcription. Previously, it was transcribing twice when both features were enabled, leading to unnecessary processing time.
 
 ## Completed
-- [x] Updated `Cargo.lock` to reflect current dependency versions
-- [x] Synchronized lockfile with recent crate updates
+- [x] Added conditional transcription that caches the result for reuse
+- [x] Improved progress reporting with dedicated step for transcription
+- [x] Refactored filler-word removal to use cached transcript
 
 ## In Progress
-- [x] Dependency version synchronization
+- [ ] Verify performance improvement with both features enabled
 
 ## Blockers
-- None identified
+- Need to test with actual audio files to measure performance impact
 
 ## Next Steps
-1. Verify build consistency across development environments
-2. Prepare for potential integration testing with updated dependencies
+1. Add performance benchmarking for transcription caching
+2. Consider adding more caching for other potentially expensive operations
