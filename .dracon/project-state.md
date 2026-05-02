@@ -1,22 +1,21 @@
 # Project State
 
 ## Current Focus
-Improved logging configuration with more robust error handling for specific crate log levels.
+Improved error handling for JSON output in FFmpeg/ffprobe checks
 
 ## Context
-The previous logging configuration had hardcoded directives that could panic if parsing failed. This change makes the logging setup more resilient by handling potential parsing errors gracefully while maintaining the same log level directives.
+The original code would panic if JSON serialization failed during error reporting. This change makes error handling more robust by providing a fallback format when serialization fails.
 
 ## Completed
-- [x] Refactored logging setup to handle potential parsing errors for "candle" and "tract" log levels
-- [x] Maintained the same log level directives (warn) for these crates
-- [x] Improved error handling by falling back to the existing filter if parsing fails
+- [x] Added fallback format for JSON serialization errors in FFmpeg check
+- [x] Added fallback format for JSON serialization errors in ffprobe check
 
 ## In Progress
-- [ ] None
+- [x] Error handling improvements for CLI output
 
 ## Blockers
-- None
+- None identified
 
 ## Next Steps
-1. Verify the new logging configuration works as expected in different environments
-2. Consider adding more comprehensive logging tests to catch similar issues early
+1. Verify fallback format works as expected in error scenarios
+2. Consider adding similar fallbacks for other JSON serialization points

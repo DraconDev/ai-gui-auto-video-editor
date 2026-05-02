@@ -321,7 +321,7 @@ fn main() -> Result<()> {
     // Check FFmpeg and ffprobe availability early
     if let Err(e) = crate::utils::check_ffmpeg() {
         if cli.json {
-            println!("{}", serde_json::to_string(&json!({"error": e.to_string()})).unwrap());
+            println!("{}", serde_json::to_string(&json!({"error": e.to_string()})).unwrap_or_else(|_| format!("{{\"error\": \"{}\"}}", e)));
         } else {
             eprintln!("Error: {}", e);
         }
@@ -330,7 +330,7 @@ fn main() -> Result<()> {
 
     if let Err(e) = crate::utils::check_ffprobe() {
         if cli.json {
-            println!("{}", serde_json::to_string(&json!({"error": e.to_string()})).unwrap());
+            println!("{}", serde_json::to_string(&json!({"error": e.to_string()})).unwrap_or_else(|_| format!("{{\"error\": \"{}\"}}", e)));
         } else {
             eprintln!("Error: {}", e);
         }
