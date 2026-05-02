@@ -79,6 +79,9 @@ impl VideoSttAnalyzer for CandleSttAnalyzer {
             .context("failed to load tokenizer")?;
 
         let vb = unsafe {
+            // SAFETY: The weights_path points to a validated safetensors file that was
+            // downloaded from HuggingFace and validated to exist. Memory-mapping a
+            // read-only file is safe as we don't modify the underlying data.
             candle_nn::VarBuilder::from_mmaped_safetensors(&[weights_path], DType::F32, &device)?
         };
 
