@@ -2124,9 +2124,9 @@ impl App {
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                     if ui.add(button_primary("Process All")).clicked() {
                         let mut added = 0;
-                        let mut errors = 0;
+                        let mut errors = Vec::new();
                         // Collect already-queued paths to avoid duplicates
-                        let existing_paths: std::collections::HashSet<_> = self.state.batch_queue
+                        let mut existing_paths: std::collections::HashSet<_> = self.state.batch_queue
                             .iter()
                             .map(|f| f.path.clone())
                             .collect();
@@ -2146,13 +2146,14 @@ impl App {
                                                     output_path: None,
                                                     completed_at: None,
                                                 });
+                                                existing_paths.insert(path);
                                                 added += 1;
                                             }
                                         }
                                     }
                                     Err(e) => {
                                         warn!(error = %e, folder = ?folder.input, "Failed to read folder");
-                                        errors += 1;
+                                        errors.push(folder.input.display().to_string());
                                     }
                                 }
                             }
@@ -2163,10 +2164,18 @@ impl App {
                                 ToastKind::Success,
                             );
                         }
-                        if errors > 0 {
+                        if !errors.is_empty() {
+                            let msg = if errors.len() == 1 {
+                                format!("Failed to read: {}", errors[0])
+                            } else {
+                                format!("Failed to read {} folders", errors.len())
+                            };
+                            self.state.add_toast(msg, ToastKind::Error);
+                        }
+                        if added == 0 && errors.is_empty() {
                             self.state.add_toast(
-                                format!("Failed to read {} folders", errors),
-                                ToastKind::Error,
+                                "No video files found in enabled folders".to_string(),
+                                ToastKind::Info,
                             );
                         }
                     }

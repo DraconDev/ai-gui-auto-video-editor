@@ -1,21 +1,23 @@
 # Project State
 
 ## Current Focus
-Optimized audio sample conversion in STT analyzer by improving byte handling
+Improved batch processing error handling and duplicate prevention in the GUI tabs module
 
 ## Context
-The change improves the efficiency of converting raw audio bytes to f32 samples by eliminating unnecessary `try_into()` operations while maintaining safety guarantees.
+The previous implementation had limited error handling for folder processing and didn't properly track existing paths to prevent duplicates. This change makes the error reporting more detailed and prevents duplicate queue entries.
 
 ## Completed
-- [x] Replaced `try_into().unwrap()` with direct array indexing for byte conversion
-- [x] Maintained safety through `chunks_exact(4)` which guarantees 4-byte chunks
+- [x] Changed error tracking from a simple counter to a vector of error messages
+- [x] Improved duplicate prevention by tracking existing paths in a mutable HashSet
+- [x] Enhanced user feedback with specific error messages for single vs multiple failures
+- [x] Added a specific message when no video files are found in enabled folders
 
 ## In Progress
-- [x] No active work in progress
+- [x] Comprehensive error handling implementation
 
 ## Blockers
-- None identified
+- None identified in this change
 
 ## Next Steps
-1. Verify performance impact with benchmarking
-2. Consider adding additional safety checks if processing non-standard audio formats
+1. Verify the new error messages provide sufficient context for users
+2. Test with various folder structures to ensure duplicate prevention works as expected
