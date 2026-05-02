@@ -736,7 +736,11 @@ fn export_additional_files(
     if config.export.edl {
         let edl_path = base_path.with_extension("edl");
         debug!(path = %edl_path.display(), "Exporting EDL");
-        let fps = crate::ml::FrameExtractor::get_video_fps(output_file).unwrap_or(25.0);
+        let fps = crate::ml::FrameExtractor::get_video_fps(output_file)
+            .unwrap_or_else(|_| {
+                warn!("Failed to detect FPS for EDL export, defaulting to 25.0");
+                25.0
+            });
         exporter::export_edl(segments, input_file, &edl_path, fps)?;
     }
 
