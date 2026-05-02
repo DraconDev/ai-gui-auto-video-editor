@@ -30,7 +30,7 @@ fn timestamp() -> String {
     use std::time::SystemTime;
     let now = SystemTime::now()
         .duration_since(SystemTime::UNIX_EPOCH)
-        .expect("system clock is before Unix epoch (1970-01-01)");
+        .unwrap_or_default();
     let secs = now.as_secs();
     let hours = (secs / 3600) % 24;
     let minutes = (secs / 60) % 60;
