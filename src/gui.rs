@@ -988,6 +988,8 @@ impl eframe::App for App {
         #[cfg(not(target_os = "macos"))]
         let is_ctrl = modifiers.ctrl;
         let skip_shortcuts = self.state.show_setup
+            || self.state.modal.show
+            || self.state.modal.delete_confirm_idx.is_some()
             || ctx.wants_keyboard_input()
             || ctx.input(|i| i.raw.dropped_files.len() > 0);
 
