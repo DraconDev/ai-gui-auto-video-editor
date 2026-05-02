@@ -7,6 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [19.56.0] - 2026-05-02
+
+### Security Fixes
+- **FFmpeg filter injection prevented**: `concatenate_videos` now uses concat demuxer (`-f concat -safe 0 -i list.txt`) instead of `filter_complex`, eliminating filter injection risks
+- **JSON escaping fixed**: Error output now uses `serde_json::to_string()` instead of raw `println!()` with manual braces, preventing malformed JSON when errors contain quotes
+- **Scene threshold clamped**: `detect_scene_changes` now clamps threshold to `[0.0, 1.0]` before interpolation, preventing filter expression escape
+- **Watermark scale validated**: `add_watermark` now rejects non-finite and non-positive scale values before filter construction
+
+### Performance Improvements
+- **Transcript caching**: STT transcript is now cached and reused for both filler-word removal and music ducking, avoiding double transcription
+- **Export transcript reuse**: `export_additional_files` accepts cached transcript, avoiding re-transcribing the output file for subtitles/chapters/captions/clips
+- **TempFile uniqueness**: Fixed race condition where parallel tests collided on temp files by adding atomic counter + nanosecond timestamp to filenames
+
+### Bug Fixes
+- **Audio ducking fixed**: Music ducking now receives transcript data even when filler-word removal is disabled
+- **Batch queue auto-clear**: Error items now set `completed_at` timestamp, so they get cleaned up after 60s instead of accumulating forever
+- **Concat path escaping**: Single quotes in file paths are properly escaped (`'` → `'\''`) in concat demuxer list files
+- **Process All button**: Now uses proper `find_video_files()` (walks subdirs, deduplicates, shows error toasts for failed folders)
+- **FPS fallback warning**: EDL export now logs a warning when falling back to 25.0 FPS instead of silently assuming
+- **Missing module**: Added `pub mod analyzer` to `main.rs` to fix binary compilation
+
+### Code Quality
+- **Removed `.expect()` / `.unwrap()` from production paths**: `stt_analyzer.rs`, `main.rs` init_logging, `main.rs` JSON error output
+- **Crop width clamped**: `CropRegion::from_face` now clamps width to `1.0` to prevent invalid regions
+- **Empty-segment guards**: Added explicit handling for empty segments in `export_fcpxml`, `export_edl`, `export_srt`, `export_youtube_chapters`
+- **Dead code removal**: Removed `draw_summary_card()`, `last_seen_activity_len`, `WARNING_BG` constant, `button_tab()` function
+- **Stale comment removed**: Removed misleading "placeholder" comment from `FaceDetector::load()`
+
+### Tests
+- **New ML tests**: 4 tests for `generate_crop_filter` (empty, single, multiple, zero-duration regions)
+- **New editor tests**: 3 tests for `stabilize`, `reframe`, `blur_background`
+- **Strengthened pipeline tests**: Audio enhancement, auto-reframe, stabilization, color correction now validate output with ffprobe (duration, dimensions, codec)
+- **Test count**: 229 passing (up from 222)
+
+### Known Limitations
+- **Transcript timestamp drift**: When filler-word removal + exports enabled, subtitle/chapter timestamps may differ from trimmed output by small amounts (silence padding). Disable filler_words for frame-accurate exports.
+- **ML blur background**: Currently uses simple `boxblur`. ML-based person segmentation is planned for future release.
+
 ## [19.32.0] - 2026-05-01
 
 ### UX Improvements
