@@ -18,6 +18,12 @@ pub fn export_fcpxml(
     input_path: &Path,
     output_path: &Path,
 ) -> Result<()> {
+    if segments.is_empty() {
+        fs::write(output_path, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE fcpxml>\n<fcpxml version=\"1.8\">\n  <resources></resources>\n  <library>\n    <event name=\"Automated Cuts\">\n      <project name=\"Edited Timeline\">\n        <sequence duration=\"0/1s\" format=\"r1\">\n          <spine></spine>\n        </sequence>\n      </project>\n    </event>\n  </library>\n</fcpxml>\n")
+            .context("failed to write empty FCPXML file")?;
+        return Ok(());
+    }
+
     let filename = input_path
         .file_name()
         .and_then(|s| s.to_str())
