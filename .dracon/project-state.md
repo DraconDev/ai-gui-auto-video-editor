@@ -1,21 +1,21 @@
 # Project State
 
 ## Current Focus
-Added dimension validation for auto-reframed videos to ensure vertical orientation (9:16 aspect ratio)
+Added comprehensive validation for video stabilization pipeline outputs
 
 ## Context
-This change extends the existing auto-reframe test to verify that the output video maintains the correct vertical orientation after processing. It addresses a need to ensure consistent output dimensions for vertical video content.
+This change enhances test coverage for the video stabilization pipeline by verifying that stabilized videos maintain original dimensions and have valid durations, ensuring processing quality.
 
 ## Completed
-- [x] Added dimension validation for auto-reframed videos
-- [x] Verifies height > width to confirm vertical orientation
+- [x] Added dimension validation for stabilized videos
+- [x] Added duration validation for stabilized videos
 
 ## In Progress
-- [x] Comprehensive validation of video dimensions
+- [x] Comprehensive validation of video stabilization outputs
 
 ## Blockers
 - None identified
 
 ## Next Steps
-1. Expand test coverage for other aspect ratios
-2. Add validation for minimum/maximum dimension constraints
+1. Review test coverage for other video processing pipelines
+2. Consider adding visual quality metrics for stabilized videos

@@ -108,6 +108,11 @@ fn test_video_stabilization() {
 
     assert!(result.is_ok(), "Video stabilization should succeed");
     assert!(output_path.exists(), "Output file should exist");
+
+    // Verify output has same dimensions as input
+    let input_dims = ffprobe_dimensions(&video_path);
+    let output_dims = ffprobe_dimensions(&output_path);
+    assert_eq!(input_dims, output_dims, "Stabilized video should maintain original dimensions");
 }
 
 #[test]
@@ -130,6 +135,10 @@ fn test_color_correction() {
 
     assert!(result.is_ok(), "Color correction should succeed");
     assert!(output_path.exists(), "Output file should exist");
+
+    // Verify output has valid duration
+    let dur = ffprobe_duration(&output_path);
+    assert!(dur.map(|d| d > 0.0).unwrap_or(false), "Output should have positive duration");
 }
 
 #[test]
