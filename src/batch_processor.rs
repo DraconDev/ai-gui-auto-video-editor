@@ -124,9 +124,14 @@ fn concatenate_videos(
     }
 
     // Build concat demuxer list file
+    // Escape single quotes in paths: replace ' with '\''
     let list_content: String = video_paths
         .iter()
-        .map(|p| format!("file '{}'\n", p.display()))
+        .map(|p| {
+            let path_str = p.to_string_lossy();
+            let escaped = path_str.replace("'", "'\\''");
+            format!("file '{}\n", escaped)
+        })
         .collect();
     let list_file = TempFile::new("ai-vid-editor-concat-list", "txt")?;
     std::fs::write(list_file.path(), list_content)?;
