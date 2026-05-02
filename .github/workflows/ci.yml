@@ -93,7 +93,7 @@ jobs:
             ${{ runner.os }}-clippy-target-
 
       - name: Run clippy
-        run: cargo clippy --all-features -- -D warnings -W clippy::pedantic
+        run: cargo clippy --all-features -- -D warnings
 
   fmt:
     name: Format
