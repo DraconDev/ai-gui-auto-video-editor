@@ -549,8 +549,13 @@ impl VideoEditor for FfmpegEditor {
         self.run_reframe_filter(input, output, &filter)
     }
 
+    /// Apply background blur to video.
+    ///
+    /// Currently applies a simple boxblur filter to the entire video.
+    /// TODO: Integrate ml::BackgroundBlurProcessor for ML-based person segmentation
+    ///       that keeps the person sharp while blurring only the background.
     fn blur_background(&self, input: &Path, output: &Path) -> Result<()> {
-        info!("Background blur: Processing video...");
+        info!("Background blur: Processing video with simple boxblur...");
 
         let filter = "boxblur=20:5";
 

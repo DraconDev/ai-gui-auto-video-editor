@@ -1,21 +1,22 @@
 # Project State
 
 ## Current Focus
-Update dependency lockfile to reflect updated crate versions
+Added background blur functionality with a simple boxblur filter
 
 ## Context
-This change was prompted by recent updates to project dependencies, particularly the addition of the `AutoReframeProcessor` for video cropping functionality and improvements to face detection with HuggingFace integration.
+The video editor now needs background blur capabilities for privacy features. This initial implementation uses a basic boxblur filter as a starting point, with a TODO to integrate a more advanced ML-based solution later.
 
 ## Completed
-- [x] Updated Cargo.lock to reflect new dependency versions
-- [x] Ensured compatibility with recently added video processing features
+- [x] Added `blur_background` method to apply boxblur filter
+- [x] Updated logging to indicate simple boxblur processing
+- [x] Added documentation for the new method
 
 ## In Progress
-- [ ] Verifying all dependencies are properly resolved in the build environment
+- [ ] Integration of ML-based background blur (person segmentation)
 
 ## Blockers
-- None identified at this stage
+- ML-based background blur implementation not yet available
 
 ## Next Steps
-1. Verify the updated lockfile works across all target platforms
-2. Prepare for integration testing with the new video processing features
+1. Implement ML-based background blur using `ml::BackgroundBlurProcessor`
+2. Add tests for the background blur functionality
