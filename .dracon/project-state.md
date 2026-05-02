@@ -1,21 +1,21 @@
 # Project State
 
 ## Current Focus
-Refactored resolution display in folder settings to improve consistency with other settings.
+Update dependency lockfile to reflect updated crate versions
 
 ## Context
-The change aligns the resolution display format with other settings in the folder summary panel, ensuring uniform handling of optional values.
+This change was triggered by recent refactoring work across the GUI module, particularly in the resolution display, silence mode handling, and tab-related imports. The lockfile needs to be updated to ensure all dependencies are properly versioned after these changes.
 
 ## Completed
-- [x] Updated resolution display to use `unwrap_or_default()` consistently with other settings
-- [x] Maintained the same fallback behavior ("—") for missing values
+- [x] Updated Cargo.lock to reflect current dependency versions
 
 ## In Progress
-- [x] No active work in progress beyond this change
+- [x] No active work in progress beyond the lockfile update
 
 ## Blockers
 - None identified
 
 ## Next Steps
-1. Verify the change doesn't affect any existing resolution display logic
-2. Check for any related settings that might need similar formatting updates
+1. Verify that all recent refactoring changes are properly reflected in the build
+2. Continue with ongoing GUI responsiveness improvements
+```
