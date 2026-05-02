@@ -1,21 +1,21 @@
 # Project State
 
 ## Current Focus
-Improved scene change detection threshold handling in `scene_detection.rs`
+Added input validation for watermark scale parameter
 
 ## Context
-The change ensures the scene detection threshold is properly clamped between 0.0 and 1.0, and improves the ffmpeg filter command formatting by using a fixed decimal precision (3 digits) for the threshold value.
+Prevented potential crashes by ensuring watermark scale values are positive and finite
 
 ## Completed
-- [x] Added threshold clamping to ensure valid range (0.0-1.0)
-- [x] Improved ffmpeg filter command formatting with fixed decimal precision
+- [x] Added validation to reject non-positive or non-finite scale values
+- [x] Added descriptive error message for invalid scale values
 
 ## In Progress
-- [ ] None (changes are complete)
+- [ ] No active work in progress
 
 ## Blockers
-- None (this is a small, self-contained improvement)
+- None identified
 
 ## Next Steps
-1. Verify the threshold clamping works as expected in integration tests
-2. Consider adding unit tests for the scene detection module
+1. Verify validation works with all watermark use cases
+2. Consider adding similar validation for other numeric parameters

@@ -119,6 +119,10 @@ pub fn add_watermark(
 ) -> Result<()> {
     info!(?position, scale, "Adding watermark to video");
 
+    if !scale.is_finite() || scale <= 0.0 {
+        anyhow::bail!("watermark scale must be a positive finite value, got {}", scale);
+    }
+
     let overlay_pos = position.to_ffmpeg_coords(0, 0);
 
     // Scale the watermark and overlay it
