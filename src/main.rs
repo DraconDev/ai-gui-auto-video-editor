@@ -291,12 +291,18 @@ fn init_logging(verbose: u8, quiet: bool) {
         }
     };
 
+    let env_filter = tracing_subscriber::EnvFilter::new(filter);
+    let env_filter = match "candle=warn".parse() {
+        Ok(d) => env_filter.add_directive(d),
+        Err(_) => env_filter,
+    };
+    let env_filter = match "tract=warn".parse() {
+        Ok(d) => env_filter.add_directive(d),
+        Err(_) => env_filter,
+    };
+
     tracing_subscriber::fmt()
-        .with_env_filter(
-            tracing_subscriber::EnvFilter::new(filter)
-                .add_directive("candle=warn".parse().expect("hardcoded directive should always parse"))
-                .add_directive("tract=warn".parse().expect("hardcoded directive should always parse")),
-        )
+        .with_env_filter(env_filter)
         .with_target(false)
         .with_file(verbose >= 2)
         .with_line_number(verbose >= 2)

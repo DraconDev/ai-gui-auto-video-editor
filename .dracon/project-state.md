@@ -1,21 +1,22 @@
 # Project State
 
 ## Current Focus
-Fixed a newline issue in video concatenation path formatting
+Improved logging configuration with more robust error handling for specific crate log levels.
 
 ## Context
-The change addresses a bug in the video concatenation process where paths were being incorrectly formatted with an extra newline character in the temporary list file.
+The previous logging configuration had hardcoded directives that could panic if parsing failed. This change makes the logging setup more resilient by handling potential parsing errors gracefully while maintaining the same log level directives.
 
 ## Completed
-- [x] Removed the extra newline in the path formatting for video concatenation
+- [x] Refactored logging setup to handle potential parsing errors for "candle" and "tract" log levels
+- [x] Maintained the same log level directives (warn) for these crates
+- [x] Improved error handling by falling back to the existing filter if parsing fails
 
 ## In Progress
-- [x] Testing the fix to ensure proper video concatenation
+- [ ] None
 
 ## Blockers
-- None identified
+- None
 
 ## Next Steps
-1. Verify the fix works with various path formats
-2. Update related documentation if needed
-```
+1. Verify the new logging configuration works as expected in different environments
+2. Consider adding more comprehensive logging tests to catch similar issues early
