@@ -128,7 +128,7 @@ fn concatenate_videos(
         .iter()
         .map(|p| format!("file '{}'\n", p.display()))
         .collect();
-    let list_file = utils::TempFile::new("ai-vid-editor-concat-list", "txt")?;
+    let list_file = TempFile::new("ai-vid-editor-concat-list", "txt")?;
     std::fs::write(list_file.path(), list_content)?;
 
     let status = std::process::Command::new("ffmpeg")
