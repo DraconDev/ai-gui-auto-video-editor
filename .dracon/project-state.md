@@ -1,21 +1,20 @@
 # Project State
 
 ## Current Focus
-Removed activity summary tracking from the GUI state
+Removed the `WARNING_BG` color constant from the theme configuration.
 
 ## Context
-This change eliminates redundant tracking of activity summary length in the application state, aligning with ongoing refactoring efforts to simplify the GUI components.
+This change appears to be part of a broader theme cleanup effort, possibly to simplify the color palette or standardize the theme system.
 
 ## Completed
-- [x] Removed `last_seen_activity_len` field from `AppState` struct
-- [x] Cleaned up related code paths that referenced the removed field
+- [x] Removed the `WARNING_BG` color constant from the theme configuration
 
 ## In Progress
-- [ ] No active work in progress related to this change
+- [x] No active work in progress related to this change
 
 ## Blockers
 - None identified
 
 ## Next Steps
-1. Verify no remaining references to the removed field exist
-2. Confirm the activity summary functionality still works as expected without the tracking field
+1. Verify if this change affects any UI components that use this color
+2. Consider whether other theme constants should be reviewed for consistency

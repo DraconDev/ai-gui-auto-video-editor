@@ -26,7 +26,6 @@ pub const SUCCESS_DIM: egui::Color32 = egui::Color32::from_rgb(40, 140, 80);
 pub const ERROR: egui::Color32 = egui::Color32::from_rgb(255, 75, 75);
 pub const ERROR_BG: egui::Color32 = egui::Color32::from_rgb(45, 16, 16);
 pub const WARNING: egui::Color32 = egui::Color32::from_rgb(255, 193, 7);
-pub const WARNING_BG: egui::Color32 = egui::Color32::from_rgb(50, 40, 10);
 pub const PROCESSING: egui::Color32 = egui::Color32::from_rgb(86, 160, 255);
 pub const PROCESSING_BG: egui::Color32 = egui::Color32::from_rgb(20, 36, 60);
 pub const PROCESSING_DIM: egui::Color32 = egui::Color32::from_rgb(60, 120, 200);
