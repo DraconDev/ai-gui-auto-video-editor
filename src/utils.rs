@@ -117,13 +117,13 @@ impl TempFile {
             .duration_since(UNIX_EPOCH)
             .unwrap_or_default()
             .as_nanos();
-        let thread_id = std::thread::current().id().as_u64().unwrap_or(0);
         let path = std::env::temp_dir().join(format!(
-            "{}-{}-{}-{:.0}.",
+            "{}-{}-{}-{:.0}.{}",
             prefix,
             std::process::id(),
-            thread_id,
-            now as f64
+            std::thread::current().id().as_u64().unwrap_or(0),
+            now as f64,
+            ext
         ));
         Ok(Self { path })
     }
