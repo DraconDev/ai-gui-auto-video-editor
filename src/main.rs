@@ -5,6 +5,7 @@ use std::path::PathBuf;
 use clap::Parser;
 
 use serde_json::json;
+pub mod analyzer;
 pub mod batch_processor;
 pub mod config;
 pub mod editor;
