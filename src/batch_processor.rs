@@ -15,7 +15,7 @@ use crate::editor::calculate_keep_segments_from_transcript;
 use crate::exporter;
 use crate::progress::BatchProgress;
 use crate::stt_analyzer::{CandleSttAnalyzer, TranscriptSegment, VideoSttAnalyzer};
-use crate::utils::find_video_files;
+use crate::utils::{find_video_files, TempFile};
 
 fn atomic_replace(src: &Path, dst: &Path) -> Result<()> {
     #[cfg(target_os = "windows")]
