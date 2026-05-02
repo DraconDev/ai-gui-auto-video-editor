@@ -1,21 +1,22 @@
 # Project State
 
 ## Current Focus
-Added shutdown completion tracking for the watcher thread
+Improved watcher thread shutdown handling with completion tracking
 
 ## Context
-This change implements a mechanism to track when the watcher thread has fully completed its shutdown process, which is important for ensuring proper cleanup and avoiding resource leaks during application termination.
+The previous watcher thread shutdown mechanism had a fixed 100ms sleep, which could lead to race conditions. This change adds proper shutdown completion tracking to ensure clean thread termination.
 
 ## Completed
-- [x] Added `watcher_shutdown_complete` field to `AppState` to track shutdown status
-- [x] This field will be used to coordinate between the GUI and watcher thread during shutdown
+- [x] Added `watcher_shutdown_complete` field to track thread shutdown status
+- [x] Implemented proper shutdown completion checking with timeout
+- [x] Updated watcher restart logic to use the new shutdown tracking
 
 ## In Progress
-- [x] Implementation of the actual shutdown coordination logic
+- [x] Watcher thread shutdown handling is now properly synchronized
 
 ## Blockers
-- Implementation of the shutdown coordination logic needs to be completed
+- None identified
 
 ## Next Steps
-1. Implement the shutdown coordination logic using the new `watcher_shutdown_complete` field
-2. Verify proper shutdown behavior in integration tests
+1. Verify shutdown handling works correctly in integration tests
+2. Monitor for any related watcher thread issues in production

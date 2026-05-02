@@ -516,6 +516,7 @@ impl AppState {
             setup_remove_silence: true,
             watcher_rx: None,
             watcher_stop: None,
+            watcher_shutdown_complete: None,
             toasts: Vec::new(),
             batch_queue: Vec::new(),
             queue_processing: false,
@@ -719,10 +720,20 @@ impl AppState {
     }
 
     fn restart_watcher(&mut self) {
-        if let Some(stop) = self.watcher_stop.take() {
+        if let Some((stop, shutdown_complete)) = self
+            .watcher_stop
+            .take()
+            .zip(self.watcher_shutdown_complete.take())
+        {
             stop.store(true, Ordering::SeqCst);
-            // Give the old thread time to finish before starting a new one
-            std::thread::sleep(std::time::Duration::from_millis(100));
+            let timeout = std::time::Duration::from_secs(2);
+            let start = std::time::Instant::now();
+            while !shutdown_complete.load(Ordering::SeqCst) {
+                if start.elapsed() > timeout {
+                    break;
+                }
+                std::thread::sleep(std::time::Duration::from_millis(10));
+            }
         }
 
         let enabled_folders: Vec<FolderState> =
@@ -738,9 +749,11 @@ impl AppState {
             return;
         }
 
-        let (rx, stop) = processing::spawn_watcher(self.config.clone(), enabled_folders, true);
+        let (rx, stop, shutdown_complete) =
+            processing::spawn_watcher(self.config.clone(), enabled_folders, true);
         self.watcher_rx = Some(rx);
         self.watcher_stop = Some(stop);
+        self.watcher_shutdown_complete = Some(shutdown_complete);
         self.status = ProcessingStatus::Watching;
     }
 
