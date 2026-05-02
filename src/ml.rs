@@ -174,8 +174,7 @@ impl FaceDetector {
     /// Model is downloaded on first use if not present.
     /// Uses MediaPipe or similar lightweight face detection model.
     pub fn load() -> Result<Self> {
-        // For now, we'll use a placeholder
-        // In production, download from HuggingFace or bundle with the binary
+        // Downloads model from HuggingFace on first use, then caches locally
         let model_path = Self::get_model_path()?;
 
         if !model_path.exists() {
