@@ -971,31 +971,28 @@ mod tests {
 
     #[test]
     fn test_generate_crop_filter_empty_regions() {
-        let processor = AutoReframeProcessor;
         let regions: &[(f32, CropRegion)] = &[];
-        let filter = processor.generate_crop_filter(regions, 1920, 1080, crate::config::VideoResolution::Vertical1080p);
+        let filter = AutoReframeProcessor::generate_crop_filter(regions, 1920, 1080, crate::config::VideoResolution::Vertical1080p);
         assert!(filter.contains("crop="));
         assert!(filter.contains("scale="));
     }
 
     #[test]
     fn test_generate_crop_filter_single_region() {
-        let processor = AutoReframeProcessor;
         let region = CropRegion { x: 0.2, y: 0.0, width: 0.5, height: 1.0 };
-        let filter = processor.generate_crop_filter(&[(0.0, region)], 1920, 1080, crate::config::VideoResolution::Vertical1080p);
+        let filter = AutoReframeProcessor::generate_crop_filter(&[(0.0, region)], 1920, 1080, crate::config::VideoResolution::Vertical1080p);
         assert!(filter.contains("crop=iw*0.5:ih:iw*0.2:0"));
         assert!(filter.contains("scale="));
     }
 
     #[test]
     fn test_generate_crop_filter_multiple_regions() {
-        let processor = AutoReframeProcessor;
         let regions = vec![
             (0.0, CropRegion { x: 0.1, y: 0.0, width: 0.4, height: 1.0 }),
             (1.0, CropRegion { x: 0.3, y: 0.0, width: 0.5, height: 1.0 }),
             (2.0, CropRegion { x: 0.5, y: 0.0, width: 0.6, height: 1.0 }),
         ];
-        let filter = processor.generate_crop_filter(&regions, 1920, 1080, crate::config::VideoResolution::Vertical1080p);
+        let filter = AutoReframeProcessor::generate_crop_filter(&regions, 1920, 1080, crate::config::VideoResolution::Vertical1080p);
         // Should produce a linear interpolation expression
         assert!(filter.contains("t/"));
         assert!(filter.contains("scale="));
@@ -1003,12 +1000,11 @@ mod tests {
 
     #[test]
     fn test_generate_crop_filter_zero_duration() {
-        let processor = AutoReframeProcessor;
         let regions = vec![
             (0.0, CropRegion { x: 0.2, y: 0.0, width: 0.5, height: 1.0 }),
             (0.0, CropRegion { x: 0.2, y: 0.0, width: 0.5, height: 1.0 }),
         ];
-        let filter = processor.generate_crop_filter(&regions, 1920, 1080, crate::config::VideoResolution::Vertical1080p);
+        let filter = AutoReframeProcessor::generate_crop_filter(&regions, 1920, 1080, crate::config::VideoResolution::Vertical1080p);
         // Duration=0 should fall back to static crop
         assert!(filter.contains("crop=iw*0.5:ih:iw*0.2:0"));
     }
