@@ -613,7 +613,6 @@ impl AutoReframeProcessor {
     /// Uses temporally smoothed crop values with linear interpolation.
     /// `target_resolution` controls the output scale dimensions.
     pub fn generate_crop_filter(
-        &self,
         crop_regions: &[(f32, CropRegion)],
         _video_width: u32,
         _video_height: u32,
