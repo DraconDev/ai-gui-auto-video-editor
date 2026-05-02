@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [19.31.8] - 2026-05-01
+
+### Bug Fixes
+- **Nested scroll areas fixed**: Removed inner `ScrollArea` from Activity Log that was trapping wheel scroll events
+- **Keyboard shortcuts blocked by modals**: Added `modal.show` and `modal.delete_confirm_idx` to `skip_shortcuts` guard
+- **Config save debounce**: Reduced debounce from 1s to 500ms for more responsive saves, watcher restart moved outside debounce check
+
+### Cleanup
+- Removed dead `button_tab()` function from theme.rs
+
 ## [19.27.2] - 2026-05-01
 
 ### Bug Fixes
