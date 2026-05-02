@@ -2122,11 +2122,34 @@ impl App {
                 );
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                     if ui.add(button_primary("Process All")).clicked() {
-                        // Queue all enabled folders
+                        let mut added = 0;
                         for folder in &self.state.folders {
                             if folder.enabled {
-                                // Would trigger batch processing
+                                if let Ok(entries) = std::fs::read_dir(&folder.input) {
+                                    for entry in entries.flatten() {
+                                        let path = entry.path();
+                                        if Self::is_video_file(&path) {
+                                            self.state.batch_queue.push(QueuedFile {
+                                                path: path.clone(),
+                                                output_dir: folder.output.clone(),
+                                                preset: folder.preset.clone(),
+                                                settings: folder.settings.clone(),
+                                                status: QueueStatus::Queued,
+                                                progress: 0.0,
+                                                output_path: None,
+                                                completed_at: None,
+                                            });
+                                            added += 1;
+                                        }
+                                    }
+                                }
                             }
+                        }
+                        if added > 0 {
+                            self.state.toasts.push(Toast::new(
+                                format!("Added {} files to queue", added),
+                                ToastKind::Success,
+                            ));
                         }
                     }
                     if ui.add(button_secondary("+ Add Folder")).clicked() {
