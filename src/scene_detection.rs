@@ -8,12 +8,14 @@ use tracing::info;
 pub fn detect_scene_changes(video_path: &Path, threshold: f32) -> Result<Vec<f32>> {
     info!("Detecting scene changes...");
 
+    let threshold = threshold.clamp(0.0, 1.0);
+
     let output = Command::new("ffmpeg")
         .args([
             "-i",
             video_path.to_str().context("invalid video path")?,
             "-vf",
-            &format!("select='gt(scene,{})',showinfo", threshold),
+            &format!("select='gt(scene,{:.3})',showinfo", threshold),
             "-f",
             "null",
             "-",

@@ -1,20 +1,21 @@
 # Project State
 
 ## Current Focus
-Update dependency lockfile to reflect updated crate versions
+Improved scene change detection threshold handling in `scene_detection.rs`
 
 ## Context
-This change was prompted by recent updates to project dependencies, which required the lockfile to be regenerated to ensure consistent builds across environments.
+The change ensures the scene detection threshold is properly clamped between 0.0 and 1.0, and improves the ffmpeg filter command formatting by using a fixed decimal precision (3 digits) for the threshold value.
 
 ## Completed
-- [x] Updated `Cargo.lock` to reflect current dependency versions
+- [x] Added threshold clamping to ensure valid range (0.0-1.0)
+- [x] Improved ffmpeg filter command formatting with fixed decimal precision
 
 ## In Progress
-- [x] No active work in progress related to this change
+- [ ] None (changes are complete)
 
 ## Blockers
-- None
+- None (this is a small, self-contained improvement)
 
 ## Next Steps
-1. Verify build consistency across development environments
-2. Prepare for any potential breaking changes from updated dependencies
+1. Verify the threshold clamping works as expected in integration tests
+2. Consider adding unit tests for the scene detection module
