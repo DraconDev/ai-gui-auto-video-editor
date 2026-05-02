@@ -1,21 +1,20 @@
 # Project State
 
 ## Current Focus
-Improved error handling for JSON output in FFmpeg/ffprobe checks
+Fix potential division-by-zero in aspect ratio calculations by capping crop width at 1.0
 
 ## Context
-The original code would panic if JSON serialization failed during error reporting. This change makes error handling more robust by providing a fallback format when serialization fails.
+The code calculates crop width as `target_aspect / video_aspect`. This could result in values > 1.0 when the target aspect is wider than the video, which might cause unexpected behavior in the cropping logic.
 
 ## Completed
-- [x] Added fallback format for JSON serialization errors in FFmpeg check
-- [x] Added fallback format for JSON serialization errors in ffprobe check
+- [x] Added `.min(1.0)` to ensure crop width never exceeds 1.0
 
 ## In Progress
-- [x] Error handling improvements for CLI output
+- [x] This change is complete
 
 ## Blockers
 - None identified
 
 ## Next Steps
-1. Verify fallback format works as expected in error scenarios
-2. Consider adding similar fallbacks for other JSON serialization points
+1. Verify this change doesn't affect other aspect ratio calculations
+2. Consider adding unit tests for edge cases in aspect ratio handling

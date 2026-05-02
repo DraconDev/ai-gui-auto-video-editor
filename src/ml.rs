@@ -538,7 +538,7 @@ impl CropRegion {
             return Self::center_crop_9_16(video_aspect);
         }
 
-        let crop_width = target_aspect / video_aspect;
+        let crop_width = (target_aspect / video_aspect).min(1.0);
 
         let face_center_x = face.x + face.width / 2.0;
 
