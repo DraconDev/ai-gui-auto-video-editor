@@ -33,16 +33,19 @@ pub(crate) fn spawn_watcher(
     config: Config,
     folders: Vec<FolderState>,
     notify: bool,
-) -> (Receiver<WatcherEvent>, Arc<AtomicBool>) {
+) -> (Receiver<WatcherEvent>, Arc<AtomicBool>, Arc<AtomicBool>) {
     let (tx, rx) = mpsc::channel();
     let stop = Arc::new(AtomicBool::new(false));
     let thread_stop = Arc::clone(&stop);
+    let shutdown_complete = Arc::new(AtomicBool::new(false));
+    let shutdown_complete_thread = Arc::clone(&shutdown_complete);
 
     std::thread::spawn(move || {
         watch_folders_loop(config, folders, tx, thread_stop, notify);
+        shutdown_complete_thread.store(true, Ordering::SeqCst);
     });
 
-    (rx, stop)
+    (rx, stop, shutdown_complete)
 }
 
 fn watch_folders_loop(
