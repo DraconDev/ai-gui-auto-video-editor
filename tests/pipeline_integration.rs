@@ -80,6 +80,12 @@ fn test_audio_enhancement() {
 
     assert!(result.is_ok(), "Audio enhancement should succeed");
     assert!(output_path.exists(), "Output file should exist");
+
+    // Verify output has valid duration and codec
+    let dur = ffprobe_duration(&output_path);
+    assert!(dur.map(|d| d > 0.0).unwrap_or(false), "Output should have positive duration");
+    let codec = ffprobe_codec(&output_path);
+    assert!(codec.is_some(), "Output should have a detectable video codec");
 }
 
 #[test]
