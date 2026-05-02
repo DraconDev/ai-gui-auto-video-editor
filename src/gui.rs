@@ -447,6 +447,7 @@ pub struct AppState {
     setup_remove_silence: bool,
     watcher_rx: Option<Receiver<WatcherEvent>>,
     watcher_stop: Option<Arc<AtomicBool>>,
+    watcher_shutdown_complete: Option<Arc<AtomicBool>>,
     // Toast notifications
     toasts: Vec<Toast>,
     // Batch queue
