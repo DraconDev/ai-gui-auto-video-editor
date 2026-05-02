@@ -530,7 +530,7 @@ impl VideoEditor for FfmpegEditor {
                         }
                     };
 
-                    processor.generate_crop_filter(&crop_regions, w, h, target_resolution)
+                    AutoReframeProcessor::generate_crop_filter(&crop_regions, w, h, target_resolution)
                 }
                 Err(e) => {
                     warn!(error = %e, "Face detection failed, using center crop");

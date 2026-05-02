@@ -1,21 +1,21 @@
 # Project State
 
 ## Current Focus
-Refactored test cases for `generate_crop_filter` to remove redundant `&self` parameter usage.
+Refactored `generate_crop_filter` method to use `AutoReframeProcessor` directly
 
 ## Context
-The `generate_crop_filter` method was refactored to remove the `&self` parameter, making it a static method. This change was part of a broader refactoring effort to simplify the API and improve testability.
+This change removes the dependency on the `processor` instance by making the method static, aligning with recent refactoring of the face detection module
 
 ## Completed
-- [x] Updated test cases to call `generate_crop_filter` as a static method instead of through an instance
-- [x] Maintained all test assertions and functionality while removing the redundant `&self` parameter
+- [x] Made `generate_crop_filter` a static method of `AutoReframeProcessor`
+- [x] Removed redundant `&self` parameter from method signature
 
 ## In Progress
-- [x] Refactoring of the `generate_crop_filter` method itself (not yet complete)
+- [x] No active work in progress
 
 ## Blockers
-- The actual method implementation still needs to be updated to remove the `&self` parameter
+- None identified
 
 ## Next Steps
-1. Update the `generate_crop_filter` method implementation to remove the `&self` parameter
-2. Verify all functionality remains consistent after the change
+1. Verify test coverage for the refactored method
+2. Update any dependent code that might need adjustment for this change
