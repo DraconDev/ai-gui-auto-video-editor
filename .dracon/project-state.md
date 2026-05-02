@@ -1,21 +1,21 @@
 # Project State
 
 ## Current Focus
-Added a helper function to map silence mode variants to human-readable names.
+Refactored silence mode display in folder settings to use a dedicated helper method.
 
 ## Context
-This change improves code organization by centralizing the mapping of `SilenceMode` variants to their display names, making the code more maintainable and consistent with the existing `yes_no` helper.
+The change improves consistency by using `Self::silence_mode_name()` instead of directly calling `display_name()` on the silence mode variant.
 
 ## Completed
-- [x] Added `silence_mode_name` function to convert `SilenceMode` variants to display strings
-- [x] Implemented matching logic for all variants: `Keep`, `Cut`, and `Speedup`
+- [x] Replaced direct `display_name()` call with `Self::silence_mode_name()` for silence mode display
+- [x] Updated fallback value from `unwrap_or_default()` to `unwrap_or("—")` for clearer empty state representation
 
 ## In Progress
-- [ ] None
+- [x] No active work in progress beyond this change
 
 ## Blockers
-- None
+- None identified
 
 ## Next Steps
-1. Verify the new function works correctly with existing UI components
-2. Consider adding similar helpers for other enum types if needed
+1. Verify the new silence mode display matches expected behavior in UI
+2. Consider if similar refactoring should be applied to other settings displays
