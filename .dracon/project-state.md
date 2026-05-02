@@ -1,22 +1,21 @@
 # Project State
 
 ## Current Focus
-Added support for cached transcript handling in batch processing
+Improved error message formatting in batch processing for better readability
 
 ## Context
-The change improves transcription handling by allowing the use of cached transcripts when available, which optimizes performance for batch processing operations.
+The previous error message for multiple folder read failures was too generic. Users needed more specific information about which folders failed, but the message was truncated when there were many errors.
 
 ## Completed
-- [x] Added conditional logic to use cached transcripts when available
-- [x] Added documentation explaining timestamp drift behavior for trimmed videos
-- [x] Added note about frame-accurate export requirements when filler words are disabled
+- [x] Enhanced error message to show individual folder names when there are few errors (≤80 chars)
+- [x] Maintained concise format for many errors (shows count instead of listing all)
 
 ## In Progress
-- [x] Implementation of cached transcript handling
+- [x] Error message formatting is complete
 
 ## Blockers
 - None identified
 
 ## Next Steps
-1. Verify cached transcript timestamp handling works correctly with trimmed videos
-2. Add integration tests for cached transcript functionality
+1. Verify the new error messages provide sufficient information for debugging
+2. Consider adding more context to error messages if needed

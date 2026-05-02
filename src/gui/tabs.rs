@@ -2168,7 +2168,12 @@ impl App {
                             let msg = if errors.len() == 1 {
                                 format!("Failed to read: {}", errors[0])
                             } else {
-                                format!("Failed to read {} folders", errors.len())
+                                let joined = errors.join(", ");
+                                if joined.len() > 80 {
+                                    format!("Failed to read {} folders", errors.len())
+                                } else {
+                                    format!("Failed to read: {}", joined)
+                                }
                             };
                             self.state.add_toast(msg, ToastKind::Error);
                         }
