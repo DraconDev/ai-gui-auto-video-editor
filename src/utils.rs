@@ -112,16 +112,19 @@ pub struct TempFile {
 
 impl TempFile {
     pub fn new(prefix: &str, ext: &str) -> std::io::Result<Self> {
+        use std::sync::atomic::{AtomicU64, Ordering};
         use std::time::{SystemTime, UNIX_EPOCH};
+        static COUNTER: AtomicU64 = AtomicU64::new(0);
         let now = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .unwrap_or_default()
             .as_nanos();
+        let count = COUNTER.fetch_add(1, Ordering::SeqCst);
         let path = std::env::temp_dir().join(format!(
             "{}-{}-{}-{:.0}.{}",
             prefix,
             std::process::id(),
-            std::thread::current().id().as_u64().unwrap_or(0),
+            count,
             now as f64,
             ext
         ));
