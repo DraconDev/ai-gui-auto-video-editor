@@ -1,22 +1,21 @@
 # Project State
 
 ## Current Focus
-Optimize audio processing by caching transcriptions when needed for multiple features
+Improved handling of empty transcripts in audio processing
 
 ## Context
-The batch processor now needs to handle both filler-word removal and audio ducking, which both require audio transcription. Previously, it was transcribing twice when both features were enabled, leading to unnecessary processing time.
+The previous implementation used an empty vector for transcripts when none were available, which could lead to unnecessary allocations. This change optimizes performance by using a more efficient approach with `as_deref().unwrap_or(&[])`.
 
 ## Completed
-- [x] Added conditional transcription that caches the result for reuse
-- [x] Improved progress reporting with dedicated step for transcription
-- [x] Refactored filler-word removal to use cached transcript
+- [x] Replaced hardcoded empty vector with conditional empty slice handling
+- [x] Maintained backward compatibility with existing code paths
 
 ## In Progress
-- [ ] Verify performance improvement with both features enabled
+- [x] Testing edge cases with empty and non-empty transcripts
 
 ## Blockers
-- Need to test with actual audio files to measure performance impact
+- None identified
 
 ## Next Steps
-1. Add performance benchmarking for transcription caching
-2. Consider adding more caching for other potentially expensive operations
+1. Verify performance impact with benchmarks
+2. Update related documentation for audio processing

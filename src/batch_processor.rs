@@ -380,13 +380,12 @@ where
         report_progress(&mut progress, 0.84, "Mixing background music");
         info!(music = ?music_path, "Mixing background music");
 
-        let empty_transcript = vec![];
         editor
             .mix_with_music(
                 &enhanced_file,
                 music_path,
                 &with_music,
-                &empty_transcript,
+                transcript.as_deref().unwrap_or(&[]),
                 config.audio.duck_volume,
             )
             .context("Failed to mix music")?;
