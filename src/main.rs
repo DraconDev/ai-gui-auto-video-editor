@@ -293,12 +293,8 @@ fn init_logging(verbose: u8, quiet: bool) {
     tracing_subscriber::fmt()
         .with_env_filter(
             tracing_subscriber::EnvFilter::new(filter)
-                .add_directive(
-                    "candle=warn"
-                        .parse()
-                        .expect("invalid directive candle=warn"),
-                )
-                .add_directive("tract=warn".parse().expect("invalid directive tract=warn")),
+                .add_directive("candle=warn".parse().expect("hardcoded directive should always parse"))
+                .add_directive("tract=warn".parse().expect("hardcoded directive should always parse")),
         )
         .with_target(false)
         .with_file(verbose >= 2)
