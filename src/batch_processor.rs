@@ -130,7 +130,7 @@ fn concatenate_videos(
         .map(|p| {
             let path_str = p.to_string_lossy();
             let escaped = path_str.replace("'", "'\\''");
-            format!("file '{}\n", escaped)
+            format!("file '{}'\n", escaped)
         })
         .collect();
     let list_file = TempFile::new("ai-vid-editor-concat-list", "txt")?;
