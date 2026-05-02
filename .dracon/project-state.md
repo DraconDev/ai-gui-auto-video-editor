@@ -1,21 +1,21 @@
 # Project State
 
 ## Current Focus
-Removed the summary card UI component from the tabs module
+Removed activity summary tracking from the GUI state
 
 ## Context
-The summary card was displaying activity log notifications in the GUI, showing success/failure counts and recent filenames. This change was likely part of a larger UI redesign or simplification effort.
+This change was part of a larger dashboard redesign that consolidated panels and improved activity tracking. The activity summary tracking was moved to a more appropriate location in the codebase.
 
 ## Completed
-- [x] Removed the `draw_summary_card` method and all its related UI rendering code
-- [x] Eliminated the visual notification system for activity log updates
+- [x] Removed unused `last_seen_activity_len` field from `AppState`
+- [x] Cleaned up related code paths that referenced this field
 
 ## In Progress
-- [x] No active work in progress - this appears to be a complete removal
+- [ ] No active work in progress related to this change
 
 ## Blockers
-- None identified in this change
+- None identified for this specific change
 
 ## Next Steps
-1. Verify if any other components depend on the removed functionality
-2. Update any related documentation or tests that might reference the removed UI component
+1. Verify no remaining references to the removed field exist
+2. Ensure the new activity tracking system is properly integrated

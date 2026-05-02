@@ -455,8 +455,6 @@ pub struct AppState {
     queue_processing: bool,
     queue_rx: Option<Receiver<QueueEvent>>,
     queue_stop: Option<Arc<AtomicBool>>,
-    // Activity summary tracking
-    last_seen_activity_len: usize,
     // Settings sidebar navigation
     settings_category: SettingsCategory,
     // Debounced config save
