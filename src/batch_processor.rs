@@ -97,7 +97,8 @@ impl DurationGetter for FfmpegDurationGetter {
     }
 }
 
-/// Concatenate intro/outro videos using ffmpeg
+/// Concatenate intro/outro videos using ffmpeg concat demuxer
+/// Uses a list file instead of filter_complex to avoid filter injection risks
 fn concatenate_videos(
     intro: Option<&Path>,
     main: &Path,
@@ -108,58 +109,39 @@ fn concatenate_videos(
     let has_outro = outro.is_some();
 
     if !has_intro && !has_outro {
-        // No intro/outro, just copy
         fs::copy(main, output)?;
         return Ok(());
     }
 
-    // Build ffmpeg concat filter
-    let mut args: Vec<String> = vec![];
-    let mut concat_inputs = String::new();
-    let mut input_idx = 0;
-
-    if let Some(intro_path) = intro {
-        args.push("-i".to_string());
-        args.push(
-            intro_path
-                .to_str()
-                .context("invalid intro path")?
-                .to_string(),
-        );
-        concat_inputs.push_str(&format!("[{}:v][{}:a]", input_idx, input_idx));
-        input_idx += 1;
+    // Collect video paths in order
+    let mut video_paths: Vec<&Path> = Vec::new();
+    if let Some(p) = intro {
+        video_paths.push(p);
+    }
+    video_paths.push(main);
+    if let Some(p) = outro {
+        video_paths.push(p);
     }
 
-    args.push("-i".to_string());
-    args.push(main.to_str().context("invalid main path")?.to_string());
-    concat_inputs.push_str(&format!("[{}:v][{}:a]", input_idx, input_idx));
-    input_idx += 1;
-
-    if let Some(outro_path) = outro {
-        args.push("-i".to_string());
-        args.push(
-            outro_path
-                .to_str()
-                .context("invalid outro path")?
-                .to_string(),
-        );
-        concat_inputs.push_str(&format!("[{}:v][{}:a]", input_idx, input_idx));
-    }
-
-    let n = input_idx;
-    let filter = format!("{}concat=n={}:v=1:a=1[outv][outa]", concat_inputs, n);
-
-    args.push("-filter_complex".to_string());
-    args.push(filter);
-    args.push("-map".to_string());
-    args.push("[outv]".to_string());
-    args.push("-map".to_string());
-    args.push("[outa]".to_string());
-    args.push("-y".to_string());
-    args.push(output.to_str().context("invalid output path")?.to_string());
+    // Build concat demuxer list file
+    let list_content: String = video_paths
+        .iter()
+        .map(|p| format!("file '{}'\n", p.display()))
+        .collect();
+    let list_file = utils::TempFile::new("ai-vid-editor-concat-list", "txt")?;
+    std::fs::write(list_file.path(), list_content)?;
 
     let status = std::process::Command::new("ffmpeg")
-        .args(&args)
+        .args([
+            "-f",
+            "concat",
+            "-safe",
+            "0",
+            "-i",
+        ])
+        .arg(list_file.path())
+        .args(["-c", "copy", "-y"])
+        .arg(output)
         .status()
         .context("failed to execute ffmpeg for concat")?;
 
