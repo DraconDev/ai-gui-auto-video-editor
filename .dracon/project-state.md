@@ -1,21 +1,21 @@
 # Project State
 
 ## Current Focus
-Refactored `yes_no` helper method to be called via `Self` for consistency in the tabs module.
+Added a helper function to map silence mode variants to human-readable names.
 
 ## Context
-The change improves code consistency by ensuring the `yes_no` helper is called consistently through the `App` struct rather than as a standalone function.
+This change improves code organization by centralizing the mapping of `SilenceMode` variants to their display names, making the code more maintainable and consistent with the existing `yes_no` helper.
 
 ## Completed
-- [x] Changed `yes_no(folder.settings.stabilize)` to `Self::yes_no(folder.settings.stabilize)`
-- [x] Applied same change to `color_correct` and `reframe` settings for uniformity
+- [x] Added `silence_mode_name` function to convert `SilenceMode` variants to display strings
+- [x] Implemented matching logic for all variants: `Keep`, `Cut`, and `Speedup`
 
 ## In Progress
-- [x] Verified no functional changes were introduced
+- [ ] None
 
 ## Blockers
-- None identified
+- None
 
 ## Next Steps
-1. Review other similar calls in the module for consistency
-2. Ensure no other refactoring opportunities exist in the tabs module
+1. Verify the new function works correctly with existing UI components
+2. Consider adding similar helpers for other enum types if needed

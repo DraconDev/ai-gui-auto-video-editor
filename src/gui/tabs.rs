@@ -2352,6 +2352,14 @@ impl App {
         });
     }
 
+    fn silence_mode_name(mode: SilenceMode) -> &'static str {
+        match mode {
+            SilenceMode::Keep => "Keep All",
+            SilenceMode::Cut => "Cut",
+            SilenceMode::Speedup => "Speed Up",
+        }
+    }
+
     fn yes_no(val: Option<bool>) -> &'static str {
         match val {
             Some(true) => "On",
