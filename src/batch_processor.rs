@@ -544,7 +544,7 @@ where
     guard.untrack(&output_file); // Don't delete the final output
 
     report_progress(&mut progress, 0.99, "Writing exports");
-    export_additional_files(&input_file, &output_file, &processed_segments, config)?;
+    export_additional_files(&input_file, &output_file, &processed_segments, config, transcript.as_deref())?;
 
     report_progress(&mut progress, 1.0, "Done");
     info!(file = ?output_file, "Successfully saved video");
