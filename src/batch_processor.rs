@@ -651,6 +651,12 @@ fn export_additional_files(
     let base_path = output_file.with_extension("");
 
     // Use cached transcript if available, otherwise transcribe the output file
+    // NOTE: Cached transcript timestamps come from the ORIGINAL input file.
+    // When video is trimmed (silences removed), output timestamps will differ
+    // from input timestamps by small amounts (typically <1s per cut, equal to
+    // silence padding). For automator use cases this drift is acceptable.
+    // If frame-accurate exports are needed, disable filler_words so exports
+    // always transcribe the output file directly.
     let transcript: Option<Vec<TranscriptSegment>> = if config.export.subtitles
         || config.export.chapters
         || config.export.captions

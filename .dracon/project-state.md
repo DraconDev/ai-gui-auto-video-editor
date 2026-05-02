@@ -1,20 +1,22 @@
 # Project State
 
 ## Current Focus
-Update dependency lockfile to reflect updated crate versions
+Added support for cached transcript handling in batch processing
 
 ## Context
-This change was prompted by recent updates to project dependencies, ensuring the lockfile accurately reflects the current versions of all crates used in the project.
+The change improves transcription handling by allowing the use of cached transcripts when available, which optimizes performance for batch processing operations.
 
 ## Completed
-- [x] Updated Cargo.lock to synchronize with the latest dependency versions
+- [x] Added conditional logic to use cached transcripts when available
+- [x] Added documentation explaining timestamp drift behavior for trimmed videos
+- [x] Added note about frame-accurate export requirements when filler words are disabled
 
 ## In Progress
-- [x] No active work in progress related to this change
+- [x] Implementation of cached transcript handling
 
 ## Blockers
-- None
+- None identified
 
 ## Next Steps
-1. Verify that all dependencies are properly resolved and compatible
-2. Continue with other development tasks that may require updated dependencies
+1. Verify cached transcript timestamp handling works correctly with trimmed videos
+2. Add integration tests for cached transcript functionality
