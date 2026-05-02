@@ -520,7 +520,6 @@ impl AppState {
             queue_processing: false,
             queue_rx: None,
             queue_stop: None,
-            last_seen_activity_len: 0,
             settings_category: SettingsCategory::default(),
             last_save_time: None,
             recent_outputs: Vec::new(),
