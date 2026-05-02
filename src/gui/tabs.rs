@@ -2318,41 +2318,37 @@ impl App {
                     self.state.activity_log.iter().rev().take(50).collect()
                 };
 
-                egui::ScrollArea::vertical()
-                    .max_height(if full_height { 800.0 } else { 200.0 })
-                    .show(ui, |ui| {
-                        for entry in entries {
-                            ui.add_space(4.0);
-                            match entry.status {
-                                EntryStatus::Success => {
-                                    log_entry_success(
-                                        ui,
-                                        &entry.timestamp,
-                                        &entry.filename,
-                                        &format_file_size(entry.file_size),
-                                        &format_duration(entry.duration.unwrap_or(0)),
-                                    );
-                                }
-                                EntryStatus::Processing => {
-                                    log_entry_processing(
-                                        ui,
-                                        &entry.timestamp,
-                                        &entry.filename,
-                                        &entry.message,
-                                        entry.progress.unwrap_or(0.0),
-                                    );
-                                }
-                                EntryStatus::Error => {
-                                    log_entry_error(
-                                        ui,
-                                        &entry.timestamp,
-                                        &entry.filename,
-                                        &entry.message,
-                                    );
-                                }
-                            }
+                for entry in entries {
+                    ui.add_space(4.0);
+                    match entry.status {
+                        EntryStatus::Success => {
+                            log_entry_success(
+                                ui,
+                                &entry.timestamp,
+                                &entry.filename,
+                                &format_file_size(entry.file_size),
+                                &format_duration(entry.duration.unwrap_or(0)),
+                            );
                         }
-                    });
+                        EntryStatus::Processing => {
+                            log_entry_processing(
+                                ui,
+                                &entry.timestamp,
+                                &entry.filename,
+                                &entry.message,
+                                entry.progress.unwrap_or(0.0),
+                            );
+                        }
+                        EntryStatus::Error => {
+                            log_entry_error(
+                                ui,
+                                &entry.timestamp,
+                                &entry.filename,
+                                &entry.message,
+                            );
+                        }
+                    }
+                }
             }
         });
     }
