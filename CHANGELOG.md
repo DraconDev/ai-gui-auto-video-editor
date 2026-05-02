@@ -7,7 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [19.31.8] - 2026-05-01
+## [19.32.0] - 2026-05-01
+
+### UX Improvements
+- **Dashboard redesign**: "All" tab now shows a proper dashboard with stats row (folders, queue, processing count), recent activity (last 6 items), quick actions, watch folders summary, and settings overview instead of stacking 4 full panels
 
 ### Bug Fixes
 - **Nested scroll areas fixed**: Removed inner `ScrollArea` from Activity Log that was trapping wheel scroll events
@@ -17,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Cleanup
 - Removed dead `button_tab()` function from theme.rs
 
-## [19.27.2] - 2026-05-01
+## [19.31.8] - 2026-05-01
 
 ### Bug Fixes
 - **Sidebar layout fix**: Used `SidePanel::left()` instead of manual `Frame::show()` to properly fill available height, fixing thin sidebar with content only appearing beside it
