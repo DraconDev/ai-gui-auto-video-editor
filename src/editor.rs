@@ -1455,4 +1455,46 @@ mod tests {
             "First and second segments must not overlap"
         );
     }
+
+    #[test]
+    fn test_stabilize() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let input = temp_dir.path().join("input.mp4");
+        let output = temp_dir.path().join("stabilized.mp4");
+        create_test_video(&input, 3.0).expect("ffmpeg not found");
+
+        let editor = FfmpegEditor::default();
+        let result = editor.stabilize(&input, &output);
+
+        assert!(result.is_ok(), "Stabilization should succeed");
+        assert!(output.exists(), "Stabilized output should exist");
+    }
+
+    #[test]
+    fn test_reframe() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let input = temp_dir.path().join("input.mp4");
+        let output = temp_dir.path().join("reframed.mp4");
+        create_test_video(&input, 3.0).expect("ffmpeg not found");
+
+        let editor = FfmpegEditor::default();
+        let result = editor.reframe(&input, &output, crate::config::VideoResolution::Vertical1080p);
+
+        assert!(result.is_ok(), "Reframe should succeed");
+        assert!(output.exists(), "Reframed output should exist");
+    }
+
+    #[test]
+    fn test_blur_background() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let input = temp_dir.path().join("input.mp4");
+        let output = temp_dir.path().join("blurred.mp4");
+        create_test_video(&input, 3.0).expect("ffmpeg not found");
+
+        let editor = FfmpegEditor::default();
+        let result = editor.blur_background(&input, &output);
+
+        assert!(result.is_ok(), "Blur background should succeed");
+        assert!(output.exists(), "Blurred output should exist");
+    }
 }
