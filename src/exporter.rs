@@ -130,6 +130,11 @@ fn seconds_to_timecode(seconds: f32, fps: f32) -> (u32, u32, u32, u32) {
 }
 
 pub fn export_srt(transcript: &[TranscriptSegment], output_path: &Path) -> Result<()> {
+    if transcript.is_empty() {
+        fs::write(output_path, "").context("failed to write empty SRT file")?;
+        return Ok(());
+    }
+
     let mut srt = String::new();
     for (i, seg) in transcript.iter().enumerate() {
         srt.push_str(&format!("{}\n", i + 1));
