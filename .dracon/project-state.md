@@ -1,20 +1,21 @@
 # Project State
 
 ## Current Focus
-Removed `&self` parameter from `generate_crop_filter` method signature.
+Refactored `smooth_crop_regions` function call to remove redundant `Self::` prefix
 
 ## Context
-This change was made to simplify the method signature by removing an unused reference parameter, making the API cleaner and more straightforward.
+The change eliminates unnecessary `Self::` prefix when calling the `smooth_crop_regions` function, which was previously called as a method of the `AutoReframeProcessor` struct.
 
 ## Completed
-- [x] Removed unused `&self` parameter from `generate_crop_filter` method
+- [x] Removed redundant `Self::` prefix in function call
+- [x] Maintained identical functionality
 
 ## In Progress
-- [x] No active work in progress related to this change
+- [ ] None
 
 ## Blockers
 - None
 
 ## Next Steps
-1. Verify no functionality was affected by this change
-2. Update any documentation that referenced the old method signature
+1. Verify no runtime behavior changes occurred
+2. Check for any other similar redundant `Self::` calls in the module
