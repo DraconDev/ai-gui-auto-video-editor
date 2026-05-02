@@ -1,23 +1,22 @@
 # Project State
 
 ## Current Focus
-Refactored transcription handling to support broader use cases while maintaining fallback behavior
+Optimize transcription handling by adding support for cached transcripts
 
 ## Context
-The batch processor was previously specialized for filler-word removal, but now needs to support transcription for other features like audio ducking. The change makes the transcription logic more reusable while maintaining the same fallback behavior when transcription fails.
+The code was refactored to improve performance by avoiding redundant transcriptions when possible. This change was prompted by the need to optimize audio processing workflows where transcriptions are frequently reused across multiple operations.
 
 ## Completed
-- [x] Renamed `maybe_transcribe_for_filler_words` to `maybe_transcribe` to reflect broader usage
-- [x] Simplified function signature by removing unused `config` parameter
-- [x] Updated logging messages to be more generic
-- [x] Maintained identical fallback behavior when transcription fails
+- [x] Added support for cached transcripts to avoid redundant transcription calls
+- [x] Improved error handling for transcription failures
+- [x] Maintained backward compatibility with existing transcription workflows
 
 ## In Progress
-- [x] No active work in progress
+- [x] Implementation of cached transcript handling
 
 ## Blockers
 - None identified
 
 ## Next Steps
-1. Verify that audio ducking functionality works correctly with the new transcription handler
-2. Consider adding more detailed error reporting for transcription failures
+1. Verify performance improvements with cached transcripts
+2. Add comprehensive test coverage for the new caching mechanism

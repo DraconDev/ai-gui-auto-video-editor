@@ -641,23 +641,29 @@ fn export_additional_files(
     output_file: &Path,
     segments: &[ProcessedSegment],
     config: &Config,
+    cached_transcript: Option<&[TranscriptSegment]>,
 ) -> Result<()> {
     let base_path = output_file.with_extension("");
 
-    // Run transcription if we need transcript for any export
-    let transcript = if config.export.subtitles
+    // Use cached transcript if available, otherwise transcribe the output file
+    let transcript: Option<Vec<TranscriptSegment>> = if config.export.subtitles
         || config.export.chapters
         || config.export.captions
         || config.export.clips
     {
-        match CandleSttAnalyzer.transcribe(output_file) {
-            Ok(t) => {
-                info!(segments = t.len(), "Transcription complete");
-                Some(t)
-            }
-            Err(e) => {
-                warn!(error = %e, "Transcription failed");
-                None
+        if let Some(t) = cached_transcript {
+            info!(segments = t.len(), "Using cached transcript for exports");
+            Some(t.to_vec())
+        } else {
+            match CandleSttAnalyzer.transcribe(output_file) {
+                Ok(t) => {
+                    info!(segments = t.len(), "Transcription complete");
+                    Some(t)
+                }
+                Err(e) => {
+                    warn!(error = %e, "Transcription failed");
+                    None
+                }
             }
         }
     } else {
