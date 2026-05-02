@@ -1,20 +1,23 @@
 # Project State
 
 ## Current Focus
-Update dependency lockfile to reflect updated crate versions
+Refactored transcription handling to support broader use cases while maintaining fallback behavior
 
 ## Context
-This change was prompted by recent updates to project dependencies, which required the lockfile to be regenerated to ensure consistent builds across environments.
+The batch processor was previously specialized for filler-word removal, but now needs to support transcription for other features like audio ducking. The change makes the transcription logic more reusable while maintaining the same fallback behavior when transcription fails.
 
 ## Completed
-- [x] Updated Cargo.lock to reflect current dependency versions
+- [x] Renamed `maybe_transcribe_for_filler_words` to `maybe_transcribe` to reflect broader usage
+- [x] Simplified function signature by removing unused `config` parameter
+- [x] Updated logging messages to be more generic
+- [x] Maintained identical fallback behavior when transcription fails
 
 ## In Progress
-- [x] No active work in progress beyond the lockfile update
+- [x] No active work in progress
 
 ## Blockers
 - None identified
 
 ## Next Steps
-1. Verify that all dependencies are properly resolved
-2. Ensure the updated lockfile doesn't introduce any compatibility issues
+1. Verify that audio ducking functionality works correctly with the new transcription handler
+2. Consider adding more detailed error reporting for transcription failures

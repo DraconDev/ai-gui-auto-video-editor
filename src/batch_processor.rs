@@ -270,7 +270,7 @@ where
     // Fetch transcript if needed for filler-word removal or audio ducking
     let transcript = if config.filler_words.enabled || config.audio.music_file.is_some() {
         report_progress(&mut progress, 0.1, "Transcribing audio");
-        maybe_transcribe_for_filler_words(&input_file, config)
+        maybe_transcribe(&input_file, config)
     } else {
         None
     };
@@ -551,26 +551,22 @@ where
     Ok(())
 }
 
-/// Transcribe the input file for filler-word removal planning.
-/// Returns `Some(transcript)` if filler_words removal is enabled, `None` otherwise.
-fn maybe_transcribe_for_filler_words(
+/// Transcribe the input file if transcription is needed for processing.
+/// Returns `Some(transcript)` on success, `None` on failure or if not needed.
+fn maybe_transcribe(
     input_file: &Path,
-    config: &Config,
+    _config: &Config,
 ) -> Option<Vec<TranscriptSegment>> {
-    if !config.filler_words.enabled {
-        return None;
-    }
-
     match CandleSttAnalyzer.transcribe(input_file) {
         Ok(t) => {
             info!(
                 segments = t.len(),
-                "Transcription for filler-word removal complete"
+                "Transcription complete"
             );
             Some(t)
         }
         Err(e) => {
-            warn!(error = %e, "Transcription for filler-word removal failed, falling back to silence-based processing");
+            warn!(error = %e, "Transcription failed");
             None
         }
     }
