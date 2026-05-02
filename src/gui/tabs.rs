@@ -3,6 +3,7 @@ use egui::RichText;
 use rfd::FileDialog;
 use std::path::PathBuf;
 use std::sync::mpsc;
+use tracing::warn;
 
 use super::theme::*;
 use super::{
