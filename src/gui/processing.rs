@@ -333,7 +333,8 @@ fn queue_worker_loop(
             enabled: true,
             settings: file.settings.clone(),
         };
-        let file_config = build_folder_config(&config, &folder_state);
+        let file_config =
+            config.with_folder_settings(&folder_state.preset, &folder_state.settings);
 
         let analyzer = FfmpegAnalyzer;
         let editor = FfmpegEditor::new(file_config.video.hw_accel);
