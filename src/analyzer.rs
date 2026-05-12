@@ -127,7 +127,7 @@ mod tests {
 [silencedetect @ 0x559e1c2c4840] silence_start: 10.0
 [silencedetect @ 0x559e1c2c4840] silence_end: 12.5 | silence_duration: 2.5"#;
 
-        let segments = parse_ffmpeg_silence(output);
+        let segments = parse_ffmpeg_silence(output, 20.0);
         assert_eq!(segments.len(), 2);
         assert_eq!(
             segments[0],
@@ -153,7 +153,7 @@ mod tests {
 [silencedetect] silence_start: 10.0
 [silencedetect] silence_end: 9.0 | silence_duration: -1.0"#;
 
-        let segments = parse_ffmpeg_silence(output);
+        let segments = parse_ffmpeg_silence(output, 20.0);
         assert_eq!(segments.len(), 0);
     }
 
@@ -162,17 +162,18 @@ mod tests {
         // silence_end without matching silence_start should be ignored
         let output = r#"[silencedetect] silence_end: 4.0 | silence_duration: 3.0"#;
 
-        let segments = parse_ffmpeg_silence(output);
+        let segments = parse_ffmpeg_silence(output, 20.0);
         assert_eq!(segments.len(), 0);
     }
 
     #[test]
     fn test_parse_silence_unmatched_start() {
-        // silence_start without matching silence_end should be ignored
+        // silence_start without matching silence_end should be extended to EOF
         let output = r#"[silencedetect] silence_start: 1.0"#;
 
-        let segments = parse_ffmpeg_silence(output);
-        assert_eq!(segments.len(), 0);
+        let segments = parse_ffmpeg_silence(output, 10.0);
+        assert_eq!(segments.len(), 1);
+        assert_eq!(segments[0], Segment { start: 1.0, end: 10.0 });
     }
 
     #[test]
@@ -186,7 +187,7 @@ more noise
 [silencedetect] silence_start: 10.0
 [silencedetect] silence_end: 12.0"#;
 
-        let segments = parse_ffmpeg_silence(output);
+        let segments = parse_ffmpeg_silence(output, 20.0);
         assert_eq!(segments.len(), 2);
         assert_eq!(
             segments[0],
@@ -206,7 +207,7 @@ more noise
 
     #[test]
     fn test_parse_silence_empty_output() {
-        let segments = parse_ffmpeg_silence("");
+        let segments = parse_ffmpeg_silence("", 10.0);
         assert_eq!(segments.len(), 0);
     }
 
@@ -216,7 +217,7 @@ more noise
         let output = r#"[silencedetect] silence_start: 5.0
 [silencedetect] silence_end: 8.0 | silence_duration: 3.0 | extra: stuff"#;
 
-        let segments = parse_ffmpeg_silence(output);
+        let segments = parse_ffmpeg_silence(output, 20.0);
         assert_eq!(segments.len(), 1);
         assert_eq!(
             segments[0],
