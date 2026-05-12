@@ -32,6 +32,9 @@ impl VideoAnalyzer for FfmpegAnalyzer {
         threshold_db: f32,
         duration_s: f32,
     ) -> Result<Vec<Segment>> {
+        // Get video duration first to handle unclosed silence segments at EOF
+        let duration = get_video_duration(path).unwrap_or(f32::MAX);
+
         let output = std::process::Command::new("ffmpeg")
             .args([
                 "-i",
@@ -46,11 +49,30 @@ impl VideoAnalyzer for FfmpegAnalyzer {
             .context("failed to execute ffmpeg")?;
 
         let stderr = String::from_utf8_lossy(&output.stderr);
-        Ok(parse_ffmpeg_silence(&stderr))
+        Ok(parse_ffmpeg_silence(&stderr, duration))
     }
 }
 
-fn parse_ffmpeg_silence(output: &str) -> Vec<Segment> {
+/// Get video duration via ffprobe.
+fn get_video_duration(path: &Path) -> Result<f32> {
+    let output = std::process::Command::new("ffprobe")
+        .args([
+            "-v",
+            "error",
+            "-show_entries",
+            "format=duration",
+            "-of",
+            "default=noprint_wrappers=1:nokey=1",
+            path.to_str().context("invalid path")?,
+        ])
+        .output()
+        .context("failed to execute ffprobe")?;
+
+    let val_str = String::from_utf8_lossy(&output.stdout).trim().to_string();
+    val_str.parse::<f32>().context("failed to parse duration")
+}
+
+fn parse_ffmpeg_silence(output: &str, video_duration: f32) -> Vec<Segment> {
     let mut segments = Vec::new();
     let mut current_start: Option<f32> = None;
 
@@ -80,6 +102,17 @@ fn parse_ffmpeg_silence(output: &str) -> Vec<Segment> {
             }
         }
     }
+
+    // Handle unclosed silence segment at EOF
+    if let Some(start) = current_start {
+        if video_duration > start {
+            segments.push(Segment {
+                start,
+                end: video_duration,
+            });
+        }
+    }
+
     segments
 }
 
