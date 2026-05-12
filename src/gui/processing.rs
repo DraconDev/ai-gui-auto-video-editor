@@ -178,7 +178,8 @@ fn watch_folders_loop(
                 }
 
                 let started = Instant::now();
-                let folder_config = build_folder_config(&config, folder);
+                let folder_config =
+                    config.with_folder_settings(&folder.preset, &folder.settings);
                 let result = process_single_file_with_intro_outro_progress(
                     path.clone(),
                     output_path,

@@ -1059,6 +1059,159 @@ impl Config {
         self
     }
 
+    /// Build a config for a specific watch folder by applying its preset and
+    /// folder-level settings overrides on top of the base config.
+    pub fn with_folder_settings(&self, preset_name: &str, settings: &FolderSettings) -> Config {
+        let mut merged = if let Some(preset) = Preset::parse_name(preset_name) {
+            self.clone().merge(preset.to_config())
+        } else {
+            self.clone()
+        };
+
+        // Silence settings
+        if let Some(silence_mode) = settings.silence_mode {
+            merged.silence.mode = silence_mode;
+        } else if let Some(legacy_remove) = settings.remove_silence {
+            merged.silence.mode = if legacy_remove {
+                SilenceMode::Cut
+            } else {
+                SilenceMode::Keep
+            };
+        }
+        if let Some(threshold) = settings.silence_threshold_db {
+            merged.silence.threshold_db = threshold;
+        }
+        if let Some(min_duration) = settings.silence_min_duration {
+            merged.silence.min_duration = min_duration;
+        }
+        if let Some(padding) = settings.silence_padding {
+            merged.silence.padding = padding;
+        }
+        if let Some(speedup_factor) = settings.silence_speedup_factor {
+            merged.silence.speedup_factor = speedup_factor;
+        }
+        if let Some(min_silence_for_speedup) = settings.silence_min_silence_for_speedup {
+            merged.silence.min_silence_for_speedup = min_silence_for_speedup;
+        }
+        if let Some(scene_threshold) = settings.silence_scene_threshold {
+            merged.silence.scene_threshold = scene_threshold;
+        }
+        if let Some(scene_detect) = settings.scene_detect {
+            merged.silence.scene_detect = scene_detect;
+        }
+
+        // Audio settings
+        if let Some(enhance_audio) = settings.enhance_audio {
+            merged.audio.enhance = enhance_audio;
+        }
+        if let Some(target_lufs) = settings.target_lufs {
+            merged.audio.target_lufs = target_lufs;
+        }
+        if let Some(noise_reduction) = settings.noise_reduction {
+            merged.audio.noise_reduction = noise_reduction;
+        }
+        if let Some(music_path) = settings.music_path.clone() {
+            merged.paths.music = Some(music_path);
+        }
+        if let Some(duck_volume) = settings.duck_volume {
+            merged.audio.duck_volume = duck_volume;
+        }
+        if let Some(filler_words) = settings.filler_words {
+            merged.filler_words.enabled = filler_words;
+        }
+
+        // Video settings
+        if let Some(stabilize) = settings.stabilize {
+            merged.video.stabilize = stabilize;
+        }
+        if let Some(color_correct) = settings.color_correct {
+            merged.video.color_correct = color_correct;
+        }
+        if let Some(reframe) = settings.reframe {
+            merged.video.reframe = reframe;
+        }
+        if let Some(blur_background) = settings.blur_background {
+            merged.video.blur_background = blur_background;
+        }
+        if let Some(hw_accel) = settings.hw_accel {
+            merged.video.hw_accel = hw_accel;
+        }
+        if let Some(target_resolution) = settings.target_resolution {
+            merged.video.target_resolution = target_resolution;
+        }
+        if let Some(watermark_path) = settings.watermark_path.clone() {
+            merged.video.watermark = Some(watermark_path);
+        }
+        if let Some(watermark_position) = settings.watermark_position.clone() {
+            merged.video.watermark_position = watermark_position;
+        }
+        if let Some(watermark_scale) = settings.watermark_scale {
+            merged.video.watermark_scale = watermark_scale;
+        }
+
+        // Path settings
+        if let Some(intro_path) = settings.intro_path.clone() {
+            merged.paths.intro = Some(intro_path);
+        }
+        if let Some(outro_path) = settings.outro_path.clone() {
+            merged.paths.outro = Some(outro_path);
+        }
+
+        // Export settings
+        if let Some(preview) = settings.preview {
+            merged.export.preview = preview;
+        }
+        if let Some(multi_format) = settings.multi_format {
+            merged.export.multi_format = multi_format;
+        }
+        if let Some(subtitles) = settings.subtitles {
+            merged.export.subtitles = subtitles;
+        }
+        if let Some(chapters) = settings.chapters {
+            merged.export.chapters = chapters;
+        }
+        if let Some(captions) = settings.captions {
+            merged.export.captions = captions;
+        }
+        if let Some(clips) = settings.clips {
+            merged.export.clips = clips;
+        }
+        if let Some(clip_count) = settings.clip_count {
+            merged.export.clip_count = clip_count;
+        }
+        if let Some(clip_min_duration) = settings.clip_min_duration {
+            merged.export.clip_min_duration = clip_min_duration;
+        }
+        if let Some(clip_max_duration) = settings.clip_max_duration {
+            merged.export.clip_max_duration = clip_max_duration;
+        }
+        if let Some(fcpxml) = settings.fcpxml {
+            merged.export.fcpxml = fcpxml;
+        }
+        if let Some(edl) = settings.edl {
+            merged.export.edl = edl;
+        }
+        if let Some(thumbnail) = settings.thumbnail {
+            merged.export.thumbnail = thumbnail;
+        }
+        if let Some(extra_resolutions) = settings.extra_resolutions.clone() {
+            merged.export.extra_resolutions = extra_resolutions;
+        }
+
+        // Processing settings
+        if let Some(join_mode) = settings.join_mode {
+            merged.processing.join_mode = join_mode;
+        }
+        if let Some(join_after_count) = settings.join_after_count {
+            merged.processing.join_after_count = join_after_count;
+        }
+        if let Some(join_output_pattern) = settings.join_output_pattern.clone() {
+            merged.processing.join_output_pattern = join_output_pattern;
+        }
+
+        merged
+    }
+
     /// Validate config values are within sensible bounds.
     /// Returns Ok(()) if valid, or an error describing the first invalid value.
     pub fn validate(&self) -> Result<()> {
