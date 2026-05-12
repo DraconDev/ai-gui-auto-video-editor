@@ -546,15 +546,19 @@ pub fn settings_value_badge(ui: &mut egui::Ui, value: &str) {
 }
 
 pub fn truncate_path(path: &str, max_len: usize) -> String {
-    if path.len() <= max_len {
+    let char_count = path.chars().count();
+    if char_count <= max_len {
         path.to_string()
     } else if max_len < 7 {
         // Too short to show anything meaningful, just truncate
         path.chars().take(max_len).collect()
     } else {
-        let start = &path[..max_len / 2 - 2];
-        let end = &path[path.len() - max_len / 2 + 2..];
-        format!("{}...{}", start, end)
+        let prefix_len = max_len / 2 - 2;
+        let suffix_len = max_len / 2 - 2;
+        let prefix: String = path.chars().take(prefix_len).collect();
+        let skip = char_count.saturating_sub(suffix_len);
+        let suffix: String = path.chars().skip(skip).collect();
+        format!("{}...{}", prefix, suffix)
     }
 }
 
@@ -712,7 +716,7 @@ mod tests {
         let path =
             "/very/long/path/that/needs/truncating/especially/when/it/is/really/very/long/file.txt";
         let result = truncate_path(path, 20);
-        assert!(result.len() <= 20);
+        assert!(result.chars().count() <= 20);
         assert!(result.contains("..."));
     }
 
@@ -720,7 +724,7 @@ mod tests {
     fn test_truncate_path_very_short() {
         let path = "/foo/bar.txt";
         let result = truncate_path(path, 3);
-        assert!(result.len() <= 3);
+        assert!(result.chars().count() <= 3);
     }
 
     #[test]

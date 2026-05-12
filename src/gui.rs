@@ -653,9 +653,27 @@ impl AppState {
 
     fn duplicate_folder(&mut self, index: usize) {
         if let Some(original) = self.folders.get(index).cloned() {
+            let mut new_input = original.input.clone();
+            if let Some(name) = original.input.file_name() {
+                let mut new_name = name.to_os_string();
+                new_name.push("_copy");
+                new_input.set_file_name(new_name);
+            } else {
+                new_input.push("_copy");
+            }
+
+            let mut new_output = original.output.clone();
+            if let Some(name) = original.output.file_name() {
+                let mut new_name = name.to_os_string();
+                new_name.push("_copy");
+                new_output.set_file_name(new_name);
+            } else {
+                new_output.push("_copy");
+            }
+
             let new_folder = FolderState {
-                input: PathBuf::from(format!("{}_copy", original.input.display())),
-                output: PathBuf::from(format!("{}_copy", original.output.display())),
+                input: new_input,
+                output: new_output,
                 preset: original.preset,
                 enabled: original.enabled,
                 settings: original.settings,
