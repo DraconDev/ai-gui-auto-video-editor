@@ -2329,7 +2329,7 @@ impl App {
                     if self.state.folders.len() > 3 {
                         ui.add_space(4.0);
                         ui.label(
-                            egui::RichText::new(&format!("+{} more", self.state.folders.len() - 3))
+                            egui::RichText::new(format!("+{} more", self.state.folders.len() - 3))
                                 .size(11.0)
                                 .color(TEXT_MUTED),
                         );
@@ -2362,7 +2362,7 @@ impl App {
 
                 if let Some(folder) = self.state.folders.get(self.state.selected_folder_idx) {
                     let summary_items = [
-                        ("Silence", folder.settings.silence_mode.map(|m| Self::silence_mode_name(m)).unwrap_or("—")),
+                        ("Silence", folder.settings.silence_mode.map(Self::silence_mode_name).unwrap_or("—")),
                         ("Resolution", folder.settings.target_resolution.map(|r| r.display_name()).unwrap_or_default()),
                         ("Stabilize", Self::yes_no(folder.settings.stabilize)),
                         ("Color", Self::yes_no(folder.settings.color_correct)),

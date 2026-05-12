@@ -181,14 +181,14 @@ pub fn calculate_keep_segments_from_transcript(
         }
     }
 
-    if let Some(last) = processed.last() {
-        if last.end < total_duration {
-            processed.push(ProcessedSegment {
-                start: last.end,
-                end: total_duration,
-                speed: 1.0,
-            });
-        }
+    if let Some(last) = processed.last()
+        && last.end < total_duration
+    {
+        processed.push(ProcessedSegment {
+            start: last.end,
+            end: total_duration,
+            speed: 1.0,
+        });
     }
 
     processed

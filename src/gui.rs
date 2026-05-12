@@ -920,15 +920,13 @@ impl AppState {
         const MAX_BATCH_QUEUE: usize = 100;
         let now = chrono::Local::now();
         self.batch_queue.retain(|f| {
-            if f.status == QueueStatus::Done || f.status == QueueStatus::Error {
-                if let Some(completed) = f.completed_at {
-                    let elapsed = now.signed_duration_since(completed);
-                    if elapsed.num_seconds() > 60 {
-                        return false;
-                    }
-                }
+            if !matches!(f.status, QueueStatus::Done | QueueStatus::Error) {
+                return true;
             }
-            true
+            let Some(completed) = f.completed_at else {
+                return true;
+            };
+            now.signed_duration_since(completed).num_seconds() <= 60
         });
         if self.batch_queue.len() > MAX_BATCH_QUEUE {
             self.batch_queue.drain(0..self.batch_queue.len() - MAX_BATCH_QUEUE);
@@ -1017,7 +1015,7 @@ impl eframe::App for App {
             || self.state.modal.show
             || self.state.modal.delete_confirm_idx.is_some()
             || ctx.wants_keyboard_input()
-            || ctx.input(|i| i.raw.dropped_files.len() > 0);
+            || ctx.input(|i| !i.raw.dropped_files.is_empty());
 
         // Escape key closes setup wizard
         if self.state.show_setup && ctx.input(|i| i.key_pressed(egui::Key::Escape)) {
