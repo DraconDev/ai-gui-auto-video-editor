@@ -112,7 +112,6 @@ enum SetupStep {
     Complete,
 }
 
-#[allow(dead_code)]
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) enum ProcessingStatus {
     Idle,
@@ -140,7 +139,6 @@ enum EntryStatus {
 }
 
 impl ActivityEntry {
-    #[allow(dead_code)]
     fn success(filename: impl Into<String>, file_size: u64, duration: u64) -> Self {
         let now = chrono::Local::now();
         Self {
@@ -154,7 +152,6 @@ impl ActivityEntry {
         }
     }
 
-    #[allow(dead_code)]
     fn processing(filename: impl Into<String>, file_size: u64, progress: f32) -> Self {
         let now = chrono::Local::now();
         Self {
@@ -168,7 +165,6 @@ impl ActivityEntry {
         }
     }
 
-    #[allow(dead_code)]
     fn error(filename: impl Into<String>, message: impl Into<String>) -> Self {
         let now = chrono::Local::now();
         Self {
@@ -249,7 +245,6 @@ pub(crate) enum WatcherEvent {
 }
 
 #[derive(Debug)]
-#[allow(dead_code)]
 pub(crate) enum QueueEvent {
     Processing {
         filename: String,
@@ -353,7 +348,6 @@ pub(crate) struct QueuedFile {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-#[allow(dead_code)]
 enum QueueStatus {
     Queued,
     Processing,
@@ -362,7 +356,6 @@ enum QueueStatus {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-#[allow(dead_code)]
 pub(crate) enum ToastKind {
     Success,
     Error,

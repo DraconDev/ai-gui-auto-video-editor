@@ -36,7 +36,6 @@ pub const SETTINGS_SECTION_BORDER_HIGHLIGHT: egui::Color32 = egui::Color32::from
 
 pub const CORNER_RADIUS: f32 = 14.0;
 pub const CORNER_RADIUS_SMALL: f32 = 8.0;
-#[allow(dead_code)]
 pub const CORNER_RADIUS_PILL: f32 = 24.0;
 
 #[allow(dead_code)]
@@ -139,7 +138,6 @@ pub fn section_header(text: &str) -> egui::RichText {
         .strong()
 }
 
-#[allow(dead_code)]
 pub fn section_title(text: &str) -> egui::RichText {
     egui::RichText::new(text)
         .size(16.0)
@@ -195,7 +193,6 @@ pub fn button_icon(icon: &str, _tooltip: &str) -> egui::Button<'static> {
         .sense(egui::Sense::click())
 }
 
-#[allow(dead_code)]
 pub fn button_primary(text: impl Into<String>) -> egui::Button<'static> {
     egui::Button::new(
         egui::RichText::new(text)
@@ -209,7 +206,6 @@ pub fn button_primary(text: impl Into<String>) -> egui::Button<'static> {
     .min_size(egui::vec2(180.0, 52.0))
 }
 
-#[allow(dead_code)]
 pub fn button_danger(text: impl Into<String>) -> egui::Button<'static> {
     egui::Button::new(egui::RichText::new(text).color(ERROR).size(15.0).strong())
         .fill(ERROR_BG)
