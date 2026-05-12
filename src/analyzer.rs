@@ -104,13 +104,13 @@ fn parse_ffmpeg_silence(output: &str, video_duration: f32) -> Vec<Segment> {
     }
 
     // Handle unclosed silence segment at EOF
-    if let Some(start) = current_start {
-        if video_duration > start {
-            segments.push(Segment {
-                start,
-                end: video_duration,
-            });
-        }
+    if let Some(start) = current_start
+        && video_duration > start
+    {
+        segments.push(Segment {
+            start,
+            end: video_duration,
+        });
     }
 
     segments

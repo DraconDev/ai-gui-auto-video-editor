@@ -424,7 +424,7 @@ mod tests {
         let base_config = Config::default();
         let folder = make_test_folder_state();
 
-        let merged = build_folder_config(&base_config, &folder);
+        let merged = base_config.with_folder_settings(&folder.preset, &folder.settings);
 
         // With no folder overrides, merged should equal base
         assert_eq!(
@@ -441,7 +441,7 @@ mod tests {
         let mut folder = make_test_folder_state();
         folder.settings.silence_mode = Some(SilenceMode::Speedup);
 
-        let merged = build_folder_config(&base_config, &folder);
+        let merged = base_config.with_folder_settings(&folder.preset, &folder.settings);
         assert_eq!(merged.silence.mode, SilenceMode::Speedup);
     }
 
@@ -452,7 +452,7 @@ mod tests {
         folder.settings.remove_silence = Some(true);
         folder.settings.silence_mode = None;
 
-        let merged = build_folder_config(&base_config, &folder);
+        let merged = base_config.with_folder_settings(&folder.preset, &folder.settings);
         assert_eq!(merged.silence.mode, SilenceMode::Cut);
     }
 
@@ -463,7 +463,7 @@ mod tests {
         folder.settings.remove_silence = Some(false);
         folder.settings.silence_mode = None;
 
-        let merged = build_folder_config(&base_config, &folder);
+        let merged = base_config.with_folder_settings(&folder.preset, &folder.settings);
         assert_eq!(merged.silence.mode, SilenceMode::Keep);
     }
 
@@ -474,7 +474,7 @@ mod tests {
         folder.settings.silence_mode = Some(SilenceMode::Speedup);
         folder.settings.remove_silence = Some(true); // Legacy value should be ignored
 
-        let merged = build_folder_config(&base_config, &folder);
+        let merged = base_config.with_folder_settings(&folder.preset, &folder.settings);
         assert_eq!(merged.silence.mode, SilenceMode::Speedup);
     }
 
@@ -484,7 +484,7 @@ mod tests {
         let mut folder = make_test_folder_state();
         folder.settings.watermark_path = Some(std::path::PathBuf::from("/path/to/watermark.png"));
 
-        let merged = build_folder_config(&base_config, &folder);
+        let merged = base_config.with_folder_settings(&folder.preset, &folder.settings);
         assert_eq!(
             merged.video.watermark,
             Some(std::path::PathBuf::from("/path/to/watermark.png"))
@@ -497,7 +497,7 @@ mod tests {
         let mut folder = make_test_folder_state();
         folder.settings.music_path = Some(std::path::PathBuf::from("/path/to/music.mp3"));
 
-        let merged = build_folder_config(&base_config, &folder);
+        let merged = base_config.with_folder_settings(&folder.preset, &folder.settings);
         assert_eq!(
             merged.paths.music,
             Some(std::path::PathBuf::from("/path/to/music.mp3"))
@@ -510,7 +510,7 @@ mod tests {
         let mut folder = make_test_folder_state();
         folder.settings.silence_threshold_db = Some(-50.0);
 
-        let merged = build_folder_config(&base_config, &folder);
+        let merged = base_config.with_folder_settings(&folder.preset, &folder.settings);
         assert_eq!(merged.silence.threshold_db, -50.0);
     }
 
@@ -520,7 +520,7 @@ mod tests {
         let mut folder = make_test_folder_state();
         folder.preset = "shorts".to_string();
 
-        let merged = build_folder_config(&base_config, &folder);
+        let merged = base_config.with_folder_settings(&folder.preset, &folder.settings);
         // Shorts preset should change target resolution to vertical
         assert_eq!(
             merged.video.target_resolution,
@@ -536,7 +536,7 @@ mod tests {
         let mut folder = make_test_folder_state();
         folder.preset = "nonexistent_preset".to_string();
 
-        let merged = build_folder_config(&base_config, &folder);
+        let merged = base_config.with_folder_settings(&folder.preset, &folder.settings);
         // Invalid preset should be ignored, config stays the same
         assert_eq!(
             merged.video.target_resolution,
