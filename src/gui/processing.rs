@@ -12,11 +12,9 @@ use crate::Config;
 use crate::FfmpegAnalyzer;
 use crate::FfmpegDurationGetter;
 use crate::FfmpegEditor;
-use crate::Preset;
 use crate::batch_processor::ProcessingProgress;
 use crate::batch_processor::process_single_file_with_intro_outro_progress;
 use crate::config::FolderSettings;
-use crate::config::SilenceMode;
 
 #[cfg(feature = "notify-rust")]
 fn send_desktop_notification(title: &str, body: &str) {
