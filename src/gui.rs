@@ -245,6 +245,7 @@ pub(crate) enum WatcherEvent {
 }
 
 #[derive(Debug)]
+#[allow(dead_code)]
 pub(crate) enum QueueEvent {
     Processing {
         filename: String,
