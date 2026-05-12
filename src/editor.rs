@@ -10,26 +10,6 @@ use tracing::{info, warn};
 
 const TRIM_SEGMENTS_PER_CHUNK: usize = 48;
 
-struct ScopedTempFile {
-    path: PathBuf,
-}
-
-impl ScopedTempFile {
-    fn new(prefix: &str, ext: &str) -> Self {
-        let path = std::env::temp_dir().join(format!("{}-{}.{}", prefix, std::process::id(), ext));
-        Self { path }
-    }
-    fn path(&self) -> &Path {
-        &self.path
-    }
-}
-
-impl Drop for ScopedTempFile {
-    fn drop(&mut self) {
-        let _ = fs::remove_file(&self.path);
-    }
-}
-
 /// Calculate segments to keep after processing silences
 ///
 /// # Arguments

@@ -493,16 +493,11 @@ where
         report_progress(&mut progress, 0.96, "Scaling to target resolution");
         info!(resolution = ?config.video.target_resolution, "Scaling to target resolution");
         let status = std::process::Command::new("ffmpeg")
-            .args([
-                "-i",
-                current_file.to_str().context("invalid input path")?,
-                "-vf",
-                &format!("scale={}:{}", target_w, target_h),
-                "-c:a",
-                "copy",
-                "-y",
-                scaled.to_str().context("invalid output path")?,
-            ])
+            .arg("-i")
+            .arg(&current_file)
+            .args(["-vf", &format!("scale={}:{}", target_w, target_h)])
+            .args(["-c:a", "copy", "-y"])
+            .arg(&scaled)
             .status()
             .context("failed to scale video")?;
         if !status.success() {
@@ -791,16 +786,11 @@ fn export_additional_files(
             debug!(path = %multi_path.display(), resolution = ?resolution, "Generating alternate resolution");
 
             let status = std::process::Command::new("ffmpeg")
-                .args([
-                    "-i",
-                    output_file.to_str().context("invalid output path")?,
-                    "-vf",
-                    &format!("scale={}:{}", w, h),
-                    "-c:a",
-                    "copy",
-                    "-y",
-                    multi_path.to_str().context("invalid multi-format path")?,
-                ])
+                .arg("-i")
+                .arg(output_file)
+                .args(["-vf", &format!("scale={}:{}", w, h)])
+                .args(["-c:a", "copy", "-y"])
+                .arg(&multi_path)
                 .status()
                 .context("failed to execute ffmpeg for multi-format")?;
 
@@ -886,16 +876,12 @@ fn burn_subtitles_into_video(
 ) -> Result<()> {
     let escaped_subtitle_path = crate::utils::escape_ffmpeg_filter_path(subtitle_path);
     let status = std::process::Command::new("ffmpeg")
-        .args([
-            "-i",
-            video_path.to_str().context("invalid video path")?,
-            "-vf",
-            &format!("subtitles='{}'", escaped_subtitle_path),
-            "-c:a",
-            "copy",
-            "-y",
-            output_path.to_str().context("invalid output path")?,
-        ])
+        .arg("-i")
+        .arg(video_path)
+        .arg("-vf")
+        .arg(&format!("subtitles='{}'", escaped_subtitle_path))
+        .args(["-c:a", "copy", "-y"])
+        .arg(output_path)
         .status()
         .context("failed to burn subtitles")?;
 
