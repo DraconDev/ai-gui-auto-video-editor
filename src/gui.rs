@@ -1033,8 +1033,16 @@ impl eframe::App for App {
                     .collect::<Vec<_>>()
             });
             for path in dropped {
-                let output_dir = PathBuf::from("output");
-                let preset = "youtube".to_string();
+                let output_dir = self
+                    .state
+                    .config
+                    .paths
+                    .output_dir
+                    .clone()
+                    .unwrap_or_else(|| PathBuf::from("output"));
+                let preset = self.state.config.paths.watch_folders.first()
+                    .map(|f| f.preset.clone())
+                    .unwrap_or_else(|| self.state.setup_preset.clone());
                 let settings = FolderSettings::default();
                 self.state.batch_queue.push(QueuedFile {
                     path,

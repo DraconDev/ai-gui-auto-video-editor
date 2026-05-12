@@ -483,7 +483,40 @@ where
         current_file = blurred;
     }
 
-    // Apply watermark if configured
+    // Apply target resolution scaling if configured and not already reframed
+    // Scaling must happen BEFORE watermarking to avoid stretching the watermark
+    if !config.video.reframe
+        && config.video.target_resolution != crate::config::VideoResolution::default()
+    {
+        let (target_w, target_h) = config.video.target_resolution.dimensions();
+        let scaled = output_file.with_extension("scaled.mp4");
+        report_progress(&mut progress, 0.96, "Scaling to target resolution");
+        info!(resolution = ?config.video.target_resolution, "Scaling to target resolution");
+        let status = std::process::Command::new("ffmpeg")
+            .args([
+                "-i",
+                current_file.to_str().context("invalid input path")?,
+                "-vf",
+                &format!("scale={}:{}", target_w, target_h),
+                "-c:a",
+                "copy",
+                "-y",
+                scaled.to_str().context("invalid output path")?,
+            ])
+            .status()
+            .context("failed to scale video")?;
+        if !status.success() {
+            anyhow::bail!("ffmpeg scale failed with status: {}", status);
+        }
+        if current_file != output_file {
+            guard.untrack(&current_file);
+            let _ = fs::remove_file(&current_file);
+        }
+        guard.track(scaled.clone());
+        current_file = scaled;
+    }
+
+    // Apply watermark if configured (must be LAST video processing step)
     if let Some(ref watermark_path) = config.video.watermark {
         let watermarked = output_file.with_extension("watermarked.mp4");
         report_progress(&mut progress, 0.98, "Adding watermark");
@@ -508,38 +541,6 @@ where
         }
         guard.track(watermarked.clone());
         current_file = watermarked;
-    }
-
-    // Apply target resolution scaling if configured and not already reframed
-    if !config.video.reframe
-        && config.video.target_resolution != crate::config::VideoResolution::default()
-    {
-        let (target_w, target_h) = config.video.target_resolution.dimensions();
-        let scaled = output_file.with_extension("scaled.mp4");
-        report_progress(&mut progress, 0.985, "Scaling to target resolution");
-        info!(resolution = ?config.video.target_resolution, "Scaling to target resolution");
-        let status = std::process::Command::new("ffmpeg")
-            .args([
-                "-i",
-                current_file.to_str().context("invalid input path")?,
-                "-vf",
-                &format!("scale={}:{}", target_w, target_h),
-                "-c:a",
-                "copy",
-                "-y",
-                scaled.to_str().context("invalid output path")?,
-            ])
-            .status()
-            .context("failed to scale video")?;
-        if !status.success() {
-            anyhow::bail!("ffmpeg scale failed with status: {}", status);
-        }
-        if current_file != output_file {
-            guard.untrack(&current_file);
-            let _ = fs::remove_file(&current_file);
-        }
-        guard.track(scaled.clone());
-        current_file = scaled;
     }
 
     // Move final temp file to output if needed

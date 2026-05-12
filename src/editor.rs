@@ -433,7 +433,7 @@ impl VideoEditor for FfmpegEditor {
     fn stabilize(&self, input: &Path, output: &Path) -> Result<()> {
         let input_str = input.to_str().context("invalid input path")?;
         let output_str = output.to_str().context("invalid output path")?;
-        let trf_file = ScopedTempFile::new("ai-vid-editor-vidstab", "trf");
+        let trf_file = crate::utils::TempFile::new("ai-vid-editor-vidstab", "trf")?;
         let escaped_trf_path = crate::utils::escape_ffmpeg_filter_path(trf_file.path());
 
         let status1 = Command::new("ffmpeg")
