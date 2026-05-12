@@ -416,7 +416,7 @@ mod tests {
             },
         ];
         let mut sorted = segs.clone();
-        sorted.sort_by(|a, b| a.start.partial_cmp(&b.start).unwrap());
+        sorted.sort_by(|a, b| a.start.total_cmp(&b.start));
         assert_eq!(sorted[0].text, "First");
         assert_eq!(sorted[1].text, "Second");
     }

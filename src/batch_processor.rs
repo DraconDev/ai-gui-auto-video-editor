@@ -610,11 +610,7 @@ fn merge_silences_and_scenes(
         })
         .collect();
 
-    merged.sort_by(|a, b| {
-        a.start
-            .partial_cmp(&b.start)
-            .unwrap_or(std::cmp::Ordering::Equal)
-    });
+    merged.sort_by(|a, b| a.start.total_cmp(&b.start));
 
     let mut deduplicated: Vec<crate::analyzer::Segment> = Vec::new();
     for seg in merged {
@@ -945,7 +941,7 @@ fn extract_highlight_clips(
     }
 
     // Find peaks: sort by energy and take top N segments
-    segment_energy.sort_by(|a, b| b.2.partial_cmp(&a.2).unwrap_or(std::cmp::Ordering::Equal));
+    segment_energy.sort_by(|a, b| b.2.total_cmp(&a.2));
 
     // Get video duration to clamp clips properly
     let video_duration = crate::ml::FrameExtractor::get_video_duration(video_path)

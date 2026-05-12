@@ -628,9 +628,9 @@ fn create_trim_chunk_dir(output: &Path) -> Result<PathBuf> {
     let parent = output.parent().unwrap_or_else(|| Path::new("."));
     let stem = output
         .file_stem()
-        .and_then(|stem| stem.to_str())
-        .unwrap_or("trim");
-    let chunk_dir = parent.join(format!(".ai-vid-editor-{}-{}", stem, std::process::id()));
+        .map(|stem| stem.to_string_lossy().to_string())
+        .unwrap_or_else(|| "trim".to_string());
+    let chunk_dir = parent.join(format!(".ai-vid-editor-{}-{}-{:x}", stem, std::process::id(), std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_nanos()));
 
     if chunk_dir.exists() {
         let _ = fs::remove_dir_all(&chunk_dir);

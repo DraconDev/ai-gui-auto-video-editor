@@ -1092,6 +1092,12 @@ impl Config {
                 self.silence.min_silence_for_speedup
             );
         }
+        if self.silence.scene_threshold < 0.0 || self.silence.scene_threshold > 1.0 {
+            anyhow::bail!(
+                "silence.scene_threshold must be between 0.0 and 1.0 (got {})",
+                self.silence.scene_threshold
+            );
+        }
         if self.audio.duck_volume < 0.0 || self.audio.duck_volume > 1.0 {
             anyhow::bail!(
                 "audio.duck_volume must be between 0.0 and 1.0 (got {})",
@@ -1187,10 +1193,12 @@ impl Config {
             "padding",
             "speedup_factor",
             "min_silence_for_speedup",
+            "scene_threshold",
             "target_lufs",
             "duck_volume",
             "clip_min_duration",
             "clip_max_duration",
+            "watermark_scale",
         ];
         fn fix_floats(s: &str) -> String {
             let mut result = String::new();

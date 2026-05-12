@@ -412,20 +412,6 @@ pub fn build_folder_config(config: &Config, folder: &FolderState) -> Config {
     merged
 }
 
-fn is_video_file(path: &Path) -> bool {
-    path.is_file()
-        && path
-            .extension()
-            .and_then(|ext| ext.to_str())
-            .map(|ext| {
-                matches!(
-                    ext.to_ascii_lowercase().as_str(),
-                    "mp4" | "mov" | "avi" | "mkv" | "webm"
-                )
-            })
-            .unwrap_or(false)
-}
-
 #[allow(dead_code)]
 pub fn make_test_folder_state() -> FolderState {
     FolderState {
