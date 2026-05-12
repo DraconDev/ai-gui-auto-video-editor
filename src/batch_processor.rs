@@ -879,7 +879,7 @@ fn burn_subtitles_into_video(
         .arg("-i")
         .arg(video_path)
         .arg("-vf")
-        .arg(&format!("subtitles='{}'", escaped_subtitle_path))
+        .arg(format!("subtitles='{}'", escaped_subtitle_path))
         .args(["-c:a", "copy", "-y"])
         .arg(output_path)
         .status()
