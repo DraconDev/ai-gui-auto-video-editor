@@ -60,9 +60,10 @@
             echo "AI Video Editor development environment"
             echo ""
             echo "Commands:"
-            echo "  cargo build                         - Build CLI only"
-            echo "  cargo build --features gui          - Build with GUI"
-            echo "  cargo run --features gui --bin ai-vid-editor-gui  - Run GUI"
+            echo "  cargo build                         - Build CLI + GUI (default)"
+            echo "  cargo build --no-default-features --features cli  - Build CLI only"
+            echo "  cargo run                           - Run GUI"
+            echo "  cargo run -- --headless             - Run watch mode"
             echo ""
           '';
         };

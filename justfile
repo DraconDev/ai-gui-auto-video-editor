@@ -20,9 +20,13 @@ build:
 build-cli:
     cargo build --release --no-default-features --features cli
 
-# Run tests
+# Run tests (unit tests only, no ffmpeg required)
 test:
     cargo test --lib
+
+# Run full test suite (requires ffmpeg)
+test-full:
+    cargo test --all-features
 
 # Generate default config
 config:
