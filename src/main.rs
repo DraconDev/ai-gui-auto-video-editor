@@ -972,6 +972,10 @@ fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
         }
 
         for (idx, folder) in enabled_folders.iter().enumerate() {
+            // Build folder config once, before iterating files
+            let folder_config =
+                config.with_folder_settings(&folder.preset, &folder.settings);
+
             if let Ok(entries) = std::fs::read_dir(&folder.input) {
                 for entry in entries.flatten() {
                     let path = entry.path();
@@ -982,42 +986,6 @@ fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
                     {
                         let now = timestamp();
                         println!("\n[{}] [NEW FILE] {:?}", now, path);
-
-                        // Build config for this folder's preset
-                        let folder_config = if let Some(preset) =
-                            crate::config::Preset::parse_name(&folder.preset)
-                        {
-                            let mut c = preset.to_config();
-                            // Apply folder-level settings overrides
-                            if let Some(enhance) = folder.settings.enhance_audio {
-                                c.audio.enhance = enhance;
-                            }
-                            if let Some(threshold) = folder.settings.silence_threshold_db {
-                                c.silence.threshold_db = threshold;
-                            }
-                            if let Some(lufs) = folder.settings.target_lufs {
-                                c.audio.target_lufs = lufs;
-                            }
-                            if let Some(stabilize) = folder.settings.stabilize {
-                                c.video.stabilize = stabilize;
-                            }
-                            if let Some(color_correct) = folder.settings.color_correct {
-                                c.video.color_correct = color_correct;
-                            }
-                            if let Some(reframe) = folder.settings.reframe {
-                                c.video.reframe = reframe;
-                            }
-                            if let Some(blur) = folder.settings.blur_background {
-                                c.video.blur_background = blur;
-                            }
-                            c
-                        } else {
-                            eprintln!(
-                                "Warning: Unknown preset '{}', using default config",
-                                folder.preset
-                            );
-                            config.clone()
-                        };
 
                         let file_name = path
                             .file_name()
