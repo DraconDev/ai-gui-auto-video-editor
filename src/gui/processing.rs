@@ -144,7 +144,7 @@ fn watch_folders_loop(
                 }
 
                 let path = entry.path();
-                if !is_video_file(&path) || attempted.contains(&path) {
+                if !crate::utils::is_video_file(&path) || attempted.contains(&path) {
                     continue;
                 }
 
