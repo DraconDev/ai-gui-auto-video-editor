@@ -234,7 +234,7 @@ more noise
         let output = r#"[silencedetect] silence_start: 3600.5
 [silencedetect] silence_end: 3605.75 | silence_duration: 5.25"#;
 
-        let segments = parse_ffmpeg_silence(output);
+        let segments = parse_ffmpeg_silence(output, 100.0);
         assert_eq!(segments.len(), 1);
         assert_eq!(
             segments[0],
@@ -252,7 +252,7 @@ more noise
 [silencedetect] silence_start: 2.0
 [silencedetect] silence_end: 3.0 | silence_duration: 1.0"#;
 
-        let segments = parse_ffmpeg_silence(output);
+        let segments = parse_ffmpeg_silence(output, 100.0);
         assert_eq!(segments.len(), 1);
         // Second start overwrites the first, so segment is 2.0-3.0
         assert_eq!(
@@ -271,7 +271,7 @@ more noise
 [silencedetect] silence_start: 10.0
 [silencedetect] silence_end: 12.0 | silence_duration: 2.0"#;
 
-        let segments = parse_ffmpeg_silence(output);
+        let segments = parse_ffmpeg_silence(output, 100.0);
         assert_eq!(segments.len(), 1);
         assert_eq!(
             segments[0],
@@ -288,7 +288,7 @@ more noise
         let output = r#"[silencedetect] silence_start: 5
 [silencedetect] silence_end: 10 | silence_duration: 5"#;
 
-        let segments = parse_ffmpeg_silence(output);
+        let segments = parse_ffmpeg_silence(output, 100.0);
         assert_eq!(segments.len(), 1);
         assert_eq!(
             segments[0],
@@ -305,7 +305,7 @@ more noise
         let output = r#"[silencedetect] silence_start:   1.5  
 [silencedetect] silence_end:   4.5   | silence_duration: 3.0"#;
 
-        let segments = parse_ffmpeg_silence(output);
+        let segments = parse_ffmpeg_silence(output, 100.0);
         assert_eq!(segments.len(), 1);
         assert_eq!(
             segments[0],
