@@ -1936,4 +1936,47 @@ mod tests {
             }
         );
     }
+
+    #[test]
+    fn test_format_batch_summary_basic() {
+        let s = format_batch_summary(10, 7, 2, 1);
+        // Should contain ANSI color codes
+        assert!(s.contains("\x1b[32m"), "missing green color code");
+        assert!(s.contains("\x1b[31m"), "missing red color code");
+        assert!(s.contains("\x1b[33m"), "missing yellow color code");
+        assert!(s.contains("\x1b[0m"), "missing reset color code");
+        // Should contain the values
+        assert!(s.contains("7"), "missing successful count");
+        assert!(s.contains("2"), "missing failed count");
+        assert!(s.contains("1"), "missing skipped count");
+        // Should contain percentages
+        assert!(s.contains("70%"), "missing success percentage");
+        assert!(s.contains("20%"), "missing failure percentage");
+    }
+
+    #[test]
+    fn test_format_batch_summary_zero_division() {
+        // Edge case: total = 0 should not panic
+        let s = format_batch_summary(0, 0, 0, 0);
+        assert!(s.contains("BATCH SUMMARY"));
+        // Percentages should be 0 when total is 0
+        assert!(s.contains("0%"));
+    }
+
+    #[test]
+    fn test_format_batch_summary_large_numbers() {
+        let s = format_batch_summary(100000, 99999, 1, 0);
+        // Should right-align large numbers
+        assert!(s.contains("99999"));
+        assert!(s.contains("100000"));
+        // Percentage calculations should be correct
+        assert!(s.contains("99%") || s.contains("100%"));
+    }
+
+    #[test]
+    fn test_format_batch_summary_all_success() {
+        let s = format_batch_summary(5, 5, 0, 0);
+        assert!(s.contains("100%"), "expected 100% success rate");
+        assert!(s.contains("0%"), "expected 0% failure rate");
+    }
 }
