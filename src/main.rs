@@ -304,18 +304,18 @@ fn main() -> Result<()> {
     // Check FFmpeg and ffprobe availability early
     if let Err(e) = crate::utils::check_ffmpeg() {
         if cli.json {
-            println!("{}", serde_json::to_string_pretty(&json!({"error": e.to_string()})).unwrap_or_else(|_| format!("{{\"error\": \"{}\"}}", e)));
+            info!("{}", serde_json::to_string_pretty(&json!({"error": e.to_string()})).unwrap_or_else(|_| format!("{{\"error\": \"{}\"}}", e)));
         } else {
-            eprintln!("Error: {}", e);
+            error!("Error: {}", e);
         }
         std::process::exit(1);
     }
 
     if let Err(e) = crate::utils::check_ffprobe() {
         if cli.json {
-            println!("{}", serde_json::to_string_pretty(&json!({"error": e.to_string()})).unwrap_or_else(|_| format!("{{\"error\": \"{}\"}}", e)));
+            info!("{}", serde_json::to_string_pretty(&json!({"error": e.to_string()})).unwrap_or_else(|_| format!("{{\"error\": \"{}\"}}", e)));
         } else {
-            eprintln!("Error: {}", e);
+            error!("Error: {}", e);
         }
         std::process::exit(1);
     }
@@ -374,17 +374,14 @@ fn main() -> Result<()> {
             // Headless with no watch folders: show help
             use clap::CommandFactory;
             Cli::command().print_help()?;
-            println!();
-            println!(
-                "No input specified and no watch folders configured. Use --input-file, --input-dir, or configure watch folders in config."
-            );
+            info!("No input specified and no watch folders configured. Use --input-file, --input-dir, or configure watch folders in config.");
             return Ok(());
         }
 
         // Default: always launch GUI (no more TTY-based fallback to watch mode)
         #[cfg(feature = "gui")]
         {
-            println!("Launching GUI. Use --headless for watch/daemon mode.");
+            info!("Launching GUI. Use --headless for watch/daemon mode.");
             return run_gui(start_minimized);
         }
 
@@ -392,10 +389,7 @@ fn main() -> Result<()> {
         {
             use clap::CommandFactory;
             Cli::command().print_help()?;
-            println!();
-            println!(
-                "No GUI support compiled in. Use --input-file, --input-dir, or --headless with watch folders."
-            );
+            info!("No GUI support compiled in. Use --input-file, --input-dir, or --headless with watch folders.");
             return Ok(());
         }
     }
@@ -403,8 +397,8 @@ fn main() -> Result<()> {
     // Handle --generate-config
     if cli.generate_config {
         let config_content = Config::generate_default_toml()?;
-        println!("{}", config_content);
-        println!("\n# Save this to 'ai-vid-editor.toml' or '~/.config/ai-vid-editor/config.toml'");
+        info!("{}", config_content);
+        info!("\n# Save this to 'ai-vid-editor.toml' or '~/.config/ai-vid-editor/config.toml'");
         return Ok(());
     }
 
@@ -417,7 +411,7 @@ fn main() -> Result<()> {
             )
         })?;
         if !cli.json {
-            println!("Using preset: {}", preset.as_str());
+            info!("Using preset: {}", preset.as_str());
         }
         let mut c = preset.to_config();
         // Merge preloaded config over preset (so watch_folders etc. are preserved)
@@ -468,7 +462,7 @@ fn main() -> Result<()> {
             && let Some(random_music) = pick_random_music_file(music_dir_path)?
         {
             if !cli.json {
-                println!("Selected random music: {:?}", random_music);
+                info!("Selected random music: {:?}", random_music);
             }
             config.audio.music_file = Some(random_music);
         }
@@ -536,7 +530,7 @@ fn main() -> Result<()> {
             crate::hwaccel::HwAccel::detect()
         } else {
             crate::hwaccel::HwAccel::parse_name(gpu_str).unwrap_or_else(|| {
-                eprintln!(
+                error!(
                     "Warning: unknown GPU type '{}', using CPU encoding",
                     gpu_str
                 );
@@ -547,15 +541,15 @@ fn main() -> Result<()> {
 
     // Print config (unless JSON mode)
     if !cli.json {
-        println!("Loaded configuration:");
-        println!("  Silence threshold: {} dB", config.silence.threshold_db);
-        println!("  Silence mode: {:?}", config.silence.mode);
-        println!("  Padding: {}s", config.silence.padding);
-        println!("  Audio enhance: {}", config.audio.enhance);
+        info!("Loaded configuration:");
+        info!("  Silence threshold: {} dB", config.silence.threshold_db);
+        info!("  Silence mode: {:?}", config.silence.mode);
+        info!("  Padding: {}s", config.silence.padding);
+        info!("  Audio enhance: {}", config.audio.enhance);
         if let Some(ref music) = config.audio.music_file {
-            println!("  Background music: {:?}", music);
+            info!("  Background music: {:?}", music);
         }
-        println!(
+        info!(
             "  Export: SRT={} Chapters={} FCPXML={} EDL={} Thumbnail={} MultiFormat={} Preview={}",
             config.export.subtitles,
             config.export.chapters,
@@ -565,12 +559,12 @@ fn main() -> Result<()> {
             config.export.multi_format,
             config.export.preview
         );
-        println!("  Resolution: {:?}", config.video.target_resolution);
+        info!("  Resolution: {:?}", config.video.target_resolution);
         if config.video.hw_accel != crate::hwaccel::HwAccel::None {
-            println!("  GPU encoding: {:?}", config.video.hw_accel);
+            info!("  GPU encoding: {:?}", config.video.hw_accel);
         }
         if cli.parallel_workers > 1 {
-            println!("  Parallel workers: {}", cli.parallel_workers);
+            info!("  Parallel workers: {}", cli.parallel_workers);
         }
     }
 
@@ -658,9 +652,9 @@ fn main() -> Result<()> {
 
         if cli.clear_progress && progress_path.exists() {
             if let Err(e) = std::fs::remove_file(&progress_path) {
-                eprintln!("Warning: Failed to clear progress file: {}", e);
+                error!("Warning: Failed to clear progress file: {}", e);
             } else {
-                println!("Progress file cleared.");
+                info!("Progress file cleared.");
             }
         }
 
@@ -705,7 +699,7 @@ fn run_watch_mode(
     notify: bool,
     dry_run: bool,
 ) -> Result<()> {
-    println!("=== WATCH MODE ===");
+    info!("=== WATCH MODE ===");
 
     crate::watch::run_watch_loop(crate::watch::WatchFolderConfig {
         watch_dir,
@@ -722,7 +716,7 @@ fn run_watch_mode(
 
 /// Run watch mode for multiple folders from config
 fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
-    println!("=== MULTI-FOLDER WATCH MODE ===");
+    info!("=== MULTI-FOLDER WATCH MODE ===");
 
     let enabled_folders: Vec<&crate::config::WatchFolder> = config
         .paths
@@ -732,14 +726,14 @@ fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
         .collect();
 
     if enabled_folders.is_empty() {
-        println!("No enabled watch folders found in config.");
+        info!("No enabled watch folders found in config.");
         return Ok(());
     }
 
-    println!("Monitoring {} watch folder(s)\n", enabled_folders.len());
+    info!("Monitoring {} watch folder(s)\n", enabled_folders.len());
 
     for folder in &enabled_folders {
-        println!(
+        info!(
             "  Folder: {} -> {} (preset: {})",
             folder.input.display(),
             folder.output.display(),
@@ -762,7 +756,7 @@ fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
                 dry_run: cli.dry_run,
                 folder_label: &name,
             }) {
-                eprintln!(
+                error!(
                     "[{}] [ERROR] Watch folder {} encountered an error: {}",
                     crate::watch::timestamp(),
                     name,
@@ -797,7 +791,7 @@ fn pick_random_music_file(music_dir: &PathBuf) -> Result<Option<PathBuf>> {
         .collect();
 
     if music_files.is_empty() {
-        eprintln!("Warning: No music files found in {:?}", music_dir);
+        error!("Warning: No music files found in {:?}", music_dir);
         return Ok(None);
     }
 
@@ -853,54 +847,54 @@ fn handle_dry_run(cli: &Cli, config: &Config) -> Result<()> {
                 "enhance_audio": config.audio.enhance,
             }
         });
-        println!("{}", serde_json::to_string_pretty(&result)?);
+        info!("{}", serde_json::to_string_pretty(&result)?);
     } else {
-        println!("\n=== DRY RUN ANALYSIS ===");
-        println!("Input: {:?}", input_path);
-        println!(
+        info!("\n=== DRY RUN ANALYSIS ===");
+        info!("Input: {:?}", input_path);
+        info!(
             "Input duration: {:.1}s ({:.1} min)",
             video_duration,
             video_duration / 60.0
         );
-        println!("Silent segments detected: {}", silences.len());
-        println!(
+        info!("Silent segments detected: {}", silences.len());
+        info!(
             "Total silence: {:.1}s ({:.1} min)",
             total_silence,
             total_silence / 60.0
         );
-        println!("\nWould produce:");
-        println!(
+        info!("\nWould produce:");
+        info!(
             "  Output duration: {:.1}s ({:.1} min)",
             output_duration,
             output_duration / 60.0
         );
-        println!(
+        info!(
             "  Time saved: {:.1}s ({:.1} min)",
             video_duration - output_duration,
             (video_duration - output_duration) / 60.0
         );
-        println!("\nOperations:");
-        println!("  - Silence mode: {:?}", config.silence.mode);
+        info!("\nOperations:");
+        info!("  - Silence mode: {:?}", config.silence.mode);
         if config.audio.enhance {
-            println!(
+            info!(
                 "  - Audio enhancement: enabled (target {} LUFS)",
                 config.audio.target_lufs
             );
         }
         if config.audio.music_file.is_some() {
-            println!("  - Background music: {:?}", config.audio.music_file);
+            info!("  - Background music: {:?}", config.audio.music_file);
         }
         if config.export.subtitles {
-            println!("  - Export SRT subtitles");
+            info!("  - Export SRT subtitles");
         }
         if config.export.chapters {
-            println!("  - Export YouTube chapters");
+            info!("  - Export YouTube chapters");
         }
         if config.export.fcpxml {
-            println!("  - Export FCPXML");
+            info!("  - Export FCPXML");
         }
         if config.export.edl {
-            println!("  - Export EDL");
+            info!("  - Export EDL");
         }
     }
 

@@ -41,7 +41,7 @@ pub fn run_watch_loop(params: WatchFolderConfig) -> Result<()> {
 
         heartbeat += 1;
         if heartbeat.is_multiple_of(6) {
-            println!(
+            info!(
                 "[{}] Watching {} {label} for new files...",
                 timestamp(),
                 params.watch_dir.display()
@@ -86,7 +86,7 @@ pub fn run_watch_loop(params: WatchFolderConfig) -> Result<()> {
                     params.outro.clone(),
                     move |p| {
                         let now = timestamp();
-                        println!(
+                        info!(
                             "[{}] [{:>6.1}%] {label} {} - {}",
                             now,
                             p.fraction * 100.0,
@@ -98,7 +98,7 @@ pub fn run_watch_loop(params: WatchFolderConfig) -> Result<()> {
 
                 if params.dry_run {
                     let elapsed = start_time.elapsed().as_secs_f32();
-                    println!(
+                    info!(
                         "[{}] [DRY-RUN] {label} {} -> {} ({:.1}s)",
                         timestamp(),
                         file_name,
@@ -113,7 +113,7 @@ pub fn run_watch_loop(params: WatchFolderConfig) -> Result<()> {
                 match &result {
                     Ok(_) => {
                         let elapsed = start_time.elapsed().as_secs_f32();
-                        println!(
+                        info!(
                             "[{}] [{:>7}] {label} {} -> {} ({:.1}s)",
                             timestamp(),
                             "DONE",
@@ -130,7 +130,7 @@ pub fn run_watch_loop(params: WatchFolderConfig) -> Result<()> {
                     Err(e) => {
                         let elapsed = start_time.elapsed().as_secs_f32();
                         last_processed = Some(format!("{} (error)", file_name));
-                        eprintln!(
+                        error!(
                             "[{}] [ERROR] {label} {} failed after {:.1}s: {}",
                             timestamp(),
                             file_name,
