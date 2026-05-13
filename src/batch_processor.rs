@@ -632,6 +632,24 @@ where
     });
 }
 
+fn print_batch_summary(total: usize, successful: usize, failed: usize, skipped: usize) {
+    let width = total.to_string().len().max(3);
+    let s_pct = if total > 0 { successful * 100 / total } else { 0 };
+    let f_pct = if total > 0 { failed * 100 / total } else { 0 };
+
+    let green = "\x1b[32m";
+    let red = "\x1b[31m";
+    let yellow = "\x1b[33m";
+    let reset = "\x1b[0m";
+
+    println!("\n=== BATCH SUMMARY ===");
+    println!("  Total files:     {:>width$}", total, width = width);
+    println!("  {green}Successful:{reset}      {:>width$} ({s_pct}%)", successful, width = width);
+    println!("  {red}Failed:{reset}          {:>width$} ({f_pct}%)", failed, width = width);
+    println!("  {yellow}Skipped (done):{reset}  {:>width$}", skipped, width = width);
+    println!("=====================\n");
+}
+
 /// Export additional files (SRT, chapters, FCPXML, EDL, clips) based on config
 fn export_additional_files(
     input_file: &Path,
@@ -988,6 +1006,7 @@ pub fn process_batch_dir<A, E, D>(
     analyzer: &A,
     editor: &E,
     duration_getter: &D,
+    no_progress: bool,
 ) -> Result<()>
 where
     A: VideoAnalyzer,
@@ -1019,14 +1038,19 @@ where
     let mut failed_files = 0;
     let mut skipped_files = 0;
 
-    let pb = ProgressBar::new(total_files as u64);
-    let template = "{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {pos}/{len} {msg}";
-    pb.set_style(
-        ProgressStyle::default_bar()
-            .template(template)
-            .unwrap_or_else(|_| ProgressStyle::default_bar())
-            .progress_chars("#>-"),
-    );
+    let pb = if no_progress {
+        None
+    } else {
+        let bar = ProgressBar::new(total_files as u64);
+        let template = "{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {pos}/{len} {msg}";
+        bar.set_style(
+            ProgressStyle::default_bar()
+                .template(template)
+                .unwrap_or_else(|_| ProgressStyle::default_bar())
+                .progress_chars("#>-"),
+        );
+        Some(bar)
+    };
 
     let preset_rules = crate::preset_rules::default_preset_rules();
 
@@ -1087,14 +1111,11 @@ where
         pb.inc(1);
     }
 
-    pb.finish_with_message("Done");
+    if let Some(b) = pb {
+        b.finish_with_message("Done");
+    }
 
-    println!("\n=== BATCH SUMMARY ===");
-    println!("  Total files:     {}", total_files);
-    println!("  Successful:      {}", successful_files);
-    println!("  Failed:          {}", failed_files);
-    println!("  Skipped (done):  {}", skipped_files);
-    println!("=====================\n");
+    print_batch_summary(total_files, successful_files, failed_files, skipped_files);
 
     info!(
         total = total_files,
@@ -1110,15 +1131,16 @@ where
 /// Process a directory of videos in parallel using multiple worker threads.
 /// Each worker gets its own analyzer/editor instances since they are stateless.
 pub fn process_batch_dir_parallel<A, E, D>(
+pub fn process_batch_dir_parallel<A, E, D>(
     input_dir: PathBuf,
     output_dir: PathBuf,
     config: &Config,
     worker_count: usize,
-    _analyzer: &A,
-    _editor: &E,
-    _duration_getter: &D,
+    analyzer: &A,
+    editor: &E,
+    duration_getter: &D,
+    no_progress: bool,
 ) -> Result<()>
-where
     A: VideoAnalyzer + Send + Sync,
     E: VideoEditor + Send + Sync,
     D: DurationGetter + Send + Sync,
