@@ -628,7 +628,7 @@ fn main() -> Result<()> {
         let out_dir = output_dir
             .clone()
             .ok_or_else(|| anyhow::anyhow!("Output directory required for watch mode"))?;
-        return run_watch_mode(&watch_path, &out_dir, &config, &intro, &outro, cli.notify);
+        return run_watch_mode(&watch_path, &out_dir, &config, &intro, &outro, cli.notify, cli.dry_run);
     }
 
     let analyzer = FfmpegAnalyzer;
@@ -848,6 +848,20 @@ fn run_watch_mode(
                             },
                         );
 
+                    if dry_run {
+                        let elapsed = start_time.elapsed().as_secs_f32();
+                        println!(
+                            "[{}] [DRY-RUN] {} -> {} ({:.1}s)",
+                            timestamp(),
+                            file_name,
+                            output_path.display(),
+                            elapsed
+                        );
+                        last_processed = Some(file_name.clone());
+                        processed.insert(path);
+                        continue;
+                    }
+
                     match &result {
                         Ok(_) => {
                             let elapsed = start_time.elapsed().as_secs_f32();
@@ -1028,6 +1042,19 @@ fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
                                     );
                                 },
                             );
+
+                        if cli.dry_run {
+                            let elapsed = start_time.elapsed().as_secs_f32();
+                            println!(
+                                "[{}] [DRY-RUN] {} -> {} ({:.1}s)",
+                                timestamp(),
+                                file_name,
+                                output_path.display(),
+                                elapsed
+                            );
+                            processed_sets[idx].insert(path);
+                            continue;
+                        }
 
                         match &result {
                             Ok(_) => {
