@@ -24,6 +24,44 @@ pub struct WatchFolderConfig<'a> {
     pub folder_label: &'a str,
 }
 
+/// Track config file mtime for hot-reload detection
+struct ConfigWatcher {
+    path: Option<PathBuf>,
+    last_mtime: Option<std::time::SystemTime>,
+}
+
+impl ConfigWatcher {
+    fn new() -> Self {
+        Self {
+            path: None,
+            last_mtime: None,
+        }
+    }
+
+    /// Check if the config file has changed since last check.
+    /// If it changed, return true and update the tracked mtime.
+    fn check_for_reload(&mut self, config_path: Option<&Path>) -> bool {
+        let path = match config_path {
+            Some(p) => p,
+            None => return false,
+        };
+        let mtime = match std::fs::metadata(path).and_then(|m| m.modified()) {
+            Ok(t) => t,
+            Err(_) => return false,
+        };
+        if self.last_mtime.is_some_and(|t| t == mtime) {
+            return false;
+        }
+        self.last_mtime = Some(mtime);
+        self.path = Some(path.to_path_buf());
+        true
+    }
+
+    fn was_ever_loaded(&self) -> bool {
+        self.last_mtime.is_some()
+    }
+}
+
 /// Run the watch loop for a single folder.
 /// Extracted to avoid duplication between single-watch and multi-watch modes.
 pub fn run_watch_loop(params: WatchFolderConfig) -> Result<()> {
