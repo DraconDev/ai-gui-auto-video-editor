@@ -771,7 +771,7 @@ fn run_watch_mode(
 
     let analyzer = FfmpegAnalyzer;
     let editor = FfmpegEditor::new(config.video.hw_accel);
-    let duration_getter = FfmpegDurationGetter;
+    let duration_getter = CachingDurationGetter::new();
 
     let mut heartbeat = 0u32;
     let mut last_processed: Option<String> = None;
@@ -934,7 +934,7 @@ fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
 
     let analyzer = FfmpegAnalyzer;
     let editor = FfmpegEditor::new(config.video.hw_accel);
-    let duration_getter = FfmpegDurationGetter;
+    let duration_getter = CachingDurationGetter::new();
 
     // Track processed files per folder
     let mut processed_sets: Vec<HashSet<PathBuf>> = Vec::new();
