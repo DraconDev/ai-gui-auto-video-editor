@@ -714,374 +714,75 @@ fn run_watch_mode(
     notify: bool,
     dry_run: bool,
 ) -> Result<()> {
-    use std::collections::HashSet;
-    use std::time::Duration;
-
     println!("=== WATCH MODE ===");
-    println!("Watching: {}", watch_dir.display());
-    println!("Output to: {}", output_dir.display());
-    println!("Polling every {}s", config.watch.interval);
-    println!("Press Ctrl+C to stop\n");
 
-    // Create output directory if it doesn't exist
-    std::fs::create_dir_all(output_dir)?;
-
-    // Track processed files
-    let mut processed: HashSet<PathBuf> = HashSet::new();
-
-    // Initial scan - process existing files
-    for entry in std::fs::read_dir(watch_dir)? {
-        let entry = entry?;
-        let path = entry.path();
-
-        if let Some(ext) = path.extension().and_then(|e| e.to_str())
-            && crate::utils::VIDEO_EXTENSIONS.contains(&ext.to_lowercase().as_str())
-        {
-            let name = path
-                .file_name()
-                .map(|n| n.to_string_lossy())
-                .unwrap_or_default();
-            println!("  Skipping existing: {}", name);
-            processed.insert(path);
-        }
-    }
-
-    if processed.is_empty() {
-        println!(
-            "  No existing videos found. Drop a video in {:?} to start processing.",
-            watch_dir
-        );
-    } else {
-        println!(
-            "  {} existing file(s) skipped (already present on startup).",
-            processed.len()
-        );
-    }
-
-    let analyzer = FfmpegAnalyzer;
-    let editor = FfmpegEditor::new(config.video.hw_accel);
-    let duration_getter = CachingDurationGetter::new();
-
-    let mut heartbeat = 0u32;
-    let mut last_processed: Option<String> = None;
-
-    loop {
-        std::thread::sleep(Duration::from_secs(config.watch.interval));
-        heartbeat += 1;
-
-        // Print a heartbeat every (6 * watch.interval) seconds
-        if heartbeat.is_multiple_of(6) {
-            if let Some(ref last) = last_processed {
-                println!(
-                    "[{}] Watching {:?} for new files... (last: {})",
-                    timestamp(),
-                    watch_dir,
-                    last
-                );
-            } else {
-                println!(
-                    "[{}] Watching {:?} for new files...",
-                    timestamp(),
-                    watch_dir
-                );
-            }
-        }
-
-        // Check for new files
-        if let Ok(entries) = std::fs::read_dir(watch_dir) {
-            for entry in entries.flatten() {
-                let path = entry.path();
-
-                if let Some(ext) = path.extension().and_then(|e| e.to_str())
-                    && crate::utils::VIDEO_EXTENSIONS.contains(&ext.to_lowercase().as_str())
-                    && !processed.contains(&path)
-                {
-                    let now = timestamp();
-                    println!("\n[{}] [NEW FILE] {:?}", now, path);
-
-                    let file_name = path
-                        .file_name()
-                        .map(|n| n.to_string_lossy().to_string())
-                        .unwrap_or_else(|| "output.mp4".to_string());
-                    let output_path = output_dir.join(&file_name);
-
-                    println!("[{}] [START] Processing {}...", now, file_name);
-
-                    if notify {
-                        notify_processing(&path);
-                    }
-
-                    let start_time = std::time::Instant::now();
-
-                    // Process with intro/outro, showing progress
-                    let file_name_for_progress = file_name.clone();
-                    let result =
-                        crate::batch_processor::process_single_file_with_intro_outro_progress(
-                            path.clone(),
-                            output_path.clone(),
-                            config,
-                            &analyzer,
-                            &editor,
-                            &duration_getter,
-                            intro.clone(),
-                            outro.clone(),
-                            move |p| {
-                                let now = timestamp();
-                                println!(
-                                    "[{}] [{:>6.1}%] {} - {}",
-                                    now,
-                                    p.fraction * 100.0,
-                                    file_name_for_progress,
-                                    p.stage
-                                );
-                            },
-                        );
-
-                    if dry_run {
-                        let elapsed = start_time.elapsed().as_secs_f32();
-                        println!(
-                            "[{}] [DRY-RUN] {} -> {} ({:.1}s)",
-                            timestamp(),
-                            file_name,
-                            output_path.display(),
-                            elapsed
-                        );
-                        last_processed = Some(file_name.clone());
-                        processed.insert(path);
-                        continue;
-                    }
-
-                    match &result {
-                        Ok(_) => {
-                            let elapsed = start_time.elapsed().as_secs_f32();
-                            println!(
-                                "[{}] [{:>7}] {} -> {} ({:.1}s)",
-                                timestamp(),
-                                "DONE",
-                                file_name,
-                                output_path.display(),
-                                elapsed
-                            );
-                            if notify {
-                                notify_complete(&path, &output_path);
-                            }
-                            last_processed = Some(file_name.clone());
-                            processed.insert(path);
-                        }
-                        Err(e) => {
-                            let elapsed = start_time.elapsed().as_secs_f32();
-                            last_processed = Some(format!("{} (error)", file_name));
-                            eprintln!(
-                                "[{}] [ERROR] {} failed after {:.1}s: {}",
-                                timestamp(),
-                                file_name,
-                                elapsed,
-                                e
-                            );
-                            if notify {
-                                notify_error(&path, &e.to_string());
-                            }
-                            // Still mark as processed to avoid retrying
-                            processed.insert(path);
-                        }
-                    }
-                }
-            }
-        }
-    }
+    crate::watch::run_watch_loop(crate::watch::WatchFolderConfig {
+        watch_dir,
+        output_dir,
+        config,
+        intro: intro.clone(),
+        outro: outro.clone(),
+        notify,
+        dry_run,
+        folder_label: "",
+    })
 }
+
 
 /// Run watch mode for multiple folders from config
 fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
-    use std::collections::HashSet;
-    use std::time::Duration;
+    println!("=== MULTI-FOLDER WATCH MODE ===");
 
     let enabled_folders: Vec<&crate::config::WatchFolder> = config
         .paths
         .watch_folders
         .iter()
-        .filter(|f| f.enabled)
+        .filter(|f| f.enabled.unwrap_or(true))
         .collect();
 
     if enabled_folders.is_empty() {
-        anyhow::bail!("No enabled watch folders in config");
+        println!("No enabled watch folders found in config.");
+        return Ok(());
     }
 
-    println!("=== MULTI-FOLDER WATCH MODE ===");
-    println!("Config: ~/.config/ai-vid-editor/config.toml");
-    println!("Watching {} folder(s):", enabled_folders.len());
+    println!("Monitoring {} watch folder(s)\n", enabled_folders.len());
+
     for folder in &enabled_folders {
+        let name = folder.name.as_deref().unwrap_or("unnamed");
         println!(
-            "  {} -> {} [{}]",
+            "  Folder: {} -> {} (preset: {})",
             folder.input.display(),
             folder.output.display(),
-            folder.preset
+            folder.settings.preset.as_deref().unwrap_or("default")
         );
     }
-    println!("Polling every {}s", config.watch.interval);
-    println!("Press Ctrl+C to stop\n");
-
-    let analyzer = FfmpegAnalyzer;
-    let editor = FfmpegEditor::new(config.video.hw_accel);
-    let duration_getter = CachingDurationGetter::new();
-
-    // Track processed files per folder
-    let mut processed_sets: Vec<HashSet<PathBuf>> = Vec::new();
-    for folder in &enabled_folders {
-        let mut processed: HashSet<PathBuf> = HashSet::new();
-
-        // Create output directory
-        std::fs::create_dir_all(&folder.output)?;
-
-        // Initial scan - mark existing files as already processed
-        if let Ok(entries) = std::fs::read_dir(&folder.input) {
-            for entry in entries.flatten() {
-                let path = entry.path();
-                if let Some(ext) = path.extension().and_then(|e| e.to_str())
-                    && crate::utils::VIDEO_EXTENSIONS.contains(&ext.to_lowercase().as_str())
-                {
-                    let name = path
-                        .file_name()
-                        .map(|n| n.to_string_lossy())
-                        .unwrap_or_default();
-                    println!("  Skipping existing: {}", name);
-                    processed.insert(path);
-                }
-            }
-        }
-
-        if processed.is_empty() {
-            println!(
-                "  {:?}: No videos found. Drop a video here to start processing.",
-                folder.input
-            );
-        } else {
-            println!(
-                "  {:?}: {} existing file(s) skipped.",
-                folder.input,
-                processed.len()
-            );
-        }
-        processed_sets.push(processed);
-    }
-
-    let mut heartbeat = 0u32;
 
     loop {
-        std::thread::sleep(Duration::from_secs(config.watch.interval));
-        heartbeat += 1;
+        for folder in &enabled_folders {
+            let name = folder.name.as_deref().unwrap_or("unnamed");
+            let folder_config = config.with_folder_settings(folder);
 
-        // Print a heartbeat every (6 * watch.interval) seconds
-        if heartbeat.is_multiple_of(6) {
-            println!(
-                "[{}] Watching {} folder(s) for new files...",
-                timestamp(),
-                enabled_folders.len()
-            );
-        }
-
-        for (idx, folder) in enabled_folders.iter().enumerate() {
-            // Build folder config once, before iterating files
-            let folder_config =
-                config.with_folder_settings(&folder.preset, &folder.settings);
-
-            if let Ok(entries) = std::fs::read_dir(&folder.input) {
-                for entry in entries.flatten() {
-                    let path = entry.path();
-
-                    if let Some(ext) = path.extension().and_then(|e| e.to_str())
-                        && crate::utils::VIDEO_EXTENSIONS.contains(&ext.to_lowercase().as_str())
-                        && !processed_sets[idx].contains(&path)
-                    {
-                        let now = timestamp();
-                        println!("\n[{}] [NEW FILE] {:?}", now, path);
-
-                        let file_name = path
-                            .file_name()
-                            .map(|n| n.to_string_lossy().to_string())
-                            .unwrap_or_else(|| "output.mp4".to_string());
-                        let output_path = folder.output.join(&file_name);
-
-                        println!("[{}] [START] Processing {}...", now, file_name);
-
-                        if cli.notify {
-                            notify_processing(&path);
-                        }
-
-                        let start_time = std::time::Instant::now();
-                        let progress_name = file_name.clone();
-                        let result =
-                            crate::batch_processor::process_single_file_with_intro_outro_progress(
-                                path.clone(),
-                                output_path.clone(),
-                                &folder_config,
-                                &analyzer,
-                                &editor,
-                                &duration_getter,
-                                None,
-                                None,
-                                move |p| {
-                                    let now = timestamp();
-                                    println!(
-                                        "[{}] [{:>6.1}%] {} - {}",
-                                        now,
-                                        p.fraction * 100.0,
-                                        progress_name,
-                                        p.stage
-                                    );
-                                },
-                            );
-
-                        if cli.dry_run {
-                            let elapsed = start_time.elapsed().as_secs_f32();
-                            println!(
-                                "[{}] [DRY-RUN] {} -> {} ({:.1}s)",
-                                timestamp(),
-                                file_name,
-                                output_path.display(),
-                                elapsed
-                            );
-                            processed_sets[idx].insert(path);
-                            continue;
-                        }
-
-                        match &result {
-                            Ok(_) => {
-                                let elapsed = start_time.elapsed().as_secs_f32();
-                                println!(
-                                    "[{}] [{:>7}] {} -> {} ({:.1}s)",
-                                    timestamp(),
-                                    "DONE",
-                                    file_name,
-                                    output_path.display(),
-                                    elapsed
-                                );
-                                if cli.notify {
-                                    notify_complete(&path, &output_path);
-                                }
-                                processed_sets[idx].insert(path);
-                            }
-                            Err(e) => {
-                                let elapsed = start_time.elapsed().as_secs_f32();
-                                eprintln!(
-                                    "[{}] [ERROR] {} failed after {:.1}s: {}",
-                                    timestamp(),
-                                    file_name,
-                                    elapsed,
-                                    e
-                                );
-                                if cli.notify {
-                                    notify_error(&path, &e.to_string());
-                                }
-                                processed_sets[idx].insert(path);
-                            }
-                        }
-                    }
-                }
+            if let Err(e) = crate::watch::run_watch_loop(crate::watch::WatchFolderConfig {
+                watch_dir: &folder.input,
+                output_dir: &folder.output,
+                config: &folder_config,
+                intro: &folder.intro,
+                outro: &folder.outro,
+                notify: config.watch.notify,
+                dry_run: cli.dry_run,
+                folder_label: name,
+            }) {
+                eprintln!(
+                    "[{}] [ERROR] Watch folder {} encountered an error: {}",
+                    crate::watch::timestamp(),
+                    name,
+                    e
+                );
             }
         }
     }
 }
+
 
 /// Pick a random music file from a directory
 fn pick_random_music_file(music_dir: &PathBuf) -> Result<Option<PathBuf>> {
