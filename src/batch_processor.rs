@@ -97,6 +97,52 @@ impl DurationGetter for FfmpegDurationGetter {
     }
 }
 
+/// Duration getter that caches results keyed by file metadata.
+/// Uses modification time + file size to detect changes.
+pub struct CachingDurationGetter {
+    inner: FfmpegDurationGetter,
+    cache: std::sync::Mutex<std::collections::HashMap<PathBuf, (std::time::SystemTime, u64, f32)>>,
+}
+
+impl CachingDurationGetter {
+    pub fn new() -> Self {
+        Self {
+            inner: FfmpegDurationGetter,
+            cache: std::sync::Mutex::new(std::collections::HashMap::new()),
+        }
+    }
+}
+
+impl DurationGetter for CachingDurationGetter {
+    fn get_duration(&self, path: &Path) -> Result<f32> {
+        let metadata = std::fs::metadata(path).with_context(|| format!("failed to read metadata for {:?}", path))?;
+        let mtime = metadata.modified().unwrap_or(std::time::SystemTime::UNIX_EPOCH);
+        let file_size = metadata.len();
+
+        {
+            let cache = self.cache.lock().unwrap_or_else(|p| p.into_inner());
+            if let Some((cached_mtime, cached_size, cached_dur)) = cache.get(path) {
+                if *cached_mtime == mtime && *cached_size == file_size {
+                    return Ok(*cached_dur);
+                }
+            }
+        }
+
+        let duration = self.inner.get_duration(path)?;
+
+        let mut cache = self.cache.lock().unwrap_or_else(|p| p.into_inner());
+        cache.insert(path.to_path_buf(), (mtime, file_size, duration));
+
+        Ok(duration)
+    }
+}
+
+impl Default for CachingDurationGetter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Concatenate intro/outro videos using ffmpeg concat demuxer
 /// Uses a list file instead of filter_complex to avoid filter injection risks
 fn concatenate_videos(

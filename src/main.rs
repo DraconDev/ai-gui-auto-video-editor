@@ -23,7 +23,7 @@ pub mod watermark;
 
 use crate::analyzer::FfmpegAnalyzer;
 use crate::batch_processor::{
-    FfmpegDurationGetter, process_batch_dir, process_batch_dir_parallel,
+    CachingDurationGetter, FfmpegDurationGetter, process_batch_dir, process_batch_dir_parallel,
     process_single_file_with_intro_outro,
 };
 
