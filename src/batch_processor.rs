@@ -634,8 +634,8 @@ where
 
 fn print_batch_summary(total: usize, successful: usize, failed: usize, skipped: usize) {
     let width = total.to_string().len().max(3);
-    let s_pct = if total > 0 { successful * 100 / total } else { 0 };
-    let f_pct = if total > 0 { failed * 100 / total } else { 0 };
+    let s_pct = successful.checked_mul(100).and_then(|v| v.checked_div(total)).unwrap_or(0);
+    let f_pct = failed.checked_mul(100).and_then(|v| v.checked_div(total)).unwrap_or(0);
 
     let green = "\x1b[32m";
     let red = "\x1b[31m";
