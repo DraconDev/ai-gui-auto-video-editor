@@ -321,7 +321,7 @@ fn main() -> Result<()> {
     // Check FFmpeg and ffprobe availability early
     if let Err(e) = crate::utils::check_ffmpeg() {
         if cli.json {
-            println!("{}", serde_json::to_string(&json!({"error": e.to_string()})).unwrap_or_else(|_| format!("{{\"error\": \"{}\"}}", e)));
+            println!("{}", serde_json::to_string_pretty(&json!({"error": e.to_string()})).unwrap_or_else(|_| format!("{{\"error\": \"{}\"}}", e)));
         } else {
             eprintln!("Error: {}", e);
         }
@@ -330,7 +330,7 @@ fn main() -> Result<()> {
 
     if let Err(e) = crate::utils::check_ffprobe() {
         if cli.json {
-            println!("{}", serde_json::to_string(&json!({"error": e.to_string()})).unwrap_or_else(|_| format!("{{\"error\": \"{}\"}}", e)));
+            println!("{}", serde_json::to_string_pretty(&json!({"error": e.to_string()})).unwrap_or_else(|_| format!("{{\"error\": \"{}\"}}", e)));
         } else {
             eprintln!("Error: {}", e);
         }
@@ -774,7 +774,7 @@ fn run_watch_mode(
         std::thread::sleep(Duration::from_secs(config.watch.interval));
         heartbeat += 1;
 
-        // Print a heartbeat every ~30s so user knows we're still watching
+        // Print a heartbeat every (6 * watch.interval) seconds
         if heartbeat.is_multiple_of(6) {
             if let Some(ref last) = last_processed {
                 println!(
@@ -962,7 +962,7 @@ fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
         std::thread::sleep(Duration::from_secs(config.watch.interval));
         heartbeat += 1;
 
-        // Print a heartbeat every ~30s so user knows we're still watching
+        // Print a heartbeat every (6 * watch.interval) seconds
         if heartbeat.is_multiple_of(6) {
             println!(
                 "[{}] Watching {} folder(s) for new files...",
