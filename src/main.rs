@@ -20,24 +20,14 @@ pub mod stt_analyzer;
 pub mod thumbnail;
 pub mod utils;
 pub mod watermark;
+pub mod watch;
 
 use crate::analyzer::FfmpegAnalyzer;
 use crate::batch_processor::{
-    CachingDurationGetter, FfmpegDurationGetter, process_batch_dir, process_batch_dir_parallel,
+    FfmpegDurationGetter, process_batch_dir, process_batch_dir_parallel,
     process_single_file_with_intro_outro,
 };
 
-fn timestamp() -> String {
-    use std::time::SystemTime;
-    let now = SystemTime::now()
-        .duration_since(SystemTime::UNIX_EPOCH)
-        .unwrap_or_default();
-    let secs = now.as_secs();
-    let hours = (secs / 3600) % 24;
-    let minutes = (secs / 60) % 60;
-    let seconds = secs % 60;
-    format!("{:02}:{:02}:{:02}", hours, minutes, seconds)
-}
 use crate::config::{Config, Preset};
 use crate::editor::FfmpegEditor;
 
@@ -748,7 +738,6 @@ fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
     println!("Monitoring {} watch folder(s)\n", enabled_folders.len());
 
     for folder in &enabled_folders {
-        let name = folder.input.display().to_string();
         println!(
             "  Folder: {} -> {} (preset: {})",
             folder.input.display(),
