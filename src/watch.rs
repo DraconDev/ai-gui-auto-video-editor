@@ -6,8 +6,9 @@ use anyhow::Result;
 
 use crate::analyzer::FfmpegAnalyzer;
 use crate::batch_processor::{
-    process_single_file_with_intro_outro_progress, CachingDurationGetter, FfmpegEditor,
+    process_single_file_with_intro_outro_progress, CachingDurationGetter,
 };
+use crate::editor::FfmpegEditor;
 use crate::config::Config;
 
 /// Shared configuration for a single watch folder
