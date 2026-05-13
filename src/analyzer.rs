@@ -72,7 +72,7 @@ fn get_video_duration(path: &Path) -> Result<f32> {
     val_str.parse::<f32>().context("failed to parse duration")
 }
 
-fn parse_ffmpeg_silence(output: &str, video_duration: f32) -> Vec<Segment> {
+pub fn parse_ffmpeg_silence(output: &str, video_duration: f32) -> Vec<Segment> {
     let mut segments = Vec::new();
     let mut current_start: Option<f32> = None;
 
