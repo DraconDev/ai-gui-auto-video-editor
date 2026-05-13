@@ -760,14 +760,14 @@ fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
     loop {
         for folder in &enabled_folders {
             let name = folder.name.as_deref().unwrap_or("unnamed");
-            let folder_config = config.with_folder_settings(folder);
+            let folder_config = config.with_folder_settings(&folder.preset, &folder.settings);
 
             if let Err(e) = crate::watch::run_watch_loop(crate::watch::WatchFolderConfig {
                 watch_dir: &folder.input,
                 output_dir: &folder.output,
                 config: &folder_config,
-                intro: &config.paths.intro,
-                outro: &config.paths.outro,
+                intro: config.paths.intro.clone(),
+                outro: config.paths.outro.clone(),
                 notify: cli.notify,
                 dry_run: cli.dry_run,
                 folder_label: &name,

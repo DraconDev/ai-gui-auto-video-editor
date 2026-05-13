@@ -166,7 +166,7 @@ fn is_new_video(path: &Path, processed: &HashSet<PathBuf>) -> bool {
     crate::utils::VIDEO_EXTENSIONS.contains(&ext.as_str())
 }
 
-fn timestamp() -> String {
+pub(crate) fn timestamp() -> String {
     use std::time::SystemTime;
     let now = SystemTime::now()
         .duration_since(SystemTime::UNIX_EPOCH)
