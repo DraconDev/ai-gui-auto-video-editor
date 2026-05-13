@@ -1186,6 +1186,22 @@ where
     let progress = Arc::new(std::sync::Mutex::new(progress));
     let progress_path = Arc::new(progress_path);
 
+    let pb = if no_progress {
+        None
+    } else {
+        let mp = MultiProgress::new();
+        let bar = mp.add(ProgressBar::new(total_files as u64));
+        let template = "{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {pos}/{len} {msg}";
+        bar.set_style(
+            ProgressStyle::default_bar()
+                .template(template)
+                .unwrap_or_else(|_| ProgressStyle::default_bar())
+                .progress_chars("#>-"),
+        );
+        bar.set_message("Parallel processing...");
+        Some(Arc::new(bar))
+    };
+
     // Split files into chunks for each worker
     let chunks: Vec<Vec<PathBuf>> = video_files
         .chunks(total_files.div_ceil(worker_count))
@@ -1200,6 +1216,7 @@ where
             let failed = Arc::clone(&failed_files);
             let progress = Arc::clone(&progress);
             let progress_path = Arc::clone(&progress_path);
+            let pb = pb.clone();
 
             s.spawn(move || {
                 for input_file in chunk {
@@ -1214,14 +1231,16 @@ where
                     let editor = crate::editor::FfmpegEditor::new(config.video.hw_accel);
                     let duration_getter = FfmpegDurationGetter;
 
-                    match process_single_file(
+                    let result = process_single_file(
                         input_file.clone(),
                         output_file,
                         &config,
                         &analyzer,
                         &editor,
                         &duration_getter,
-                    ) {
+                    );
+
+                    match result {
                         Ok(_) => {
                             info!(file = ?input_file, "Successfully processed");
                             successful.fetch_add(1, Ordering::SeqCst);
@@ -1241,13 +1260,23 @@ where
                             }
                         }
                     }
+                    if let Some(ref b) = pb {
+                        b.inc(1);
+                    }
                 }
             });
         }
     });
 
+    if let Some(b) = pb {
+        b.finish_with_message("Done");
+    }
+
     let successful = successful_files.load(Ordering::SeqCst);
     let failed = failed_files.load(Ordering::SeqCst);
+    let skipped = 0usize;
+
+    print_batch_summary(total_files, successful, failed, skipped);
 
     info!(
         total = total_files,
