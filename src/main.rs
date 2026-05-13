@@ -766,9 +766,9 @@ fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
                 watch_dir: &folder.input,
                 output_dir: &folder.output,
                 config: &folder_config,
-                intro: &folder.intro,
-                outro: &folder.outro,
-                notify: config.watch.notify,
+                intro: &folder.settings.intro,
+                outro: &folder.settings.outro,
+                notify: cli.notify,
                 dry_run: cli.dry_run,
                 folder_label: name,
             }) {
