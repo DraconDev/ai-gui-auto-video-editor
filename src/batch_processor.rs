@@ -632,7 +632,7 @@ where
     });
 }
 
-fn print_batch_summary(total: usize, successful: usize, failed: usize, skipped: usize) {
+fn format_batch_summary(total: usize, successful: usize, failed: usize, skipped: usize) -> String {
     let width = total.to_string().len().max(3);
     let s_pct = successful.checked_mul(100).and_then(|v| v.checked_div(total)).unwrap_or(0);
     let f_pct = failed.checked_mul(100).and_then(|v| v.checked_div(total)).unwrap_or(0);
@@ -642,12 +642,25 @@ fn print_batch_summary(total: usize, successful: usize, failed: usize, skipped: 
     let yellow = "\x1b[33m";
     let reset = "\x1b[0m";
 
-    println!("\n=== BATCH SUMMARY ===");
-    println!("  Total files:     {:>width$}", total, width = width);
-    println!("  {green}Successful:{reset}      {:>width$} ({s_pct}%)", successful, width = width);
-    println!("  {red}Failed:{reset}          {:>width$} ({f_pct}%)", failed, width = width);
-    println!("  {yellow}Skipped (done):{reset}  {:>width$}", skipped, width = width);
-    println!("=====================\n");
+    format!(
+        "\n=== BATCH SUMMARY ===\n\
+         {green}  Successful:{reset}      {:>width$} ({s_pct}%)\n\
+         {red}  Failed:{reset}          {:>width$} ({f_pct}%)\n\
+         {yellow}  Skipped (done):{reset}  {:>width$}\n\
+         =====================\n",
+        successful, failed, skipped,
+        width = width,
+        green = green,
+        red = red,
+        yellow = yellow,
+        reset = reset,
+        s_pct = s_pct,
+        f_pct = f_pct,
+    )
+}
+
+fn print_batch_summary(total: usize, successful: usize, failed: usize, skipped: usize) {
+    print!("{}", format_batch_summary(total, successful, failed, skipped));
 }
 
 /// Export additional files (SRT, chapters, FCPXML, EDL, clips) based on config
