@@ -1404,6 +1404,7 @@ mod tests {
             &mock_analyzer,
             &mock_editor,
             &mock_duration_getter,
+            true,
         );
 
         assert!(result.is_ok());
@@ -1439,6 +1440,7 @@ mod tests {
             &mock_analyzer,
             &mock_editor,
             &mock_duration_getter,
+            true,
         );
 
         assert!(result.is_ok());
@@ -1468,6 +1470,7 @@ mod tests {
             &mock_analyzer,
             &mock_editor,
             &mock_duration_getter,
+            true,
         );
 
         assert!(result.is_ok());
@@ -1595,6 +1598,7 @@ mod tests {
             &mock_analyzer,
             &mock_editor,
             &mock_duration_getter,
+            true,
         );
 
         // Should complete even with failures (logs errors but doesn't panic)
@@ -1632,6 +1636,7 @@ mod tests {
             &mock_analyzer,
             &mock_editor,
             &mock_duration_getter,
+            true,
         );
 
         assert!(result.is_ok());
@@ -1670,6 +1675,7 @@ mod tests {
             &mock_analyzer,
             &mock_editor,
             &mock_duration_getter,
+            true,
         );
 
         assert!(result.is_ok());
@@ -1705,6 +1711,7 @@ mod tests {
             &mock_analyzer,
             &mock_editor,
             &mock_duration_getter,
+            true,
         );
 
         // With all features disabled, trim is still called which creates the output
@@ -1737,6 +1744,7 @@ mod tests {
             &mock_analyzer,
             &mock_editor,
             &mock_duration_getter,
+            true,
         );
         assert!(result1.is_ok());
 
@@ -1748,6 +1756,7 @@ mod tests {
             &mock_analyzer,
             &mock_editor,
             &mock_duration_getter,
+            true,
         );
         assert!(result2.is_ok());
 
