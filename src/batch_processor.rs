@@ -1112,7 +1112,9 @@ where
         if let Err(e) = progress.to_file(&progress_path) {
             warn!("Failed to save progress file: {}", e);
         }
-        pb.inc(1);
+        if let Some(ref b) = pb {
+            b.inc(1);
+        }
     }
 
     if let Some(b) = pb {
