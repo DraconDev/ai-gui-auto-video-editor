@@ -121,10 +121,10 @@ impl DurationGetter for CachingDurationGetter {
 
         {
             let cache = self.cache.lock().unwrap_or_else(|p| p.into_inner());
-            if let Some((cached_mtime, cached_size, cached_dur)) = cache.get(path) {
-                if *cached_mtime == mtime && *cached_size == file_size {
-                    return Ok(*cached_dur);
-                }
+            if let Some((cached_mtime, cached_size, cached_dur)) = cache.get(path)
+                && *cached_mtime == mtime && *cached_size == file_size
+            {
+                return Ok(*cached_dur);
             }
         }
 
