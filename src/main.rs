@@ -248,6 +248,10 @@ pub struct Cli {
     /// Quiet mode (suppress non-error output)
     #[arg(short, long, conflicts_with = "verbose")]
     pub quiet: bool,
+
+    /// Suppress progress bars (useful for CI/non-interactive environments)
+    #[arg(long)]
+    pub no_progress: bool,
 }
 
 #[cfg(feature = "notify-rust")]
