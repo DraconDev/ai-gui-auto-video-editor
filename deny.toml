@@ -1,0 +1,59 @@
+# cargo-deny configuration for ai-vid-editor
+# Run with: cargo deny check
+
+[advisories]
+# Ignore advisories that are not relevant (add advisory IDs here)
+# ignore = ["RUSTSEC-2023-0001"]
+vulnerability = "deny"
+unmaintained = "warn"
+unsound = "deny"
+notice = "warn"
+
+[licenses]
+# Deny licenses that are not allowed
+unlicensed = "deny"
+allow = [
+    "MIT",
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "Zlib",
+    "Unicode-3.0",
+    "Unlicense",
+    "CC0-1.0",
+    "MPL-2.0",
+    "OpenSSL",
+]
+deny = [
+    "GPL-3.0",
+    "GPL-3.0-only",
+    "GPL-3.0-or-later",
+    "AGPL-3.0",
+    "AGPL-3.0-only",
+    "AGPL-3.0-or-later",
+]
+copyleft = "deny"
+allow-osi-fsf-free = "neither"
+default = "deny"
+confidence-threshold = 0.8
+
+[bans]
+# Deny multiple versions of the same crate
+multiple-versions = "deny"
+# Skip certain crates that are allowed to have multiple versions
+skip = []
+skip-tree = [
+    # tokenizers uses an older version of serde_json
+    { name = "serde_json", version = ">=1.0.100, <1.0.120" },
+]
+
+[sources]
+# Deny crates from unknown sources
+unknown-registry = "deny"
+unknown-git = "deny"
+
+[graph]
+# Show features of dependency graph
+show-features = true

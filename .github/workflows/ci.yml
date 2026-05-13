@@ -35,8 +35,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-check-target-
 
-      - name: Check compilation
+      - name: Check compilation (all features)
         run: cargo check --all-features
+
+      - name: Check compilation (CLI only)
+        run: cargo check --no-default-features --features cli
+
+      - name: Check compilation (GUI only)
+        run: cargo check --no-default-features --features gui
 
   test:
     name: Test
@@ -64,7 +70,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-test-target-
 
-      - name: Run tests
+      - name: Run lib tests
+        run: cargo test --lib
+
+      - name: Run all tests (requires FFmpeg)
         run: cargo test --all-features
 
   clippy:
@@ -108,6 +117,21 @@ jobs:
 
       - name: Check formatting
         run: cargo fmt --all -- --check
+
+  deny:
+    name: License & Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-action@stable
+
+      - name: Install cargo-deny
+        uses: EmbarkStudios/cargo-deny-action@v2
+
+      - name: Run cargo-deny
+        run: cargo deny check
 
   docs:
     name: Documentation

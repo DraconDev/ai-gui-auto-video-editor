@@ -70,6 +70,7 @@ pub fn escape_ffmpeg_filter_path(path: &Path) -> String {
         .replace('\'', "'\\''")
 }
 
+#[must_use]
 pub struct TempDir {
     path: PathBuf,
     keep: bool,
@@ -106,6 +107,7 @@ impl Drop for TempDir {
     }
 }
 
+#[must_use]
 pub struct TempFile {
     path: PathBuf,
 }

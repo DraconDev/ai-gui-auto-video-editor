@@ -840,10 +840,11 @@ fn run_watch_mode(
                                 let now = timestamp();
                                 println!(
                                     "[{}] [{:.0}%] {} - {}",
-                                    now,
-                                    p.fraction * 100.0,
-                                    file_name_for_progress,
-                                    p.stage
+                                "[{}] [{:>6.1}%] {} - {}",
+                                        now,
+                                        p.fraction * 100.0,
+                                        file_name_for_progress,
+                                        p.stage
                                 );
                             },
                         );
@@ -852,11 +853,11 @@ fn run_watch_mode(
                         Ok(_) => {
                             let elapsed = start_time.elapsed().as_secs_f32();
                             println!(
-                                "[{}] [DONE] {} -> {} ({:.1}s)",
+                                "[{}] [{:>7}] {} -> {} ({:.1}s)",
                                 timestamp(),
+                                "DONE",
                                 file_name,
                                 output_path.display(),
-                                elapsed
                             );
                             if notify {
                                 notify_complete(&path, &output_path);
@@ -1020,7 +1021,7 @@ fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
                                 move |p| {
                                     let now = timestamp();
                                     println!(
-                                        "[{}] [{:.0}%] {} - {}",
+                                        "[{}] [{:>6.1}%] {} - {}",
                                         now,
                                         p.fraction * 100.0,
                                         progress_name,
@@ -1033,8 +1034,9 @@ fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
                             Ok(_) => {
                                 let elapsed = start_time.elapsed().as_secs_f32();
                                 println!(
-                                    "[{}] [DONE] {} -> {} ({:.1}s)",
+                                    "[{}] [{:>7}] {} -> {} ({:.1}s)",
                                     timestamp(),
+                                    "DONE",
                                     file_name,
                                     output_path.display(),
                                     elapsed

@@ -1056,13 +1056,14 @@ where
         None
     } else {
         let bar = ProgressBar::new(total_files as u64);
-        let template = "{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {pos}/{len} {msg}";
+        let template = "{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {pos}/{len} [{eta_precise}] {msg}";
         bar.set_style(
             ProgressStyle::default_bar()
                 .template(template)
                 .unwrap_or_else(|_| ProgressStyle::default_bar())
                 .progress_chars("#>-"),
         );
+        bar.enable_steady_tick(std::time::Duration::from_millis(250));
         Some(bar)
     };
 
@@ -1206,7 +1207,7 @@ where
     } else {
         let mp = MultiProgress::new();
         let bar = mp.add(ProgressBar::new(total_files as u64));
-        let template = "{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {pos}/{len} {msg}";
+        let template = "{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {pos}/{len} [{eta_precise}] {msg}";
         bar.set_style(
             ProgressStyle::default_bar()
                 .template(template)
@@ -1214,6 +1215,7 @@ where
                 .progress_chars("#>-"),
         );
         bar.set_message("Parallel processing...");
+        bar.enable_steady_tick(std::time::Duration::from_millis(250));
         Some(Arc::new(bar))
     };
 
