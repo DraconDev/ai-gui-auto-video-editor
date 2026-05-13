@@ -613,7 +613,7 @@ fn main() -> Result<()> {
             let out_dir = output_dir
                 .clone()
                 .ok_or_else(|| anyhow::anyhow!("Output directory required for watch mode"))?;
-            return run_watch_mode(&watch_path, &out_dir, &config, &intro, &outro, cli.notify);
+            return run_watch_mode(&watch_path, &out_dir, &config, &intro, &outro, cli.notify, cli.dry_run);
         }
 
         // Use watch_folders from config if available and enabled
@@ -723,6 +723,7 @@ fn run_watch_mode(
     intro: &Option<PathBuf>,
     outro: &Option<PathBuf>,
     notify: bool,
+    dry_run: bool,
 ) -> Result<()> {
     use std::collections::HashSet;
     use std::time::Duration;
