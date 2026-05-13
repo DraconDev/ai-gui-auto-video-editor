@@ -1,5 +1,6 @@
 use anyhow::Result;
 use std::path::PathBuf;
+use tracing::{info, error};
 
 #[cfg(feature = "cli")]
 use clap::Parser;

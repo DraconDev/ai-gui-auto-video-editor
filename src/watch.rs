@@ -3,6 +3,7 @@ use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
 use anyhow::Result;
+use tracing::{info, error};
 
 use crate::analyzer::FfmpegAnalyzer;
 use crate::batch_processor::{
@@ -56,7 +57,8 @@ pub fn run_watch_loop(params: WatchFolderConfig) -> Result<()> {
                 }
 
                 let now = timestamp();
-                println!("\n[{}] [NEW FILE] {label} {:?}", now, path);
+                info!("
+[{}] [NEW FILE] {label} {:?}", now, path);
 
                 let file_name = path
                     .file_name()
@@ -64,7 +66,7 @@ pub fn run_watch_loop(params: WatchFolderConfig) -> Result<()> {
                     .unwrap_or_else(|| "output.mp4".to_string());
                 let output_path = params.output_dir.join(&file_name);
 
-                println!("[{}] [START] {label} Processing {}...", now, file_name);
+                info!("[{}] [START] {label} Processing {}...", now, file_name);
 
                 if params.notify {
                     notify_processing(&path);
@@ -145,12 +147,12 @@ pub fn run_watch_loop(params: WatchFolderConfig) -> Result<()> {
         }
 
         // Show status line when nothing processed recently
-        if last_processed.is_none() || heartbeat % 12 == 0 {
+        if last_processed.is_none() || heartbeat.is_multiple_of(12) {
             let status = match &last_processed {
                 Some(name) => format!("last: {name}"),
                 None => "waiting for files...".to_string(),
             };
-            println!("[{}] [{status}] {label}", timestamp());
+            info!("[{}] [{status}] {label}", timestamp());
         }
     }
 }
