@@ -693,6 +693,7 @@ fn main() -> Result<()> {
                 &analyzer,
                 &editor,
                 &duration_getter,
+                cli.no_progress,
             )?;
         } else {
             process_batch_dir(
@@ -702,6 +703,7 @@ fn main() -> Result<()> {
                 &analyzer,
                 &editor,
                 &duration_getter,
+                cli.no_progress,
             )?;
         }
     } else {
