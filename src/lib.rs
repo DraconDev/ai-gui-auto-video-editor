@@ -13,6 +13,7 @@ pub mod stt_analyzer;
 pub mod thumbnail;
 pub mod utils;
 pub mod watermark;
+pub mod watch;
 
 // gui module conditionally compiled to avoid circular dependency during crate compilation
 #[cfg(feature = "gui")]
@@ -32,3 +33,4 @@ pub use editor::FfmpegEditor;
 pub use hwaccel::HwAccel;
 pub use ml::{AutoReframeProcessor, FaceDetector, FrameExtractor, PersonSegmenter};
 pub use preview::{generate_preview, preview_path};
+pub use watch::{run_watch_loop, WatchFolderConfig};
