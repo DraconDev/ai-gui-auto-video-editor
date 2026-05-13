@@ -1058,7 +1058,9 @@ where
         if progress.is_completed(input_file) {
             info!(file = ?input_file, "Skipping already processed file");
             skipped_files += 1;
-            pb.inc(1);
+            if let Some(ref b) = pb {
+                b.inc(1);
+            }
             continue;
         }
 
@@ -1067,7 +1069,9 @@ where
             .context(format!("Could not get file name for {:?}", input_file))?;
         let output_file = output_dir.join(file_name);
 
-        pb.set_message(format!("{}", input_file.display()));
+        if let Some(ref b) = pb {
+            b.set_message(format!("{}", input_file.display()));
+        }
 
         // Apply per-file preset based on filename
         let file_preset = crate::preset_rules::preset_for_file(
