@@ -715,6 +715,7 @@ fn run_watch_mode(
 
 
 /// Run watch mode for multiple folders from config
+/// Spawns a thread per folder so all folders are watched concurrently.
 fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
     info!("=== MULTI-FOLDER WATCH MODE ===");
 
@@ -741,30 +742,78 @@ fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
         );
     }
 
-    loop {
-        for folder in &enabled_folders {
-            let name = folder.input.display().to_string();
-            let folder_config = config.with_folder_settings(&folder.preset, &folder.settings);
+    // Detect the config file path for hot-reload checking
+    let config_path = find_config_path(cli);
+    let mut config_watcher = ConfigWatcher::new();
+    if let Some(ref cp) = config_path {
+        config_watcher.check_for_reload(Some(cp.as_ref()));
+    }
 
-            if let Err(e) = crate::watch::run_watch_loop(crate::watch::WatchFolderConfig {
-                watch_dir: &folder.input,
-                output_dir: &folder.output,
-                config: &folder_config,
-                intro: config.paths.intro.clone(),
-                outro: config.paths.outro.clone(),
-                notify: cli.notify,
-                dry_run: cli.dry_run,
-                folder_label: &name,
+    // Spawn one thread per watch folder so they run concurrently
+    let mut handles = Vec::new();
+    for folder in &enabled_folders {
+        let folder_config = config.with_folder_settings(&folder.preset, &folder.settings);
+        let watch_dir = folder.input.clone();
+        let output_dir = folder.output.clone();
+        let config_clone = Box::new(folder_config.clone());
+        let intro = config.paths.intro.clone();
+        let outro = config.paths.outro.clone();
+        let notify = cli.notify;
+        let dry_run = cli.dry_run;
+        let label = format!("{}", folder.input.display());
+
+        handles.push(std::thread::spawn(move || {
+            let mutable_config = *config_clone;
+            match crate::watch::run_watch_loop(crate::watch::WatchFolderConfig {
+                watch_dir: &watch_dir,
+                output_dir: &output_dir,
+                config: &mutable_config,
+                intro,
+                outro,
+                notify,
+                dry_run,
+                folder_label: &label,
             }) {
-                error!(
-                    "[{}] [ERROR] Watch folder {} encountered an error: {}",
+                Ok(()) => {}
+                Err(e) => println!(
+                    "[{}] [FATAL] Watch folder {} terminated: {}",
                     crate::watch::timestamp(),
-                    name,
+                    label,
                     e
-                );
+                ),
             }
+        }));
+    }
+
+    // Main thread: check config file for changes and report
+    loop {
+        std::thread::sleep(std::time::Duration::from_secs(30));
+        if config_watcher.check_for_reload(config_path.as_deref()) {
+            let label = config_path
+                .as_ref()
+                .map(|p| p.display().to_string())
+                .unwrap_or_else(|| "config".to_string());
+            info!(
+                "[{}] [CONFIG CHANGE DETECTED] {} - restart to apply",
+                crate::watch::timestamp(),
+                label
+            );
+            info!(
+                "[{}] Settings will be applied on next file processing cycle.",
+                crate::watch::timestamp()
+            );
         }
     }
+}
+
+/// Find the config file path from CLI args or defaults
+fn find_config_path(cli: &Cli) -> Option<PathBuf> {
+    if let Some(ref path) = cli.config {
+        if path.exists() {
+            return Some(path.clone());
+        }
+    }
+    Config::default_config_path().filter(|p| p.exists())
 }
 
 

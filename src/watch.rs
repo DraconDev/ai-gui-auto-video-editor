@@ -25,7 +25,7 @@ pub struct WatchFolderConfig<'a> {
 }
 
 /// Track config file mtime for hot-reload detection
-struct ConfigWatcher {
+pub(crate) struct ConfigWatcher {
     path: Option<PathBuf>,
     last_mtime: Option<std::time::SystemTime>,
 }
