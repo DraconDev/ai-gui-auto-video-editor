@@ -177,31 +177,19 @@ fn timestamp() -> String {
 }
 
 fn notify_processing(path: &Path) {
-    #[cfg(feature = "cli")]
-    crate::utils::send_notification(
-        "Processing Started",
-        &format!("{}", path.display()),
-    );
-    #[cfg(not(feature = "cli"))]
-    let _ = path;
+    crate::utils::send_notification("Processing Started", &format!("{}", path.display()));
 }
 
 fn notify_complete(path: &Path, output: &Path) {
-    #[cfg(feature = "cli")]
     crate::utils::send_notification(
         "Processing Complete",
         &format!("{} -> {}", path.display(), output.display()),
     );
-    #[cfg(not(feature = "cli"))]
-    let _ = (path, output);
 }
 
 fn notify_error(path: &Path, error: &str) {
-    #[cfg(feature = "cli")]
     crate::utils::send_notification(
         "Processing Error",
         &format!("{} failed: {}", path.display(), error),
     );
-    #[cfg(not(feature = "cli"))]
-    let _ = (path, error);
 }

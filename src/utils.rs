@@ -64,6 +64,17 @@ pub fn check_ffprobe_available() -> bool {
         .is_ok()
 }
 
+#[cfg(feature = "notify-rust")]
+pub fn send_notification(summary: &str, body: &str) {
+    let _ = notify_rust::Notification::new()
+        .summary(summary)
+        .body(body)
+        .show();
+}
+
+#[cfg(not(feature = "notify-rust"))]
+pub fn send_notification(_summary: &str, _body: &str) {}
+
 pub fn escape_ffmpeg_filter_path(path: &Path) -> String {
     path.to_string_lossy()
         .replace('\\', "\\\\")
