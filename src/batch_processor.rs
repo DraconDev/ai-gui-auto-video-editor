@@ -644,11 +644,12 @@ fn format_batch_summary(total: usize, successful: usize, failed: usize, skipped:
 
     format!(
         "\n=== BATCH SUMMARY ===\n\
+         Total files:     {:>width$}\n\
          {green}  Successful:{reset}      {:>width$} ({s_pct}%)\n\
          {red}  Failed:{reset}          {:>width$} ({f_pct}%)\n\
          {yellow}  Skipped (done):{reset}  {:>width$}\n\
          =====================\n",
-        successful, failed, skipped,
+        total, successful, failed, skipped,
         width = width,
         green = green,
         red = red,
