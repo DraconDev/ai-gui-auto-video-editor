@@ -120,6 +120,24 @@ fn load_audio_as_f32(path: &Path) -> Result<Vec<f32>> {
     }
 
     let bytes = &output.stdout;
+    let sample_count = bytes.len() / 4;
+    let duration_secs = sample_count as f64 / 16000.0;
+
+    // Warn for very long audio files (>= 1 hour) that are loaded entirely into RAM.
+    // This is a known design limitation: the entire audio buffer must fit in memory
+    // because Whisper mel-spectrogram computation and model inference operate on the
+    // full audio tensor. For typical content-creator videos (10-30 min), RAM usage is
+    // ~50-150 MB. For very long files (>1 hr), RAM usage may exceed 500 MB.
+    // Future work: implement chunked streaming through pcm_to_mel and model inference.
+    if duration_secs > 3600.0 {
+        let estimated_mb = (bytes.len() as f64) / (1024.0 * 1024.0);
+        tracing::warn!(
+            "Loading very long audio ({:.1} min, ~{:.0} MB) entirely into RAM. ",
+            duration_secs / 60.0,
+            estimated_mb
+        );
+    }
+
     // chunks_exact(4) guarantees each chunk is exactly 4 bytes
     let samples: Vec<f32> = bytes
         .chunks_exact(4)
