@@ -1,13 +1,13 @@
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
 
 /// Tracks progress of batch processing jobs so they can be resumed.
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct BatchProgress {
     /// Files that have been successfully processed
-    pub completed: HashSet<PathBuf>,
+    pub completed: HashMap<PathBuf, u64>,
     /// Files that failed processing
     pub failed: HashSet<PathBuf>,
     /// Total number of files in the batch
@@ -32,14 +32,23 @@ impl BatchProgress {
         Ok(())
     }
 
-    /// Check if a file has already been processed
+    /// Check if a file has already been processed (and has the same mtime)
     pub fn is_completed(&self, path: &Path) -> bool {
-        self.completed.contains(path)
+        let mtime = std::fs::metadata(path).ok().and_then(|m| m.modified().ok()).map(|t| t.elapsed().unwrap_or_default().as_secs());
+        match (self.completed.get(path), mtime) {
+            (Some(&saved_mtime), Some(current_mtime)) => {
+                // Allow 5s tolerance for filesystem timestamp precision
+                saved_mtime.abs_diff(current_mtime) <= 5
+            }
+            (Some(_), None) => true, // Can't check mtime? Assume same file
+            _ => false,
+        }
     }
 
-    /// Mark a file as completed
+    /// Mark a file as completed with current mtime
     pub fn mark_completed(&mut self, path: &Path) {
-        self.completed.insert(path.to_path_buf());
+        let mtime = std::fs::metadata(path).ok().and_then(|m| m.modified().ok()).map(|t| t.elapsed().unwrap_or_default().as_secs()).unwrap_or(0);
+        self.completed.insert(path.to_path_buf(), mtime);
     }
 
     /// Mark a file as failed
@@ -59,7 +68,7 @@ impl BatchProgress {
             .file_name()
             .and_then(|n| n.to_str())
             .unwrap_or("default");
-        std::env::temp_dir().join(format!("ai-vid-editor-progress-{}.json", dir_name))
+        std::env::temp_dir().join(format!("ai-vid-editor-progress-{dir_name}.json"))
     }
 }
 
@@ -91,8 +100,8 @@ mod tests {
         let progress = BatchProgress {
             total: 3,
             completed: vec![
-                PathBuf::from("/tmp/video1.mp4"),
-                PathBuf::from("/tmp/video2.mov"),
+                (PathBuf::from("/tmp/video1.mp4"), 1000),
+                (PathBuf::from("/tmp/video2.mov"), 2000),
             ]
             .into_iter()
             .collect(),
