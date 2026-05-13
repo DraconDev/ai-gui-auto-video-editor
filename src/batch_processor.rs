@@ -1136,6 +1136,7 @@ where
 
 /// Process a directory of videos in parallel using multiple worker threads.
 /// Each worker gets its own analyzer/editor instances since they are stateless.
+#[allow(clippy::too_many_arguments)]
 pub fn process_batch_dir_parallel<A, E, D>(
     input_dir: PathBuf,
     output_dir: PathBuf,
