@@ -71,6 +71,7 @@ pub fn run_watch_loop(params: WatchFolderConfig) -> Result<()> {
                 }
 
                 let start_time = Instant::now();
+                let file_name_for_progress = file_name.clone();
 
                 let result = process_single_file_with_intro_outro_progress(
                     path.clone(),
@@ -87,7 +88,7 @@ pub fn run_watch_loop(params: WatchFolderConfig) -> Result<()> {
                             "[{}] [{:>6.1}%] {label} {} - {}",
                             now,
                             p.fraction * 100.0,
-                            file_name,
+                            file_name_for_progress,
                             p.stage
                         );
                     },
