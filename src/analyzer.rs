@@ -315,6 +315,54 @@ more noise
             }
         );
     }
+    mod proptests {
+        use super::*;
+        use proptest::prelude::*;
+
+        proptest! {
+            /// Property: parse_ffmpeg_silence should never panic regardless of input
+            #[test]
+            fn never_panics(output: String, duration: f32) {
+                let duration = if duration.is_nan() || duration <= 0.0 { 1.0 } else { duration };
+                let segments = parse_ffmpeg_silence(&output, duration);
+                for seg in &segments {
+                    prop_assert!(seg.start >= 0.0, "start must be non-negative");
+                    prop_assert!(seg.end > seg.start, "end must be > start");
+                }
+            }
+        }
+
+        proptest! {
+            /// Property: isolated silence_end without matching start should be ignored
+            #[test]
+            fn orphan_end_ignored(end_val: f32, dur_val: f32) {
+                let duration = dur_val.abs().max(1.0);
+                let end = end_val.abs().min(duration);
+                let output = format!("[sd] silence_end: {} | silence_duration: {}", end, dur_val.abs());
+                let segments = parse_ffmpeg_silence(&output, duration);
+                prop_assert_eq!(segments.len(), 0);
+            }
+        }
+
+        proptest! {
+            /// Property: paired start/end should always produce a valid segment
+            #[test]
+            fn paired_start_end_produces_segment(start: f32, end: f32, duration: f32) {
+                let duration = duration.abs().max(1.0);
+                let start = start.abs().min(duration - 0.001);
+                let end = end.abs().max(start + 0.001).min(duration);
+                let output = format!(
+                    "[sd] silence_start: {}\n[sd] silence_end: {} | silence_duration: {}",
+                    start, end, end - start
+                );
+                let segments = parse_ffmpeg_silence(&output, duration);
+                prop_assert_eq!(segments.len(), 1);
+                prop_assert!((segments[0].start - start).abs() < 0.001);
+                prop_assert!((segments[0].end - end).abs() < 0.001);
+            }
+        }
+    }
+
 }
 
     mod proptests {
