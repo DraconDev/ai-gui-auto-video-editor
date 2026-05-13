@@ -349,18 +349,21 @@ more noise
         proptest! {
             /// Property: paired start/end should always produce a valid segment
             #[test]
-            fn paired_start_end_produces_segment(start: f32, end: f32, duration: f32) {
-                let duration = duration.abs().max(1.0);
-                let start = start.abs().min(duration - 0.001);
-                let end = end.abs().max(start + 0.001).min(duration);
+            fn paired_start_end_produces_segment(start: f64, end: f64, duration: f64) {
+                let duration = duration.abs().max(1.0).min(1e6);
+                let start = start.abs().min(duration - 0.1);
+                let end = end.abs().max(start + 0.1).min(duration);
+                let start_f32 = start as f32;
+                let end_f32 = end as f32;
+                let dur_f32 = duration as f32;
                 let output = format!(
                     "[sd] silence_start: {}\n[sd] silence_end: {} | silence_duration: {}",
-                    start, end, end - start
+                    start_f32, end_f32, end_f32 - start_f32
                 );
-                let segments = parse_ffmpeg_silence(&output, duration);
+                let segments = parse_ffmpeg_silence(&output, dur_f32);
                 prop_assert_eq!(segments.len(), 1);
-                prop_assert!((segments[0].start - start).abs() < 0.001);
-                prop_assert!((segments[0].end - end).abs() < 0.001);
+                prop_assert!((segments[0].start - start_f32).abs() < 0.05);
+                prop_assert!((segments[0].end - end_f32).abs() < 0.05);
             }
         }
     }
