@@ -1141,9 +1141,9 @@ pub fn process_batch_dir_parallel<A, E, D>(
     output_dir: PathBuf,
     config: &Config,
     worker_count: usize,
-    analyzer: &A,
-    editor: &E,
-    duration_getter: &D,
+    _analyzer: &A,
+    _editor: &E,
+    _duration_getter: &D,
     no_progress: bool,
 ) -> Result<()>
 where
