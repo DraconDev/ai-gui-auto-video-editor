@@ -737,7 +737,7 @@ fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
         .paths
         .watch_folders
         .iter()
-        .filter(|f| f.enabled.unwrap_or(true))
+        .filter(|f| f.enabled)
         .collect();
 
     if enabled_folders.is_empty() {
@@ -753,13 +753,13 @@ fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
             "  Folder: {} -> {} (preset: {})",
             folder.input.display(),
             folder.output.display(),
-            folder.settings.preset.as_deref().unwrap_or("default")
+            folder.preset
         );
     }
 
     loop {
         for folder in &enabled_folders {
-            let name = folder.name.as_deref().unwrap_or("unnamed");
+            let name = folder.input.display().to_string();
             let folder_config = config.with_folder_settings(&folder.preset, &folder.settings);
 
             if let Err(e) = crate::watch::run_watch_loop(crate::watch::WatchFolderConfig {
