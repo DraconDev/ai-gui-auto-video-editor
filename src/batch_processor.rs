@@ -1131,7 +1131,6 @@ where
 /// Process a directory of videos in parallel using multiple worker threads.
 /// Each worker gets its own analyzer/editor instances since they are stateless.
 pub fn process_batch_dir_parallel<A, E, D>(
-pub fn process_batch_dir_parallel<A, E, D>(
     input_dir: PathBuf,
     output_dir: PathBuf,
     config: &Config,
@@ -1141,6 +1140,7 @@ pub fn process_batch_dir_parallel<A, E, D>(
     duration_getter: &D,
     no_progress: bool,
 ) -> Result<()>
+where
     A: VideoAnalyzer + Send + Sync,
     E: VideoEditor + Send + Sync,
     D: DurationGetter + Send + Sync,
