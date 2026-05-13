@@ -748,7 +748,7 @@ fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
     println!("Monitoring {} watch folder(s)\n", enabled_folders.len());
 
     for folder in &enabled_folders {
-        let name = folder.name.as_deref().unwrap_or("unnamed");
+        let name = folder.input.display().to_string();
         println!(
             "  Folder: {} -> {} (preset: {})",
             folder.input.display(),
@@ -766,11 +766,11 @@ fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
                 watch_dir: &folder.input,
                 output_dir: &folder.output,
                 config: &folder_config,
-                intro: &folder.settings.intro,
-                outro: &folder.settings.outro,
+                intro: &config.paths.intro,
+                outro: &config.paths.outro,
                 notify: cli.notify,
                 dry_run: cli.dry_run,
-                folder_label: name,
+                folder_label: &name,
             }) {
                 eprintln!(
                     "[{}] [ERROR] Watch folder {} encountered an error: {}",
