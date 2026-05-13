@@ -1436,6 +1436,17 @@ mod tests {
             Some(crate::config::VideoResolution::Vertical1080p)
         );
     }
+
+    #[test]
+    fn test_cli_no_progress_flag_parsing() {
+        // Test that --no-progress can be parsed
+        let cli = Cli::try_parse_from(["ai-vid-editor", "--no-progress"]).unwrap();
+        assert!(cli.no_progress);
+
+        // Test that it defaults to false
+        let cli = Cli::try_parse_from(["ai-vid-editor"]).unwrap();
+        assert!(!cli.no_progress);
+    }
 }
 
 #[cfg(feature = "gui")]
