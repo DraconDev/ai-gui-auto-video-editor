@@ -89,7 +89,22 @@ pub struct TempDir {
 
 impl TempDir {
     pub fn new(prefix: &str) -> std::io::Result<Self> {
-        let path = std::env::temp_dir().join(format!("{}-{}", prefix, std::process::id()));
+        use std::sync::atomic::{AtomicU64, Ordering};
+        use std::time::{SystemTime, UNIX_EPOCH};
+        static COUNTER: AtomicU64 = AtomicU64::new(0);
+
+        let now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_nanos();
+        let count = COUNTER.fetch_add(1, Ordering::SeqCst);
+        let path = std::env::temp_dir().join(format!(
+            "{}-{}-{}-{}",
+            prefix,
+            std::process::id(),
+            count,
+            now
+        ));
         let _ = std::fs::remove_dir_all(&path);
         std::fs::create_dir_all(&path)?;
         Ok(Self { path, keep: false })

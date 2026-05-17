@@ -9,12 +9,12 @@ AI-powered video editor for content creators. Processes raw footage through auto
 ```
 ai-vid-editor/
 ├── src/
-│   ├── main.rs              # CLI entry point, arg parsing, watch mode
-│   ├── lib.rs               # Library exports
+│   ├── main.rs              # CLI entry point, arg parsing, watch mode, signal handling
+│   ├── lib.rs               # Library exports (incl. pub tests_common)
 │   ├── analyzer.rs          # Silence detection, scene detection
-│   ├── batch_processor.rs   # Single/batch file processing, exports
-│   ├── config.rs            # Config struct, presets, merge logic
-│   ├── editor.rs            # Video trimming, stabilization, color correction
+│   ├── batch_processor.rs   # Single/batch file processing, exports, highlight clips
+│   ├── config.rs            # Config struct, presets, merge logic, VideoResolution::parse_name
+│   ├── editor.rs            # Video trimming, stabilization, color correction, boxblur
 │   ├── exporter.rs          # SRT, FCPXML, EDL, chapter exporters
 │   ├── hwaccel.rs           # Hardware acceleration enum (NVENC, VAAPI, etc.)
 │   ├── ml.rs                # Auto-reframe, person segmentation (tract-onnx)
@@ -23,15 +23,23 @@ ai-vid-editor/
 │   ├── progress.rs          # Batch progress tracking (JSON state file)
 │   ├── scene_detection.rs   # FFmpeg-based scene detection wrapper
 │   ├── stt_analyzer.rs      # Whisper STT transcription (candle)
+│   ├── tests_common.rs     # Shared test helpers (create_test_video, etc.)
 │   ├── thumbnail.rs         # Best-frame thumbnail extraction
-│   ├── utils.rs             # Path helpers, FFmpeg checks, temp RAII
+│   ├── utils.rs             # Path helpers, FFmpeg checks, temp RAII (atomic counter)
 │   ├── watermark.rs         # Text/image watermark overlay
+│   ├── watch.rs            # Watch loop with stop flag for graceful shutdown
 │   ├── gui/                 # Egui-based GUI
-│   │   ├── mod.rs
-│   │   ├── processing.rs    # Watcher loop, folder config builder
-│   │   └── tabs.rs          # UI tab rendering
+│   │   ├── mod.rs           # App struct, sidebar navigation, eframe::App impl
+│   │   ├── processing.rs    # Watcher loop, folder config builder, queue worker
+│   │   ├── theme.rs         # Dark theme constants (sharp corners, red accent)
+│   │   └── tabs/            # UI tab rendering (split from monolithic tabs.rs)
+│   │       ├── mod.rs       # Header, folders panel
+│   │       ├── settings.rs  # Settings panel (processing, audio, video, exports, advanced)
+│   │       ├── modals.rs    # Delete confirm, setup wizard, generic modal
+│   │       ├── dashboard.rs # Dashboard, toasts, activity log
+│   │       └── queue.rs     # Queue panel, batch processing trigger
 ├── tests/
-│   ├── common/mod.rs         # Shared test helpers (ffmpeg presence, test videos)
+│   ├── common/mod.rs         # Integration test helpers (delegates to tests_common)
 │   ├── pipeline_integration.rs
 │   ├── gui_processing_tests.rs
 │   └── ml_integration.rs
@@ -104,11 +112,26 @@ cargo check --all-features    # Type-check all feature combos
 
 ### Naming
 - `from_str` / `parse_name`: avoid naming methods `from_str` to prevent collision with `std::FromStr` trait. Use `parse_name` instead.
-- `HwAccel::parse_name`, `WatermarkPosition::parse_name`, `Preset::parse_name`
+- `HwAccel::parse_name`, `WatermarkPosition::parse_name`, `Preset::parse_name`, `VideoResolution::parse_name`
+- Resolution parsing is centralized in `VideoResolution::parse_name()` — do not duplicate match arms in `main.rs` or elsewhere
 
 ### Module Re-exports (lib.rs)
 - Public re-exports allow binary and tests to access library modules uniformly
 - Preview module must be explicitly re-exported: `pub use preview;`
+- `tests_common` module is public (not gated by `#[cfg(test)]`) so integration tests can use `ai_vid_editor::tests_common::create_test_video`
+- Both `lib.rs` and `main.rs` declare `pub mod tests_common;` so `crate::tests_common` works in both compilation targets
+
+### GUI Theme (theme.rs)
+- Corner radius is intentionally `0.0` everywhere — sharp rectangular edges, no rounding
+- Red accent (`ACCENT_PRIMARY = rgb(230,57,70)`) on dark background (`PANEL_BG = rgb(14,14,16)`)
+- Sidebar active state: red-tinted background + red border stroke (no accent column that shifts content)
+- When adding new UI elements, use the theme constants — never hardcode colors or radii
+
+### Graceful Shutdown
+- Watch modes (`run_watch_mode`, `run_multi_watch_mode`) register a `ctrlc` handler that sets a shared `AtomicBool` stop flag
+- `WatchFolderConfig` carries a `stop: &AtomicBool` — `run_watch_loop` checks it each iteration and breaks with `Ok(())`
+- Multi-watch mode joins all watcher threads on shutdown before returning
+- GUI watcher uses a bounded `sync_channel(1000)` — blocks sender if GUI thread stalls, preventing unbounded memory growth
 
 ## Critical Code Locations
 
@@ -122,10 +145,20 @@ cargo check --all-features    # Type-check all feature combos
 - `batch_processor.rs:merge_silences_and_scenes()` — Merges silence + scene boundaries, deduplicates overlapping segments
 - `editor.rs:trim_video_with_progress()` — Chunked trimming to avoid FFmpeg arg-length limits
 
+### Clip Extraction
+- `batch_processor.rs:extract_highlight_clips()` — Uses `-ss` before `-i` with `-c copy` for fast keyframe-seeking
+- Cuts align to nearest keyframe (acceptable for highlight clips); add `-avoid_negative_ts make_zero` to prevent timestamp issues
+- For frame-accurate cuts, re-encode instead of stream copy
+
 ### Transcription
 - `stt_analyzer.rs` — Whisper via candle, downloads model on first use
 - `pcm_to_mel()` — FFT-based mel spectrogram (rustfft), handles short audio gracefully
 - Audio loaded entirely into memory; no streaming for simplicity
+
+### Config Serialization
+- `Config::generate_default_toml()` serializes to TOML, then rounds all floats to 2 decimal places via `round_floats_in_value()` (TOML Value tree walk)
+- This avoids f32→f64 serialization artifacts (e.g., `0.10000000149011612`)
+- `VideoConfig` has a manual `Default` impl — serde defaults and Rust `Default` must stay in sync
 
 ### Config Priority
 1. CLI flags (highest)
@@ -152,7 +185,7 @@ The old behavior (TTY detection → fallback to watch mode) has been removed. GU
 
 | Flag | Enables |
 |------|---------|
-| `cli` | Clap CLI parsing, notify-rust desktop notifications |
+| `cli` | Clap CLI parsing, notify-rust desktop notifications, ctrlc signal handling |
 | `gui` | Egui-based GUI, rfd file dialogs, chrono |
 | `notify-rust` | Desktop notifications (auto-enabled with cli) |
 
@@ -163,4 +196,6 @@ Default: `cli` + `gui`
 - Audio for transcription is loaded entirely into RAM (no streaming)
 - Auto-reframe uses linear interpolation between smoothed keyframes (not full piecewise)
 - Temp directories for ML frame extraction are cleaned on scope exit; may leak on panic
+- `blur_background` applies a uniform boxblur to the entire video (no ML person segmentation yet) — see `ml::BackgroundBlurProcessor` for the intended implementation
+- Highlight clip extraction uses stream copy (`-c copy`) so cuts align to keyframes, not exact timestamps
 - FFmpeg concat demuxer path escaping handles `'` and newlines but not all special characters

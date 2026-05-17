@@ -1,6 +1,6 @@
 [package]
 name = "ai-vid-editor"
-version = "19.57.1"
+version = "19.58.0"
 edition = "2024"
 authors = ["DraconDev"]
 description = "AI-powered video editor for content creators"
@@ -8,6 +8,7 @@ license = "AGPL-3.0-only"
 repository = "https://github.com/DraconDev/ai-vid-editor"
 keywords = ["video", "editor", "ai", "ffmpeg", "automation"]
 categories = ["command-line-utilities", "multimedia::video"]
+rust-version = "1.87"
 
 [dependencies]
 anyhow = "1.0.102"
@@ -36,10 +37,11 @@ egui = { version = "0.31", optional = true }
 rfd = { version = "0.15", optional = true }
 chrono = { version = "0.4", optional = true }
 notify-rust = { version = "4", optional = true }
+ctrlc = { version = "3", optional = true }
 
 [features]
 default = ["cli", "gui"]
-cli = ["clap", "notify-rust"]
+cli = ["clap", "notify-rust", "ctrlc"]
 gui = ["eframe", "egui", "rfd", "chrono", "notify-rust"]
 
 [dev-dependencies]

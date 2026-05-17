@@ -1044,16 +1044,20 @@ fn extract_highlight_clips(
         let clip_path = output_dir.join(format!("{}_{}.mp4", clip_pattern, i + 1));
 
         let duration = clip_end - clip_start;
+        // Fast keyframe-seeking with stream copy. Cuts may shift to the nearest keyframe
+        // (acceptable for highlight clips). For frame-accurate cuts re-encode instead.
         let status = std::process::Command::new("ffmpeg")
             .args([
-                "-i",
-                video_path.to_str().context("invalid path")?,
                 "-ss",
                 &format!("{}", clip_start),
+                "-i",
+                video_path.to_str().context("invalid path")?,
                 "-t",
                 &format!("{}", duration),
                 "-c",
                 "copy",
+                "-avoid_negative_ts",
+                "make_zero",
                 "-y",
                 clip_path.to_str().context("invalid output path")?,
             ])

@@ -32,7 +32,8 @@ pub(crate) fn spawn_watcher(
     folders: Vec<FolderState>,
     notify: bool,
 ) -> (Receiver<WatcherEvent>, Arc<AtomicBool>, Arc<AtomicBool>) {
-    let (tx, rx) = mpsc::channel();
+    // Bounded channel prevents unbounded memory growth if the GUI thread stalls.
+    let (tx, rx) = mpsc::sync_channel(1000);
     let stop = Arc::new(AtomicBool::new(false));
     let thread_stop = Arc::clone(&stop);
     let shutdown_complete = Arc::new(AtomicBool::new(false));
@@ -49,7 +50,7 @@ pub(crate) fn spawn_watcher(
 fn watch_folders_loop(
     config: Config,
     folders: Vec<FolderState>,
-    tx: mpsc::Sender<WatcherEvent>,
+    tx: mpsc::SyncSender<WatcherEvent>,
     stop: Arc<AtomicBool>,
     notify: bool,
 ) {
@@ -401,6 +402,13 @@ fn queue_worker_loop(
     let _ = tx.send(QueueEvent::Finished);
 }
 
+/// Build a processed config for a folder by applying its preset and settings overrides.
+/// Public so integration tests can verify folder config building without importing internals.
+#[allow(dead_code)]
+pub fn build_folder_config(config: &Config, folder: &FolderState) -> Config {
+    config.with_folder_settings(&folder.preset, &folder.settings)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -408,13 +416,7 @@ mod tests {
     use crate::gui::FolderState;
 
     fn make_test_folder_state() -> FolderState {
-        FolderState {
-            input: std::path::PathBuf::from("/input"),
-            output: std::path::PathBuf::from("/output"),
-            preset: String::new(),
-            enabled: true,
-            settings: FolderSettings::default(),
-        }
+        super::make_test_folder_state()
     }
 
     #[test]

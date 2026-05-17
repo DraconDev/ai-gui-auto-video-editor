@@ -1,3 +1,4 @@
+use anyhow::Context;
 use std::path::PathBuf;
 use std::process::Command;
 
@@ -88,6 +89,12 @@ pub fn has_ffmpeg() -> bool {
 #[allow(dead_code)]
 pub fn has_ffprobe() -> bool {
     Command::new("ffprobe").arg("-version").status().is_ok()
+}
+
+/// Helper: create a small test video using ffmpeg (video+audio, 320x240, libx264/aac).
+/// Delegates to the shared crate helper so integration and unit tests use the same code.
+pub fn create_test_video(output_path: &std::path::Path, duration_secs: f32) -> Result<(), String> {
+    ai_vid_editor::tests_common::create_test_video(output_path, duration_secs)
 }
 
 #[allow(dead_code)]

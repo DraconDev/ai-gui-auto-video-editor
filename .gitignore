@@ -13,6 +13,7 @@
 .direnv/
 .dracon/*
 .git/
+.ralph/
 .venv/
 __pycache__/
 build/

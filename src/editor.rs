@@ -534,13 +534,13 @@ impl VideoEditor for FfmpegEditor {
         self.run_reframe_filter(input, output, &filter)
     }
 
-    /// Apply background blur to video.
+    /// Apply a simple uniform box-blur to the entire video.
     ///
-    /// Currently applies a simple boxblur filter to the entire video.
-    /// TODO: Integrate ml::BackgroundBlurProcessor for ML-based person segmentation
-    ///       that keeps the person sharp while blurring only the background.
+    /// This is a fast FFmpeg filter-based blur; it does **not** perform person
+    /// segmentation. For ML-based background blur that keeps the subject sharp,
+    /// see `ml::BackgroundBlurProcessor` (not yet integrated into the video pipeline).
     fn blur_background(&self, input: &Path, output: &Path) -> Result<()> {
-        info!("Background blur: Processing video with simple boxblur...");
+        info!("Background blur: applying uniform boxblur to entire video...");
 
         let filter = "boxblur=20:5";
 
@@ -853,41 +853,9 @@ fn generate_duck_filter(transcript: &[TranscriptSegment], duck_volume: f32) -> S
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::process::Command;
 
-    /// Helper: create a small test video using ffmpeg
     fn create_test_video(path: &Path, duration_secs: f32) -> Result<(), String> {
-        let status = Command::new("ffmpeg")
-            .args([
-                "-f",
-                "lavfi",
-                "-i",
-                &format!("testsrc=duration={}:size=320x240:rate=30", duration_secs),
-                "-f",
-                "lavfi",
-                "-i",
-                "sine=frequency=1000:duration=0.1",
-                "-c:v",
-                "libx264",
-                "-preset",
-                "ultrafast",
-                "-crf",
-                "28",
-                "-c:a",
-                "aac",
-                "-b:a",
-                "32k",
-                "-shortest",
-                "-y",
-                path.to_str().unwrap(),
-            ])
-            .status()
-            .map_err(|_| "ffmpeg not found".to_string())?;
-        if status.success() {
-            Ok(())
-        } else {
-            Err("ffmpeg test video creation failed".to_string())
-        }
+        crate::tests_common::create_test_video(path, duration_secs)
     }
 
     #[test]

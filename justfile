@@ -54,4 +54,19 @@ fmt:
 
 # Lint
 lint:
-    cargo clippy --all-features
+    cargo clippy --all-features -- -D warnings
+    cargo fmt --all -- --check
+
+# Full CI check (lint + test + check all feature combos)
+ci: lint test-full
+    cargo check --all-features
+    cargo check --no-default-features --features cli
+    cargo check --no-default-features --features gui
+
+# Audit dependencies for vulnerabilities
+audit:
+    cargo audit 2>/dev/null || cargo install cargo-audit && cargo audit
+
+# Check for outdated dependencies
+outdated:
+    cargo outdated 2>/dev/null || cargo install cargo-outdated && cargo outdated

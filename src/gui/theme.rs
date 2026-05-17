@@ -8,10 +8,6 @@ pub const PANEL_BG_LIGHTER: egui::Color32 = egui::Color32::from_rgb(32, 32, 38);
 
 pub const ACCENT_PRIMARY: egui::Color32 = egui::Color32::from_rgb(230, 57, 70);
 pub const ACCENT_DARK: egui::Color32 = egui::Color32::from_rgb(180, 45, 55);
-#[allow(dead_code)]
-pub fn accent_glow() -> egui::Color32 {
-    egui::Color32::from_rgba_premultiplied(230, 57, 70, 40)
-}
 
 pub const TEXT_PRIMARY: egui::Color32 = egui::Color32::from_rgb(250, 250, 252);
 pub const TEXT_SECONDARY: egui::Color32 = egui::Color32::from_rgb(165, 165, 172);
@@ -34,14 +30,9 @@ pub const SETTINGS_SECTION_BG: egui::Color32 = egui::Color32::from_rgb(18, 21, 2
 pub const SETTINGS_SECTION_BG_HIGHLIGHT: egui::Color32 = egui::Color32::from_rgb(30, 20, 26);
 pub const SETTINGS_SECTION_BORDER_HIGHLIGHT: egui::Color32 = egui::Color32::from_rgb(100, 50, 60);
 
-pub const CORNER_RADIUS: f32 = 14.0;
-pub const CORNER_RADIUS_SMALL: f32 = 8.0;
-pub const CORNER_RADIUS_PILL: f32 = 24.0;
-
-#[allow(dead_code)]
-pub fn glow_color() -> egui::Color32 {
-    egui::Color32::from_rgba_unmultiplied(230, 57, 70, 80)
-}
+pub const CORNER_RADIUS: f32 = 0.0;
+pub const CORNER_RADIUS_SMALL: f32 = 0.0;
+pub const CORNER_RADIUS_PILL: f32 = 0.0;
 
 pub fn accent_bar() -> egui::Frame {
     egui::Frame::NONE

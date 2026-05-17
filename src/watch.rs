@@ -22,16 +22,22 @@ pub struct WatchFolderConfig<'a> {
     pub notify: bool,
     pub dry_run: bool,
     pub folder_label: &'a str,
+    /// Shared flag to signal the watcher to stop.
+    pub stop: &'a std::sync::atomic::AtomicBool,
 }
 
 /// Track config file mtime for hot-reload detection.
-#[allow(dead_code)]
 pub struct ConfigWatcher {
     path: Option<PathBuf>,
     last_mtime: Option<std::time::SystemTime>,
 }
 
-#[allow(dead_code)]
+impl Default for ConfigWatcher {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ConfigWatcher {
     pub fn new() -> Self {
         Self {
@@ -77,6 +83,15 @@ pub fn run_watch_loop(params: WatchFolderConfig) -> Result<()> {
     let label = params.folder_label;
 
     loop {
+        if params.stop.load(std::sync::atomic::Ordering::SeqCst) {
+            info!(
+                "[{}] Watcher for {} stopping...",
+                timestamp(),
+                params.watch_dir.display()
+            );
+            break Ok(());
+        }
+
         std::thread::sleep(Duration::from_secs(params.config.watch.interval));
 
         heartbeat += 1;

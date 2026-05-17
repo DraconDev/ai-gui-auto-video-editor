@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{Context, Result};
 use std::path::PathBuf;
 use tracing::{error, info};
 
@@ -22,6 +22,8 @@ pub mod thumbnail;
 pub mod utils;
 pub mod watch;
 pub mod watermark;
+
+pub mod tests_common;
 
 use crate::analyzer::FfmpegAnalyzer;
 use crate::batch_processor::{
@@ -535,8 +537,8 @@ fn main() -> Result<()> {
         config.export.multi_format = true;
     }
     if let Some(ref resolution_str) = cli.resolution {
-        config.video.target_resolution =
-            parse_resolution(resolution_str).unwrap_or(crate::config::VideoResolution::Fhd1080p);
+        config.video.target_resolution = crate::config::VideoResolution::parse_name(resolution_str)
+            .unwrap_or(crate::config::VideoResolution::Fhd1080p);
     }
     if let Some(ref gpu_str) = cli.gpu {
         config.video.hw_accel = if gpu_str == "auto" {
@@ -728,7 +730,23 @@ fn run_watch_mode(
     notify: bool,
     dry_run: bool,
 ) -> Result<()> {
+    use std::sync::Arc;
+    use std::sync::atomic::AtomicBool;
+
     info!("=== WATCH MODE ===");
+
+    let stop = Arc::new(AtomicBool::new(false));
+
+    // Register Ctrl+C handler
+    #[cfg(feature = "cli")]
+    {
+        let stop_handler = stop.clone();
+        ctrlc::set_handler(move || {
+            info!("\nCtrl+C received, shutting down gracefully...");
+            stop_handler.store(true, std::sync::atomic::Ordering::SeqCst);
+        })
+        .context("Failed to set Ctrl+C handler")?;
+    }
 
     crate::watch::run_watch_loop(crate::watch::WatchFolderConfig {
         watch_dir,
@@ -739,12 +757,16 @@ fn run_watch_mode(
         notify,
         dry_run,
         folder_label: "",
+        stop: &stop,
     })
 }
 
 /// Run watch mode for multiple folders from config
 /// Spawns a thread per folder so all folders are watched concurrently.
 fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
+    use std::sync::Arc;
+    use std::sync::atomic::AtomicBool;
+
     info!("=== MULTI-FOLDER WATCH MODE ===");
 
     let enabled_folders: Vec<&crate::config::WatchFolder> = config
@@ -770,6 +792,20 @@ fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
         );
     }
 
+    // Shared stop flag for graceful shutdown
+    let stop = Arc::new(AtomicBool::new(false));
+
+    // Register Ctrl+C handler
+    let stop_handler = stop.clone();
+    #[cfg(feature = "cli")]
+    {
+        ctrlc::set_handler(move || {
+            info!("\nCtrl+C received, shutting down gracefully...");
+            stop_handler.store(true, std::sync::atomic::Ordering::SeqCst);
+        })
+        .context("Failed to set Ctrl+C handler")?;
+    }
+
     // Detect the config file path for hot-reload checking
     let config_path = find_config_path(cli);
     let mut config_watcher = ConfigWatcher::new();
@@ -789,6 +825,7 @@ fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
         let notify = cli.notify;
         let dry_run = cli.dry_run;
         let label = format!("{}", folder.input.display());
+        let stop_flag = stop.clone();
 
         handles.push(std::thread::spawn(move || {
             let mutable_config = *config_clone;
@@ -801,6 +838,7 @@ fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
                 notify,
                 dry_run,
                 folder_label: &label,
+                stop: &stop_flag,
             }) {
                 Ok(()) => {}
                 Err(e) => println!(
@@ -813,10 +851,22 @@ fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
         }));
     }
 
-    // Main thread: check config file for changes and report
+    // Main thread: check config file for changes and wait for shutdown signal
     loop {
-        std::thread::sleep(std::time::Duration::from_secs(30));
-        if config_watcher.check_for_reload(config_path.as_deref()) {
+        std::thread::sleep(std::time::Duration::from_secs(1));
+
+        if stop.load(std::sync::atomic::Ordering::SeqCst) {
+            info!("Waiting for watcher threads to finish...");
+            break;
+        }
+
+        // Check config every 30 seconds
+        static CHECK_INTERVAL: std::sync::atomic::AtomicU32 = std::sync::atomic::AtomicU32::new(0);
+        let count = CHECK_INTERVAL.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+        if count > 0
+            && count.is_multiple_of(30)
+            && config_watcher.check_for_reload(config_path.as_deref())
+        {
             let label = config_path
                 .as_ref()
                 .map(|p| p.display().to_string())
@@ -832,14 +882,21 @@ fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
             );
         }
     }
+
+    // Wait for all watcher threads to finish
+    for handle in handles {
+        let _ = handle.join();
+    }
+    info!("All watchers stopped. Goodbye.");
+    Ok(())
 }
 
 /// Find the config file path from CLI args or defaults
 fn find_config_path(cli: &Cli) -> Option<PathBuf> {
-    if let Some(ref path) = cli.config {
-        if path.exists() {
-            return Some(path.clone());
-        }
+    if let Some(ref path) = cli.config
+        && path.exists()
+    {
+        return Some(path.clone());
     }
     Config::default_config_path().filter(|p| p.exists())
 }
@@ -977,23 +1034,6 @@ fn handle_dry_run(cli: &Cli, config: &Config) -> Result<()> {
     Ok(())
 }
 
-/// Parse a resolution string into VideoResolution
-fn parse_resolution(s: &str) -> Option<crate::config::VideoResolution> {
-    match s.to_lowercase().as_str() {
-        "720p" | "hd" | "hd720p" => Some(crate::config::VideoResolution::Hd720p),
-        "1080p" | "fhd" | "fhd1080p" | "fullhd" => Some(crate::config::VideoResolution::Fhd1080p),
-        "1440p" | "qhd" | "qhd1440p" | "2k" => Some(crate::config::VideoResolution::Qhd1440p),
-        "4k" | "uhd" | "uhd4k" | "2160p" => Some(crate::config::VideoResolution::Uhd4k),
-        "vertical-1080p" | "vertical1080p" | "1080x1920" | "shorts" | "reels" | "tiktok" => {
-            Some(crate::config::VideoResolution::Vertical1080p)
-        }
-        "vertical-720p" | "vertical720p" | "720x1280" => {
-            Some(crate::config::VideoResolution::Vertical720p)
-        }
-        _ => None,
-    }
-}
-
 #[cfg(feature = "gui")]
 fn run_gui(start_minimized: bool) -> Result<()> {
     use eframe::egui;
@@ -1091,126 +1131,130 @@ mod tests {
 
     #[test]
     fn test_parse_resolution_all_variants() {
+        use crate::config::VideoResolution;
         assert_eq!(
-            parse_resolution("720p"),
-            Some(crate::config::VideoResolution::Hd720p)
+            VideoResolution::parse_name("720p"),
+            Some(VideoResolution::Hd720p)
         );
         assert_eq!(
-            parse_resolution("hd"),
-            Some(crate::config::VideoResolution::Hd720p)
+            VideoResolution::parse_name("hd"),
+            Some(VideoResolution::Hd720p)
         );
         assert_eq!(
-            parse_resolution("HD720p"),
-            Some(crate::config::VideoResolution::Hd720p)
-        );
-
-        assert_eq!(
-            parse_resolution("1080p"),
-            Some(crate::config::VideoResolution::Fhd1080p)
-        );
-        assert_eq!(
-            parse_resolution("fhd"),
-            Some(crate::config::VideoResolution::Fhd1080p)
-        );
-        assert_eq!(
-            parse_resolution("FHD1080p"),
-            Some(crate::config::VideoResolution::Fhd1080p)
-        );
-        assert_eq!(
-            parse_resolution("fullhd"),
-            Some(crate::config::VideoResolution::Fhd1080p)
+            VideoResolution::parse_name("HD720p"),
+            Some(VideoResolution::Hd720p)
         );
 
         assert_eq!(
-            parse_resolution("1440p"),
-            Some(crate::config::VideoResolution::Qhd1440p)
+            VideoResolution::parse_name("1080p"),
+            Some(VideoResolution::Fhd1080p)
         );
         assert_eq!(
-            parse_resolution("qhd"),
-            Some(crate::config::VideoResolution::Qhd1440p)
+            VideoResolution::parse_name("fhd"),
+            Some(VideoResolution::Fhd1080p)
         );
         assert_eq!(
-            parse_resolution("2k"),
-            Some(crate::config::VideoResolution::Qhd1440p)
+            VideoResolution::parse_name("FHD1080p"),
+            Some(VideoResolution::Fhd1080p)
+        );
+        assert_eq!(
+            VideoResolution::parse_name("fullhd"),
+            Some(VideoResolution::Fhd1080p)
         );
 
         assert_eq!(
-            parse_resolution("4k"),
-            Some(crate::config::VideoResolution::Uhd4k)
+            VideoResolution::parse_name("1440p"),
+            Some(VideoResolution::Qhd1440p)
         );
         assert_eq!(
-            parse_resolution("uhd"),
-            Some(crate::config::VideoResolution::Uhd4k)
+            VideoResolution::parse_name("qhd"),
+            Some(VideoResolution::Qhd1440p)
         );
         assert_eq!(
-            parse_resolution("UHD4k"),
-            Some(crate::config::VideoResolution::Uhd4k)
+            VideoResolution::parse_name("2k"),
+            Some(VideoResolution::Qhd1440p)
+        );
+
+        assert_eq!(
+            VideoResolution::parse_name("4k"),
+            Some(VideoResolution::Uhd4k)
         );
         assert_eq!(
-            parse_resolution("2160p"),
-            Some(crate::config::VideoResolution::Uhd4k)
+            VideoResolution::parse_name("uhd"),
+            Some(VideoResolution::Uhd4k)
+        );
+        assert_eq!(
+            VideoResolution::parse_name("UHD4k"),
+            Some(VideoResolution::Uhd4k)
+        );
+        assert_eq!(
+            VideoResolution::parse_name("2160p"),
+            Some(VideoResolution::Uhd4k)
         );
     }
 
     #[test]
     fn test_parse_resolution_vertical() {
+        use crate::config::VideoResolution;
         assert_eq!(
-            parse_resolution("vertical-1080p"),
-            Some(crate::config::VideoResolution::Vertical1080p)
+            VideoResolution::parse_name("vertical-1080p"),
+            Some(VideoResolution::Vertical1080p)
         );
         assert_eq!(
-            parse_resolution("1080x1920"),
-            Some(crate::config::VideoResolution::Vertical1080p)
+            VideoResolution::parse_name("1080x1920"),
+            Some(VideoResolution::Vertical1080p)
         );
         assert_eq!(
-            parse_resolution("shorts"),
-            Some(crate::config::VideoResolution::Vertical1080p)
+            VideoResolution::parse_name("shorts"),
+            Some(VideoResolution::Vertical1080p)
         );
         assert_eq!(
-            parse_resolution("reels"),
-            Some(crate::config::VideoResolution::Vertical1080p)
+            VideoResolution::parse_name("reels"),
+            Some(VideoResolution::Vertical1080p)
         );
         assert_eq!(
-            parse_resolution("tiktok"),
-            Some(crate::config::VideoResolution::Vertical1080p)
+            VideoResolution::parse_name("tiktok"),
+            Some(VideoResolution::Vertical1080p)
         );
 
         assert_eq!(
-            parse_resolution("vertical-720p"),
-            Some(crate::config::VideoResolution::Vertical720p)
+            VideoResolution::parse_name("vertical-720p"),
+            Some(VideoResolution::Vertical720p)
         );
         assert_eq!(
-            parse_resolution("720x1280"),
-            Some(crate::config::VideoResolution::Vertical720p)
+            VideoResolution::parse_name("720x1280"),
+            Some(VideoResolution::Vertical720p)
         );
     }
 
     #[test]
     fn test_parse_resolution_invalid() {
-        assert_eq!(parse_resolution(""), None);
-        assert_eq!(parse_resolution("invalid"), None);
-        assert_eq!(parse_resolution("1080i"), None);
-        assert_eq!(parse_resolution("sd"), None);
-        assert_eq!(parse_resolution("8k"), None);
+        use crate::config::VideoResolution;
+        assert_eq!(VideoResolution::parse_name(""), None);
+        assert_eq!(VideoResolution::parse_name("invalid"), None);
+        assert_eq!(VideoResolution::parse_name("1080i"), None);
+        assert_eq!(VideoResolution::parse_name("sd"), None);
+        assert_eq!(VideoResolution::parse_name("8k"), None);
     }
 
     #[test]
     fn test_parse_resolution_case_insensitive() {
+        use crate::config::VideoResolution;
         assert_eq!(
-            parse_resolution("FHD"),
-            Some(crate::config::VideoResolution::Fhd1080p)
+            VideoResolution::parse_name("FHD"),
+            Some(VideoResolution::Fhd1080p)
         );
         assert_eq!(
-            parse_resolution("QHD"),
-            Some(crate::config::VideoResolution::Qhd1440p)
+            VideoResolution::parse_name("QHD"),
+            Some(VideoResolution::Qhd1440p)
         );
         assert_eq!(
-            parse_resolution("UHD"),
-            Some(crate::config::VideoResolution::Uhd4k)
+            VideoResolution::parse_name("UHD"),
+            Some(VideoResolution::Uhd4k)
         );
         assert_eq!(
-            parse_resolution("SHORTS"),
-            Some(crate::config::VideoResolution::Vertical1080p)
+            VideoResolution::parse_name("SHORTS"),
+            Some(VideoResolution::Vertical1080p)
         );
     }
 

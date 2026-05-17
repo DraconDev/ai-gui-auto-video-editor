@@ -144,3 +144,33 @@ jobs:
 
       - name: Build documentation
         run: cargo doc --no-deps --all-features
+
+  audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-action@stable
+
+      - name: Install cargo-audit
+        run: cargo install cargo-audit
+
+      - name: Run cargo-audit
+        run: cargo audit
+
+  msrv:
+    name: MSRV Verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust ${{ vars.MSRV || '1.87.0' }}
+        uses: dtolnay/rust-action@stable
+        with:
+          toolchain: ${{ vars.MSRV || '1.87.0' }}
+
+      - name: Verify MSRV compiles
+        run: cargo check --all-features

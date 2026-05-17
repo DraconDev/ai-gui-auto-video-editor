@@ -405,7 +405,7 @@ fn default_clip_max_duration() -> f32 {
     60.0
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Default)]
 pub struct FolderSettings {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub enhance_audio: Option<bool>,
@@ -507,48 +507,7 @@ pub struct WatchFolder {
 
 impl FolderSettings {
     fn is_default(&self) -> bool {
-        self.enhance_audio.is_none()
-            && self.remove_silence.is_none()
-            && self.silence_threshold_db.is_none()
-            && self.silence_min_duration.is_none()
-            && self.silence_padding.is_none()
-            && self.silence_mode.is_none()
-            && self.silence_speedup_factor.is_none()
-            && self.silence_min_silence_for_speedup.is_none()
-            && self.silence_scene_threshold.is_none()
-            && self.target_lufs.is_none()
-            && self.stabilize.is_none()
-            && self.color_correct.is_none()
-            && self.reframe.is_none()
-            && self.blur_background.is_none()
-            && self.noise_reduction.is_none()
-            && self.preview.is_none()
-            && self.scene_detect.is_none()
-            && self.multi_format.is_none()
-            && self.hw_accel.is_none()
-            && self.target_resolution.is_none()
-            && self.subtitles.is_none()
-            && self.chapters.is_none()
-            && self.captions.is_none()
-            && self.clips.is_none()
-            && self.clip_count.is_none()
-            && self.clip_min_duration.is_none()
-            && self.clip_max_duration.is_none()
-            && self.filler_words.is_none()
-            && self.watermark_path.is_none()
-            && self.watermark_position.is_none()
-            && self.watermark_scale.is_none()
-            && self.intro_path.is_none()
-            && self.outro_path.is_none()
-            && self.music_path.is_none()
-            && self.duck_volume.is_none()
-            && self.fcpxml.is_none()
-            && self.edl.is_none()
-            && self.thumbnail.is_none()
-            && self.extra_resolutions.is_none()
-            && self.join_mode.is_none()
-            && self.join_after_count.is_none()
-            && self.join_output_pattern.is_none()
+        self == &Self::default()
     }
 }
 
@@ -673,6 +632,22 @@ pub enum VideoResolution {
 }
 
 impl VideoResolution {
+    /// Parse a resolution string into a VideoResolution variant.
+    /// Accepts common aliases (e.g. "720p", "hd", "1080p", "fhd", "4k", "shorts").
+    pub fn parse_name(s: &str) -> Option<Self> {
+        match s.to_lowercase().as_str() {
+            "720p" | "hd" | "hd720p" => Some(Self::Hd720p),
+            "1080p" | "fhd" | "fhd1080p" | "fullhd" => Some(Self::Fhd1080p),
+            "1440p" | "qhd" | "qhd1440p" | "2k" => Some(Self::Qhd1440p),
+            "4k" | "uhd" | "uhd4k" | "2160p" => Some(Self::Uhd4k),
+            "vertical-1080p" | "vertical1080p" | "1080x1920" | "shorts" | "reels" | "tiktok" => {
+                Some(Self::Vertical1080p)
+            }
+            "vertical-720p" | "vertical720p" | "720x1280" => Some(Self::Vertical720p),
+            _ => None,
+        }
+    }
+
     /// Get resolution as (width, height)
     pub fn dimensions(&self) -> (u32, u32) {
         match self {
@@ -705,7 +680,7 @@ impl VideoResolution {
 }
 
 /// Configuration for video processing
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VideoConfig {
     /// Enable video stabilization (vidstab filter)
     #[serde(default)]
@@ -742,6 +717,22 @@ pub struct VideoConfig {
     /// Watermark scale factor
     #[serde(default = "default_watermark_scale")]
     pub watermark_scale: f32,
+}
+
+impl Default for VideoConfig {
+    fn default() -> Self {
+        Self {
+            stabilize: false,
+            color_correct: false,
+            reframe: false,
+            blur_background: false,
+            target_resolution: VideoResolution::default(),
+            hw_accel: crate::hwaccel::HwAccel::default(),
+            watermark: None,
+            watermark_position: default_watermark_position(),
+            watermark_scale: default_watermark_scale(),
+        }
+    }
 }
 
 /// Join mode for combining processed videos
@@ -1336,53 +1327,38 @@ impl Config {
     pub fn generate_default_toml() -> Result<String> {
         let config = Config::default();
         let toml = toml::to_string_pretty(&config).context("Failed to serialize default config")?;
-
-        // Fix floating point precision artifacts (e.g., 0.10000000149011612 -> 0.1)
-        // This happens because f32 values get serialized as f64
-        // Only fix known float fields to avoid corrupting strings/paths
-        const FLOAT_KEYS: &[&str] = &[
-            "threshold_db",
-            "min_duration",
-            "padding",
-            "speedup_factor",
-            "min_silence_for_speedup",
-            "scene_threshold",
-            "target_lufs",
-            "duck_volume",
-            "clip_min_duration",
-            "clip_max_duration",
-            "watermark_scale",
-        ];
-        fn fix_floats(s: &str) -> String {
-            let mut result = String::new();
-            for line in s.lines() {
-                if line.contains('=') && line.chars().any(|c| c == '.') {
-                    let parts: Vec<&str> = line.splitn(2, '=').collect();
-                    if parts.len() == 2 {
-                        let key = parts[0].trim_end();
-                        let value = parts[1].trim();
-                        // Only round values for known float fields
-                        let is_float_key = FLOAT_KEYS.iter().any(|&k| key.ends_with(k));
-                        if is_float_key && let Ok(float_val) = value.parse::<f64>() {
-                            let rounded = (float_val * 100.0).round() / 100.0;
-                            if rounded == rounded.trunc() {
-                                result.push_str(&format!("{} = {}\n", key, rounded as i64));
-                            } else {
-                                result.push_str(&format!("{} = {}\n", key, rounded));
-                            }
-                            continue;
-                        }
-                    }
-                }
-                result.push_str(line);
-                result.push('\n');
-            }
-            result
-        }
-
-        Ok(fix_floats(&toml))
+        // f32 values serialize via f64, producing artifacts like 0.10000000149011612.
+        // Round all floats in the TOML document to 2 decimal places.
+        let mut value: toml::Value =
+            toml::from_str(&toml).context("Failed to parse serialized TOML")?;
+        round_floats_in_value(&mut value, 2);
+        toml::to_string_pretty(&value).context("Failed to re-serialize TOML")
     }
+}
 
+/// Recursively round all float values in a TOML value tree to `decimals` places.
+fn round_floats_in_value(value: &mut toml::Value, decimals: u32) {
+    use toml::Value;
+    match value {
+        Value::Float(f) => {
+            let multiplier = 10f64.powi(decimals as i32);
+            *f = (*f * multiplier).round() / multiplier;
+        }
+        Value::Array(arr) => {
+            for item in arr {
+                round_floats_in_value(item, decimals);
+            }
+        }
+        Value::Table(table) => {
+            for (_, v) in table.iter_mut() {
+                round_floats_in_value(v, decimals);
+            }
+        }
+        _ => {}
+    }
+}
+
+impl Config {
     /// Load a preset from a TOML file in the presets directory
     pub fn from_preset_file(preset_name: &str) -> Result<Self> {
         let preset_path = PathBuf::from("presets").join(format!("{}.toml", preset_name));

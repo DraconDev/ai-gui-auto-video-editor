@@ -109,7 +109,7 @@ Add `--preview-duration <SEC>` override in `main.rs`.
 ## Task 3: Better Notifications & UI Feedback
 
 **Files:**
-- Modify: `src/gui/tabs.rs`, `src/gui/theme.rs`, `src/batch_processor.rs`, `src/main.rs`
+- Modify: `src/gui/tabs/`, `src/gui/theme.rs`, `src/batch_processor.rs`, `src/main.rs`
 - Create: `src/notifier.rs` (optional abstraction)
 
 ### Step 3.1: Add indicatif progress bars to CLI batch mode
@@ -137,7 +137,7 @@ In `run_watch_mode`, print `[HH:MM:SS] Watching... (last: filename)` every 30s.
 ## Task 4: GUI Batch Queue + Process Now
 
 **Files:**
-- Modify: `src/gui.rs`, `src/gui/tabs.rs`, `src/gui/processing.rs`
+- Modify: `src/gui.rs`, `src/gui/tabs/`, `src/gui/processing.rs`
 - Create: `src/gui/queue.rs`
 
 ### Step 4.1: Create queue data structures

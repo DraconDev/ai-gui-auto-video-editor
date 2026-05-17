@@ -25,45 +25,35 @@ fn sidebar_item(
 ) {
     let text = format!("{}  {}", icon, label);
     let bg = if is_active {
-        PANEL_BG_LIGHTER
+        egui::Color32::from_rgb(42, 22, 28)
     } else {
         PANEL_BG
     };
     let text_color = if is_active {
-        TEXT_PRIMARY
+        ACCENT_PRIMARY
     } else {
         TEXT_SECONDARY
     };
-    let border_color = if is_active {
-        ACCENT_PRIMARY
+    let border = if is_active {
+        egui::Stroke::new(2.0, ACCENT_PRIMARY)
     } else {
-        egui::Color32::TRANSPARENT
+        egui::Stroke::new(0.0, egui::Color32::TRANSPARENT)
     };
 
-    ui.horizontal(|ui| {
-        if is_active {
-            // Left accent bar
-            let (rect, _) = ui.allocate_exact_size(egui::vec2(3.0, 36.0), egui::Sense::hover());
-            ui.painter().rect_filled(rect, 2.0, ACCENT_PRIMARY);
-        } else {
-            ui.add_space(3.0);
-        }
+    let btn = egui::Button::new(
+        egui::RichText::new(&text)
+            .color(text_color)
+            .size(13.0)
+            .strong(),
+    )
+    .fill(bg)
+    .stroke(border)
+    .corner_radius(CORNER_RADIUS_SMALL)
+    .min_size(egui::vec2(160.0, 36.0));
 
-        let btn = egui::Button::new(
-            egui::RichText::new(&text)
-                .color(text_color)
-                .size(13.0)
-                .strong(),
-        )
-        .fill(bg)
-        .stroke(egui::Stroke::new(0.0, border_color))
-        .corner_radius(CORNER_RADIUS_SMALL)
-        .min_size(egui::vec2(140.0, 36.0));
-
-        if ui.add(btn).clicked() {
-            *current_tab = tab;
-        }
-    });
+    if ui.add(btn).clicked() {
+        *current_tab = tab;
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Default)]

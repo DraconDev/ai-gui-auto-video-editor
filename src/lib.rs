@@ -34,3 +34,6 @@ pub use hwaccel::HwAccel;
 pub use ml::{AutoReframeProcessor, FaceDetector, FrameExtractor, PersonSegmenter};
 pub use preview::{generate_preview, preview_path};
 pub use watch::{ConfigWatcher, WatchFolderConfig, run_watch_loop};
+
+/// Shared test helpers (available to both unit and integration tests).
+pub mod tests_common;
