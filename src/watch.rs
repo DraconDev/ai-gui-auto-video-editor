@@ -33,7 +33,7 @@ pub struct ConfigWatcher {
 
 #[allow(dead_code)]
 impl ConfigWatcher {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             path: None,
             last_mtime: None,
@@ -42,7 +42,7 @@ impl ConfigWatcher {
 
     /// Check if the config file has changed since last check.
     /// If it changed, return true and update the tracked mtime.
-    fn check_for_reload(&mut self, config_path: Option<&Path>) -> bool {
+    pub fn check_for_reload(&mut self, config_path: Option<&Path>) -> bool {
         let path = match config_path {
             Some(p) => p,
             None => return false,
@@ -59,7 +59,7 @@ impl ConfigWatcher {
         true
     }
 
-    fn was_ever_loaded(&self) -> bool {
+    pub fn was_ever_loaded(&self) -> bool {
         self.last_mtime.is_some()
     }
 }
