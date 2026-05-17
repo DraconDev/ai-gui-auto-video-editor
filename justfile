@@ -20,6 +20,18 @@ build:
 build-cli:
     cargo build --release --no-default-features --features cli
 
+# Quick install: build & replace binary (kills running instance first)
+install-quick:
+    ./install.sh --user --quick
+
+# Full user install (binary + icon + desktop entry + config)
+install:
+    ./install.sh --user
+
+# Uninstall
+uninstall:
+    ./install.sh --uninstall
+
 # Run tests (unit tests only, no ffmpeg required)
 test:
     cargo test --lib

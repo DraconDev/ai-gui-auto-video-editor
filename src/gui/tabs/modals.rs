@@ -111,7 +111,7 @@ impl App {
             .show(ctx, |ui| {
                 egui::Frame::NONE
                     .fill(PANEL_BG_LIGHT)
-                    .corner_radius(16.0)
+                    .corner_radius(0.0)
                     .inner_margin(egui::vec2(48.0, 40.0))
                     .show(ui, |ui| {
                         ui.set_min_width(520.0);
@@ -146,7 +146,7 @@ impl App {
             // Feature highlights
             egui::Frame::NONE
                 .fill(PANEL_BG)
-                .corner_radius(12.0)
+                .corner_radius(0.0)
                 .inner_margin(egui::vec2(24.0, 16.0))
                 .show(ui, |ui| {
                     ui.vertical(|ui| {
@@ -185,7 +185,7 @@ impl App {
     pub(crate) fn setup_feature_row(&self, ui: &mut egui::Ui, title: &str, desc: &str) {
         egui::Frame::NONE
             .fill(PANEL_BG)
-            .corner_radius(8.0)
+            .corner_radius(0.0)
             .inner_margin(egui::vec2(12.0, 10.0))
             .show(ui, |ui| {
                 ui.horizontal_wrapped(|ui| {
@@ -221,7 +221,7 @@ impl App {
         // Folder path display
         egui::Frame::NONE
             .fill(PANEL_BG)
-            .corner_radius(8.0)
+            .corner_radius(0.0)
             .inner_margin(egui::vec2(16.0, 12.0))
             .show(ui, |ui| {
                 ui.horizontal(|ui| {
@@ -306,7 +306,7 @@ impl App {
 
         egui::Frame::NONE
             .fill(bg_color)
-            .corner_radius(10.0)
+            .corner_radius(0.0)
             .stroke(egui::Stroke::new(2.0, stroke_color))
             .inner_margin(egui::vec2(16.0, 12.0))
             .show(ui, |ui| {
@@ -435,7 +435,7 @@ impl App {
             // Summary
             egui::Frame::NONE
                 .fill(PANEL_BG)
-                .corner_radius(10.0)
+                .corner_radius(0.0)
                 .inner_margin(egui::vec2(24.0, 16.0))
                 .show(ui, |ui| {
                     ui.vertical(|ui| {

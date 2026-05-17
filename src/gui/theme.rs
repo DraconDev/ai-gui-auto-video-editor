@@ -239,7 +239,7 @@ pub fn button_pill(is_active: bool, text: impl Into<String>) -> egui::Button<'st
             .fill(PANEL_BG_LIGHT)
             .stroke(egui::Stroke::new(1.0, BORDER))
     };
-    btn.corner_radius(16.0).min_size(egui::vec2(60.0, 32.0))
+    btn.corner_radius(0.0).min_size(egui::vec2(60.0, 32.0))
 }
 
 pub fn button_add(text: impl Into<String>) -> egui::Button<'static> {
@@ -506,7 +506,7 @@ pub fn preset_badge(preset: &str, ui: &mut egui::Ui) {
     };
     egui::Frame::NONE
         .fill(color)
-        .corner_radius(4.0)
+        .corner_radius(0.0)
         .inner_margin(egui::vec2(12.0, 6.0))
         .show(ui, |ui| {
             ui.label(
@@ -521,7 +521,7 @@ pub fn preset_badge(preset: &str, ui: &mut egui::Ui) {
 pub fn settings_value_badge(ui: &mut egui::Ui, value: &str) {
     egui::Frame::NONE
         .fill(egui::Color32::from_rgb(42, 22, 28))
-        .corner_radius(4.0)
+        .corner_radius(0.0)
         .inner_margin(egui::vec2(10.0, 5.0))
         .stroke(egui::Stroke::new(1.0, ACCENT_DARK))
         .show(ui, |ui| {
@@ -630,7 +630,7 @@ pub fn log_entry_processing(
                 egui::ProgressBar::new(progress)
                     .text(format!("{:.0}%", progress * 100.0))
                     .fill(PROCESSING_DIM)
-                    .corner_radius(4.0)
+                    .corner_radius(0.0)
                     .desired_width(200.0),
             );
         });

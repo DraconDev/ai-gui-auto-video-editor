@@ -127,7 +127,7 @@ impl App {
                                 ui.add(
                                     egui::ProgressBar::new(file.progress)
                                         .fill(PROCESSING)
-                                        .corner_radius(4.0)
+                                        .corner_radius(0.0)
                                         .desired_width(ui.available_width() - 50.0),
                                 );
                                 ui.add_space(8.0);

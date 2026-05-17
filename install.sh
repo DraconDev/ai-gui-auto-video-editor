@@ -6,6 +6,7 @@
 # Usage:
 #   ./install.sh              # Install to /usr/local/bin (requires sudo)
 #   ./install.sh --user       # Install to ~/.local/bin (no sudo)
+#   ./install.sh --quick      # Build & replace binary only (fast)
 #   ./install.sh --uninstall  # Remove installation
 #
 # Requirements:
@@ -26,6 +27,7 @@ NC='\033[0m' # No Color
 PREFIX="/usr/local"
 USER_INSTALL=false
 UNINSTALL=false
+QUICK=false
 BIN_NAME="ai-vid-editor"
 CONFIG_DIR="$HOME/.config/ai-vid-editor"
 SERVICE_FILE="/etc/systemd/system/ai-vid-editor.service"
@@ -42,16 +44,22 @@ while [[ $# -gt 0 ]]; do
             UNINSTALL=true
             shift
             ;;
+        --quick)
+            QUICK=true
+            shift
+            ;;
         --help|-h)
             echo "AI Video Editor - Install Script"
             echo ""
             echo "Usage:"
             echo "  ./install.sh              Install to /usr/local/bin (requires sudo)"
             echo "  ./install.sh --user       Install to ~/.local/bin (no sudo)"
-            echo "  ./install.sh --uninstall  Remove installation"
+            echo "  ./install.sh --quick      Build & replace binary only (fast, no desktop/service)"
+            echo "  ./install.sh --uninstall Remove installation"
             echo ""
             echo "Options:"
             echo "  --user       Install to user directory (no sudo required)"
+            echo "  --quick      Build and replace binary only (skip icon, desktop, config)"
             echo "  --uninstall  Remove the installation"
             echo "  --help, -h   Show this help message"
             exit 0
@@ -62,6 +70,12 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+# Auto-detect: if not root and no --user flag, default to user install
+if [ "$EUID" -ne 0 ] && [ "$USER_INSTALL" = false ]; then
+    USER_INSTALL=true
+    PREFIX="$HOME/.local"
+fi
 
 # -----------------------------------------------------------------------------
 # Uninstall
@@ -161,12 +175,29 @@ echo -e "${GREEN}✓ Build complete${NC}"
 # Install binary
 BINARY_PATH="target/release/$BIN_NAME"
 if [ -f "$BINARY_PATH" ]; then
+    # Kill any running instance before replacing
+    if pgrep -x "$BIN_NAME" > /dev/null 2>&1; then
+        echo -e "${YELLOW}Stopping running $BIN_NAME instance...${NC}"
+        pkill -x "$BIN_NAME" 2>/dev/null || true
+        sleep 1
+        # Force kill if still running
+        if pgrep -x "$BIN_NAME" > /dev/null 2>&1; then
+            pkill -9 -x "$BIN_NAME" 2>/dev/null || true
+            sleep 1
+        fi
+    fi
     cp "$BINARY_PATH" "$PREFIX/bin/"
     chmod +x "$PREFIX/bin/$BIN_NAME"
     echo -e "${GREEN}✓ Installed binary to $PREFIX/bin/$BIN_NAME${NC}"
 else
     echo -e "${RED}Error: Binary not found at $BINARY_PATH${NC}"
     exit 1
+fi
+
+# Quick mode: just build and replace binary, then exit
+if [ "$QUICK" = true ]; then
+    echo -e "${GREEN}Quick install done. Binary replaced at $PREFIX/bin/$BIN_NAME${NC}"
+    exit 0
 fi
 
 # Install icon and desktop entry (for GUI)

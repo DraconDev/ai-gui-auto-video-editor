@@ -48,3 +48,27 @@ pub fn create_test_video(output_path: &Path, duration_secs: f32) -> Result<(), S
 pub fn has_ffmpeg() -> bool {
     Command::new("ffmpeg").arg("-version").status().is_ok()
 }
+
+/// Helper: create a small test image (50x50 red square PNG) using ffmpeg.
+pub fn create_test_image(output_path: &Path) -> Result<(), String> {
+    let status = Command::new("ffmpeg")
+        .args([
+            "-f",
+            "lavfi",
+            "-i",
+            "color=c=red:size=50x50",
+            "-frames:v",
+            "1",
+            "-y",
+            output_path
+                .to_str()
+                .ok_or_else(|| "non-UTF-8 path".to_string())?,
+        ])
+        .status()
+        .map_err(|_| "ffmpeg not found".to_string())?;
+    if status.success() {
+        Ok(())
+    } else {
+        Err("ffmpeg test image creation failed".to_string())
+    }
+}

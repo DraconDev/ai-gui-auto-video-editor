@@ -170,37 +170,7 @@ mod tests {
     use std::process::Command;
 
     fn create_test_video(path: &Path, duration_secs: f32) -> Result<(), String> {
-        let status = Command::new("ffmpeg")
-            .args([
-                "-f",
-                "lavfi",
-                "-i",
-                &format!("testsrc=duration={}:size=320x240:rate=30", duration_secs),
-                "-f",
-                "lavfi",
-                "-i",
-                &format!("sine=frequency=1000:duration={}", duration_secs),
-                "-c:v",
-                "libx264",
-                "-preset",
-                "ultrafast",
-                "-crf",
-                "28",
-                "-c:a",
-                "aac",
-                "-b:a",
-                "32k",
-                "-shortest",
-                "-y",
-                path.to_str().unwrap(),
-            ])
-            .status()
-            .map_err(|_| "ffmpeg not found".to_string())?;
-        if status.success() {
-            Ok(())
-        } else {
-            Err("ffmpeg test video creation failed".to_string())
-        }
+        crate::tests_common::create_test_video(path, duration_secs)
     }
 
     #[test]

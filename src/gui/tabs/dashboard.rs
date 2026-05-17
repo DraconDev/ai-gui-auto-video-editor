@@ -391,7 +391,7 @@ impl App {
                 .show(ctx, |ui| {
                     egui::Frame::NONE
                         .fill(bg_color)
-                        .corner_radius(8.0)
+                        .corner_radius(0.0)
                         .inner_margin(egui::vec2(14.0, 10.0))
                         .stroke(egui::Stroke::new(
                             1.0,
@@ -432,7 +432,7 @@ impl App {
                                 ui.add(
                                     egui::ProgressBar::new(1.0 - progress)
                                         .fill(color)
-                                        .corner_radius(2.0)
+                                        .corner_radius(0.0)
                                         .desired_width(ui.available_width()),
                                 );
                             }
