@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [19.57.1] - 2026-05-17
+## [19.58.0] - 2026-05-17
 
 ### Bug Fixes
 - **`VideoConfig::default()` produced `watermark_scale = 0.0`**: The derived `Default` impl used `f32::default()` (0.0) instead of the serde default (1.0), causing watermark pipeline failures. Replaced with manual `Default` impl that matches serde defaults

@@ -122,7 +122,7 @@ After batch completes, print summary table: processed / failed / skipped / total
 
 ### Step 3.3: Add animated spinner to GUI status badge
 
-In `gui/theme.rs`, add `animated_spinner()` helper. In `gui/tabs.rs`, show spinner in `draw_header()` status badge when `Processing`.
+In `gui/theme.rs`, add `animated_spinner()` helper. In `gui/tabs/mod.rs`, show spinner in `draw_header()` status badge when `Processing`.
 
 ### Step 3.4: Add toast notifications in GUI
 

@@ -619,6 +619,36 @@ color_correct = false
 # CLI equivalent: --gpu
 hw_accel = "auto"
 
+# Watermark image path (PNG with alpha recommended)
+# The watermark is overlaid on the video at the configured position and scale.
+# CLI equivalent: --watermark
+#watermark = "branding/watermark.png"
+
+# Watermark position on the video
+# OPTIONS: "top-left", "top-right", "bottom-left", "bottom-right"
+# DEFAULT: "bottom-right"
+watermark_position = "bottom-right"
+
+# Watermark scale factor
+# 1.0 = original size, 0.5 = half size, 2.0 = double size
+# DEFAULT: 1.0
+watermark_scale = 1.0
+
+# Enable background blur (applies uniform boxblur to entire video)
+# NOTE: This is a simple boxblur, not ML-based person segmentation.
+# For ML background blur, see ml::BackgroundBlurProcessor (not yet integrated).
+# CLI equivalent: --blur-background
+blur_background = false
+
+# Auto-reframe horizontal video to vertical (9:16, follows face)
+# CLI equivalent: --reframe
+reframe = false
+
+# Target output resolution
+# OPTIONS: "720p", "1080p", "1440p", "4k", "shorts", "reels", "tiktok"
+# DEFAULT: "1080p"
+target_resolution = "1080p"
+
 # =============================================================================
 # WATCH MODE - Automatic Processing
 # =============================================================================
