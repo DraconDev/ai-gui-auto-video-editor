@@ -138,7 +138,7 @@ outro = ""
 # stabilize = false
 # color_correct = false
 # reframe = false
-# blur_background = false
+# blur_background = false  # Applies uniform boxblur to entire video (not ML person segmentation)
 
 # =============================================================================
 # SILENCE DETECTION - How Silent Segments Are Handled
@@ -250,6 +250,8 @@ mode = "cut"
 #   6.0 = 6x speed (very fast, may be noticeable)
 #
 # NOTE: Only applies when mode = "speedup"
+speedup_factor = 4.0
+
 min_silence_for_speedup = 0.5
 
 # Enable scene-change detection to augment silence-based cuts
