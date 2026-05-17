@@ -83,8 +83,11 @@ pub fn export_edl(
     fps: f32,
 ) -> Result<()> {
     if segments.is_empty() {
-        fs::write(output_path, "TITLE: Edited Timeline\nFCM: NON-DROP FRAME\n\n")
-            .context("failed to write empty EDL file")?;
+        fs::write(
+            output_path,
+            "TITLE: Edited Timeline\nFCM: NON-DROP FRAME\n\n",
+        )
+        .context("failed to write empty EDL file")?;
         return Ok(());
     }
 

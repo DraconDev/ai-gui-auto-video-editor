@@ -15,7 +15,7 @@ use crate::editor::calculate_keep_segments_from_transcript;
 use crate::exporter;
 use crate::progress::BatchProgress;
 use crate::stt_analyzer::{CandleSttAnalyzer, TranscriptSegment, VideoSttAnalyzer};
-use crate::utils::{find_video_files, TempFile};
+use crate::utils::{TempFile, find_video_files};
 
 fn atomic_replace(src: &Path, dst: &Path) -> Result<()> {
     #[cfg(target_os = "windows")]
@@ -115,14 +115,18 @@ impl CachingDurationGetter {
 
 impl DurationGetter for CachingDurationGetter {
     fn get_duration(&self, path: &Path) -> Result<f32> {
-        let metadata = std::fs::metadata(path).with_context(|| format!("failed to read metadata for {:?}", path))?;
-        let mtime = metadata.modified().unwrap_or(std::time::SystemTime::UNIX_EPOCH);
+        let metadata = std::fs::metadata(path)
+            .with_context(|| format!("failed to read metadata for {:?}", path))?;
+        let mtime = metadata
+            .modified()
+            .unwrap_or(std::time::SystemTime::UNIX_EPOCH);
         let file_size = metadata.len();
 
         {
             let cache = self.cache.lock().unwrap_or_else(|p| p.into_inner());
             if let Some((cached_mtime, cached_size, cached_dur)) = cache.get(path)
-                && *cached_mtime == mtime && *cached_size == file_size
+                && *cached_mtime == mtime
+                && *cached_size == file_size
             {
                 return Ok(*cached_dur);
             }
@@ -183,13 +187,7 @@ fn concatenate_videos(
     std::fs::write(list_file.path(), list_content)?;
 
     let status = std::process::Command::new("ffmpeg")
-        .args([
-            "-f",
-            "concat",
-            "-safe",
-            "0",
-            "-i",
-        ])
+        .args(["-f", "concat", "-safe", "0", "-i"])
         .arg(list_file.path())
         .args(["-c", "copy", "-y"])
         .arg(output)
@@ -591,7 +589,13 @@ where
     guard.untrack(&output_file); // Don't delete the final output
 
     report_progress(&mut progress, 0.99, "Writing exports");
-    export_additional_files(&input_file, &output_file, &processed_segments, config, transcript.as_deref())?;
+    export_additional_files(
+        &input_file,
+        &output_file,
+        &processed_segments,
+        config,
+        transcript.as_deref(),
+    )?;
 
     report_progress(&mut progress, 1.0, "Done");
     info!(file = ?output_file, "Successfully saved video");
@@ -600,16 +604,10 @@ where
 
 /// Transcribe the input file if transcription is needed for processing.
 /// Returns `Some(transcript)` on success, `None` on failure or if not needed.
-fn maybe_transcribe(
-    input_file: &Path,
-    _config: &Config,
-) -> Option<Vec<TranscriptSegment>> {
+fn maybe_transcribe(input_file: &Path, _config: &Config) -> Option<Vec<TranscriptSegment>> {
     match CandleSttAnalyzer.transcribe(input_file) {
         Ok(t) => {
-            info!(
-                segments = t.len(),
-                "Transcription complete"
-            );
+            info!(segments = t.len(), "Transcription complete");
             Some(t)
         }
         Err(e) => {
@@ -680,8 +678,14 @@ where
 
 fn format_batch_summary(total: usize, successful: usize, failed: usize, skipped: usize) -> String {
     let width = total.to_string().len().max(3);
-    let s_pct = successful.checked_mul(100).and_then(|v| v.checked_div(total)).unwrap_or(0);
-    let f_pct = failed.checked_mul(100).and_then(|v| v.checked_div(total)).unwrap_or(0);
+    let s_pct = successful
+        .checked_mul(100)
+        .and_then(|v| v.checked_div(total))
+        .unwrap_or(0);
+    let f_pct = failed
+        .checked_mul(100)
+        .and_then(|v| v.checked_div(total))
+        .unwrap_or(0);
 
     let green = "\x1b[32m";
     let red = "\x1b[31m";
@@ -695,7 +699,10 @@ fn format_batch_summary(total: usize, successful: usize, failed: usize, skipped:
          {red}  Failed:{reset}          {:>width$} ({f_pct}%)\n\
          {yellow}  Skipped (done):{reset}  {:>width$}\n\
          =====================\n",
-        total, successful, failed, skipped,
+        total,
+        successful,
+        failed,
+        skipped,
         width = width,
         green = green,
         red = red,
@@ -707,7 +714,10 @@ fn format_batch_summary(total: usize, successful: usize, failed: usize, skipped:
 }
 
 fn print_batch_summary(total: usize, successful: usize, failed: usize, skipped: usize) {
-    print!("{}", format_batch_summary(total, successful, failed, skipped));
+    print!(
+        "{}",
+        format_batch_summary(total, successful, failed, skipped)
+    );
 }
 
 /// Export additional files (SRT, chapters, FCPXML, EDL, clips) based on config
@@ -825,11 +835,10 @@ fn export_additional_files(
     if config.export.edl {
         let edl_path = base_path.with_extension("edl");
         debug!(path = %edl_path.display(), "Exporting EDL");
-        let fps = crate::ml::FrameExtractor::get_video_fps(output_file)
-            .unwrap_or_else(|_| {
-                warn!("Failed to detect FPS for EDL export, defaulting to 25.0");
-                25.0
-            });
+        let fps = crate::ml::FrameExtractor::get_video_fps(output_file).unwrap_or_else(|_| {
+            warn!("Failed to detect FPS for EDL export, defaulting to 25.0");
+            25.0
+        });
         exporter::export_edl(segments, input_file, &edl_path, fps)?;
     }
 

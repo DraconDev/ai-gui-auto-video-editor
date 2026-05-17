@@ -83,9 +83,15 @@ fn test_audio_enhancement() {
 
     // Verify output has valid duration and codec
     let dur = ffprobe_duration(&output_path);
-    assert!(dur.map(|d| d > 0.0).unwrap_or(false), "Output should have positive duration");
+    assert!(
+        dur.map(|d| d > 0.0).unwrap_or(false),
+        "Output should have positive duration"
+    );
     let codec = ffprobe_codec(&output_path);
-    assert!(codec.is_some(), "Output should have a detectable video codec");
+    assert!(
+        codec.is_some(),
+        "Output should have a detectable video codec"
+    );
 }
 
 #[test]
@@ -112,7 +118,10 @@ fn test_video_stabilization() {
     // Verify output has same dimensions as input
     let input_dims = ffprobe_dimensions(&video_path);
     let output_dims = ffprobe_dimensions(&output_path);
-    assert_eq!(input_dims, output_dims, "Stabilized video should maintain original dimensions");
+    assert_eq!(
+        input_dims, output_dims,
+        "Stabilized video should maintain original dimensions"
+    );
 }
 
 #[test]
@@ -138,7 +147,10 @@ fn test_color_correction() {
 
     // Verify output has valid duration
     let dur = ffprobe_duration(&output_path);
-    assert!(dur.map(|d| d > 0.0).unwrap_or(false), "Output should have positive duration");
+    assert!(
+        dur.map(|d| d > 0.0).unwrap_or(false),
+        "Output should have positive duration"
+    );
 }
 
 #[test]

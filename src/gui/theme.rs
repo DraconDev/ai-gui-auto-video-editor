@@ -362,17 +362,19 @@ pub fn dropdown_selector<T: PartialEq + Copy>(
                                             ui.horizontal_wrapped(|ui| {
                                                 ui.set_width(ui.available_width());
                                                 ui.label(
-                                                    egui::RichText::new(label.as_str()).size(14.0).color(
-                                                        if is_selected {
+                                                    egui::RichText::new(label.as_str())
+                                                        .size(14.0)
+                                                        .color(if is_selected {
                                                             ACCENT_PRIMARY
                                                         } else {
                                                             TEXT_PRIMARY
-                                                        },
-                                                    ),
+                                                        }),
                                                 );
                                                 if is_selected {
                                                     ui.with_layout(
-                                                        egui::Layout::right_to_left(egui::Align::Center),
+                                                        egui::Layout::right_to_left(
+                                                            egui::Align::Center,
+                                                        ),
                                                         |ui| {
                                                             ui.label(
                                                                 egui::RichText::new("✓")

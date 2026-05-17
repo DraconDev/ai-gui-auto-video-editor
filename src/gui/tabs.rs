@@ -7,8 +7,8 @@ use tracing::warn;
 
 use super::theme::*;
 use super::{
-    ActivityEntry, App, EntryStatus, FolderState, ProcessingStatus, QueueStatus, SettingsCategory, SetupStep,
-    Tab, ToastKind,
+    ActivityEntry, App, EntryStatus, FolderState, ProcessingStatus, QueueStatus, SettingsCategory,
+    SetupStep, Tab, ToastKind,
 };
 use crate::config::{FolderSettings, JoinMode, SilenceMode, VideoResolution};
 use crate::hwaccel::HwAccel;
@@ -43,11 +43,7 @@ impl App {
                     ProcessingStatus::Processing(stage) => stage.as_str(),
                     ProcessingStatus::Error(err) => err.as_str(),
                 };
-                ui.label(
-                    egui::RichText::new(status_text)
-                        .size(13.0)
-                        .color(dot_color),
-                );
+                ui.label(egui::RichText::new(status_text).size(13.0).color(dot_color));
             });
         });
     }
@@ -197,10 +193,12 @@ impl App {
                 if idx > 0 {
                     ui.add_space(4.0);
                 }
-                let filename = path.file_name()
+                let filename = path
+                    .file_name()
                     .map(|n| n.to_string_lossy().to_string())
                     .unwrap_or_else(|| path.display().to_string());
-                let dir = path.parent()
+                let dir = path
+                    .parent()
                     .map(|p| p.display().to_string())
                     .unwrap_or_default();
                 ui.horizontal_wrapped(|ui| {
@@ -2070,12 +2068,14 @@ impl App {
         // Stats row
         let folder_count = self.state.folders.len();
         let enabled_count = self.state.folders.iter().filter(|f| f.enabled).count();
-        let queued_count = self.state
+        let queued_count = self
+            .state
             .batch_queue
             .iter()
             .filter(|f| f.status == QueueStatus::Queued)
             .count();
-        let processing_count = self.state
+        let processing_count = self
+            .state
             .batch_queue
             .iter()
             .filter(|f| matches!(f.status, QueueStatus::Processing | QueueStatus::Queued))
@@ -2091,11 +2091,7 @@ impl App {
                 ];
                 for (label, value) in stat_items {
                     ui.horizontal(|ui| {
-                        ui.label(
-                            egui::RichText::new(label)
-                                .size(12.0)
-                                .color(TEXT_MUTED),
-                        );
+                        ui.label(egui::RichText::new(label).size(12.0).color(TEXT_MUTED));
                         ui.add_space(4.0);
                         ui.label(
                             egui::RichText::new(&value)
@@ -2213,13 +2209,7 @@ impl App {
 
                 ui.add_space(8.0);
 
-                let recent: Vec<_> = self
-                    .state
-                    .activity_log
-                    .iter()
-                    .rev()
-                    .take(6)
-                    .collect();
+                let recent: Vec<_> = self.state.activity_log.iter().rev().take(6).collect();
 
                 if recent.is_empty() || recent.iter().all(|e| e.filename.is_empty()) {
                     ui.add_space(8.0);
@@ -2239,11 +2229,7 @@ impl App {
                                 EntryStatus::Processing => PROCESSING,
                                 EntryStatus::Error => ERROR,
                             };
-                            ui.label(
-                                egui::RichText::new(dot)
-                                    .size(10.0)
-                                    .color(dot_color),
-                            );
+                            ui.label(egui::RichText::new(dot).size(10.0).color(dot_color));
                             ui.add_space(6.0);
                             ui.label(
                                 egui::RichText::new(&entry.timestamp)
@@ -2309,21 +2295,27 @@ impl App {
                             );
                             ui.add_space(4.0);
                             ui.label(
-                                egui::RichText::new(truncate_path(&folder.input.to_string_lossy(), 36))
-                                    .size(12.0)
-                                    .color(if folder.enabled {
-                                        TEXT_PRIMARY
-                                    } else {
-                                        TEXT_MUTED
-                                    }),
+                                egui::RichText::new(truncate_path(
+                                    &folder.input.to_string_lossy(),
+                                    36,
+                                ))
+                                .size(12.0)
+                                .color(if folder.enabled {
+                                    TEXT_PRIMARY
+                                } else {
+                                    TEXT_MUTED
+                                }),
                             );
-                            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                                ui.label(
-                                    egui::RichText::new(&folder.preset)
-                                        .size(10.0)
-                                        .color(TEXT_MUTED),
-                                );
-                            });
+                            ui.with_layout(
+                                egui::Layout::right_to_left(egui::Align::Center),
+                                |ui| {
+                                    ui.label(
+                                        egui::RichText::new(&folder.preset)
+                                            .size(10.0)
+                                            .color(TEXT_MUTED),
+                                    );
+                                },
+                            );
                         });
                     }
                     if self.state.folders.len() > 3 {
@@ -2362,8 +2354,22 @@ impl App {
 
                 if let Some(folder) = self.state.folders.get(self.state.selected_folder_idx) {
                     let summary_items = [
-                        ("Silence", folder.settings.silence_mode.map(Self::silence_mode_name).unwrap_or("—")),
-                        ("Resolution", folder.settings.target_resolution.map(|r| r.display_name()).unwrap_or_default()),
+                        (
+                            "Silence",
+                            folder
+                                .settings
+                                .silence_mode
+                                .map(Self::silence_mode_name)
+                                .unwrap_or("—"),
+                        ),
+                        (
+                            "Resolution",
+                            folder
+                                .settings
+                                .target_resolution
+                                .map(|r| r.display_name())
+                                .unwrap_or_default(),
+                        ),
                         ("Stabilize", Self::yes_no(folder.settings.stabilize)),
                         ("Color", Self::yes_no(folder.settings.color_correct)),
                         ("Reframe", Self::yes_no(folder.settings.reframe)),
@@ -2373,18 +2379,15 @@ impl App {
                         ui.horizontal_wrapped(|ui| {
                             ui.set_width(ui.available_width());
                             ui.add_space(4.0);
-                            ui.label(
-                                egui::RichText::new(label)
-                                    .size(12.0)
-                                    .color(TEXT_MUTED),
+                            ui.label(egui::RichText::new(label).size(12.0).color(TEXT_MUTED));
+                            ui.with_layout(
+                                egui::Layout::right_to_left(egui::Align::Center),
+                                |ui| {
+                                    ui.label(
+                                        egui::RichText::new(value).size(12.0).color(TEXT_PRIMARY),
+                                    );
+                                },
                             );
-                            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                                ui.label(
-                                    egui::RichText::new(value)
-                                        .size(12.0)
-                                        .color(TEXT_PRIMARY),
-                                );
-                            });
                         });
                     }
                 } else {
@@ -2587,12 +2590,7 @@ impl App {
                             );
                         }
                         EntryStatus::Error => {
-                            log_entry_error(
-                                ui,
-                                &entry.timestamp,
-                                &entry.filename,
-                                &entry.message,
-                            );
+                            log_entry_error(ui, &entry.timestamp, &entry.filename, &entry.message);
                         }
                     }
                 }

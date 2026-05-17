@@ -173,7 +173,13 @@ mod tests {
 
         let segments = parse_ffmpeg_silence(output, 10.0);
         assert_eq!(segments.len(), 1);
-        assert_eq!(segments[0], Segment { start: 1.0, end: 10.0 });
+        assert_eq!(
+            segments[0],
+            Segment {
+                start: 1.0,
+                end: 10.0
+            }
+        );
     }
 
     #[test]
@@ -316,7 +322,6 @@ more noise
         );
     }
 
-
     mod proptests {
         use super::*;
         use proptest::prelude::*;
@@ -367,6 +372,4 @@ more noise
             }
         }
     }
-
-
 }

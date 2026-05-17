@@ -176,8 +176,7 @@ fn watch_folders_loop(
                 }
 
                 let started = Instant::now();
-                let folder_config =
-                    config.with_folder_settings(&folder.preset, &folder.settings);
+                let folder_config = config.with_folder_settings(&folder.preset, &folder.settings);
                 let result = process_single_file_with_intro_outro_progress(
                     path.clone(),
                     output_path,
@@ -333,8 +332,7 @@ fn queue_worker_loop(
             enabled: true,
             settings: file.settings.clone(),
         };
-        let file_config =
-            config.with_folder_settings(&folder_state.preset, &folder_state.settings);
+        let file_config = config.with_folder_settings(&folder_state.preset, &folder_state.settings);
 
         let analyzer = FfmpegAnalyzer;
         let editor = FfmpegEditor::new(file_config.video.hw_accel);

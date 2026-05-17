@@ -3,14 +3,14 @@ use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
 use anyhow::Result;
-use tracing::{info, error};
+use tracing::{error, info};
 
 use crate::analyzer::FfmpegAnalyzer;
 use crate::batch_processor::{
-    process_single_file_with_intro_outro_progress, CachingDurationGetter,
+    CachingDurationGetter, process_single_file_with_intro_outro_progress,
 };
-use crate::editor::FfmpegEditor;
 use crate::config::Config;
+use crate::editor::FfmpegEditor;
 
 /// Shared configuration for a single watch folder
 pub struct WatchFolderConfig<'a> {
@@ -95,8 +95,11 @@ pub fn run_watch_loop(params: WatchFolderConfig) -> Result<()> {
                 }
 
                 let now = timestamp();
-                info!("
-[{}] [NEW FILE] {label} {:?}", now, path);
+                info!(
+                    "
+[{}] [NEW FILE] {label} {:?}",
+                    now, path
+                );
 
                 let file_name = path
                     .file_name()

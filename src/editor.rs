@@ -511,7 +511,12 @@ impl VideoEditor for FfmpegEditor {
                         }
                     };
 
-                    AutoReframeProcessor::generate_crop_filter(&crop_regions, w, h, target_resolution)
+                    AutoReframeProcessor::generate_crop_filter(
+                        &crop_regions,
+                        w,
+                        h,
+                        target_resolution,
+                    )
                 }
                 Err(e) => {
                     warn!(error = %e, "Face detection failed, using center crop");
@@ -610,7 +615,15 @@ fn create_trim_chunk_dir(output: &Path) -> Result<PathBuf> {
         .file_stem()
         .map(|stem| stem.to_string_lossy().to_string())
         .unwrap_or_else(|| "trim".to_string());
-    let chunk_dir = parent.join(format!(".ai-vid-editor-{}-{}-{:x}", stem, std::process::id(), std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_nanos()));
+    let chunk_dir = parent.join(format!(
+        ".ai-vid-editor-{}-{}-{:x}",
+        stem,
+        std::process::id(),
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_nanos()
+    ));
 
     if chunk_dir.exists() {
         let _ = fs::remove_dir_all(&chunk_dir);
@@ -1458,7 +1471,11 @@ mod tests {
         create_test_video(&input, 3.0).expect("ffmpeg not found");
 
         let editor = FfmpegEditor::default();
-        let result = editor.reframe(&input, &output, crate::config::VideoResolution::Vertical1080p);
+        let result = editor.reframe(
+            &input,
+            &output,
+            crate::config::VideoResolution::Vertical1080p,
+        );
 
         assert!(result.is_ok(), "Reframe should succeed");
         assert!(output.exists(), "Reframed output should exist");

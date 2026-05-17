@@ -34,7 +34,10 @@ impl BatchProgress {
 
     /// Check if a file has already been processed (and has the same mtime)
     pub fn is_completed(&self, path: &Path) -> bool {
-        let mtime = std::fs::metadata(path).ok().and_then(|m| m.modified().ok()).map(|t| t.elapsed().unwrap_or_default().as_secs());
+        let mtime = std::fs::metadata(path)
+            .ok()
+            .and_then(|m| m.modified().ok())
+            .map(|t| t.elapsed().unwrap_or_default().as_secs());
         match (self.completed.get(path), mtime) {
             (Some(&saved_mtime), Some(current_mtime)) => {
                 // Allow 5s tolerance for filesystem timestamp precision
@@ -47,7 +50,11 @@ impl BatchProgress {
 
     /// Mark a file as completed with current mtime
     pub fn mark_completed(&mut self, path: &Path) {
-        let mtime = std::fs::metadata(path).ok().and_then(|m| m.modified().ok()).map(|t| t.elapsed().unwrap_or_default().as_secs()).unwrap_or(0);
+        let mtime = std::fs::metadata(path)
+            .ok()
+            .and_then(|m| m.modified().ok())
+            .map(|t| t.elapsed().unwrap_or_default().as_secs())
+            .unwrap_or(0);
         self.completed.insert(path.to_path_buf(), mtime);
     }
 

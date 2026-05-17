@@ -29,7 +29,11 @@ fn sidebar_item(
     } else {
         PANEL_BG
     };
-    let text_color = if is_active { TEXT_PRIMARY } else { TEXT_SECONDARY };
+    let text_color = if is_active {
+        TEXT_PRIMARY
+    } else {
+        TEXT_SECONDARY
+    };
     let border_color = if is_active {
         ACCENT_PRIMARY
     } else {
@@ -828,7 +832,8 @@ impl AppState {
         }
 
         if self.activity_log.len() > MAX_ACTIVITY_LOG {
-            self.activity_log.drain(0..self.activity_log.len() - MAX_ACTIVITY_LOG);
+            self.activity_log
+                .drain(0..self.activity_log.len() - MAX_ACTIVITY_LOG);
         }
     }
 
@@ -929,7 +934,8 @@ impl AppState {
             now.signed_duration_since(completed).num_seconds() <= 60
         });
         if self.batch_queue.len() > MAX_BATCH_QUEUE {
-            self.batch_queue.drain(0..self.batch_queue.len() - MAX_BATCH_QUEUE);
+            self.batch_queue
+                .drain(0..self.batch_queue.len() - MAX_BATCH_QUEUE);
         }
     }
 
@@ -1040,7 +1046,12 @@ impl eframe::App for App {
                     .output_dir
                     .clone()
                     .unwrap_or_else(|| PathBuf::from("output"));
-                let preset = self.state.config.paths.watch_folders.first()
+                let preset = self
+                    .state
+                    .config
+                    .paths
+                    .watch_folders
+                    .first()
                     .map(|f| f.preset.clone())
                     .unwrap_or_else(|| self.state.setup_preset.clone());
                 let settings = FolderSettings::default();
@@ -1081,7 +1092,9 @@ impl eframe::App for App {
         }
 
         // Keyboard shortcuts for settings navigation
-        if !skip_shortcuts && (self.state.current_tab == Tab::Settings || self.state.current_tab == Tab::All) {
+        if !skip_shortcuts
+            && (self.state.current_tab == Tab::Settings || self.state.current_tab == Tab::All)
+        {
             if is_ctrl && ctx.input(|i| i.key_pressed(egui::Key::ArrowLeft)) {
                 self.navigate_settings_category(-1);
             }
@@ -1180,7 +1193,14 @@ impl eframe::App for App {
                     for tab in process_items {
                         let (_, icon, label) = tab;
                         let is_active = self.state.current_tab == tab.0;
-                        sidebar_item(ui, is_active, icon, label, tab.0, &mut self.state.current_tab);
+                        sidebar_item(
+                            ui,
+                            is_active,
+                            icon,
+                            label,
+                            tab.0,
+                            &mut self.state.current_tab,
+                        );
                     }
 
                     ui.add_space(12.0);
@@ -1204,7 +1224,14 @@ impl eframe::App for App {
                     for tab in config_items {
                         let (_, icon, label) = tab;
                         let is_active = self.state.current_tab == tab.0;
-                        sidebar_item(ui, is_active, icon, label, tab.0, &mut self.state.current_tab);
+                        sidebar_item(
+                            ui,
+                            is_active,
+                            icon,
+                            label,
+                            tab.0,
+                            &mut self.state.current_tab,
+                        );
                     }
 
                     // Spacer and status at bottom

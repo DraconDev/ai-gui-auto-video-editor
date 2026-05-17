@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use criterion::{Criterion, black_box, criterion_group, criterion_main};
 
 /// Benchmark the silence detection parser with a realistic FFmpeg output
 fn bench_parse_ffmpeg_silence(c: &mut Criterion) {

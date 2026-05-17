@@ -1,6 +1,6 @@
 use anyhow::Result;
 use std::path::PathBuf;
-use tracing::{info, error};
+use tracing::{error, info};
 
 #[cfg(feature = "cli")]
 use clap::Parser;
@@ -20,8 +20,8 @@ pub mod scene_detection;
 pub mod stt_analyzer;
 pub mod thumbnail;
 pub mod utils;
-pub mod watermark;
 pub mod watch;
+pub mod watermark;
 
 use crate::analyzer::FfmpegAnalyzer;
 use crate::batch_processor::{
@@ -304,7 +304,11 @@ fn main() -> Result<()> {
     // Check FFmpeg and ffprobe availability early
     if let Err(e) = crate::utils::check_ffmpeg() {
         if cli.json {
-            info!("{}", serde_json::to_string_pretty(&json!({"error": e.to_string()})).unwrap_or_else(|_| format!("{{\"error\": \"{}\"}}", e)));
+            info!(
+                "{}",
+                serde_json::to_string_pretty(&json!({"error": e.to_string()}))
+                    .unwrap_or_else(|_| format!("{{\"error\": \"{}\"}}", e))
+            );
         } else {
             error!("Error: {}", e);
         }
@@ -313,7 +317,11 @@ fn main() -> Result<()> {
 
     if let Err(e) = crate::utils::check_ffprobe() {
         if cli.json {
-            info!("{}", serde_json::to_string_pretty(&json!({"error": e.to_string()})).unwrap_or_else(|_| format!("{{\"error\": \"{}\"}}", e)));
+            info!(
+                "{}",
+                serde_json::to_string_pretty(&json!({"error": e.to_string()}))
+                    .unwrap_or_else(|_| format!("{{\"error\": \"{}\"}}", e))
+            );
         } else {
             error!("Error: {}", e);
         }
@@ -374,7 +382,9 @@ fn main() -> Result<()> {
             // Headless with no watch folders: show help
             use clap::CommandFactory;
             Cli::command().print_help()?;
-            info!("No input specified and no watch folders configured. Use --input-file, --input-dir, or configure watch folders in config.");
+            info!(
+                "No input specified and no watch folders configured. Use --input-file, --input-dir, or configure watch folders in config."
+            );
             return Ok(());
         }
 
@@ -389,7 +399,9 @@ fn main() -> Result<()> {
         {
             use clap::CommandFactory;
             Cli::command().print_help()?;
-            info!("No GUI support compiled in. Use --input-file, --input-dir, or --headless with watch folders.");
+            info!(
+                "No GUI support compiled in. Use --input-file, --input-dir, or --headless with watch folders."
+            );
             return Ok(());
         }
     }
@@ -587,7 +599,15 @@ fn main() -> Result<()> {
             let out_dir = output_dir
                 .clone()
                 .ok_or_else(|| anyhow::anyhow!("Output directory required for watch mode"))?;
-            return run_watch_mode(&watch_path, &out_dir, &config, &intro, &outro, cli.notify, cli.dry_run);
+            return run_watch_mode(
+                &watch_path,
+                &out_dir,
+                &config,
+                &intro,
+                &outro,
+                cli.notify,
+                cli.dry_run,
+            );
         }
 
         // Use watch_folders from config if available and enabled
@@ -602,7 +622,15 @@ fn main() -> Result<()> {
         let out_dir = output_dir
             .clone()
             .ok_or_else(|| anyhow::anyhow!("Output directory required for watch mode"))?;
-        return run_watch_mode(&watch_path, &out_dir, &config, &intro, &outro, cli.notify, cli.dry_run);
+        return run_watch_mode(
+            &watch_path,
+            &out_dir,
+            &config,
+            &intro,
+            &outro,
+            cli.notify,
+            cli.dry_run,
+        );
     }
 
     let analyzer = FfmpegAnalyzer;
@@ -713,7 +741,6 @@ fn run_watch_mode(
     })
 }
 
-
 /// Run watch mode for multiple folders from config
 /// Spawns a thread per folder so all folders are watched concurrently.
 fn run_multi_watch_mode(config: &Config, cli: &Cli) -> Result<()> {
@@ -815,7 +842,6 @@ fn find_config_path(cli: &Cli) -> Option<PathBuf> {
     }
     Config::default_config_path().filter(|p| p.exists())
 }
-
 
 /// Pick a random music file from a directory
 fn pick_random_music_file(music_dir: &PathBuf) -> Result<Option<PathBuf>> {
