@@ -31,6 +31,7 @@ use crate::batch_processor::{
 
 use crate::config::{Config, Preset};
 use crate::editor::FfmpegEditor;
+use crate::watch::ConfigWatcher;
 
 #[derive(Parser, Debug)]
 #[command(
