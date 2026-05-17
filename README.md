@@ -4,6 +4,8 @@ A command-line and GUI tool for automated video editing using AI. Designed for c
 
 ![AI Video Editor GUI](assets/Screenshot_20260319_124018.png)
 
+> **Screenshot may show an older UI.** Current version uses sharp rectangular edges and a red-accent dark theme.
+
 ## Quick Start
 
 **GUI** (default):
@@ -31,6 +33,12 @@ just test     # Run tests
 
 ## Installation
 
+### From crates.io
+
+```bash
+cargo install ai-vid-editor
+```
+
 ### From Source
 
 ```bash
@@ -48,9 +56,9 @@ The install script will:
 
 ### Releases & Distribution
 
-- Run `scripts/release.sh <version>` after tests to build, bundle, and checksum `release/ai-vid-editor-<version>.tar.gz`. The script already copies the binary, installer, desktop assets, and docs into the release directory.
-- Publish the generated artifacts plus any AppImage/DEB/RPM/Flatpak/Snap packages to GitHub Releases or your download site, then update `docs/release-locations.md` (and link from `docs/linux-release-guide.md`) so casual Linux users know where to download and how to install.
-- Point readers to `docs/linux-release-guide.md` for packaging options and `docs/customer-facing.md` for the onboarding story, so both builders and end users understand the experience.
+- Download pre-built binaries from [GitHub Releases](https://github.com/DraconDev/ai-vid-editor/releases).
+- Run `scripts/release.sh` to build, bundle, and checksum a release tarball locally.
+- Also available on [crates.io](https://crates.io/crates/ai-vid-editor): `cargo install ai-vid-editor`.
 
 ### Requirements
 
@@ -109,9 +117,14 @@ ai-vid-editor -I ./raw_videos -O ./edited
 | `--clear-progress` | Clear batch progress before processing |
 | `--notify` | Send desktop notifications |
 | `-w, --watch <DIR>` | Watch folder for new videos |
+| `--headless` | Run in watch/daemon mode (no GUI) |
+| `--start-minimized` | Start GUI minimized (background watch) |
 | `-n, --dry-run` | Preview without processing |
 | `-j, --json` | JSON output for scripting |
 | `--generate-config` | Output sample config |
+| `-v, --verbose` | Increase verbosity (-v, -vv) |
+| `-q, --quiet` | Suppress output |
+| `--no-progress` | Disable progress bars |
 
 ### Processing Options
 
@@ -130,8 +143,7 @@ ai-vid-editor -I ./raw_videos -O ./edited
 | `--stabilize` | Enable video stabilization |
 | `--color-correct` | Enable auto color correction |
 | `--reframe` | Auto-reframe to vertical (9:16) |
-| `--blur-background` | Blur background behind speaker |
-| `--export-thumbnail` | Generate thumbnail image for YouTube |
+| `--blur-background` | Apply uniform boxblur to video (not ML segmentation) |
 | `--watermark <FILE>` | Add watermark image overlay |
 | `--watermark-position <POS>` | Watermark position (top-left, top-right, bottom-left, bottom-right, center) |
 | `--watermark-scale <FLOAT>` | Watermark scale factor (default: 1.0) |
@@ -154,9 +166,8 @@ ai-vid-editor -I ./raw_videos -O ./edited
 | `--export-clips` | Extract highlight clips for Shorts/Reels |
 | `--export-fcpxml` | Generate FCPXML |
 | `--export-thumbnail` | Generate YouTube thumbnail from best frame |
-| `--preview` | Generate a quick low-resolution preview file |
-| `--preview-duration <SEC>` | Preview duration in seconds (default: 30.0) |
-| `--export-multi-format` | Output multiple resolutions simultaneously |
+
+
 
 ## Presets
 
