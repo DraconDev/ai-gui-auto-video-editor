@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [19.57.1] - 2026-05-17
+
+### Bug Fixes
+- **`VideoConfig::default()` produced `watermark_scale = 0.0`**: The derived `Default` impl used `f32::default()` (0.0) instead of the serde default (1.0), causing watermark pipeline failures. Replaced with manual `Default` impl that matches serde defaults
+- **`TempDir::new` collision**: Two calls in the same process would delete the first directory via `remove_dir_all`. Now appends an atomic counter + nanosecond timestamp for uniqueness
+- **Clip extraction frame accuracy**: Moved `-ss` before `-i` for fast keyframe-seeking and added `-avoid_negative_ts make_zero` to prevent timestamp issues when using `-c copy`
+
+### Code Quality
+- **`create_test_video` deduplication**: `tests/common/mod.rs` now delegates to `ai_vid_editor::tests_common::create_test_video` instead of duplicating the helper
+- **`make_test_folder_state` deduplication**: Private `#[cfg(test)]` copy now delegates to the public version
+- **`VideoResolution::parse_name()`**: Resolution parsing centralized in one method; removed duplicate `parse_resolution` from `main.rs`
+- **`fix_floats` replaced**: Fragile line-by-line string manipulation in `Config::generate_default_toml()` replaced with `round_floats_in_value()` — a proper TOML Value tree walk
+- **`FolderSettings::is_default()` simplified**: Derived `PartialEq`, replaced 30-line `.is_none()` chain with `self == &Self::default()`
+- **`blur_background` documentation clarified**: Updated doc comment to clearly state this applies a uniform boxblur, not ML person segmentation
+- **`build_folder_config` exposed**: Added public wrapper in `gui::processing` so integration tests can verify folder config building
+
+### Features
+- **Graceful shutdown**: Watch modes (`run_watch_mode`, `run_multi_watch_mode`) now register a `ctrlc` handler that sets a shared `AtomicBool` stop flag. `run_watch_loop` checks it each iteration and exits cleanly. Multi-watch mode joins all threads on shutdown
+- **Bounded GUI watcher channel**: `mpsc::channel()` → `mpsc::sync_channel(1000)` in `spawn_watcher`, preventing unbounded memory growth if the GUI thread stalls
+
+### GUI
+- **Sharp corners**: All corner radii set to `0.0` — no rounding anywhere
+- **Sidebar highlight fix**: Active sidebar items now use a red-tinted background + red border stroke instead of a 3px red accent column that shifted the button position
+- **`gui/tabs.rs` split**: 2,797-line monolith split into `tabs/mod.rs`, `settings.rs`, `modals.rs`, `dashboard.rs`, `queue.rs`
+
+### Cleanup
+- Removed stale release artifacts (`0.1.424/`, `0.1.467/`, `3.0.0/`, `13.2.0/`, `19.1.9/`, `19.2.2/` + tarballs/checksums)
+- Removed `.commandcode/taste/taste.md` (empty AI tool placeholder)
+- Added `.ralph/` to `.gitignore`
+- Updated `AGENTS.md`, `justfile`, `docs/` for current file structure and conventions
+
 ## [19.56.0] - 2026-05-02
 
 ### Security Fixes
