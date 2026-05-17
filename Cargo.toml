@@ -11,6 +11,33 @@ readme = "README.md"
 keywords = ["video", "editor", "ai", "ffmpeg", "automation"]
 categories = ["command-line-utilities", "multimedia::video"]
 rust-version = "1.87"
+exclude = [
+    ".dracon/",
+    ".ralph/",
+    ".github/",
+    "docs/",
+    "plans/",
+    "presets/",
+    "benches/",
+    "proptest-regressions/",
+    "release/",
+    "assets/Screenshot_20260319_124018.png",
+    "todo.md",
+    "justfile",
+    "install.sh",
+    "scripts/",
+    "ai-vid-editor.example.toml",
+    "CHANGELOG.md",
+    "CLA.md",
+    "COMMERCIAL-LICENSE.md",
+    "CONTRIBUTING.md",
+    "LICENSE",
+    "flake.nix",
+    "flake.lock",
+    "deny.toml",
+    ".gitattributes",
+    ".gitignore",
+]
 
 [dependencies]
 anyhow = "1.0.102"
