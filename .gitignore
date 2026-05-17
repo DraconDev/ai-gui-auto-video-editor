@@ -51,6 +51,3 @@ target/
 !rust-toolchain.toml
 !rustfmt.toml
 # --- END DRACON MANAGED BLOCK ---
-
-# Release build artifacts
-release/
