@@ -24,12 +24,15 @@ pub struct WatchFolderConfig<'a> {
     pub folder_label: &'a str,
 }
 
-/// Track config file mtime for hot-reload detection
+/// Track config file mtime for hot-reload detection.
+/// Used by the binary crate's multi-watch mode; dead in the library crate.
+#[allow(dead_code)]
 pub(crate) struct ConfigWatcher {
     path: Option<PathBuf>,
     last_mtime: Option<std::time::SystemTime>,
 }
 
+#[allow(dead_code)]
 impl ConfigWatcher {
     fn new() -> Self {
         Self {
