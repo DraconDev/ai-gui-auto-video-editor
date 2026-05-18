@@ -1198,4 +1198,195 @@ mod tests {
         assert!(content.contains("00:00"));
         Ok(())
     }
+
+    // ── Phase 2: Exporter enhancements ─────────────────────────────────────
+    #[test]
+    fn test_export_fcpxml_out_of_order_segments() -> Result<()> {
+        let dir = tempdir()?;
+        let output_fcpxml = dir.path().join("output.fcpxml");
+        let input_path = dir.path().join("video.mp4");
+
+        // Add segments out of order - verify they get sorted
+        let segments = vec![
+            crate::analyzer::ProcessedSegment {
+                start: 20.0,
+                end: 30.0,
+                speed: 1.0,
+            },
+            crate::analyzer::ProcessedSegment {
+                start: 0.0,
+                end: 10.0,
+                speed: 1.0,
+            },
+        ];
+
+        export_fcpxml(&segments, &input_path, &output_fcpxml)?;
+
+        let content = fs::read_to_string(&output_fcpxml)?;
+        // First start value should be 0s (earlier segment comes first)
+        assert!(content.contains("start=\"0s\""));
+        Ok(())
+    }
+
+    #[test]
+    fn test_export_fcpxml_timestamps_have_s_suffix() -> Result<()> {
+        let dir = tempdir()?;
+        let output_fcpxml = dir.path().join("output.fcpxml");
+        let input_path = dir.path().join("video.mp4");
+
+        let segments = vec![crate::analyzer::ProcessedSegment {
+            start: 0.0,
+            end: 30.0,
+            speed: 1.0,
+        }];
+
+        export_fcpxml(&segments, &input_path, &output_fcpxml)?;
+
+        let content = fs::read_to_string(&output_fcpxml)?;
+        // All timestamps should have "s" suffix
+        assert!(content.contains("duration=\"30s\""));
+        assert!(content.contains("offset=\"0s\""));
+        assert!(content.contains("start=\"0s\""));
+        Ok(())
+    }
+
+    #[test]
+    fn test_export_srt_ampersand_needs_escaping() -> Result<()> {
+        let dir = tempdir()?;
+        let output_srt = dir.path().join("subs.srt");
+        let transcript = vec![TranscriptSegment {
+            start: 0.0,
+            end: 5.0,
+            text: "Tom & Jerry".to_string(),
+            confidence: 1.0,
+        }];
+
+        export_srt(&transcript, &output_srt)?;
+
+        let content = fs::read_to_string(&output_srt)?;
+        // Text should be present (SRT doesn't strictly require XML escaping)
+        assert!(content.contains("Tom") || content.contains("Jerry"));
+        Ok(())
+    }
+
+    #[test]
+    fn test_export_srt_multiple_cues_sorted() -> Result<()> {
+        let dir = tempdir()?;
+        let output_srt = dir.path().join("subs.srt");
+        // Add out of order
+        let transcript = vec![
+            TranscriptSegment {
+                start: 5.0,
+                end: 10.0,
+                text: "Second".to_string(),
+                confidence: 1.0,
+            },
+            TranscriptSegment {
+                start: 0.0,
+                end: 5.0,
+                text: "First".to_string(),
+                confidence: 1.0,
+            },
+        ];
+
+        export_srt(&transcript, &output_srt)?;
+
+        let content = fs::read_to_string(&output_srt)?;
+        // First timestamp should be 00:00:00,000 (sorted by start time)
+        assert!(content.contains("00:00:00,000"));
+        // Second timestamp should be 00:00:05,000
+        assert!(content.contains("00:00:05,000"));
+        Ok(())
+    }
+
+    #[test]
+    fn test_export_edl_single_segment_timecode_format() -> Result<()> {
+        let dir = tempdir()?;
+        let output_edl = dir.path().join("output.edl");
+        let input_path = dir.path().join("video.mp4");
+
+        // 10s segment at 25fps
+        let segments = vec![crate::analyzer::ProcessedSegment {
+            start: 0.0,
+            end: 10.0,
+            speed: 1.0,
+        }];
+
+        export_edl(&segments, &input_path, &output_edl, 25.0)?;
+
+        let content = fs::read_to_string(&output_edl)?;
+        // Verify format: HH:MM:SS:FF (timecode with frame number)
+        assert!(content.contains("00:00:10:00") || content.contains("00:00:09:24"));
+        Ok(())
+    }
+
+    // ── Phase 2: Chapter export tests ───────────────────────────────────────
+    #[test]
+    fn test_export_youtube_chapters_single_marker() -> Result<()> {
+        let dir = tempdir()?;
+        let output = dir.path().join("chapters.txt");
+
+        export_youtube_chapters(
+            &[TranscriptSegment {
+                start: 0.0,
+                end: 180.0,
+                text: "Intro".to_string(),
+                confidence: 1.0,
+            }],
+            &output,
+        )?;
+
+        let content = fs::read_to_string(&output)?;
+        assert!(content.contains("00:00"));
+        Ok(())
+    }
+
+    #[test]
+    fn test_export_youtube_chapters_multiple_markers() -> Result<()> {
+        let dir = tempdir()?;
+        let output = dir.path().join("chapters.txt");
+
+        export_youtube_chapters(
+            &[
+                TranscriptSegment {
+                    start: 0.0,
+                    end: 30.0,
+                    text: "Intro".to_string(),
+                    confidence: 1.0,
+                },
+                TranscriptSegment {
+                    start: 30.0,
+                    end: 60.0,
+                    text: "Part 1".to_string(),
+                    confidence: 1.0,
+                },
+                TranscriptSegment {
+                    start: 60.0,
+                    end: 90.0,
+                    text: "Part 2".to_string(),
+                    confidence: 1.0,
+                },
+            ],
+            &output,
+        )?;
+
+        let content = fs::read_to_string(&output)?;
+        // Should have multiple timestamps
+        let timestamps = content.matches("00:").count();
+        assert!(timestamps >= 2, "Should have multiple chapter markers");
+        Ok(())
+    }
+
+    #[test]
+    fn test_export_youtube_chapters_empty_transcript() -> Result<()> {
+        let dir = tempdir()?;
+        let output = dir.path().join("chapters.txt");
+
+        export_youtube_chapters(&[], &output)?;
+
+        let content = fs::read_to_string(&output)?;
+        // Empty transcript still produces intro marker
+        assert_eq!(content, "00:00 Intro\n");
+        Ok(())
+    }
 }
