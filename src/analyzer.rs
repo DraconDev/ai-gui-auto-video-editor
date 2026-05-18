@@ -500,15 +500,24 @@ more noise
     // ── Segment boundary edge cases ─────────────────────────────────────────
     #[test]
     fn test_segment_exact_boundary() {
-        let seg1 = Segment { start: 0.0, end: 10.0 };
-        let seg2 = Segment { start: 10.0, end: 20.0 };
+        let seg1 = Segment {
+            start: 0.0,
+            end: 10.0,
+        };
+        let seg2 = Segment {
+            start: 10.0,
+            end: 20.0,
+        };
         // These segments touch exactly at 10.0
         assert_eq!(seg1.end, seg2.start);
     }
 
     #[test]
     fn test_segment_zero_duration() {
-        let seg = Segment { start: 5.0, end: 5.0 };
+        let seg = Segment {
+            start: 5.0,
+            end: 5.0,
+        };
         // Zero-length segment should be detected
         let duration = seg.end - seg.start;
         assert!(duration.abs() < 1e-6);
@@ -516,8 +525,14 @@ more noise
 
     #[test]
     fn test_segments_non_overlapping() {
-        let seg1 = Segment { start: 0.0, end: 5.0 };
-        let seg2 = Segment { start: 10.0, end: 15.0 };
+        let seg1 = Segment {
+            start: 0.0,
+            end: 5.0,
+        };
+        let seg2 = Segment {
+            start: 10.0,
+            end: 15.0,
+        };
         // Gap between segments
         let gap = seg2.start - seg1.end;
         assert_eq!(gap, 5.0);
@@ -525,8 +540,14 @@ more noise
 
     #[test]
     fn test_segments_fully_contained() {
-        let outer = Segment { start: 0.0, end: 20.0 };
-        let inner = Segment { start: 5.0, end: 15.0 };
+        let outer = Segment {
+            start: 0.0,
+            end: 20.0,
+        };
+        let inner = Segment {
+            start: 5.0,
+            end: 15.0,
+        };
         // Inner is fully contained within outer
         assert!(inner.start >= outer.start);
         assert!(inner.end <= outer.end);

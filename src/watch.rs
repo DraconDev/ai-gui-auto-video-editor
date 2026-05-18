@@ -249,6 +249,69 @@ fn notify_complete(path: &Path, output: &Path) {
     );
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::collections::HashSet;
+
+    #[test]
+    fn test_is_new_video_known_extension() {
+        let processed = HashSet::new();
+        let path = Path::new("/videos/test.mp4");
+        assert!(is_new_video(path, &processed));
+    }
+
+    #[test]
+    fn test_is_new_video_unknown_extension() {
+        let processed = HashSet::new();
+        let path = Path::new("/videos/test.txt");
+        assert!(!is_new_video(path, &processed));
+    }
+
+    #[test]
+    fn test_is_new_video_already_processed() {
+        let mut processed = HashSet::new();
+        processed.insert(PathBuf::from("/videos/test.mp4"));
+        let path = Path::new("/videos/test.mp4");
+        assert!(!is_new_video(path, &processed));
+    }
+
+    #[test]
+    fn test_is_new_video_case_insensitive() {
+        let processed = HashSet::new();
+        let path = Path::new("/videos/test.MP4");
+        assert!(is_new_video(path, &processed));
+    }
+
+    #[test]
+    fn test_is_new_video_no_extension() {
+        let processed = HashSet::new();
+        let path = Path::new("/videos/testfile");
+        assert!(!is_new_video(path, &processed));
+    }
+
+    #[test]
+    fn test_timestamp_format() {
+        let ts = timestamp();
+        // Format: HH:MM:SS
+        assert!(ts.len() == 8);
+        assert!(ts.contains(':'));
+    }
+
+    #[test]
+    fn test_config_watcher_new() {
+        let watcher = ConfigWatcher::new();
+        assert!(!watcher.was_ever_loaded());
+    }
+
+    #[test]
+    fn test_config_watcher_check_no_config() {
+        let mut watcher = ConfigWatcher::new();
+        // No config set, check_for_reload should return false
+        assert!(!watcher.check_for_reload(None));
+    }
+}
+
 fn notify_error(path: &Path, error: &str) {
     crate::utils::send_notification(
         "Processing Error",
