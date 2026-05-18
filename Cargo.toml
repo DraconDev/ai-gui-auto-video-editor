@@ -1,6 +1,6 @@
 [package]
 name = "ai-gui-auto-video-editor"
-version = "19.59.3"
+version = "19.59.4"
 edition = "2024"
 authors = ["DraconDev"]
 description = "AGAVE - GUI + CLI AI-powered video editor: auto silence cutting, audio enhancement, scene detection, auto-reframe for content creators"

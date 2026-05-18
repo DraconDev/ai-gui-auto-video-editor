@@ -155,8 +155,14 @@ fn concatenate_videos(
     outro: Option<&Path>,
     output: &Path,
 ) -> Result<()> {
-    let has_intro = intro.as_ref().map(|p| !p.as_os_str().is_empty()).unwrap_or(false);
-    let has_outro = outro.as_ref().map(|p| !p.as_os_str().is_empty()).unwrap_or(false);
+    let has_intro = intro
+        .as_ref()
+        .map(|p| !p.as_os_str().is_empty())
+        .unwrap_or(false);
+    let has_outro = outro
+        .as_ref()
+        .map(|p| !p.as_os_str().is_empty())
+        .unwrap_or(false);
 
     if !has_intro && !has_outro {
         fs::copy(main, output)?;
