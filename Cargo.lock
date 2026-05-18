@@ -141,7 +141,7 @@ dependencies = [
 
 [[package]]
 name = "ai-gui-auto-video-editor"
-version = "19.59.3"
+version = "19.59.4"
 dependencies = [
  "anyhow",
  "candle-core",
