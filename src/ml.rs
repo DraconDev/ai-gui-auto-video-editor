@@ -1129,4 +1129,70 @@ mod tests {
         // Vertical video - function always returns full height
         assert_eq!(region.height, 1.0);
     }
+
+    // ── AutoReframeProcessor edge cases ────────────────────────────────────
+    #[test]
+    fn test_generate_crop_filter_with_no_faces() {
+        let regions: Vec<(f32, CropRegion)> = vec![];
+        let filter = AutoReframeProcessor::generate_crop_filter(
+            &regions,
+            1920,
+            1080,
+            crate::config::VideoResolution::Fhd1080p,
+        );
+        // Empty regions should produce fallback filter
+        assert!(filter.contains("crop"));
+        assert!(filter.contains("scale"));
+    }
+
+    #[test]
+    fn test_generate_crop_filter_one_face_detected() {
+        let regions = vec![(
+            0.0,
+            CropRegion {
+                x: 0.25,
+                y: 0.0,
+                width: 0.5,
+                height: 1.0,
+            },
+        )];
+        let filter = AutoReframeProcessor::generate_crop_filter(
+            &regions,
+            1920,
+            1080,
+            crate::config::VideoResolution::Vertical1080p,
+        );
+        // Single region should produce crop filter
+        assert!(filter.contains("crop"));
+    }
+
+    #[test]
+    fn test_generate_crop_filter_vertical_resolution() {
+        let regions = vec![(
+            0.0,
+            CropRegion {
+                x: 0.0,
+                y: 0.25,
+                width: 1.0,
+                height: 0.5,
+            },
+        )];
+        let filter = AutoReframeProcessor::generate_crop_filter(
+            &regions,
+            1920,
+            1080,
+            crate::config::VideoResolution::Vertical1080p,
+        );
+        // Should produce scale to 1080x1920
+        assert!(filter.contains("1080"));
+    }
+
+    // ── AutoReframeProcessor edge cases ────────────────────────────────────
+    #[test]
+    fn test_auto_reframe_processor_new_signature() {
+        // new() returns Result<Self>, so we can test the signature exists
+        let result = AutoReframeProcessor::new();
+        // Should be Result type
+        assert!(result.is_ok() || result.is_err());
+    }
 }

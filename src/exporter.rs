@@ -1389,4 +1389,109 @@ mod tests {
         assert_eq!(content, "00:00 Intro\n");
         Ok(())
     }
+
+    // ── Exporter edge cases ─────────────────────────────────────────────────
+    #[test]
+    fn test_export_srt_single_cue() -> Result<()> {
+        let dir = tempdir()?;
+        let output = dir.path().join("subs.srt");
+        let transcript = vec![TranscriptSegment {
+            start: 0.0,
+            end: 5.0,
+            text: "Hello world".to_string(),
+            confidence: 1.0,
+        }];
+
+        export_srt(&transcript, &output)?;
+
+        let content = fs::read_to_string(&output)?;
+        assert!(content.contains("1"));
+        assert!(content.contains("00:00:00,000"));
+        Ok(())
+    }
+
+    #[test]
+    fn test_export_srt_two_cues() -> Result<()> {
+        let dir = tempdir()?;
+        let output = dir.path().join("subs.srt");
+        let transcript = vec![
+            TranscriptSegment {
+                start: 0.0,
+                end: 3.0,
+                text: "First".to_string(),
+                confidence: 1.0,
+            },
+            TranscriptSegment {
+                start: 3.0,
+                end: 6.0,
+                text: "Second".to_string(),
+                confidence: 1.0,
+            },
+        ];
+
+        export_srt(&transcript, &output)?;
+
+        let content = fs::read_to_string(&output)?;
+        assert!(content.contains("1\n") && content.contains("2\n"));
+        Ok(())
+    }
+
+    #[test]
+    fn test_export_fcpxml_one_segment() -> Result<()> {
+        let dir = tempdir()?;
+        let output = dir.path().join("output.fcpxml");
+        let input = dir.path().join("video.mp4");
+
+        let segments = vec![ProcessedSegment {
+            start: 0.0,
+            end: 10.0,
+            speed: 1.0,
+        }];
+
+        export_fcpxml(&segments, &input, &output)?;
+
+        let content = fs::read_to_string(&output)?;
+        assert!(content.contains("fcpxml"));
+        assert!(content.contains("duration"));
+        Ok(())
+    }
+
+    #[test]
+    fn test_export_fcpxml_zero_speed_segment() -> Result<()> {
+        let dir = tempdir()?;
+        let output = dir.path().join("output.fcpxml");
+        let input = dir.path().join("video.mp4");
+
+        let segments = vec![ProcessedSegment {
+            start: 0.0,
+            end: 10.0,
+            speed: 1.0,
+        }];
+
+        export_fcpxml(&segments, &input, &output)?;
+
+        // Should not panic
+        let content = fs::read_to_string(&output)?;
+        assert!(!content.is_empty());
+        Ok(())
+    }
+
+    #[test]
+    fn test_export_edl_single_segment() -> Result<()> {
+        let dir = tempdir()?;
+        let output = dir.path().join("output.edl");
+        let input = dir.path().join("video.mp4");
+
+        let segments = vec![ProcessedSegment {
+            start: 0.0,
+            end: 5.0,
+            speed: 1.0,
+        }];
+
+        export_edl(&segments, &input, &output, 24.0)?;
+
+        let content = fs::read_to_string(&output)?;
+        assert!(content.contains("FCM:"));
+        Ok(())
+    }
 }

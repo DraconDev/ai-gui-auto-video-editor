@@ -279,4 +279,35 @@ mod tests {
         assert_eq!(loaded.total, 10);
         Ok(())
     }
+
+    // ── BatchProgress edge cases ──────────────────────────────────────────
+    #[test]
+    fn test_batch_progress_empty_completed() {
+        let mut progress = BatchProgress::default();
+        progress.total = 5;
+        // No completed files
+        assert_eq!(progress.completed.len(), 0);
+    }
+
+    #[test]
+    fn test_batch_progress_full_completion() {
+        let mut progress = BatchProgress::default();
+        progress.total = 3;
+        progress.completed.insert(PathBuf::from("/a.mp4"), 100);
+        progress.completed.insert(PathBuf::from("/b.mp4"), 200);
+        progress.completed.insert(PathBuf::from("/c.mp4"), 300);
+        // All files completed
+        assert_eq!(progress.completed.len(), progress.total);
+    }
+
+    #[test]
+    fn test_batch_progress_mixed_results() {
+        let mut progress = BatchProgress::default();
+        progress.total = 10;
+        progress.completed.insert(PathBuf::from("/a.mp4"), 100);
+        progress.failed.insert(PathBuf::from("/b.mp4"));
+        // Some completed, some failed
+        assert!(progress.completed.len() < progress.total);
+        assert!(progress.failed.len() > 0);
+    }
 }
