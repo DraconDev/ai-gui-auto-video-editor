@@ -310,6 +310,40 @@ mod tests {
         // No config set, check_for_reload should return false
         assert!(!watcher.check_for_reload(None));
     }
+
+    // ── ConfigWatcher more edge cases ────────────────────────────────────
+    #[test]
+    fn test_is_new_video_mp4_uppercase() {
+        let processed = HashSet::new();
+        // Uppercase extension - should match 'mp4'
+        assert!(is_new_video(Path::new("video.MP4"), &processed));
+    }
+
+    #[test]
+    fn test_is_new_video_mov_uppercase() {
+        let processed = HashSet::new();
+        // Uppercase MOV
+        assert!(is_new_video(Path::new("video.MOV"), &processed));
+    }
+
+    #[test]
+    fn test_timestamp_format_structure() {
+        // Test timestamp format
+        let t = timestamp();
+        assert!(t.contains(":"));
+        // Format should be HH:MM:SS
+        let parts: Vec<&str> = t.split(':').collect();
+        assert_eq!(parts.len(), 3);
+    }
+
+    #[test]
+    fn test_config_watcher_initial_state() {
+        let watcher = ConfigWatcher::new();
+        // Initial state should be consistent
+        let mut w = watcher;
+        w.check_for_reload(None);
+        // Should not panic
+    }
 }
 
 fn notify_error(path: &Path, error: &str) {
