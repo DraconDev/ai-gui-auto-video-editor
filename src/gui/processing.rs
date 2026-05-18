@@ -543,4 +543,25 @@ mod tests {
             base_config.video.target_resolution
         );
     }
+
+    // ── FolderState edge cases ───────────────────────────────────────────────
+    #[test]
+    fn test_folder_state_enabled_flag() {
+        let folder = FolderState {
+            preset: "youtube".to_string(),
+            enabled: true,
+            ..Default::default()
+        };
+        assert!(folder.enabled);
+    }
+
+    #[test]
+    fn test_folder_state_disabled_flag() {
+        let folder = FolderState {
+            preset: "podcast".to_string(),
+            enabled: false,
+            ..Default::default()
+        };
+        assert!(!folder.enabled);
+    }
 }
