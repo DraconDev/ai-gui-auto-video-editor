@@ -155,8 +155,8 @@ fn concatenate_videos(
     outro: Option<&Path>,
     output: &Path,
 ) -> Result<()> {
-    let has_intro = intro.is_some();
-    let has_outro = outro.is_some();
+    let has_intro = intro.as_ref().map(|p| !p.as_os_str().is_empty()).unwrap_or(false);
+    let has_outro = outro.as_ref().map(|p| !p.as_os_str().is_empty()).unwrap_or(false);
 
     if !has_intro && !has_outro {
         fs::copy(main, output)?;
@@ -165,12 +165,22 @@ fn concatenate_videos(
 
     // Collect video paths in order
     let mut video_paths: Vec<&Path> = Vec::new();
-    if let Some(p) = intro {
-        video_paths.push(p);
+    if let Some(ref p) = intro {
+        if !p.as_os_str().is_empty() {
+            video_paths.push(p);
+        }
     }
     video_paths.push(main);
-    if let Some(p) = outro {
-        video_paths.push(p);
+    if let Some(ref p) = outro {
+        if !p.as_os_str().is_empty() {
+            video_paths.push(p);
+        }
+    }
+
+    // Ensure we have at least one video to concat
+    if video_paths.len() < 2 {
+        fs::copy(main, output)?;
+        return Ok(());
     }
 
     // Build concat demuxer list file
