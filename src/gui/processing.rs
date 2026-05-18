@@ -379,9 +379,6 @@ fn queue_worker_loop(
         match result {
             Ok(_) => {
                 let file_size = output_file.metadata().map(|m| m.len()).unwrap_or(0);
-                if notify {
-                    open_in_player(&output_file);
-                }
                 let _ = tx.send(QueueEvent::Completed {
                     filename,
                     path: file.path.clone(),
