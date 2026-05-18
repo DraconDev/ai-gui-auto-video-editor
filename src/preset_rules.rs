@@ -242,4 +242,40 @@ mod tests {
             Preset::Minimal
         );
     }
+
+    // ── PresetRule edge cases ───────────────────────────────────────────────
+    #[test]
+    fn test_preset_for_file_multiple_patterns() {
+        let rules = vec![
+            PresetRule::new("podcast", Preset::Podcast),
+            PresetRule::new("interview", Preset::Youtube),
+            PresetRule::new("shorts", Preset::Shorts),
+        ];
+        // Test each pattern
+        assert_eq!(preset_for_file(Path::new("podcast_001.mp4"), &rules, Preset::Minimal), Preset::Podcast);
+        assert_eq!(preset_for_file(Path::new("interview_001.mp4"), &rules, Preset::Minimal), Preset::Youtube);
+        assert_eq!(preset_for_file(Path::new("shorts_001.mp4"), &rules, Preset::Minimal), Preset::Shorts);
+    }
+
+    #[test]
+    fn test_preset_for_file_no_match_fallback() {
+        let rules = vec![PresetRule::new("podcast", Preset::Podcast)];
+        // Filename doesn't match any rule
+        let result = preset_for_file(Path::new("random_video.mp4"), &rules, Preset::Minimal);
+        assert_eq!(result, Preset::Minimal);
+    }
+
+    #[test]
+    fn test_preset_for_file_empty_rules_fallback() {
+        let rules: Vec<PresetRule> = vec![];
+        let result = preset_for_file(Path::new("any_video.mp4"), &rules, Preset::Twitter);
+        assert_eq!(result, Preset::Twitter);
+    }
+
+    #[test]
+    fn test_preset_rule_new() {
+        let rule = PresetRule::new("test", Preset::Podcast);
+        assert_eq!(rule.pattern, "test");
+        assert!(matches!(rule.preset, Preset::Podcast));
+    }
 }
