@@ -2041,4 +2041,51 @@ mod tests {
         assert!(s.contains("100%"), "expected 100% success rate");
         assert!(s.contains("0%"), "expected 0% failure rate");
     }
+
+    // ── Pure logic tests (no FFmpeg needed) ─────────────────────────────────
+
+    #[test]
+    fn test_segment_gap_detection() {
+        use crate::analyzer::Segment;
+
+        let seg1 = Segment {
+            start: 0.0,
+            end: 10.0,
+        };
+        let seg2 = Segment {
+            start: 15.0,
+            end: 25.0,
+        };
+
+        // Gap between segments
+        let gap = seg2.start - seg1.end;
+        assert_eq!(gap, 5.0, "There should be a 5s gap between segments");
+    }
+
+    #[test]
+    fn test_segment_total_duration() {
+        use crate::analyzer::ProcessedSegment;
+
+        let segments = vec![
+            ProcessedSegment {
+                start: 0.0,
+                end: 10.0,
+                speed: 1.0,
+            },
+            ProcessedSegment {
+                start: 10.0,
+                end: 25.0,
+                speed: 1.0,
+            },
+            ProcessedSegment {
+                start: 25.0,
+                end: 40.0,
+                speed: 1.0,
+            },
+        ];
+
+        let total_duration: f32 = segments.iter().map(|s| s.end - s.start).sum();
+
+        assert!((total_duration - 40.0).abs() < 1e-6);
+    }
 }

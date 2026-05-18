@@ -167,4 +167,56 @@ mod tests {
         let path_str = path.to_string_lossy();
         assert!(path_str.contains("default"));
     }
+
+    #[test]
+    fn test_progress_zero_total() {
+        let mut progress = BatchProgress {
+            total: 0,
+            ..Default::default()
+        };
+        assert_eq!(progress.remaining(), 0);
+        progress.mark_completed(PathBuf::from("/tmp/v.mp4").as_path());
+        // Saturating sub prevents negative
+        assert_eq!(progress.remaining(), 0);
+    }
+
+    #[test]
+    fn test_progress_failed_vs_completed_separate() {
+        let mut progress = BatchProgress {
+            total: 5,
+            ..Default::default()
+        };
+        let file = PathBuf::from("/tmp/test.mp4");
+
+        // Mark as failed
+        progress.mark_failed(&file);
+        assert!(
+            !progress.is_completed(&file),
+            "Failed files are not completed"
+        );
+        assert_eq!(
+            progress.remaining(),
+            4,
+            "Failed files no longer count toward remaining"
+        );
+    }
+
+    #[test]
+    fn test_progress_serialization_preserves_all_fields() -> Result<()> {
+        let progress = BatchProgress {
+            total: 42,
+            completed: vec![(PathBuf::from("/a.mp4"), 123)].into_iter().collect(),
+            failed: vec![PathBuf::from("/b.mp4")].into_iter().collect(),
+        };
+
+        let dir = tempdir()?;
+        let path = dir.path().join("p.json");
+        progress.to_file(&path)?;
+
+        let loaded = BatchProgress::from_file(&path)?;
+        assert_eq!(loaded.total, 42);
+        assert_eq!(loaded.completed.len(), 1);
+        assert_eq!(loaded.failed.len(), 1);
+        Ok(())
+    }
 }

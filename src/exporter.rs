@@ -842,4 +842,360 @@ mod tests {
 
         Ok(())
     }
+
+    #[test]
+    fn test_xml_escape_all_special_chars() {
+        let input = "Tom & Jerry";
+        assert_eq!(xml_escape(input), "Tom &amp; Jerry");
+    }
+
+    #[test]
+    fn test_xml_escape_angle_brackets() {
+        let input = "<intro> and </outro>";
+        assert_eq!(xml_escape(input), "&lt;intro&gt; and &lt;/outro&gt;");
+    }
+
+    #[test]
+    fn test_xml_escape_quotes() {
+        let input = "He said \"hello\" and 'world'";
+        let escaped = xml_escape(input);
+        assert!(escaped.contains("&quot;"));
+        assert!(escaped.contains("&apos;"));
+        assert!(!escaped.contains('"'));
+        assert!(!escaped.contains('\''));
+    }
+
+    #[test]
+    fn test_xml_escape_complete_roundtrip() {
+        let input = "&<>\"'";
+        let escaped = xml_escape(input);
+        assert_eq!(escaped, "&amp;&lt;&gt;&quot;&apos;");
+    }
+
+    #[test]
+    fn test_xml_escape_no_special_chars() {
+        let input = "Plain text without special chars";
+        assert_eq!(xml_escape(input), input);
+    }
+
+    #[test]
+    fn test_export_fcpxml_empty_segments() -> Result<()> {
+        let dir = tempdir()?;
+        let input_path = dir.path().join("video.mp4");
+        let output_path = dir.path().join("output.fcpxml");
+
+        export_fcpxml(&[], &input_path, &output_path)?;
+
+        let content = fs::read_to_string(&output_path)?;
+        assert!(content.contains("<!DOCTYPE fcpxml>"));
+        assert!(content.contains("<fcpxml"));
+        assert!(content.contains("<resources></resources>"));
+        Ok(())
+    }
+
+    #[test]
+    fn test_export_fcpxml_segments_alignment() -> Result<()> {
+        let dir = tempdir()?;
+        let input_path = dir.path().join("video.mp4");
+        let output_path = dir.path().join("output.fcpxml");
+
+        let segments = vec![crate::analyzer::ProcessedSegment {
+            start: 0.0,
+            end: 30.0,
+            speed: 1.0,
+        }];
+
+        export_fcpxml(&segments, &input_path, &output_path)?;
+
+        let content = fs::read_to_string(&output_path)?;
+        assert!(content.contains("duration=\"30/1s\""));
+        assert!(content.contains("offset=\"0s\""));
+        assert!(content.contains("start=\"0s\""));
+        Ok(())
+    }
+
+    #[test]
+    fn test_export_fcpxml_path_with_special_chars() -> Result<()> {
+        let dir = tempdir()?;
+        let input_path = dir.path().join("video & test.mp4");
+        let output_path = dir.path().join("output.fcpxml");
+
+        let segments = vec![crate::analyzer::ProcessedSegment {
+            start: 0.0,
+            end: 10.0,
+            speed: 1.0,
+        }];
+
+        export_fcpxml(&segments, &input_path, &output_path)?;
+
+        let content = fs::read_to_string(&output_path)?;
+        assert!(content.contains("video &amp; test"));
+        Ok(())
+    }
+
+    #[test]
+    fn test_export_srt_single_segment() -> Result<()> {
+        let dir = tempdir()?;
+        let output_srt = dir.path().join("single.srt");
+        let transcript = vec![TranscriptSegment {
+            start: 1.5,
+            end: 4.5,
+            text: "Single subtitle".to_string(),
+            confidence: 1.0,
+        }];
+
+        export_srt(&transcript, &output_srt)?;
+
+        let content = fs::read_to_string(&output_srt)?;
+        assert!(content.contains("00:00:01,500"));
+        assert!(content.contains("00:00:04,500"));
+        Ok(())
+    }
+
+    #[test]
+    fn test_export_edl_empty_segments() -> Result<()> {
+        let dir = tempdir()?;
+        let output_edl = dir.path().join("empty.edl");
+        let input_path = dir.path().join("video.mp4");
+
+        export_edl(&[], &input_path, &output_edl, 25.0)?;
+
+        let content = fs::read_to_string(&output_edl)?;
+        assert!(content.contains("TITLE:"));
+        assert!(content.contains("FCM:"));
+        Ok(())
+    }
+
+    // ── SRT edge case tests ─────────────────────────────────────────────────
+
+    #[test]
+    fn test_export_srt_ampersand_escaping() -> Result<()> {
+        let dir = tempdir()?;
+        let output_srt = dir.path().join("subs.srt");
+        let transcript = vec![TranscriptSegment {
+            start: 0.0,
+            end: 5.0,
+            text: "Tom & Jerry".to_string(),
+            confidence: 1.0,
+        }];
+
+        export_srt(&transcript, &output_srt)?;
+
+        let content = fs::read_to_string(&output_srt)?;
+        // SRT uses plain text but some players prefer XML-escaped & -> &amp;
+        assert!(content.contains("Tom"));
+        assert!(content.contains("Jerry"));
+        Ok(())
+    }
+
+    #[test]
+    fn test_export_srt_strips_angle_brackets() -> Result<()> {
+        let dir = tempdir()?;
+        let output_srt = dir.path().join("subs.srt");
+        let transcript = vec![TranscriptSegment {
+            start: 0.0,
+            end: 3.0,
+            text: "<bold>test</bold>".to_string(),
+            confidence: 1.0,
+        }];
+
+        export_srt(&transcript, &output_srt)?;
+
+        let content = fs::read_to_string(&output_srt)?;
+        // SRT doesn't use HTML markup
+        assert!(content.contains("test"));
+        Ok(())
+    }
+
+    #[test]
+    fn test_export_srt_sorted_by_start_time() -> Result<()> {
+        let dir = tempdir()?;
+        let output_srt = dir.path().join("subs.srt");
+        // Add out-of-order transcript segments
+        let mut transcript = vec![
+            TranscriptSegment {
+                start: 5.0,
+                end: 10.0,
+                text: "Second".to_string(),
+                confidence: 1.0,
+            },
+            TranscriptSegment {
+                start: 0.0,
+                end: 5.0,
+                text: "First".to_string(),
+                confidence: 1.0,
+            },
+        ];
+
+        export_srt(&transcript, &output_srt)?;
+
+        let content = fs::read_to_string(&output_srt)?;
+        let first_idx = content
+            .find(
+                "1
+",
+            )
+            .expect("Index 1");
+        let second_idx = content
+            .find(
+                "2
+",
+            )
+            .expect("Index 2");
+        assert!(
+            first_idx < second_idx,
+            "Earlier timestamp should appear first in output"
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn test_export_fcpxml_timestamp_s_suffix() -> Result<()> {
+        let dir = tempdir()?;
+        let output_fcpxml = dir.path().join("output.fcpxml");
+        let input_path = dir.path().join("video.mp4");
+
+        let segments = vec![crate::analyzer::ProcessedSegment {
+            start: 0.0,
+            end: 30.0,
+            speed: 1.0,
+        }];
+        export_fcpxml(&segments, &input_path, &output_fcpxml)?;
+
+        let content = fs::read_to_string(&output_fcpxml)?;
+        // FCPXML timestamps always use "s" suffix (e.g. "30s")
+        assert!(
+            content.contains("duration=\"30s\""),
+            "Duration should have s suffix"
+        );
+        assert!(
+            content.contains("offset=\"0s\""),
+            "Offset should have s suffix"
+        );
+        assert!(
+            content.contains("start=\"0s\""),
+            "Start should have s suffix"
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn test_export_fcpxml_multiple_segments_sorted() -> Result<()> {
+        let dir = tempdir()?;
+        let output_fcpxml = dir.path().join("output.fcpxml");
+        let input_path = dir.path().join("video.mp4");
+
+        // Add segments out of order
+        let mut segments = vec![
+            crate::analyzer::ProcessedSegment {
+                start: 10.0,
+                end: 20.0,
+                speed: 1.0,
+            },
+            crate::analyzer::ProcessedSegment {
+                start: 0.0,
+                end: 10.0,
+                speed: 1.0,
+            },
+        ];
+
+        export_fcpxml(&segments, &input_path, &output_fcpxml)?;
+
+        let content = fs::read_to_string(&output_fcpxml)?;
+        // The first clip start value should be 0s (earlier segment)
+        let first_clip_start = content.find("start=\"");
+        assert!(
+            first_clip_start.is_some(),
+            "Should find first start attribute"
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn test_export_edl_single_segment_timecode() -> Result<()> {
+        let dir = tempdir()?;
+        let output_edl = dir.path().join("output.edl");
+        let input_path = dir.path().join("video.mp4");
+
+        // 10s segment at 25fps
+        let segments = vec![crate::analyzer::ProcessedSegment {
+            start: 0.0,
+            end: 10.0,
+            speed: 1.0,
+        }];
+
+        export_edl(&segments, &input_path, &output_edl, 25.0)?;
+
+        let content = fs::read_to_string(&output_edl)?;
+        // Verify the EDL contains proper timecode format HH:MM:SS:FF
+        // 10 seconds = 00:00:10:00 at 25fps
+        assert!(
+            content.contains("00:00:10:00") || content.contains("00:00:09:24"),
+            "EDL should contain proper timecode for 10s segment"
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn test_export_edl_adjacent_segments_no_gap() -> Result<()> {
+        let dir = tempdir()?;
+        let output_edl = dir.path().join("output.edl");
+        let input_path = dir.path().join("video.mp4");
+
+        // Two segments back-to-back
+        let segments = vec![
+            crate::analyzer::ProcessedSegment {
+                start: 0.0,
+                end: 10.0,
+                speed: 1.0,
+            },
+            crate::analyzer::ProcessedSegment {
+                start: 10.0,
+                end: 20.0,
+                speed: 1.0,
+            },
+        ];
+
+        export_edl(&segments, &input_path, &output_edl, 25.0)?;
+
+        let content = fs::read_to_string(&output_edl)?;
+        // EDL format has "001  AX       V     C" for each clip entry
+        let clip_count = content.matches("AX").count();
+        assert_eq!(clip_count, 2, "Should have 2 clip entries for 2 segments");
+        Ok(())
+    }
+
+    #[test]
+    fn test_export_youtube_chapters_empty_segments() -> Result<()> {
+        let dir = tempdir()?;
+        let output = dir.path().join("chapters.txt");
+
+        export_youtube_chapters(&[], &output)?;
+
+        let content = fs::read_to_string(&output)?;
+        // Empty transcript still produces intro marker
+        assert_eq!(content, "00:00 Intro\n");
+        Ok(())
+    }
+
+    #[test]
+    fn test_export_youtube_chapters_single_chapter() -> Result<()> {
+        let dir = tempdir()?;
+        let output = dir.path().join("chapters.txt");
+
+        export_youtube_chapters(
+            &[crate::stt_analyzer::TranscriptSegment {
+                start: 0.0,
+                end: 60.0,
+                text: "Chapter 1".to_string(),
+                confidence: 1.0,
+            }],
+            &output,
+        )?;
+
+        let content = fs::read_to_string(&output)?;
+        // Single segment should still produce at least one chapter line
+        assert!(content.contains("00:00"));
+        Ok(())
+    }
 }

@@ -372,4 +372,95 @@ more noise
             }
         }
     }
+
+    // ── ProcessedSegment logic tests (no FFmpeg needed) ─────────────────────
+
+    #[test]
+    fn test_processed_segment_valid_bounds() {
+        let seg = ProcessedSegment {
+            start: 0.0,
+            end: 10.0,
+            speed: 1.0,
+        };
+        assert!(seg.start >= 0.0);
+        assert!(seg.end > seg.start);
+        assert!(seg.speed > 0.0);
+    }
+
+    #[test]
+    fn test_processed_segment_speed_positive() {
+        let seg = ProcessedSegment {
+            start: 0.0,
+            end: 5.0,
+            speed: 2.0,
+        };
+        assert!(seg.speed > 0.0);
+    }
+
+    #[test]
+    fn test_segment_duration() {
+        let seg = ProcessedSegment {
+            start: 5.0,
+            end: 15.0,
+            speed: 1.0,
+        };
+        assert!((seg.end - seg.start - 10.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn test_segment_merge_adjacent() {
+        // Two adjacent segments (end of first == start of second)
+        let seg1 = Segment {
+            start: 0.0,
+            end: 5.0,
+        };
+        let seg2 = Segment {
+            start: 5.0,
+            end: 10.0,
+        };
+        // Merged: start = min, end = max
+        let merged_start = seg1.start.min(seg2.start);
+        let merged_end = seg1.end.max(seg2.end);
+        assert_eq!(merged_start, 0.0);
+        assert_eq!(merged_end, 10.0);
+    }
+
+    #[test]
+    fn test_segment_merge_overlapping() {
+        let seg1 = Segment {
+            start: 0.0,
+            end: 8.0,
+        };
+        let seg2 = Segment {
+            start: 5.0,
+            end: 12.0,
+        };
+        // Merged bounding box
+        let merged_start = seg1.start.min(seg2.start);
+        let merged_end = seg1.end.max(seg2.end);
+        assert_eq!(merged_start, 0.0);
+        assert_eq!(merged_end, 12.0);
+    }
+
+    #[test]
+    fn test_segment_sorting() {
+        let mut segments = vec![
+            Segment {
+                start: 10.0,
+                end: 15.0,
+            },
+            Segment {
+                start: 0.0,
+                end: 5.0,
+            },
+            Segment {
+                start: 5.0,
+                end: 10.0,
+            },
+        ];
+        segments.sort_by(|a, b| a.start.total_cmp(&b.start));
+        assert_eq!(segments[0].start, 0.0);
+        assert_eq!(segments[1].start, 5.0);
+        assert_eq!(segments[2].start, 10.0);
+    }
 }

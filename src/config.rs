@@ -1260,7 +1260,9 @@ impl Config {
                 self.export.clip_max_duration
             );
         }
-        if self.export.clip_min_duration > self.export.clip_max_duration {
+        if self.export.clip_max_duration > 0.0
+            && self.export.clip_min_duration > self.export.clip_max_duration
+        {
             anyhow::bail!(
                 "export.clip_min_duration ({}) must be <= clip_max_duration ({})",
                 self.export.clip_min_duration,
@@ -1754,5 +1756,321 @@ enhance = false
             settings.is_default(),
             "FolderSettings::default() should return true for is_default()"
         );
+    }
+
+    // ── VideoResolution tests ────────────────────────────────────────────────
+
+    #[test]
+    fn test_video_resolution_parse_name() {
+        assert_eq!(
+            VideoResolution::parse_name("720p"),
+            Some(VideoResolution::Hd720p)
+        );
+        assert_eq!(
+            VideoResolution::parse_name("HD720P"),
+            Some(VideoResolution::Hd720p)
+        );
+        assert_eq!(
+            VideoResolution::parse_name("1080p"),
+            Some(VideoResolution::Fhd1080p)
+        );
+        assert_eq!(
+            VideoResolution::parse_name("fhd"),
+            Some(VideoResolution::Fhd1080p)
+        );
+        assert_eq!(
+            VideoResolution::parse_name("fhd1080p"),
+            Some(VideoResolution::Fhd1080p)
+        );
+        assert_eq!(
+            VideoResolution::parse_name("fullhd"),
+            Some(VideoResolution::Fhd1080p)
+        );
+        assert_eq!(
+            VideoResolution::parse_name("1440p"),
+            Some(VideoResolution::Qhd1440p)
+        );
+        assert_eq!(
+            VideoResolution::parse_name("qhd"),
+            Some(VideoResolution::Qhd1440p)
+        );
+        assert_eq!(
+            VideoResolution::parse_name("2k"),
+            Some(VideoResolution::Qhd1440p)
+        );
+        assert_eq!(
+            VideoResolution::parse_name("4k"),
+            Some(VideoResolution::Uhd4k)
+        );
+        assert_eq!(
+            VideoResolution::parse_name("uhd"),
+            Some(VideoResolution::Uhd4k)
+        );
+        assert_eq!(
+            VideoResolution::parse_name("2160p"),
+            Some(VideoResolution::Uhd4k)
+        );
+        assert_eq!(
+            VideoResolution::parse_name("vertical-1080p"),
+            Some(VideoResolution::Vertical1080p)
+        );
+        assert_eq!(
+            VideoResolution::parse_name("1080x1920"),
+            Some(VideoResolution::Vertical1080p)
+        );
+        assert_eq!(
+            VideoResolution::parse_name("shorts"),
+            Some(VideoResolution::Vertical1080p)
+        );
+        assert_eq!(
+            VideoResolution::parse_name("reels"),
+            Some(VideoResolution::Vertical1080p)
+        );
+        assert_eq!(
+            VideoResolution::parse_name("vertical-720p"),
+            Some(VideoResolution::Vertical720p)
+        );
+        assert_eq!(
+            VideoResolution::parse_name("720x1280"),
+            Some(VideoResolution::Vertical720p)
+        );
+        assert_eq!(VideoResolution::parse_name("invalid"), None);
+        assert_eq!(VideoResolution::parse_name("8k"), None);
+        assert_eq!(VideoResolution::parse_name(""), None);
+    }
+
+    #[test]
+    fn test_video_resolution_dimensions() {
+        assert_eq!(VideoResolution::Hd720p.dimensions(), (1280, 720));
+        assert_eq!(VideoResolution::Fhd1080p.dimensions(), (1920, 1080));
+        assert_eq!(VideoResolution::Qhd1440p.dimensions(), (2560, 1440));
+        assert_eq!(VideoResolution::Uhd4k.dimensions(), (3840, 2160));
+        assert_eq!(VideoResolution::Vertical1080p.dimensions(), (1080, 1920));
+        assert_eq!(VideoResolution::Vertical720p.dimensions(), (720, 1280));
+    }
+
+    #[test]
+    fn test_video_resolution_ffmpeg_scale() {
+        assert_eq!(VideoResolution::Fhd1080p.to_ffmpeg_scale(), "1920:1080");
+        assert_eq!(
+            VideoResolution::Vertical1080p.to_ffmpeg_scale(),
+            "1080:1920"
+        );
+        assert_eq!(VideoResolution::Hd720p.to_ffmpeg_scale(), "1280:720");
+    }
+
+    #[test]
+    fn test_video_resolution_display_name() {
+        assert_eq!(VideoResolution::Hd720p.display_name(), "720p HD");
+        assert_eq!(VideoResolution::Fhd1080p.display_name(), "1080p Full HD");
+        assert_eq!(VideoResolution::Qhd1440p.display_name(), "1440p QHD");
+        assert_eq!(VideoResolution::Uhd4k.display_name(), "4K UHD");
+        assert_eq!(
+            VideoResolution::Vertical1080p.display_name(),
+            "1080p Vertical"
+        );
+        assert_eq!(
+            VideoResolution::Vertical720p.display_name(),
+            "720p Vertical"
+        );
+    }
+
+    // ── Preset as_str roundtrip ────────────────────────────────────────────
+
+    #[test]
+    fn test_preset_as_str() {
+        assert_eq!(Preset::Youtube.as_str(), "youtube");
+        assert_eq!(Preset::Shorts.as_str(), "shorts");
+        assert_eq!(Preset::Tiktok.as_str(), "tiktok");
+        assert_eq!(Preset::Reels.as_str(), "reels");
+        assert_eq!(Preset::Podcast.as_str(), "podcast");
+        assert_eq!(Preset::Twitter.as_str(), "twitter");
+        assert_eq!(Preset::Minimal.as_str(), "minimal");
+    }
+
+    #[test]
+    fn test_preset_as_str_roundtrip() {
+        for preset in [
+            Preset::Youtube,
+            Preset::Shorts,
+            Preset::Tiktok,
+            Preset::Reels,
+            Preset::Podcast,
+            Preset::Twitter,
+            Preset::Minimal,
+        ] {
+            let s = preset.as_str();
+            let parsed = Preset::parse_name(s);
+            assert_eq!(parsed, Some(preset), "roundtrip failed for {:?}", preset);
+        }
+    }
+
+    #[test]
+    fn test_preset_parse_name_aliases() {
+        // Shorts aliases
+        assert_eq!(Preset::parse_name("ytshorts"), Some(Preset::Shorts));
+        // Reels aliases
+        assert_eq!(Preset::parse_name("instagram"), Some(Preset::Reels));
+        // Twitter aliases
+        assert_eq!(Preset::parse_name("x"), Some(Preset::Twitter));
+    }
+
+    // ── Config merge edge cases ─────────────────────────────────────────────
+
+    #[test]
+    fn test_merge_configs_preserves_unchanged_fields() {
+        // When override has default values, base should be unchanged
+        let base = Config::default();
+        let override_config = Config::default();
+        let merged = base.merge(override_config);
+        assert_eq!(merged.silence.threshold_db, -30.0);
+        assert_eq!(merged.silence.min_duration, 0.5);
+        assert_eq!(merged.silence.padding, 0.1);
+    }
+
+    #[test]
+    fn test_merge_configs_video_fields() {
+        let base = Config::default();
+        let mut override_config = Config::default();
+        override_config.video.stabilize = true;
+        override_config.video.color_correct = true;
+        override_config.video.reframe = true;
+
+        let merged = base.merge(override_config);
+        assert!(merged.video.stabilize);
+        assert!(merged.video.color_correct);
+        assert!(merged.video.reframe);
+    }
+
+    #[test]
+    fn test_merge_configs_export_fields() {
+        let base = Config::default();
+        let mut override_config = Config::default();
+        override_config.export.subtitles = true;
+        override_config.export.chapters = true;
+        override_config.export.fcpxml = true;
+        override_config.export.edl = true;
+        override_config.export.captions = true;
+        override_config.export.clips = true;
+
+        let merged = base.merge(override_config);
+        assert!(merged.export.subtitles);
+        assert!(merged.export.chapters);
+        assert!(merged.export.fcpxml);
+        assert!(merged.export.edl);
+        assert!(merged.export.captions);
+        assert!(merged.export.clips);
+    }
+
+    // ── SilenceMode serde edge cases ──────────────────────────────────────
+
+    #[test]
+    fn test_silence_mode_keep() {
+        let mut config = Config::default();
+        config.silence.mode = SilenceMode::Keep;
+        let serialized = toml::to_string_pretty(&config).unwrap();
+        assert!(serialized.contains("mode = \"keep\""));
+        let deserialized: Config = toml::from_str(&serialized).unwrap();
+        assert_eq!(deserialized.silence.mode, SilenceMode::Keep);
+    }
+
+    // ── Config validate edge cases ─────────────────────────────────────────
+
+    #[test]
+    fn test_validate_threshold_db_extreme_values() {
+        let mut config = Config::default();
+        config.silence.threshold_db = -200.0;
+        assert!(config.validate().is_ok(), "-200 dB should be valid");
+
+        config.silence.threshold_db = 0.01;
+        let result = config.validate();
+        assert!(result.is_err(), "positive threshold should fail");
+    }
+
+    #[test]
+    fn test_validate_clip_max_duration_zero_ok() {
+        // Allow 0 for max duration (effectively means no max)
+        let mut config = Config::default();
+        config.export.clip_max_duration = 0.0;
+        assert!(config.validate().is_ok());
+    }
+
+    // ── Config roundtrip and serde tests ────────────────────────────────────
+
+    #[test]
+    fn test_video_resolution_vertical_vs_horizontal() {
+        // Check that vertical resolutions have height > width
+        assert!(
+            VideoResolution::Vertical1080p.dimensions().0
+                < VideoResolution::Vertical1080p.dimensions().1,
+            "Vertical1080p should have width < height"
+        );
+        assert!(
+            VideoResolution::Vertical720p.dimensions().0
+                < VideoResolution::Vertical720p.dimensions().1,
+            "Vertical720p should have width < height"
+        );
+        // Horizontal resolutions have width > height
+        assert!(
+            VideoResolution::Fhd1080p.dimensions().0 > VideoResolution::Fhd1080p.dimensions().1,
+            "Fhd1080p should have width > height"
+        );
+    }
+
+    #[test]
+    fn test_silence_mode_serde_roundtrip() {
+        use toml::toml;
+
+        let cut_toml = toml! { mode = "cut" };
+        let mode: SilenceMode = cut_toml.get("mode").unwrap().clone().try_into().unwrap();
+        assert_eq!(mode, SilenceMode::Cut);
+
+        let keep_toml = toml! { mode = "keep" };
+        let mode: SilenceMode = keep_toml.get("mode").unwrap().clone().try_into().unwrap();
+        assert_eq!(mode, SilenceMode::Keep);
+    }
+
+    #[test]
+    fn test_config_validate_positive_threshold_rejected() {
+        let mut config = Config::default();
+        config.silence.threshold_db = 10.0;
+        assert!(config.validate().is_err());
+    }
+
+    #[test]
+    fn test_config_validate_negative_threshold_accepted() {
+        let mut config = Config::default();
+        config.silence.threshold_db = -50.0;
+        assert!(config.validate().is_ok());
+    }
+
+    #[test]
+    fn test_config_validate_min_clip_greater_than_max() {
+        let mut config = Config::default();
+        config.export.clip_min_duration = 30.0;
+        config.export.clip_max_duration = 10.0;
+        assert!(config.validate().is_err());
+    }
+
+    #[test]
+    fn test_config_validate_min_clip_equals_max() {
+        let mut config = Config::default();
+        config.export.clip_min_duration = 10.0;
+        config.export.clip_max_duration = 10.0;
+        assert!(config.validate().is_ok());
+    }
+
+    #[test]
+    fn test_config_validate_watch_interval_zero() {
+        let mut config = Config::default();
+        config.watch.interval = 0;
+        assert!(config.validate().is_err());
+    }
+
+    #[test]
+    fn test_config_validate_watch_interval_positive() {
+        let mut config = Config::default();
+        config.watch.interval = 5;
+        assert!(config.validate().is_ok());
     }
 }

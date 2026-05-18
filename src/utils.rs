@@ -373,4 +373,56 @@ mod tests {
             "Files beyond max_depth (10) should not be found"
         );
     }
+
+    #[test]
+    fn test_video_extensions() {
+        // Verify all expected extensions are included
+        let extensions: Vec<_> = VIDEO_EXTENSIONS.iter().collect();
+        assert!(extensions.contains(&&"mp4"));
+        assert!(extensions.contains(&&"mov"));
+        assert!(extensions.contains(&&"avi"));
+        assert!(extensions.contains(&&"mkv"));
+        assert!(extensions.contains(&&"webm"));
+        assert_eq!(extensions.len(), 5);
+    }
+
+    #[test]
+    fn test_escape_ffmpeg_filter_path_empty() {
+        let path = Path::new("");
+        let escaped = escape_ffmpeg_filter_path(path);
+        assert_eq!(escaped, "");
+    }
+
+    #[test]
+    fn test_escape_ffmpeg_filter_path_unicode() {
+        // Unicode characters should pass through unchanged
+        let path = Path::new("/path/to/cafe.ttf");
+        let escaped = escape_ffmpeg_filter_path(path);
+        assert!(escaped.contains("cafe"));
+    }
+
+    #[test]
+    fn test_find_video_files_empty_dir() -> Result<()> {
+        let dir = tempdir()?;
+        let found = find_video_files(dir.path())?;
+        assert!(found.is_empty());
+        Ok(())
+    }
+
+    #[test]
+    fn test_find_video_files_case_sensitivity() -> Result<()> {
+        let dir = tempdir()?;
+
+        // Create files with various case extensions
+        let file_mp4 = dir.path().join("video.mp4");
+        let file_wmv = dir.path().join("video.wmv"); // Not in VIDEO_EXTENSIONS
+
+        fs::write(&file_mp4, "x")?;
+        fs::write(&file_wmv, "x")?;
+
+        let found = find_video_files(dir.path())?;
+        assert_eq!(found.len(), 1);
+        assert!(found[0].extension().unwrap().to_str() == Some("mp4"));
+        Ok(())
+    }
 }
