@@ -1,6 +1,6 @@
 # AGAVE - AI GUI Auto Video Editor
 
-[![crates.io](https://img.shields.io/crates/v/ai-gui-auto-video-editor.svg)](https://crates.io/crates/ai-gui-auto-video-editor) [![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/DraconDev/agave?label=)](https://github.com/DraconDev/agave/releases) [![CI](https://github.com/DraconDev/agave/actions/workflows/ci.yml/badge.svg)](https://github.com/DraconDev/agave/actions/workflows/ci.yml) [![License](https://img.shields.io/crates/l/ai-gui-auto-video-editor.svg)](https://crates.io/crates/ai-gui-auto-video-editor)
+[![crates.io](https://img.shields.io/crates/v/ai-gui-auto-video-editor.svg)](https://crates.io/crates/ai-gui-auto-video-editor) [![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/DraconDev/ai-vid-editor?label=)](https://github.com/DraconDev/ai-vid-editor/releases) [![CI](https://github.com/DraconDev/ai-vid-editor/actions/workflows/ci.yml/badge.svg)](https://github.com/DraconDev/ai-vid-editor/actions/workflows/ci.yml) [![License](https://img.shields.io/crates/l/ai-gui-auto-video-editor.svg)](https://crates.io/crates/ai-gui-auto-video-editor)
 
 AGAVE (AI GUI Auto Video Editor) is a command-line and GUI tool for automated video editing using AI. Designed for content creators who want to drop in raw footage and get polished results without manual editing.
 
@@ -44,7 +44,7 @@ cargo install ai-gui-auto-video-editor
 ### From Source
 
 ```bash
-git clone https://github.com/DraconDev/agave.git
+git clone https://github.com/DraconDev/ai-vid-editor.git
 cd agave
 ./install.sh --user    # Install to ~/.local/bin (no sudo)
 # or
@@ -58,9 +58,9 @@ The install script will:
 
 ### Releases & Distribution
 
-- Download pre-built binaries from [GitHub Releases](https://github.com/DraconDev/agave/releases).
+- Download pre-built binaries from [GitHub Releases](https://github.com/DraconDev/ai-vid-editor/releases).
 - Run `scripts/release.sh` to build, bundle, and checksum a release tarball locally.
-- Also available on [crates.io](https://crates.io/crates/agave): `cargo install ai-gui-auto-video-editor`.
+- Also available on [crates.io](https://crates.io/crates/ai-gui-auto-video-editor): `cargo install ai-gui-auto-video-editor`.
 
 ### Requirements
 
