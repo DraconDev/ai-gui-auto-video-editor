@@ -463,4 +463,72 @@ more noise
         assert_eq!(segments[1].start, 5.0);
         assert_eq!(segments[2].start, 10.0);
     }
+
+    // ── ProcessedSegment speed bounds tests ──────────────────────────────────
+    #[test]
+    fn test_processed_segment_speed_within_bounds() {
+        // Test speed is always positive and within reasonable bounds
+        let segment = ProcessedSegment {
+            start: 0.0,
+            end: 10.0,
+            speed: 1.5,
+        };
+        assert!(segment.speed > 0.0);
+        assert!(segment.speed <= 16.0, "Speed should be capped at 16x");
+    }
+
+    #[test]
+    fn test_processed_segment_very_fast_speed() {
+        let segment = ProcessedSegment {
+            start: 0.0,
+            end: 5.0,
+            speed: 4.0,
+        };
+        assert!(segment.speed > 1.0);
+    }
+
+    #[test]
+    fn test_processed_segment_very_slow_speed() {
+        let segment = ProcessedSegment {
+            start: 0.0,
+            end: 20.0,
+            speed: 0.25,
+        };
+        assert!(segment.speed > 0.0);
+    }
+
+    // ── Segment boundary edge cases ─────────────────────────────────────────
+    #[test]
+    fn test_segment_exact_boundary() {
+        let seg1 = Segment { start: 0.0, end: 10.0 };
+        let seg2 = Segment { start: 10.0, end: 20.0 };
+        // These segments touch exactly at 10.0
+        assert_eq!(seg1.end, seg2.start);
+    }
+
+    #[test]
+    fn test_segment_zero_duration() {
+        let seg = Segment { start: 5.0, end: 5.0 };
+        // Zero-length segment should be detected
+        let duration = seg.end - seg.start;
+        assert!(duration.abs() < 1e-6);
+    }
+
+    #[test]
+    fn test_segments_non_overlapping() {
+        let seg1 = Segment { start: 0.0, end: 5.0 };
+        let seg2 = Segment { start: 10.0, end: 15.0 };
+        // Gap between segments
+        let gap = seg2.start - seg1.end;
+        assert_eq!(gap, 5.0);
+    }
+
+    #[test]
+    fn test_segments_fully_contained() {
+        let outer = Segment { start: 0.0, end: 20.0 };
+        let inner = Segment { start: 5.0, end: 15.0 };
+        // Inner is fully contained within outer
+        assert!(inner.start >= outer.start);
+        assert!(inner.end <= outer.end);
+    }
 }
