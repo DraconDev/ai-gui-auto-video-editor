@@ -210,4 +210,34 @@ mod tests {
         assert_eq!(scenes[1], 2.5);
         assert_eq!(scenes[2], 4.0);
     }
+
+    #[test]
+    fn test_scenes_to_segments_single_scene() {
+        let scenes = vec![5.0];
+        let segments = scenes_to_segments(&scenes, 10.0);
+        // Single scene marker should split into 2 segments
+        assert_eq!(segments.len(), 2);
+        assert_eq!(segments[0].start, 0.0);
+        assert_eq!(segments[0].end, 5.0);
+        assert_eq!(segments[1].start, 5.0);
+        assert_eq!(segments[1].end, 10.0);
+    }
+
+    #[test]
+    fn test_scenes_to_segments_adjacent_scenes() {
+        let scenes = vec![3.0, 6.0, 9.0];
+        let segments = scenes_to_segments(&scenes, 10.0);
+        // 3 scene markers = 4 segments
+        assert_eq!(segments.len(), 4);
+    }
+
+    #[test]
+    fn test_scenes_to_segments_empty_scenes() {
+        let scenes: Vec<f32> = vec![];
+        let segments = scenes_to_segments(&scenes, 30.0);
+        // No scene markers = single segment covering entire video
+        assert_eq!(segments.len(), 1);
+        assert_eq!(segments[0].start, 0.0);
+        assert_eq!(segments[0].end, 30.0);
+    }
 }

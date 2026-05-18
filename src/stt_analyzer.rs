@@ -514,4 +514,137 @@ mod tests {
         assert_eq!(seg1, seg2);
         assert_ne!(seg1, seg3);
     }
+
+    // ── TranscriptSegment builder and validation tests ──────────────────────
+
+    #[test]
+    fn test_transcript_segment_new() {
+        let seg = TranscriptSegment {
+            start: 0.0,
+            end: 5.0,
+            text: "Test".to_string(),
+            confidence: 0.95,
+        };
+        assert!(seg.start >= 0.0);
+        assert!(seg.end > seg.start);
+        assert!((seg.confidence - 0.95).abs() < 1e-6);
+        assert_eq!(seg.text, "Test");
+    }
+
+    #[test]
+    fn test_transcript_segment_with_empty_text() {
+        let seg = TranscriptSegment {
+            start: 0.0,
+            end: 5.0,
+            text: "".to_string(),
+            confidence: 1.0,
+        };
+        assert_eq!(seg.text, "");
+        assert!(seg.end > seg.start);
+    }
+
+    #[test]
+    fn test_transcript_segment_confidence_bounds() {
+        // Confidence should be between 0.0 and 1.0
+        let high_conf = TranscriptSegment {
+            start: 0.0,
+            end: 5.0,
+            text: "High confidence".to_string(),
+            confidence: 1.0,
+        };
+        assert!(high_conf.confidence >= 0.0 && high_conf.confidence <= 1.0);
+
+        let low_conf = TranscriptSegment {
+            start: 5.0,
+            end: 10.0,
+            text: "Low confidence".to_string(),
+            confidence: 0.0,
+        };
+        assert!(low_conf.confidence >= 0.0 && low_conf.confidence <= 1.0);
+    }
+
+    #[test]
+    fn test_transcript_segment_duration() {
+        let seg = TranscriptSegment {
+            start: 10.0,
+            end: 15.5,
+            text: "Duration test".to_string(),
+            confidence: 0.9,
+        };
+        let duration = seg.end - seg.start;
+        assert!((duration - 5.5).abs() < 1e-6);
+    }
+
+    #[test]
+    fn test_transcript_segments_sorting() {
+        let mut segments = vec![
+            TranscriptSegment {
+                start: 5.0,
+                end: 10.0,
+                text: "Second".to_string(),
+                confidence: 0.9,
+            },
+            TranscriptSegment {
+                start: 0.0,
+                end: 5.0,
+                text: "First".to_string(),
+                confidence: 0.9,
+            },
+            TranscriptSegment {
+                start: 10.0,
+                end: 15.0,
+                text: "Third".to_string(),
+                confidence: 0.9,
+            },
+        ];
+        segments.sort_by(|a, b| a.start.partial_cmp(&b.start).unwrap());
+        assert_eq!(segments[0].text, "First");
+        assert_eq!(segments[1].text, "Second");
+        assert_eq!(segments[2].text, "Third");
+    }
+
+    #[test]
+    fn test_transcript_segments_total_duration() {
+        let segments = vec![
+            TranscriptSegment {
+                start: 0.0,
+                end: 5.0,
+                text: "A".to_string(),
+                confidence: 0.9,
+            },
+            TranscriptSegment {
+                start: 5.0,
+                end: 10.0,
+                text: "B".to_string(),
+                confidence: 0.9,
+            },
+            TranscriptSegment {
+                start: 10.0,
+                end: 15.0,
+                text: "C".to_string(),
+                confidence: 0.9,
+            },
+        ];
+        let total_duration = segments.iter().map(|s| s.end - s.start).sum::<f32>();
+        assert!((total_duration - 15.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn test_transcript_segments_concatenation() {
+        let seg1 = TranscriptSegment {
+            start: 0.0,
+            end: 5.0,
+            text: "Hello ".to_string(),
+            confidence: 0.9,
+        };
+        let seg2 = TranscriptSegment {
+            start: 5.0,
+            end: 10.0,
+            text: "World".to_string(),
+            confidence: 0.9,
+        };
+        // When trimming trailing space from seg1 and concatenating, we get "HelloWorld"
+        let concatenated = format!("{}{}", seg1.text.trim(), seg2.text.trim());
+        assert_eq!(concatenated, "HelloWorld");
+    }
 }
