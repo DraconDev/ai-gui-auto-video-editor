@@ -2242,7 +2242,14 @@ enhance = false
     #[test]
     fn test_config_video_resolution_all() {
         use VideoResolution::*;
-        for res in [Hd720p, Fhd1080p, Qhd1440p, Uhd4k, Vertical1080p, Vertical720p] {
+        for res in [
+            Hd720p,
+            Fhd1080p,
+            Qhd1440p,
+            Uhd4k,
+            Vertical1080p,
+            Vertical720p,
+        ] {
             let mut config = Config::default();
             config.video.target_resolution = res;
             assert!(config.validate().is_ok());

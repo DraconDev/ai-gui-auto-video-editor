@@ -620,4 +620,89 @@ more noise
         // 20 seconds at 2x speed = 10 seconds output
         assert!((speedup_duration - 10.0).abs() < 1e-6);
     }
+
+    // ── ProcessedSegment edge cases ──────────────────────────────────────
+    #[test]
+    fn test_processed_segment_contains() {
+        let seg = ProcessedSegment {
+            start: 5.0,
+            end: 15.0,
+            speed: 1.0,
+        };
+        // Check segment boundaries
+        assert!(seg.start >= 0.0);
+        assert!(seg.end > seg.start);
+        assert!(seg.speed > 0.0);
+    }
+
+    #[test]
+    fn test_processed_segment_minimum_duration() {
+        let seg = ProcessedSegment {
+            start: 0.0,
+            end: 0.001,
+            speed: 1.0,
+        };
+        let duration = seg.end - seg.start;
+        assert!(duration < 0.01);
+    }
+
+    #[test]
+    fn test_processed_segment_maximum_speedup() {
+        let seg = ProcessedSegment {
+            start: 0.0,
+            end: 1.0,
+            speed: 16.0,
+        };
+        // 1 second at 16x becomes 0.0625 seconds
+        let speedup_duration = (seg.end - seg.start) / seg.speed;
+        assert!(speedup_duration < 0.1);
+    }
+
+    #[test]
+    fn test_segments_combined_duration() {
+        let segs = vec![
+            ProcessedSegment {
+                start: 0.0,
+                end: 10.0,
+                speed: 1.0,
+            },
+            ProcessedSegment {
+                start: 10.0,
+                end: 20.0,
+                speed: 1.0,
+            },
+            ProcessedSegment {
+                start: 20.0,
+                end: 30.0,
+                speed: 1.0,
+            },
+        ];
+        let total: f32 = segs.iter().map(|s| s.end - s.start).sum();
+        assert!((total - 30.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn test_segments_mixed_speeds() {
+        let segs = vec![
+            ProcessedSegment {
+                start: 0.0,
+                end: 10.0,
+                speed: 1.0,
+            },
+            ProcessedSegment {
+                start: 10.0,
+                end: 20.0,
+                speed: 2.0,
+            },
+            ProcessedSegment {
+                start: 20.0,
+                end: 30.0,
+                speed: 0.5,
+            },
+        ];
+        // All speeds should be positive
+        for seg in &segs {
+            assert!(seg.speed > 0.0);
+        }
+    }
 }

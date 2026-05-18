@@ -283,4 +283,37 @@ mod tests {
         // Consecutive markers should still produce segments
         assert!(segments.len() >= 2);
     }
+
+    // ── Scene detection edge cases ────────────────────────────────────────
+    #[test]
+    fn test_scenes_to_segments_fractional_markers() {
+        let scenes = vec![0.5, 1.5, 2.5];
+        let segments = scenes_to_segments(&scenes, 3.0);
+        // Fractional markers should work
+        assert!(segments.len() >= 2);
+    }
+
+    #[test]
+    fn test_scenes_to_segments_short_video() {
+        let scenes = vec![1.0, 2.0];
+        let segments = scenes_to_segments(&scenes, 3.0);
+        // Short video should still work
+        assert!(segments.len() >= 2);
+    }
+
+    #[test]
+    fn test_scenes_to_segments_long_video() {
+        let scenes = vec![60.0, 300.0, 600.0];
+        let segments = scenes_to_segments(&scenes, 900.0);
+        // Long video should handle large timestamps
+        assert!(segments.len() >= 2);
+    }
+
+    #[test]
+    fn test_scenes_to_segments_markers_beyond_video() {
+        let scenes = vec![30.0, 40.0, 50.0];
+        let segments = scenes_to_segments(&scenes, 20.0);
+        // Markers beyond video duration - edge case
+        assert!(segments.len() >= 1);
+    }
 }

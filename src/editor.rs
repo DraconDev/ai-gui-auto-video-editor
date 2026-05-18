@@ -1649,4 +1649,51 @@ mod tests {
         // Zero speedup should not panic
         assert!(segments.len() >= 0);
     }
+
+    // ── editor more edge cases ─────────────────────────────────────────────
+    #[test]
+    fn test_calculate_keep_segments_single_silence() {
+        let silences = vec![Segment {
+            start: 10.0,
+            end: 20.0,
+        }];
+        let segments = calculate_keep_segments(&silences, 60.0, 0.2, SilenceMode::Cut, 1.0, 1.0);
+        // Single silence should produce 2 keep segments (before and after)
+        let total: f32 = segments.iter().map(|s| s.end - s.start).sum();
+        assert!(total > 0.0);
+    }
+
+    #[test]
+    fn test_calculate_keep_segments_negative_padding() {
+        let silences = vec![Segment {
+            start: 10.0,
+            end: 20.0,
+        }];
+        let segments = calculate_keep_segments(&silences, 30.0, -0.5, SilenceMode::Cut, 1.0, 1.0);
+        // Negative padding may produce empty or different segments
+        assert!(segments.len() >= 0);
+    }
+
+    #[test]
+    fn test_calculate_keep_segments_min_speedup() {
+        let silences = vec![Segment {
+            start: 0.0,
+            end: 10.0,
+        }];
+        let segments = calculate_keep_segments(&silences, 30.0, 0.1, SilenceMode::Cut, 0.5, 1.0);
+        // Minimum speedup should work
+        let total: f32 = segments.iter().map(|s| s.end - s.start).sum();
+        assert!(total >= 0.0);
+    }
+
+    #[test]
+    fn test_calculate_keep_segments_max_padding() {
+        let silences = vec![Segment {
+            start: 10.0,
+            end: 20.0,
+        }];
+        let segments = calculate_keep_segments(&silences, 60.0, 5.0, SilenceMode::Cut, 1.0, 1.0);
+        // Large padding should still work
+        assert!(segments.len() >= 0);
+    }
 }

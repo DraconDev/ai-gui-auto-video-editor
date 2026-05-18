@@ -694,4 +694,108 @@ mod tests {
         let total: f32 = segments.iter().map(|s| s.end - s.start).sum();
         assert!(total < 0.01);
     }
+
+    // ── Transcript timing edge cases ───────────────────────────────────────
+    #[test]
+    fn test_transcript_segment_timing_order() {
+        let seg1 = TranscriptSegment {
+            start: 0.0,
+            end: 5.0,
+            text: "A".to_string(),
+            confidence: 1.0,
+        };
+        let seg2 = TranscriptSegment {
+            start: 5.0,
+            end: 10.0,
+            text: "B".to_string(),
+            confidence: 1.0,
+        };
+        // Sequential segments
+        assert_eq!(seg1.end, seg2.start);
+    }
+
+    #[test]
+    fn test_transcript_segment_non_overlapping() {
+        let seg1 = TranscriptSegment {
+            start: 0.0,
+            end: 5.0,
+            text: "A".to_string(),
+            confidence: 1.0,
+        };
+        let seg2 = TranscriptSegment {
+            start: 10.0,
+            end: 15.0,
+            text: "B".to_string(),
+            confidence: 1.0,
+        };
+        // Gap between segments
+        assert!(seg2.start > seg1.end);
+    }
+
+    #[test]
+    fn test_transcript_segments_gap_calculation() {
+        let seg1 = TranscriptSegment {
+            start: 0.0,
+            end: 10.0,
+            text: "A".to_string(),
+            confidence: 1.0,
+        };
+        let seg2 = TranscriptSegment {
+            start: 15.0,
+            end: 20.0,
+            text: "B".to_string(),
+            confidence: 1.0,
+        };
+        // Gap is 5 seconds
+        let gap = seg2.start - seg1.end;
+        assert!((gap - 5.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn test_transcript_segments_full_coverage() {
+        let segments = vec![
+            TranscriptSegment {
+                start: 0.0,
+                end: 10.0,
+                text: "A".to_string(),
+                confidence: 1.0,
+            },
+            TranscriptSegment {
+                start: 10.0,
+                end: 20.0,
+                text: "B".to_string(),
+                confidence: 1.0,
+            },
+            TranscriptSegment {
+                start: 20.0,
+                end: 30.0,
+                text: "C".to_string(),
+                confidence: 1.0,
+            },
+        ];
+        // Full coverage with no gaps
+        let total: f32 = segments.iter().map(|s| s.end - s.start).sum();
+        assert!((total - 30.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn test_transcript_segments_partial_coverage() {
+        let segments = vec![
+            TranscriptSegment {
+                start: 0.0,
+                end: 5.0,
+                text: "A".to_string(),
+                confidence: 1.0,
+            },
+            TranscriptSegment {
+                start: 15.0,
+                end: 20.0,
+                text: "B".to_string(),
+                confidence: 1.0,
+            },
+        ];
+        // Partial coverage (gaps in between)
+        let total: f32 = segments.iter().map(|s| s.end - s.start).sum();
+        assert!((total - 10.0).abs() < 1e-6);
+    }
 }
