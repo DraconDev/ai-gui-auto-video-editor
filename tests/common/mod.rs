@@ -68,10 +68,14 @@ pub fn create_test_watermark_png(output_path: &std::path::Path, size: u32) -> bo
     // Use FFmpeg to create a red semi-transparent PNG watermark
     let status = Command::new("ffmpeg")
         .args([
-            "-f", "lavfi",
-            "-i", &format!("color=c=0xFF000080:size={}x{},format=rgba", size, size),
-            "-frames:v", "1",
-            "-update", "1",
+            "-f",
+            "lavfi",
+            "-i",
+            &format!("color=c=0xFF000080:size={}x{},format=rgba", size, size),
+            "-frames:v",
+            "1",
+            "-update",
+            "1",
             "-y",
             output_path.to_str().unwrap_or(""),
         ])
