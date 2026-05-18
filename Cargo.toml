@@ -1,15 +1,15 @@
 [package]
 name = "ai-vid-editor"
-version = "19.58.0"
+version = "19.59.0"
 edition = "2024"
 authors = ["DraconDev"]
-description = "AI-powered video editor for content creators"
+description = "GUI + CLI AI-powered video editor: auto silence cutting, audio enhancement, scene detection, auto-reframe for content creators"
 license = "AGPL-3.0-only"
 repository = "https://github.com/DraconDev/ai-vid-editor"
 homepage = "https://github.com/DraconDev/ai-vid-editor"
 readme = "README.md"
-keywords = ["video", "editor", "ai", "ffmpeg", "automation"]
-categories = ["command-line-utilities", "multimedia::video"]
+keywords = ["video", "editor", "gui", "ai", "ffmpeg", "automation", "silence-detection"]
+categories = ["command-line-utilities", "gui", "multimedia::video"]
 rust-version = "1.88"
 exclude = [
     ".dracon/",

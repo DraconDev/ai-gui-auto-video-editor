@@ -7,7 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [19.58.0] - 2026-05-17
+## [19.59.0] - 2026-05-17
+
+### Bug Fixes
+- **Button size consistency**: All GUI buttons now share uniform heights for cleaner visual alignment across queue, folders, and all other pages
+
+### Features
+- **292 new unit tests**: Comprehensive test coverage added across 17 modules (config, analyzer, editor, exporter, stt_analyzer, watermark, batch_processor, ml, progress, etc.)
+
+### Code Quality
+- **Clippy clean**: All lints pass with deny-warnings
+- **Format clean**: `cargo fmt --all` passes
+- **552 lib tests passing**: Up from 260 at start of test-writing loop
+
+### GUI
+- **Consistent button sizes**: Primary (120×44), Secondary/Danger (88×38), Small/Toggle/Pill/Add (72×34) — all action buttons now same height
 
 ### Bug Fixes
 - **`VideoConfig::default()` produced `watermark_scale = 0.0`**: The derived `Default` impl used `f32::default()` (0.0) instead of the serde default (1.0), causing watermark pipeline failures. Replaced with manual `Default` impl that matches serde defaults
