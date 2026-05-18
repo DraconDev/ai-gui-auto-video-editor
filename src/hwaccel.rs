@@ -213,4 +213,44 @@ mod tests {
     fn test_parse_name_empty() {
         assert_eq!(HwAccel::parse_name(""), None);
     }
+
+    // ── More parse_name coverage ─────────────────────────────────────────────
+    #[test]
+    fn test_parse_name_all_variants() {
+        assert_eq!(HwAccel::parse_name("nvenc"), Some(HwAccel::Nvenc));
+        assert_eq!(HwAccel::parse_name("vaapi"), Some(HwAccel::Vaapi));
+        assert_eq!(HwAccel::parse_name("amf"), Some(HwAccel::Amf));
+        assert_eq!(
+            HwAccel::parse_name("videotoolbox"),
+            Some(HwAccel::VideoToolbox)
+        );
+        assert_eq!(HwAccel::parse_name("none"), Some(HwAccel::None));
+    }
+
+    #[test]
+    fn test_parse_name_case_insensitive() {
+        assert_eq!(HwAccel::parse_name("NVENC"), Some(HwAccel::Nvenc));
+        assert_eq!(HwAccel::parse_name("NvEnc"), Some(HwAccel::Nvenc));
+        assert_eq!(HwAccel::parse_name("VAAPI"), Some(HwAccel::Vaapi));
+        assert_eq!(HwAccel::parse_name("VaApi"), Some(HwAccel::Vaapi));
+        assert_eq!(HwAccel::parse_name("AMF"), Some(HwAccel::Amf));
+    }
+
+    #[test]
+    fn test_parse_name_aliases() {
+        // nvenc aliases
+        assert_eq!(HwAccel::parse_name("nvidia"), Some(HwAccel::Nvenc));
+        // amf aliases
+        assert_eq!(HwAccel::parse_name("amd"), Some(HwAccel::Amf));
+        // vaapi aliases
+        assert_eq!(HwAccel::parse_name("intel"), Some(HwAccel::Vaapi));
+    }
+
+    #[test]
+    fn test_parse_name_unknown() {
+        assert_eq!(HwAccel::parse_name("invalid"), None);
+        assert_eq!(HwAccel::parse_name("auto"), None);
+        assert_eq!(HwAccel::parse_name("cuda"), None);
+        assert_eq!(HwAccel::parse_name("vulkan"), None);
+    }
 }

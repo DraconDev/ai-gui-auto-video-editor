@@ -1489,7 +1489,6 @@ mod tests {
         assert!(parse_loudnorm_stats(invalid_output).is_none());
     }
 
-
     // ── Duck filter generation tests ──────────────────────────────────────
 
     #[test]
@@ -1503,7 +1502,6 @@ mod tests {
         let filter = generate_duck_filter(&transcript, 0.5);
         assert!(filter.contains("0.5"));
     }
-
 
     #[test]
     fn test_generate_duck_filter_aggressive() {
@@ -1528,9 +1526,7 @@ mod tests {
     #[test]
     fn test_calculate_keep_segments_empty_silences() {
         let silences: Vec<Segment> = vec![];
-        let segments = calculate_keep_segments(
-            &silences, 60.0, 0.1, SilenceMode::Cut, 2.0, 0.5,
-        );
+        let segments = calculate_keep_segments(&silences, 60.0, 0.1, SilenceMode::Cut, 2.0, 0.5);
         assert_eq!(segments.len(), 1);
         assert_eq!(segments[0].start, 0.0);
         assert_eq!(segments[0].end, 60.0);
@@ -1538,42 +1534,52 @@ mod tests {
 
     #[test]
     fn test_calculate_keep_segments_single_short_silence() {
-        let silences = vec![Segment { start: 10.0, end: 11.0 }];
-        let segments = calculate_keep_segments(
-            &silences, 60.0, 0.1, SilenceMode::Cut, 2.0, 0.5,
-        );
+        let silences = vec![Segment {
+            start: 10.0,
+            end: 11.0,
+        }];
+        let segments = calculate_keep_segments(&silences, 60.0, 0.1, SilenceMode::Cut, 2.0, 0.5);
         assert!(segments.len() >= 1);
         assert!(segments[0].start >= 0.0);
     }
 
     #[test]
     fn test_calculate_keep_segments_silence_at_start() {
-        let silences = vec![Segment { start: 0.0, end: 5.0 }];
-        let segments = calculate_keep_segments(
-            &silences, 60.0, 0.1, SilenceMode::Cut, 2.0, 0.5,
-        );
+        let silences = vec![Segment {
+            start: 0.0,
+            end: 5.0,
+        }];
+        let segments = calculate_keep_segments(&silences, 60.0, 0.1, SilenceMode::Cut, 2.0, 0.5);
         assert!(segments[0].start >= 0.0);
     }
 
     #[test]
     fn test_calculate_keep_segments_silence_at_end() {
-        let silences = vec![Segment { start: 55.0, end: 60.0 }];
-        let segments = calculate_keep_segments(
-            &silences, 60.0, 0.1, SilenceMode::Cut, 2.0, 0.5,
-        );
+        let silences = vec![Segment {
+            start: 55.0,
+            end: 60.0,
+        }];
+        let segments = calculate_keep_segments(&silences, 60.0, 0.1, SilenceMode::Cut, 2.0, 0.5);
         assert!(segments.last().unwrap().end <= 60.0);
     }
 
     #[test]
     fn test_calculate_keep_segments_consecutive_silences() {
         let silences = vec![
-            Segment { start: 10.0, end: 15.0 },
-            Segment { start: 20.0, end: 25.0 },
-            Segment { start: 30.0, end: 35.0 },
+            Segment {
+                start: 10.0,
+                end: 15.0,
+            },
+            Segment {
+                start: 20.0,
+                end: 25.0,
+            },
+            Segment {
+                start: 30.0,
+                end: 35.0,
+            },
         ];
-        let segments = calculate_keep_segments(
-            &silences, 60.0, 0.1, SilenceMode::Cut, 2.0, 0.5,
-        );
+        let segments = calculate_keep_segments(&silences, 60.0, 0.1, SilenceMode::Cut, 2.0, 0.5);
         assert!(segments.len() >= 2);
     }
 }

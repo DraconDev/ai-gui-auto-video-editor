@@ -556,7 +556,6 @@ mod tests {
         let top_left = WatermarkPosition::TopLeft.to_ffmpeg_coords(100, 50);
         assert_eq!(top_left, "10:10", "TopLeft should use padding");
 
-
         let top_right = WatermarkPosition::TopRight.to_ffmpeg_coords(100, 50);
         assert_eq!(top_right, "W-w-10:10", "TopRight should use padding");
     }

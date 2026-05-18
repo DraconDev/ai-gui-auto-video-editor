@@ -177,7 +177,6 @@ mod tests {
 
     // ── Preset matching edge cases ─────────────────────────────────────────
 
-
     #[test]
     fn test_preset_rule_exact_match() {
         let rule = PresetRule::new("podcast", Preset::Podcast);

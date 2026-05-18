@@ -2073,4 +2073,55 @@ enhance = false
         config.watch.interval = 5;
         assert!(config.validate().is_ok());
     }
+
+    // ── Config merge and serialization tests ───────────────────────────────
+    #[test]
+    fn test_merge_configs_default_no_override() {
+        let base = Config::default();
+        let override_config = Config::default();
+        // Set a non-default value in override
+        let mut override_config = override_config;
+        override_config.audio.target_lufs = -16.0;
+        override_config.audio.enhance = true;
+
+        let merged = base.merge(override_config);
+        // The override should be reflected in the merged config
+        assert_eq!(merged.audio.target_lufs, -16.0);
+        assert!(merged.audio.enhance);
+    }
+
+    #[test]
+    fn test_merge_configs_preserves_unchanged() {
+        let mut config = Config::default();
+        config.silence.threshold_db = -40.0;
+
+        let override_config = Config::default();
+        // Override with default config should not change silence settings
+        let original_threshold = config.silence.threshold_db;
+        let merged = config.merge(override_config);
+        assert_eq!(merged.silence.threshold_db, original_threshold);
+    }
+
+    #[test]
+    fn test_config_default_values() {
+        let config = Config::default();
+        // Verify some key defaults
+        assert_eq!(config.silence.threshold_db, -30.0);
+        assert_eq!(config.silence.padding, 0.1);
+        assert!(config.audio.enhance);
+        assert_eq!(config.audio.target_lufs, -14.0);
+    }
+
+    #[test]
+    fn test_config_serialization_roundtrip() -> Result<()> {
+        use toml::toml;
+
+        let config = Config::default();
+        let serialized = toml::to_string(&config)?;
+        let deserialized: Config = toml::from_str(&serialized)?;
+
+        // Basic sanity check - deserialized should not panic on validate
+        assert!(deserialized.validate().is_ok());
+        Ok(())
+    }
 }
