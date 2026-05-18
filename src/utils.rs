@@ -425,4 +425,31 @@ mod tests {
         assert!(found[0].extension().unwrap().to_str() == Some("mp4"));
         Ok(())
     }
+
+    // ── TempDir/TempFile cleanup tests ────────────────────────────────────
+    #[test]
+    fn test_temp_dir_into_path() {
+        let temp = TempDir::new("test").unwrap();
+        let path = temp.into_path();
+        // into_path takes ownership, dir should still exist (forget prevents cleanup)
+        assert!(path.exists());
+        // Clean up manually
+        let _ = std::fs::remove_dir_all(path);
+    }
+
+    #[test]
+    fn test_temp_file_new_variant() {
+        let temp = TempFile::new("mytest", "mp4").unwrap();
+        let path = temp.path();
+        assert!(path.extension().unwrap() == "mp4");
+        assert!(path.to_string_lossy().contains("mytest"));
+    }
+
+    #[test]
+    fn test_temp_file_path_preserves_prefix() {
+        let temp = TempFile::new("videotest", "mov").unwrap();
+        let path_str = temp.path().to_string_lossy();
+        assert!(path_str.contains("videotest"));
+        assert!(path_str.ends_with(".mov"));
+    }
 }
