@@ -133,4 +133,35 @@ mod tests {
             "preview should be generated for short video"
         );
     }
+
+    // ── preview_path pure logic tests ────────────────────────────────────
+
+    // --- preview_path pure logic tests ---
+    #[test]
+    fn test_preview_path_adds_preview_suffix() {
+        let output = Path::new("/a/b/c/video.mp4");
+        let preview = preview_path(output);
+        assert!(preview.to_string_lossy().contains("_preview"));
+    }
+
+    #[test]
+    fn test_preview_path_preserves_extension() {
+        let output = Path::new("video.avi");
+        let preview = preview_path(output);
+        assert_eq!(preview.extension().unwrap(), "avi");
+    }
+
+    #[test]
+    fn test_preview_path_webm_preserved() {
+        let output = Path::new("video.webm");
+        let preview = preview_path(output);
+        assert_eq!(preview.extension().unwrap(), "webm");
+    }
+
+    #[test]
+    fn test_preview_path_mkv_preserved() {
+        let output = Path::new("video.mkv");
+        let preview = preview_path(output);
+        assert_eq!(preview.extension().unwrap(), "mkv");
+    }
 }
