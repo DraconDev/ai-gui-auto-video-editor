@@ -2208,4 +2208,56 @@ enhance = false
             assert_eq!(Preset::parse_name(s), Some(preset));
         }
     }
+
+    // ── Config validation edge cases ───────────────────────────────────────
+    #[test]
+    fn test_config_validate_threshold_db_range() {
+        let mut config = Config::default();
+        // threshold_db should be <= 0
+        config.silence.threshold_db = -50.0;
+        assert!(config.validate().is_ok());
+        config.silence.threshold_db = 0.0;
+        assert!(config.validate().is_ok());
+    }
+
+    #[test]
+    fn test_config_validate_target_lufs_range() {
+        let mut config = Config::default();
+        // target_lufs reasonable range
+        config.audio.target_lufs = -24.0;
+        assert!(config.validate().is_ok());
+        config.audio.target_lufs = -9.0;
+        assert!(config.validate().is_ok());
+    }
+
+    #[test]
+    fn test_config_validate_min_duration() {
+        let mut config = Config::default();
+        config.silence.min_duration = 0.1;
+        assert!(config.validate().is_ok());
+        config.silence.min_duration = 10.0;
+        assert!(config.validate().is_ok());
+    }
+
+    #[test]
+    fn test_config_video_resolution_all() {
+        use VideoResolution::*;
+        for res in [Hd720p, Fhd1080p, Qhd1440p, Uhd4k, Vertical1080p, Vertical720p] {
+            let mut config = Config::default();
+            config.video.target_resolution = res;
+            assert!(config.validate().is_ok());
+        }
+    }
+
+    #[test]
+    fn test_config_default_serialization() -> Result<()> {
+        use toml::toml;
+        let config = Config::default();
+        let serialized = toml::to_string(&config)?;
+        // Should be valid TOML
+        assert!(!serialized.is_empty());
+        let deserialized: Config = toml::from_str(&serialized)?;
+        assert!(deserialized.validate().is_ok());
+        Ok(())
+    }
 }
