@@ -252,9 +252,18 @@ mod tests {
             PresetRule::new("shorts", Preset::Shorts),
         ];
         // Test each pattern
-        assert_eq!(preset_for_file(Path::new("podcast_001.mp4"), &rules, Preset::Minimal), Preset::Podcast);
-        assert_eq!(preset_for_file(Path::new("interview_001.mp4"), &rules, Preset::Minimal), Preset::Youtube);
-        assert_eq!(preset_for_file(Path::new("shorts_001.mp4"), &rules, Preset::Minimal), Preset::Shorts);
+        assert_eq!(
+            preset_for_file(Path::new("podcast_001.mp4"), &rules, Preset::Minimal),
+            Preset::Podcast
+        );
+        assert_eq!(
+            preset_for_file(Path::new("interview_001.mp4"), &rules, Preset::Minimal),
+            Preset::Youtube
+        );
+        assert_eq!(
+            preset_for_file(Path::new("shorts_001.mp4"), &rules, Preset::Minimal),
+            Preset::Shorts
+        );
     }
 
     #[test]

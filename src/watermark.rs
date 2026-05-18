@@ -565,4 +565,46 @@ mod tests {
         let center = WatermarkPosition::Center.to_ffmpeg_coords(100, 50);
         assert_eq!(center, "(W-w)/2:(H-h)/2", "Center uses centering formula");
     }
+
+    // ── WatermarkPosition edge cases ───────────────────────────────────────
+    #[test]
+    fn test_watermark_position_bottom_left() {
+        let pos = WatermarkPosition::BottomLeft;
+        let coords = pos.to_ffmpeg_coords(100, 50);
+        // Bottom position should have y = H - h - padding
+        assert!(coords.contains(":H-h"));
+    }
+
+    #[test]
+    fn test_watermark_position_bottom_right() {
+        let pos = WatermarkPosition::BottomRight;
+        let coords = pos.to_ffmpeg_coords(100, 50);
+        // Should have W-w for x and H-h for y
+        assert!(coords.contains("W-w"));
+        assert!(coords.contains("H-h"));
+    }
+
+    #[test]
+    fn test_watermark_position_parse_all() {
+        use WatermarkPosition::*;
+        for pos in [TopLeft, TopRight, BottomLeft, BottomRight, Center] {
+            let name = format!("{:?}", pos);
+            let parsed = WatermarkPosition::parse_name(&name.to_lowercase());
+            assert!(parsed.is_some(), "Should parse {:?}", pos);
+        }
+    }
+
+    #[test]
+    fn test_watermark_position_parse_center() {
+        assert!(WatermarkPosition::parse_name("center").is_some());
+        assert!(WatermarkPosition::parse_name("c").is_some());
+        assert!(WatermarkPosition::parse_name("middle").is_some());
+    }
+
+    #[test]
+    fn test_watermark_position_parse_corners() {
+        assert!(WatermarkPosition::parse_name("top-left").is_some());
+        assert!(WatermarkPosition::parse_name("topleft").is_some());
+        assert!(WatermarkPosition::parse_name("tl").is_some());
+    }
 }

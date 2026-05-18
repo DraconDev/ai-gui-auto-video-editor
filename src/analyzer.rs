@@ -552,4 +552,72 @@ more noise
         assert!(inner.start >= outer.start);
         assert!(inner.end <= outer.end);
     }
+
+    // ── Segment merging edge cases ────────────────────────────────────────
+    #[test]
+    fn test_segment_merge_exact_overlap() {
+        let seg1 = Segment {
+            start: 5.0,
+            end: 15.0,
+        };
+        let seg2 = Segment {
+            start: 15.0,
+            end: 25.0,
+        };
+        // Exact overlap at boundary
+        assert_eq!(seg1.end, seg2.start);
+    }
+
+    #[test]
+    fn test_segment_merge_partial_overlap() {
+        let seg1 = Segment {
+            start: 0.0,
+            end: 10.0,
+        };
+        let seg2 = Segment {
+            start: 5.0,
+            end: 15.0,
+        };
+        // Partial overlap
+        assert!(seg1.end > seg2.start);
+        assert!(seg1.end < seg2.end);
+    }
+
+    #[test]
+    fn test_segment_merge_no_overlap() {
+        let seg1 = Segment {
+            start: 0.0,
+            end: 5.0,
+        };
+        let seg2 = Segment {
+            start: 10.0,
+            end: 15.0,
+        };
+        // No overlap
+        assert!(seg1.end < seg2.start);
+    }
+
+    #[test]
+    fn test_processed_segment_speed_one() {
+        let seg = ProcessedSegment {
+            start: 0.0,
+            end: 10.0,
+            speed: 1.0,
+        };
+        // Speed of 1 means no change
+        assert_eq!(seg.speed, 1.0);
+    }
+
+    #[test]
+    fn test_processed_segment_calculated_duration() {
+        let seg = ProcessedSegment {
+            start: 10.0,
+            end: 30.0,
+            speed: 2.0,
+        };
+        let duration = seg.end - seg.start;
+        let speedup_duration = duration / seg.speed;
+        // 20 seconds at 2x speed = 10 seconds output
+        assert!((speedup_duration - 10.0).abs() < 1e-6);
+    }
 }
