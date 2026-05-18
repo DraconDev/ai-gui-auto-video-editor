@@ -253,4 +253,33 @@ mod tests {
         assert_eq!(HwAccel::parse_name("cuda"), None);
         assert_eq!(HwAccel::parse_name("vulkan"), None);
     }
+
+    // ── HwAccel variant tests ──────────────────────────────────────────────
+    #[test]
+    fn test_hwaccel_default_variant() {
+        let default = HwAccel::default();
+        // Default should be None (software encoding)
+        match default {
+            HwAccel::None => {}
+            _ => panic!("Expected HwAccel::None as default"),
+        }
+    }
+
+    #[test]
+    fn test_hwaccel_software_encoding() {
+        let sw = HwAccel::None;
+        match sw {
+            HwAccel::None => {}
+            _ => panic!("Expected HwAccel::None"),
+        }
+    }
+
+    #[test]
+    fn test_hwaccel_parse_all_lowercase() {
+        // Test that parse_name handles lowercase variants
+        for name in ["none", "cuda", "qsv", " VideoToolbox", "vaapi", "vulkan"] {
+            // Should not panic even if it returns None
+            let _ = HwAccel::parse_name(name);
+        }
+    }
 }

@@ -240,4 +240,47 @@ mod tests {
         assert_eq!(segments[0].start, 0.0);
         assert_eq!(segments[0].end, 30.0);
     }
+
+    // ── Scene detection edge cases ────────────────────────────────────────
+    #[test]
+    fn test_scenes_to_segments_single_marker_at_zero() {
+        let scenes = vec![0.0];
+        let segments = scenes_to_segments(&scenes, 30.0);
+        // Single marker at 0 = single segment
+        assert_eq!(segments.len(), 1);
+        assert_eq!(segments[0].start, 0.0);
+    }
+
+    #[test]
+    fn test_scenes_to_segments_single_marker_at_end() {
+        let scenes = vec![30.0];
+        let segments = scenes_to_segments(&scenes, 30.0);
+        // Single marker at end = single segment
+        assert_eq!(segments.len(), 1);
+        assert_eq!(segments[0].start, 0.0);
+    }
+
+    #[test]
+    fn test_scenes_to_segments_two_markers() {
+        let scenes = vec![10.0, 20.0];
+        let segments = scenes_to_segments(&scenes, 30.0);
+        // Two markers produce three segments
+        assert_eq!(segments.len(), 3);
+    }
+
+    #[test]
+    fn test_scenes_to_segments_many_markers() {
+        let scenes = vec![5.0, 10.0, 15.0, 20.0, 25.0];
+        let segments = scenes_to_segments(&scenes, 30.0);
+        // 5 markers produce 6 segments
+        assert_eq!(segments.len(), 6);
+    }
+
+    #[test]
+    fn test_scenes_to_segments_consecutive_markers() {
+        let scenes = vec![10.0, 10.001, 10.002]; // Very close markers
+        let segments = scenes_to_segments(&scenes, 30.0);
+        // Consecutive markers should still produce segments
+        assert!(segments.len() >= 2);
+    }
 }
