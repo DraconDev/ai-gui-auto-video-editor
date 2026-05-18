@@ -212,8 +212,6 @@ fn watch_folders_loop(
                         }
                         if tx
                             .send(WatcherEvent::Completed {
-                        if tx
-                            .send(WatcherEvent::Completed {
                                 filename: file_label,
                                 file_size,
                                 duration_secs: started.elapsed().as_secs().max(1),
