@@ -452,4 +452,71 @@ mod tests {
         assert!(path_str.contains("videotest"));
         assert!(path_str.ends_with(".mov"));
     }
+
+    // ── Path utility tests ──────────────────────────────────────────────
+    #[test]
+    fn test_escape_ffmpeg_filter_path_multiple_special_chars() {
+        let path = Path::new("/path/with spaces/and'quotes/and\\backslash.mp4");
+        let escaped = escape_ffmpeg_filter_path(path);
+        // Should handle multiple special characters
+        assert!(escaped.len() > path.to_string_lossy().len());
+    }
+
+    #[test]
+    fn test_escape_ffmpeg_filter_path_no_special_chars() {
+        let path = Path::new("/simple/path/video.mp4");
+        let escaped = escape_ffmpeg_filter_path(path);
+        // No special chars to escape
+        assert!(escaped.contains("video.mp4"));
+    }
+
+    #[test]
+    fn test_escape_ffmpeg_filter_path_only_quotes() {
+        let path = Path::new("/path/to/file's name.mp4");
+        let escaped = escape_ffmpeg_filter_path(path);
+        // Single quotes should be escaped
+        assert!(escaped.contains("\\'"));
+    }
+
+    #[test]
+    fn test_escape_ffmpeg_filter_path_handles_various_chars() {
+        let path = Path::new("C:\\Users\\test\\video.mp4");
+        let escaped = escape_ffmpeg_filter_path(path);
+        // Should handle Windows paths with backslashes
+        assert!(escaped.len() >= path.to_string_lossy().len());
+    }
+
+    #[test]
+    fn test_find_video_files_none_found() {
+        let dir = tempdir().unwrap();
+        // No video files
+        let found = find_video_files(dir.path()).unwrap();
+        assert!(found.is_empty());
+    }
+
+    #[test]
+    fn test_find_video_files_multiple_formats() {
+        let dir = tempdir().unwrap();
+        let formats = ["mp4", "mov", "avi", "mkv"];
+        for fmt in formats.iter() {
+            let video = dir.path().join(format!("video.{}", fmt));
+            std::fs::write(&video, "x").unwrap();
+        }
+        let found = find_video_files(dir.path()).unwrap();
+        assert_eq!(found.len(), 4);
+    }
+
+    #[test]
+    fn test_is_video_file_symlink() {
+        let dir = tempdir().unwrap();
+        let video = dir.path().join("video.mp4");
+        std::fs::write(&video, "x").unwrap();
+        let link = dir.path().join("link.mp4");
+        #[cfg(unix)]
+        std::os::unix::fs::symlink(&video, &link).unwrap();
+        // Symlink to video file should be recognized
+        if link.exists() {
+            assert!(is_video_file(&link));
+        }
+    }
 }

@@ -290,4 +290,55 @@ mod tests {
         extract_frame_at_time(&video, &frame, 320, 180, 2.5).unwrap();
         assert!(frame.exists(), "frame should be extracted at middle");
     }
+
+    // ── Thumbnail edge cases ─────────────────────────────────────────────
+    #[test]
+    fn test_extract_frame_at_time_start() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let video = temp_dir.path().join("input.mp4");
+        let frame = temp_dir.path().join("frame.jpg");
+        let _ = create_test_video(&video, 5.0);
+
+        // Extract at start
+        extract_frame_at_time(&video, &frame, 320, 180, 0.0).unwrap();
+        assert!(frame.exists());
+    }
+
+    #[test]
+    fn test_extract_frame_at_time_near_end() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let video = temp_dir.path().join("input.mp4");
+        let frame = temp_dir.path().join("frame.jpg");
+        let _ = create_test_video(&video, 5.0);
+
+        // Extract near end
+        extract_frame_at_time(&video, &frame, 320, 180, 4.8).unwrap();
+        assert!(frame.exists());
+    }
+
+    #[test]
+    fn test_extract_frame_at_time_different_sizes() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let video = temp_dir.path().join("input.mp4");
+        let _ = create_test_video(&video, 5.0);
+
+        // Test different output sizes
+        for (w, h) in [(64, 64), (320, 180), (1920, 1080)] {
+            let frame = temp_dir.path().join(format!("frame_{}x{}.jpg", w, h));
+            extract_frame_at_time(&video, &frame, w, h, 1.0).unwrap();
+            assert!(frame.exists());
+        }
+    }
+
+    #[test]
+    fn test_extract_frame_at_time_large_size() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let video = temp_dir.path().join("input.mp4");
+        let frame = temp_dir.path().join("frame.jpg");
+        let _ = create_test_video(&video, 5.0);
+
+        // Large output size
+        extract_frame_at_time(&video, &frame, 1920, 1080, 2.0).unwrap();
+        assert!(frame.exists());
+    }
 }
