@@ -2,6 +2,23 @@ pub mod processing;
 pub mod tabs;
 pub mod theme;
 
+fn open_in_player(path: &Path) {
+    #[cfg(target_os = "linux")]
+    {
+        let _ = std::process::Command::new("xdg-open").arg(path).spawn();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let _ = std::process::Command::new("open").arg(path).spawn();
+    }
+    #[cfg(target_os = "windows")]
+    {
+        let _ = std::process::Command::new("cmd")
+            .args(["/C", "start", "", path.to_string_lossy().as_ref()])
+            .spawn();
+    }
+}
+
 use self::theme::*;
 
 use eframe::egui;
@@ -879,6 +896,7 @@ impl AppState {
                                 if self.recent_outputs.len() > 10 {
                                     self.recent_outputs.pop();
                                 }
+                                open_in_player(&output_path);
                             }
                             break;
                         }

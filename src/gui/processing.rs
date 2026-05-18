@@ -16,23 +16,6 @@ use crate::batch_processor::ProcessingProgress;
 use crate::batch_processor::process_single_file_with_intro_outro_progress;
 use crate::config::FolderSettings;
 
-fn open_in_player(path: &Path) {
-    #[cfg(target_os = "linux")]
-    {
-        let _ = std::process::Command::new("xdg-open").arg(path).spawn();
-    }
-    #[cfg(target_os = "macos")]
-    {
-        let _ = std::process::Command::new("open").arg(path).spawn();
-    }
-    #[cfg(target_os = "windows")]
-    {
-        let _ = std::process::Command::new("cmd")
-            .args(["/C", "start", "", path.to_string_lossy().as_ref()])
-            .spawn();
-    }
-}
-
 #[cfg(feature = "notify-rust")]
 fn send_desktop_notification(title: &str, body: &str) {
     let _ = notify_rust::Notification::new()
@@ -221,11 +204,11 @@ fn watch_folders_loop(
                 match result {
                     Ok(()) => {
                         if notify {
+                            super::open_in_player(&output_path);
                             send_desktop_notification(
                                 "Processing Complete",
                                 &format!("{} is ready", file_label),
                             );
-                            open_in_player(&output_path);
                         }
                         if tx
                             .send(WatcherEvent::Completed {
