@@ -33,7 +33,7 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: Install Rust
-        uses: dtolnay/rust-action@stable
+        uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.target }}
       
@@ -58,6 +58,7 @@ jobs:
           cp -r ${{ github.workspace }}/presets ai-vid-editor/
           cp ${{ github.workspace }}/README.md ai-vid-editor/
           cp ${{ github.workspace }}/LICENSE ai-vid-editor/ 2>/dev/null || true
+          cp ${{ github.workspace }}/install.sh ai-vid-editor/
           tar -czvf ai-vid-editor-${{ matrix.target }}.tar.gz ai-vid-editor
       
       - name: Package (Windows)
@@ -69,6 +70,7 @@ jobs:
           cp -r ${{ github.workspace }}/assets ai-vid-editor/
           cp -r ${{ github.workspace }}/presets ai-vid-editor/
           cp ${{ github.workspace }}/README.md ai-vid-editor/
+          cp ${{ github.workspace }}/install.sh ai-vid-editor/
           7z a ai-vid-editor-${{ matrix.target }}.zip ai-vid-editor
       
       - name: Upload artifact
