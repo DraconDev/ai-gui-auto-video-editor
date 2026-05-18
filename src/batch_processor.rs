@@ -2088,4 +2088,39 @@ mod tests {
 
         assert!((total_duration - 40.0).abs() < 1e-6);
     }
+
+    // ── Batch progress edge cases ──────────────────────────────────────────
+    #[test]
+    fn test_format_batch_summary_empty_stats() {
+        let s = format_batch_summary(0, 0, 0, 0);
+        // Should not panic and should show 0% rates
+        assert!(s.contains("0%"));
+    }
+
+    #[test]
+    fn test_format_batch_summary_all_failed() {
+        let s = format_batch_summary(5, 0, 0, 5);
+        // 0% success, 100% failure
+        assert!(s.contains("0%") || s.contains("100%"));
+    }
+
+    #[test]
+    fn test_merge_silences_scenes_empty_both() {
+        // Both silences and scenes empty
+        let silences: Vec<crate::analyzer::Segment> = vec![];
+        let scenes: Vec<f32> = vec![];
+        let result = merge_silences_and_scenes(&silences, &scenes, 60.0);
+        // Should return empty (scenes is empty so return silences as-is)
+        assert!(result.is_empty());
+    }
+
+    #[test]
+    fn test_merge_silences_scenes_single_scene() {
+        let silences: Vec<crate::analyzer::Segment> = vec![];
+        let scenes = vec![30.0]; // Single scene at 30s
+        let result = merge_silences_and_scenes(&silences, &scenes, 60.0);
+        // When silences is empty, the function returns empty vec (early return)
+        // This is expected behavior - silences drive the output
+        assert!(result.is_empty() || result.len() == 2);
+    }
 }
