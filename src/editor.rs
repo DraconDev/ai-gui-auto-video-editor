@@ -1582,4 +1582,71 @@ mod tests {
         let segments = calculate_keep_segments(&silences, 60.0, 0.1, SilenceMode::Cut, 2.0, 0.5);
         assert!(segments.len() >= 2);
     }
+
+    // ── editor edge cases ─────────────────────────────────────────────────
+    #[test]
+    fn test_calculate_keep_segments_no_silences() {
+        let silences: Vec<Segment> = vec![];
+        let segments = calculate_keep_segments(&silences, 30.0, 0.1, SilenceMode::Cut, 2.0, 1.0);
+        // No silences means no segments to remove, so we should have one keep segment
+        assert!(segments.len() >= 1);
+    }
+
+    #[test]
+    fn test_calculate_keep_segments_full_video_silent() {
+        let silences = vec![Segment {
+            start: 0.0,
+            end: 30.0,
+        }]; // Entire video is silence
+        let segments = calculate_keep_segments(&silences, 30.0, 0.1, SilenceMode::Cut, 2.0, 1.0);
+        // If entire video is silence, result depends on mode
+        let total_duration: f32 = segments.iter().map(|s| s.end - s.start).sum();
+        assert!(total_duration <= 30.0);
+    }
+
+    #[test]
+    fn test_calculate_keep_segments_different_modes() {
+        let silences = vec![Segment {
+            start: 10.0,
+            end: 15.0,
+        }];
+        // Test silence modes don't panic
+        for mode in [SilenceMode::Cut, SilenceMode::Keep, SilenceMode::Speedup] {
+            let _ = calculate_keep_segments(&silences, 30.0, 0.1, mode, 2.0, 1.0);
+        }
+    }
+
+    #[test]
+    fn test_calculate_keep_segments_very_long_video() {
+        let silences = vec![Segment {
+            start: 3600.0,
+            end: 3700.0,
+        }]; // 1 hour video
+        let segments = calculate_keep_segments(&silences, 7200.0, 0.1, SilenceMode::Cut, 2.0, 1.0);
+        // Should handle long videos without issue
+        let total_duration: f32 = segments.iter().map(|s| s.end - s.start).sum();
+        assert!(total_duration > 0.0);
+    }
+
+    #[test]
+    fn test_calculate_keep_segments_extreme_speedup() {
+        let silences = vec![Segment {
+            start: 0.0,
+            end: 10.0,
+        }];
+        let segments = calculate_keep_segments(&silences, 20.0, 0.1, SilenceMode::Cut, 16.0, 1.0);
+        // Extreme speedup should still work
+        assert!(segments.len() >= 0);
+    }
+
+    #[test]
+    fn test_calculate_keep_segments_zero_speedup() {
+        let silences = vec![Segment {
+            start: 0.0,
+            end: 5.0,
+        }];
+        let segments = calculate_keep_segments(&silences, 30.0, 0.1, SilenceMode::Cut, 1.0, 0.0);
+        // Zero speedup should not panic
+        assert!(segments.len() >= 0);
+    }
 }

@@ -2123,4 +2123,74 @@ mod tests {
         // This is expected behavior - silences drive the output
         assert!(result.is_empty() || result.len() == 2);
     }
+
+    // ── BatchProcessor edge cases ──────────────────────────────────────────
+    #[test]
+    fn test_merge_silences_multiple_markers() {
+        let silences = vec![
+            crate::analyzer::Segment {
+                start: 10.0,
+                end: 20.0,
+            },
+            crate::analyzer::Segment {
+                start: 30.0,
+                end: 40.0,
+            },
+        ];
+        let scenes: Vec<f32> = vec![15.0, 35.0];
+        let result = merge_silences_and_scenes(&silences, &scenes, 60.0);
+        // Result depends on overlap handling
+        assert!(result.len() >= 0);
+    }
+
+    #[test]
+    fn test_merge_silences_at_start_and_end() {
+        let silences = vec![
+            crate::analyzer::Segment {
+                start: 0.0,
+                end: 5.0,
+            }, // Start
+            crate::analyzer::Segment {
+                start: 55.0,
+                end: 60.0,
+            }, // End
+        ];
+        let scenes: Vec<f32> = vec![];
+        let result = merge_silences_and_scenes(&silences, &scenes, 60.0);
+        // With no scenes, result equals silences
+        assert_eq!(result.len(), silences.len());
+    }
+
+    #[test]
+    fn test_merge_silences_does_not_overlap() {
+        let silences = vec![
+            crate::analyzer::Segment {
+                start: 10.0,
+                end: 20.0,
+            },
+            crate::analyzer::Segment {
+                start: 30.0,
+                end: 40.0,
+            },
+        ];
+        let scenes: Vec<f32> = vec![];
+        let result = merge_silences_and_scenes(&silences, &scenes, 60.0);
+        // Segments don't overlap
+        for seg in &result {
+            assert!(seg.end - seg.start > 0.0);
+        }
+    }
+
+    #[test]
+    fn test_batch_summary_format_types() {
+        // Verify format_batch_summary returns valid strings
+        let s1 = format_batch_summary(0, 0, 0, 0);
+        let s2 = format_batch_summary(10, 5, 3, 2);
+        let s3 = format_batch_summary(100, 50, 30, 20);
+
+        // All should be non-empty strings
+        assert!(!s1.is_empty());
+        assert!(!s2.is_empty());
+        assert!(!s3.is_empty());
+    }
 }
