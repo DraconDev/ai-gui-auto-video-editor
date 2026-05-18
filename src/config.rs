@@ -846,13 +846,13 @@ impl Config {
 
     /// Get the default config file path in user's config directory
     pub fn default_config_path() -> Option<PathBuf> {
-        directories::ProjectDirs::from("com", "ai-vid-editor", "ai-vid-editor")
+        directories::ProjectDirs::from("com", "agave", "agave")
             .map(|dirs| dirs.config_dir().join("config.toml"))
     }
 
     /// Get the project-local config path
     pub fn project_config_path() -> PathBuf {
-        PathBuf::from("ai-vid-editor.toml")
+        PathBuf::from("agave.toml")
     }
 
     /// Load configuration with precedence: CLI > project > global > defaults

@@ -33,7 +33,7 @@ fi
 
 RELEASE_ROOT="release"
 DIST_DIR="$RELEASE_ROOT/$VERSION"
-ARCHIVE="$RELEASE_ROOT/ai-vid-editor-$VERSION.tar.gz"
+ARCHIVE="$RELEASE_ROOT/agave-$VERSION.tar.gz"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -80,8 +80,8 @@ rm -rf "$DIST_DIR"
 mkdir -p "$DIST_DIR"/{bin,assets,docs}
 
 info "Copying binary + assets..."
-cp "target/release/ai-vid-editor" "$DIST_DIR/bin/"
-cp assets/icon.svg assets/ai-vid-editor.desktop "$DIST_DIR/assets/"
+cp "target/release/agave" "$DIST_DIR/bin/"
+cp assets/icon.svg assets/agave.desktop "$DIST_DIR/assets/"
 
 info "Bundling docs..."
 cp README.md CHANGELOG.md docs/customer-facing.md docs/release-locations.md "$DIST_DIR/docs/"
@@ -92,7 +92,7 @@ rm -f "$ARCHIVE"
 tar -czf "$ARCHIVE" -C "$DIST_DIR" .
 
 info "Generating checksum..."
-sha256sum "$ARCHIVE" > "$RELEASE_ROOT/ai-vid-editor-$VERSION.sha256"
+sha256sum "$ARCHIVE" > "$RELEASE_ROOT/agave-$VERSION.sha256"
 
 ok "Release $VERSION packaged in $RELEASE_ROOT/"
 
@@ -112,7 +112,7 @@ fi
 if [ "$CARGO_PUBLISH" = true ]; then
     info "Publishing to crates.io..."
     cargo publish
-    ok "Published ai-vid-editor@$VERSION to crates.io"
+    ok "Published agave@$VERSION to crates.io"
 else
     info "Skipping crates.io publish (pass --cargo-publish to enable)"
 fi
@@ -127,7 +127,7 @@ echo "╚═══════════════════════�
 printf "${NC}"
 echo ""
 echo "  Archive:  $ARCHIVE"
-echo "  Checksum: $RELEASE_ROOT/ai-vid-editor-$VERSION.sha256"
+echo "  Checksum: $RELEASE_ROOT/agave-$VERSION.sha256"
 echo "  Git tag:  $TAG"
 echo ""
 echo "Next steps:"

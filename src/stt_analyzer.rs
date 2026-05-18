@@ -26,7 +26,7 @@ pub struct CandleSttAnalyzer;
 impl CandleSttAnalyzer {
     fn ensure_model_cached() -> Result<(std::path::PathBuf, std::path::PathBuf, std::path::PathBuf)>
     {
-        let cache_dir = directories::ProjectDirs::from("com", "ai-vid-editor", "ai-vid-editor")
+        let cache_dir = directories::ProjectDirs::from("com", "agave", "agave")
             .map(|d| d.cache_dir().to_path_buf())
             .unwrap_or_else(std::env::temp_dir);
 

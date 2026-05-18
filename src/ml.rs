@@ -193,7 +193,7 @@ impl FaceDetector {
 
     /// Get the path where the model is stored
     fn get_model_path() -> Result<std::path::PathBuf> {
-        let cache_dir = directories::ProjectDirs::from("com", "ai-vid-editor", "ai-vid-editor")
+        let cache_dir = directories::ProjectDirs::from("com", "agave", "agave")
             .map(|dirs| dirs.cache_dir().to_path_buf())
             .unwrap_or_else(std::env::temp_dir);
 
@@ -370,7 +370,7 @@ impl PersonSegmenter {
     }
 
     fn get_model_path() -> Result<std::path::PathBuf> {
-        let cache_dir = directories::ProjectDirs::from("com", "ai-vid-editor", "ai-vid-editor")
+        let cache_dir = directories::ProjectDirs::from("com", "agave", "agave")
             .map(|dirs| dirs.cache_dir().to_path_buf())
             .unwrap_or_else(std::env::temp_dir);
 
@@ -573,7 +573,7 @@ impl AutoReframeProcessor {
         video_path: &Path,
         sample_fps: f32,
     ) -> Result<Vec<(f32, CropRegion)>> {
-        let temp_dir = crate::utils::TempDir::new("ai-vid-editor-frames")?;
+        let temp_dir = crate::utils::TempDir::new("agave-frames")?;
         let frames = FrameExtractor::extract_frames(video_path, temp_dir.path(), sample_fps)?;
 
         let _video_duration = FrameExtractor::get_video_duration(video_path)?;

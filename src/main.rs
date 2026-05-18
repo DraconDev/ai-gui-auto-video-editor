@@ -41,13 +41,13 @@ use crate::watch::ConfigWatcher;
     version,
     about = "AI video editor - configure via config.toml, CLI for quick overrides",
     long_about = "AI Video Editor\n\n\
-        CONFIG-FIRST: Create ai-vid-editor.toml with all your settings.\n\
+        CONFIG-FIRST: Create agave.toml with all your settings.\n\
         CLI flags are optional overrides.\n\n\
         QUICK START:\n\
-          ai-vid-editor --generate-config > config.toml  # Create config\n\
-          ai-vid-editor --config config.toml             # Run with config\n\
-          ai-vid-editor --project ./my-project           # Project mode\n\n\
-        See ai-vid-editor.example.toml for full documentation."
+          agave --generate-config > config.toml  # Create config\n\
+          agave --config config.toml             # Run with config\n\
+          agave --project ./my-project           # Project mode\n\n\
+        See agave.example.toml for full documentation."
 )]
 pub struct Cli {
     /// Input video file
@@ -66,7 +66,7 @@ pub struct Cli {
     #[arg(group = "output_group", short = 'O', long)]
     pub output_dir: Option<PathBuf>,
 
-    /// Config file path (default: ./ai-vid-editor.toml)
+    /// Config file path (default: ./agave.toml)
     #[arg(short = 'c', long)]
     pub config: Option<PathBuf>,
 
@@ -413,7 +413,7 @@ fn main() -> Result<()> {
     if cli.generate_config {
         let config_content = Config::generate_default_toml()?;
         info!("{}", config_content);
-        info!("\n# Save this to 'ai-vid-editor.toml' or '~/.config/ai-vid-editor/config.toml'");
+        info!("\n# Save this to 'agave.toml' or '~/.config/agave/config.toml'");
         return Ok(());
     }
 
@@ -1043,7 +1043,7 @@ fn run_gui(start_minimized: bool) -> Result<()> {
             .with_inner_size([1150.0, 820.0])
             .with_min_inner_size([1000.0, 700.0])
             .with_title("AI Video Editor")
-            .with_app_id("ai-vid-editor")
+            .with_app_id("agave")
             .with_visible(!start_minimized),
         ..Default::default()
     };
@@ -1261,11 +1261,11 @@ mod tests {
     #[test]
     fn test_cli_no_progress_flag_parsing() {
         // Test that --no-progress can be parsed
-        let cli = Cli::try_parse_from(["ai-vid-editor", "--no-progress"]).unwrap();
+        let cli = Cli::try_parse_from(["agave", "--no-progress"]).unwrap();
         assert!(cli.no_progress);
 
         // Test that it defaults to false
-        let cli = Cli::try_parse_from(["ai-vid-editor"]).unwrap();
+        let cli = Cli::try_parse_from(["agave"]).unwrap();
         assert!(!cli.no_progress);
     }
 }

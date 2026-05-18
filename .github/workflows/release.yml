@@ -52,34 +52,34 @@ jobs:
         if: matrix.os != 'windows-latest'
         run: |
           cd target/${{ matrix.target }}/release
-          mkdir -p ai-vid-editor
-          cp ai-vid-editor ai-vid-editor/
-          cp -r ${{ github.workspace }}/assets ai-vid-editor/
-          cp -r ${{ github.workspace }}/presets ai-vid-editor/
-          cp ${{ github.workspace }}/README.md ai-vid-editor/
-          cp ${{ github.workspace }}/LICENSE ai-vid-editor/ 2>/dev/null || true
-          cp ${{ github.workspace }}/install.sh ai-vid-editor/
-          tar -czvf ai-vid-editor-${{ matrix.target }}.tar.gz ai-vid-editor
+          mkdir -p ai-gui-auto-video-editor
+          cp ai-gui-auto-video-editor ai-gui-auto-video-editor/
+          cp -r ${{ github.workspace }}/assets ai-gui-auto-video-editor/
+          cp -r ${{ github.workspace }}/presets ai-gui-auto-video-editor/
+          cp ${{ github.workspace }}/README.md ai-gui-auto-video-editor/
+          cp ${{ github.workspace }}/LICENSE ai-gui-auto-video-editor/ 2>/dev/null || true
+          cp ${{ github.workspace }}/install.sh ai-gui-auto-video-editor/
+          tar -czvf ai-gui-auto-video-editor-${{ matrix.target }}.tar.gz ai-gui-auto-video-editor
       
       - name: Package (Windows)
         if: matrix.os == 'windows-latest'
         run: |
           cd target/${{ matrix.target }}/release
-          mkdir ai-vid-editor
-          cp ai-vid-editor.exe ai-vid-editor/
-          cp -r ${{ github.workspace }}/assets ai-vid-editor/
-          cp -r ${{ github.workspace }}/presets ai-vid-editor/
-          cp ${{ github.workspace }}/README.md ai-vid-editor/
-          cp ${{ github.workspace }}/install.sh ai-vid-editor/
-          7z a ai-vid-editor-${{ matrix.target }}.zip ai-vid-editor
+          mkdir ai-gui-auto-video-editor
+          cp ai-gui-auto-video-editor.exe ai-gui-auto-video-editor/
+          cp -r ${{ github.workspace }}/assets ai-gui-auto-video-editor/
+          cp -r ${{ github.workspace }}/presets ai-gui-auto-video-editor/
+          cp ${{ github.workspace }}/README.md ai-gui-auto-video-editor/
+          cp ${{ github.workspace }}/install.sh ai-gui-auto-video-editor/
+          7z a ai-gui-auto-video-editor-${{ matrix.target }}.zip ai-gui-auto-video-editor
       
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ai-vid-editor-${{ matrix.target }}
+          name: ai-gui-auto-video-editor-${{ matrix.target }}
           path: |
-            target/${{ matrix.target }}/release/ai-vid-editor-*.tar.gz
-            target/${{ matrix.target }}/release/ai-vid-editor-*.zip
+            target/${{ matrix.target }}/release/ai-gui-auto-video-editor-*.tar.gz
+            target/${{ matrix.target }}/release/ai-gui-auto-video-editor-*.zip
 
   release:
     name: Create Release

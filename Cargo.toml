@@ -26,7 +26,7 @@ exclude = [
     "justfile",
     "install.sh",
     "scripts/",
-    "ai-vid-editor.example.toml",
+    "ai-gui-auto-video-editor.example.toml",
     "CHANGELOG.md",
     "CLA.md",
     "COMMERCIAL-LICENSE.md",

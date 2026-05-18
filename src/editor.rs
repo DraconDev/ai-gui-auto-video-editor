@@ -413,7 +413,7 @@ impl VideoEditor for FfmpegEditor {
     fn stabilize(&self, input: &Path, output: &Path) -> Result<()> {
         let input_str = input.to_str().context("invalid input path")?;
         let output_str = output.to_str().context("invalid output path")?;
-        let trf_file = crate::utils::TempFile::new("ai-vid-editor-vidstab", "trf")?;
+        let trf_file = crate::utils::TempFile::new("agave-vidstab", "trf")?;
         let escaped_trf_path = crate::utils::escape_ffmpeg_filter_path(trf_file.path());
 
         let status1 = Command::new("ffmpeg")
@@ -616,7 +616,7 @@ fn create_trim_chunk_dir(output: &Path) -> Result<PathBuf> {
         .map(|stem| stem.to_string_lossy().to_string())
         .unwrap_or_else(|| "trim".to_string());
     let chunk_dir = parent.join(format!(
-        ".ai-vid-editor-{}-{}-{:x}",
+        ".agave-{}-{}-{:x}",
         stem,
         std::process::id(),
         std::time::SystemTime::now()

@@ -13,7 +13,7 @@ pub fn generate_thumbnail(
 ) -> Result<()> {
     info!("Generating thumbnail...");
 
-    let temp_dir = crate::utils::TempDir::new("ai-vid-editor-thumbs")?;
+    let temp_dir = crate::utils::TempDir::new("agave-thumbs")?;
 
     let status = Command::new("ffmpeg")
         .args([

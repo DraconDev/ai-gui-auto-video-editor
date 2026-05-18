@@ -6,13 +6,13 @@
 # overrides for testing or one-off changes.
 #
 # SAVE LOCATIONS:
-#   - ./ai-vid-editor.toml          (project-local, highest priority)
-#   - ~/.config/ai-vid-editor/config.toml  (user-global)
+#   - ./agave.toml          (project-local, highest priority)
+#   - ~/config/agave/config.toml  (user-global)
 #   - Specify with --config flag   (explicit path)
 #
 # USAGE:
-#   ai-vid-editor --config ai-vid-editor.toml
-#   ai-vid-editor --project ./my-project  (loads config.toml from that folder)
+#   agave --config agave.toml
+#   agave --project ./my-project  (loads config.toml from that folder)
 #
 # =============================================================================
 
@@ -102,7 +102,7 @@ outro = ""
 # WATCH FOLDERS - Multi-Folder Auto-Processing (CLI + GUI)
 # =============================================================================
 # Configure folders to watch. Works in both CLI and GUI modes.
-# The CLI auto-loads ~/.config/ai-vid-editor/config.toml — no --config flag needed.
+# The CLI auto-loads ~/config/agave/config.toml — no --config flag needed.
 #
 # You can have multiple watch folders, each with its own preset:
 
@@ -678,7 +678,7 @@ target_resolution = "1080p"
 # HOW TO USE:
 #   1. Set enabled = true
 #   2. Set input_dir and output_dir in [paths]
-#   3. Run: ai-vid-editor
+#   3. Run: agave
 #   4. Drop videos into input_dir
 #
 # CLI equivalent: -w, --watch <directory>
@@ -703,10 +703,10 @@ interval = 5
 # from their defaults. Your explicit config values are preserved.
 #
 # USAGE:
-#   ai-vid-editor --preset youtube
-#   ai-vid-editor --preset shorts
-#   ai-vid-editor --preset podcast
-#   ai-vid-editor --preset minimal
+#   agave --preset youtube
+#   agave --preset shorts
+#   agave --preset podcast
+#   agave --preset minimal
 #
 # PRESET DETAILS:
 #
@@ -748,7 +748,7 @@ interval = 5
 # Create a folder for your project:
 #
 #   my-youtube-channel/
-#   ├── config.toml        ← This file (rename from ai-vid-editor.example.toml)
+#   ├── config.toml        ← This file (rename from agave.example.toml)
 #   ├── watch/             ← Drop raw videos here
 #   │   ├── video1.mp4
 #   │   └── video2.mp4
@@ -784,8 +784,8 @@ interval = 5
 #   interval = 5
 #
 # RUN:
-#   ai-vid-editor --project ./my-youtube-channel
-#   # or just: ai-vid-editor (auto-loads ~/.config/ai-vid-editor/config.toml)
+#   agave --project ./my-youtube-channel
+#   # or just: agave (auto-loads ~/config/agave/config.toml)
 #
 # That's it! Drop videos into watch/ and they're automatically processed.
 

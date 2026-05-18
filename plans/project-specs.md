@@ -41,7 +41,7 @@
 | Export (SRT, FCPXML, EDL) | ✅ | - | Subtitles, timelines |
 | Desktop notifications | ✅ | - | `--notify` flag |
 | Unified binary | ✅ | ✅ | `--gui` flag launches GUI |
-| Config auto-loading | ✅ | ✅ | `~/.config/ai-vid-editor/config.toml` loaded automatically |
+| Config auto-loading | ✅ | ✅ | `~/.config/agave/config.toml` loaded automatically |
 | Progress feedback | ✅ | - | Timestamped stage output during processing |
 
 ### GUI Structure
@@ -141,7 +141,7 @@ Config
 ### Phase 4: Watcher Integration
 - [x] CLI watches `[[paths.watch_folders]]` from config (same as GUI)
 - [x] Timestamped progress output during processing
-- [x] Config auto-loading from `~/.config/ai-vid-editor/config.toml`
+- [x] Config auto-loading from `~/.config/agave/config.toml`
 - [ ] Spawn watcher threads from GUI
 - [ ] Real-time activity log updates in GUI
 - [ ] Processing queue visualization
@@ -149,7 +149,7 @@ Config
 ### Phase 5: Custom Presets
 - [ ] Save folder settings as new preset
 - [ ] Preset management UI (rename, delete)
-- [ ] Preset library in `~/.config/ai-vid-editor/presets/`
+- [ ] Preset library in `~/.config/agave/presets/`
 
 ### Phase 6: UX Enhancements
 - [ ] Drag-drop folder paths
@@ -196,16 +196,16 @@ AppState              Config
 auto_save_config()
   │
   ▼
-TOML file (~/.config/ai-vid-editor/config.toml)
+TOML file (~/.config/agave/config.toml)
 ```
 
 ### Config File Locations
 
-1. `./ai-vid-editor.toml` (project-local, highest priority)
-2. `~/.config/ai-vid-editor/config.toml` (user-global, **auto-loaded**)
+1. `./agave.toml` (project-local, highest priority)
+2. `~/.config/agave/config.toml` (user-global, **auto-loaded**)
 3. `--config <path>` (explicit, overrides both)
 
-The global config (`~/.config/ai-vid-editor/config.toml`) is loaded automatically by both CLI and GUI — no `--config` flag needed. The `[[paths.watch_folders]]` section is shared between both modes.
+The global config (`~/.config/agave/config.toml`) is loaded automatically by both CLI and GUI — no `--config` flag needed. The `[[paths.watch_folders]]` section is shared between both modes.
 
 ---
 
@@ -285,14 +285,14 @@ just test
 ## File Structure
 
 ```
-ai-vid-editor/
+agave/
 ├── Cargo.toml
 ├── README.md
 ├── justfile
 ├── install.sh               # Install script with desktop integration
 ├── assets/
 │   ├── icon.svg             # Application icon
-│   └── ai-vid-editor.desktop # Desktop entry
+│   └── agave.desktop # Desktop entry
 ├── plans/
 │   └── project-specs.md     # This file
 ├── presets/
@@ -318,5 +318,5 @@ ai-vid-editor/
 │   ├── common/mod.rs
 │   ├── ml_integration.rs
 │   └── pipeline_integration.rs
-└── ai-vid-editor.example.toml  # Example config file
+└── agave.example.toml  # Example config file
 ```

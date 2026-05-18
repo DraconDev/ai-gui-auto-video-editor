@@ -1,4 +1,4 @@
-# cargo-deny configuration for ai-vid-editor
+# cargo-deny configuration for agave
 # Run with: cargo deny check
 
 [graph]
@@ -41,7 +41,7 @@ confidence-threshold = 0.8
 # Allow our own crate (AGPL-3.0-only) — we control this code
 [[licenses.exceptions]]
 allow = ["AGPL-3.0-only"]
-crate = "ai-vid-editor"
+crate = "agave"
 
 [[licenses.clarify]]
 crate = "ring"

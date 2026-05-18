@@ -1,6 +1,6 @@
 # AGAVE - AI GUI Auto Video Editor
 
-[![crates.io](https://img.shields.io/crates/v/ai-gui-auto-video-editor.svg)](https://crates.io/crates/ai-gui-auto-video-editor) [![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/DraconDev/ai-vid-editor?label=)](https://github.com/DraconDev/ai-vid-editor/releases) [![CI](https://github.com/DraconDev/ai-vid-editor/actions/workflows/ci.yml/badge.svg)](https://github.com/DraconDev/ai-vid-editor/actions/workflows/ci.yml) [![License](https://img.shields.io/crates/l/ai-gui-auto-video-editor.svg)](https://crates.io/crates/ai-gui-auto-video-editor)
+[![crates.io](https://img.shields.io/crates/v/ai-gui-auto-video-editor.svg)](https://crates.io/crates/ai-gui-auto-video-editor) [![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/DraconDev/agave?label=)](https://github.com/DraconDev/agave/releases) [![CI](https://github.com/DraconDev/agave/actions/workflows/ci.yml/badge.svg)](https://github.com/DraconDev/agave/actions/workflows/ci.yml) [![License](https://img.shields.io/crates/l/ai-gui-auto-video-editor.svg)](https://crates.io/crates/ai-gui-auto-video-editor)
 
 AGAVE (AI GUI Auto Video Editor) is a command-line and GUI tool for automated video editing using AI. Designed for content creators who want to drop in raw footage and get polished results without manual editing.
 
@@ -38,14 +38,14 @@ just test     # Run tests
 ### From crates.io
 
 ```bash
-cargo install ai-vid-editor
+cargo install ai-gui-auto-video-editor
 ```
 
 ### From Source
 
 ```bash
-git clone https://github.com/DraconDev/ai-vid-editor.git
-cd ai-vid-editor
+git clone https://github.com/DraconDev/agave.git
+cd agave
 ./install.sh --user    # Install to ~/.local/bin (no sudo)
 # or
 sudo ./install.sh      # Install to /usr/local/bin
@@ -58,9 +58,9 @@ The install script will:
 
 ### Releases & Distribution
 
-- Download pre-built binaries from [GitHub Releases](https://github.com/DraconDev/ai-vid-editor/releases).
+- Download pre-built binaries from [GitHub Releases](https://github.com/DraconDev/agave/releases).
 - Run `scripts/release.sh` to build, bundle, and checksum a release tarball locally.
-- Also available on [crates.io](https://crates.io/crates/ai-vid-editor): `cargo install ai-vid-editor`.
+- Also available on [crates.io](https://crates.io/crates/agave): `cargo install ai-gui-auto-video-editor`.
 
 ### Requirements
 
@@ -79,13 +79,13 @@ nix-shell  # or: nix develop
 
 Launch without arguments from desktop or run:
 ```bash
-ai-vid-editor
-ai-vid-editor --gui    # Explicit
+agave
+agave --gui    # Explicit
 ```
 
 **Configure once, walk away:**
 ```bash
-ai-vid-editor --gui --start-minimized
+agave --gui --start-minimized
 ```
 Starts watching configured folders with no window visible. Desktop notifications are sent when files complete. Configure folders via GUI when needed.
 
@@ -95,13 +95,13 @@ The GUI provides a visual interface for managing watch folders and settings.
 
 ```bash
 # Batch process a directory
-ai-vid-editor -I ./raw_videos -O ./edited --preset youtube
+agave -I ./raw_videos -O ./edited --preset youtube
 
 # Parallel batch processing (4 workers)
-ai-vid-editor -I ./raw_videos -O ./edited --parallel-workers 4
+agave -I ./raw_videos -O ./edited --parallel-workers 4
 
 # Resume an interrupted batch (progress is auto-saved)
-ai-vid-editor -I ./raw_videos -O ./edited
+agave -I ./raw_videos -O ./edited
 ```
 
 ## CLI Options
@@ -185,9 +185,9 @@ ai-vid-editor -I ./raw_videos -O ./edited
 
 ## Configuration
 
-Create `ai-vid-editor.toml` in your project directory or `~/.config/ai-vid-editor/config.toml`:
+Create `agave.toml` in your project directory or `~/.config/agave/config.toml`:
 
-Config from `~/.config/ai-vid-editor/config.toml` is loaded automatically — no `--config` flag needed.
+Config from `~/.config/agave/config.toml` is loaded automatically — no `--config` flag needed.
 
 ```toml
 [paths]
@@ -256,10 +256,10 @@ The `[[paths.watch_folders]]` section works for both CLI and GUI. Drop a video i
 
 ```bash
 # Uses watch_folders from config — just run:
-ai-vid-editor
+agave
 
 # Or override with a specific folder:
-ai-vid-editor --watch ./incoming -O ./processed
+agave --watch ./incoming -O ./processed
 ```
 
 Progress is shown with timestamps during processing:
@@ -289,7 +289,7 @@ cargo build --features cli,gui
 ## Testing
 
 - `cargo test --all-features` exercises config parsing, presets, silence detection, ML helpers, exporters, and CLI/GUI glue. `scripts/release.sh` already runs that plus `cargo clippy --all-features` before packaging each release.
-- For localized checks run `cargo test config::tests::test_preset_youtube` or `cargo test --package ai-vid-editor -- ml` to focus the suite on configuration/ML helpers.
+- For localized checks run `cargo test config::tests::test_preset_youtube` or `cargo test --package agave -- ml` to focus the suite on configuration/ML helpers.
 
 ## Project Status
 

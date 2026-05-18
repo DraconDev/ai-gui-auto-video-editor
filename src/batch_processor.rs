@@ -183,7 +183,7 @@ fn concatenate_videos(
             format!("file '{}'\n", escaped)
         })
         .collect();
-    let list_file = TempFile::new("ai-vid-editor-concat-list", "txt")?;
+    let list_file = TempFile::new("agave-concat-list", "txt")?;
     std::fs::write(list_file.path(), list_content)?;
 
     let status = std::process::Command::new("ffmpeg")

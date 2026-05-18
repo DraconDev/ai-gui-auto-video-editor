@@ -75,7 +75,7 @@ impl BatchProgress {
             .file_name()
             .and_then(|n| n.to_str())
             .unwrap_or("default");
-        std::env::temp_dir().join(format!("ai-vid-editor-progress-{dir_name}.json"))
+        std::env::temp_dir().join(format!("agave-progress-{dir_name}.json"))
     }
 }
 
@@ -156,7 +156,7 @@ mod tests {
         let input_dir = PathBuf::from("/videos/holiday");
         let path = BatchProgress::default_path(&input_dir);
         let path_str = path.to_string_lossy();
-        assert!(path_str.contains("ai-vid-editor-progress"));
+        assert!(path_str.contains("agave-progress"));
         assert!(path_str.contains("holiday"));
     }
 
