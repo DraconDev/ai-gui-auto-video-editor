@@ -41,7 +41,8 @@ jobs:
       - name: Check compilation (CLI only)
         run: cargo check --no-default-features --features cli
 
-      - name: Check compilation (GUI only)
+      # GUI feature implies CLI, so this is equivalent to default features
+      - name: Check compilation (GUI + CLI)
         run: cargo check --no-default-features --features gui
 
   test:
@@ -164,10 +165,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Rust ${{ vars.MSRV || '1.87.0' }}
+      - name: Install Rust 1.88.0
         uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: ${{ vars.MSRV || '1.87.0' }}
+          toolchain: 1.88.0
 
       - name: Verify MSRV compiles
         run: cargo check --all-features

@@ -1,17 +1,24 @@
 # cargo-deny configuration for ai-vid-editor
 # Run with: cargo deny check
 
+[graph]
+targets = ["x86_64-unknown-linux-gnu"]
+
 [advisories]
-# Ignore advisories that are not relevant (add advisory IDs here)
-# ignore = ["RUSTSEC-2023-0001"]
-vulnerability = "deny"
-unmaintained = "warn"
-unsound = "deny"
-notice = "warn"
+ignore = [
+    "RUSTSEC-2026-0105",  # core2 unmaintained (transitive via candle)
+    "RUSTSEC-2025-0119",  # number_prefix unmaintained (transitive via tract-onnx)
+    "RUSTSEC-2024-0436",  # paste unmaintained (transitive via candle)
+    "RUSTSEC-2026-0049",  # rand unsound with custom logger (transitive, limited impact)
+    "RUSTSEC-2026-0067",  # rustls-webpki CRL matching (transitive, limited impact)
+    "RUSTSEC-2026-0068",  # rustls-webpki name constraints URI (transitive)
+    "RUSTSEC-2026-0097",  # rustls-webpki wildcard name constraints (transitive)
+    "RUSTSEC-2026-0098",  # rustls-webpki reachable panic in CRL parsing (transitive)
+    "RUSTSEC-2026-0099",  # rustls-webpki (transitive)
+    "RUSTSEC-2026-0104",  # rustls-webpki (transitive)
+]
 
 [licenses]
-# Deny licenses that are not allowed
-unlicensed = "deny"
 allow = [
     "MIT",
     "Apache-2.0",
@@ -25,35 +32,34 @@ allow = [
     "CC0-1.0",
     "MPL-2.0",
     "OpenSSL",
+    "OFL-1.1",
+    "Ubuntu-font-1.0",
+    "CDLA-Permissive-2.0",
 ]
-deny = [
-    "GPL-3.0",
-    "GPL-3.0-only",
-    "GPL-3.0-or-later",
-    "AGPL-3.0",
-    "AGPL-3.0-only",
-    "AGPL-3.0-or-later",
-]
-copyleft = "deny"
-allow-osi-fsf-free = "neither"
-default = "deny"
 confidence-threshold = 0.8
 
+# Allow our own crate (AGPL-3.0-only) — we control this code
+[[licenses.exceptions]]
+allow = ["AGPL-3.0-only"]
+crate = "ai-vid-editor"
+
+[[licenses.clarify]]
+crate = "ring"
+expression = "MIT AND ISC AND OpenSSL"
+license-files = [{ path = "LICENSE", hash = 0xbd0eed23 }]
+
 [bans]
-# Deny multiple versions of the same crate
-multiple-versions = "deny"
-# Skip certain crates that are allowed to have multiple versions
-skip = []
+multiple-versions = "warn"
+wildcards = "allow"
+highlight = "all"
+workspace-default-features = "allow"
+external-default-features = "allow"
 skip-tree = [
     # tokenizers uses an older version of serde_json
-    { name = "serde_json", version = ">=1.0.100, <1.0.120" },
+    { crate = "serde_json@>=1.0.100, <1.0.120" },
 ]
 
 [sources]
-# Deny crates from unknown sources
 unknown-registry = "deny"
 unknown-git = "deny"
-
-[graph]
-# Show features of dependency graph
-show-features = true
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]

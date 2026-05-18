@@ -1,6 +1,6 @@
 [package]
 name = "ai-vid-editor"
-version = "19.58.1"
+version = "19.58.0"
 edition = "2024"
 authors = ["DraconDev"]
 description = "AI-powered video editor for content creators"
@@ -10,7 +10,7 @@ homepage = "https://github.com/DraconDev/ai-vid-editor"
 readme = "README.md"
 keywords = ["video", "editor", "ai", "ffmpeg", "automation"]
 categories = ["command-line-utilities", "multimedia::video"]
-rust-version = "1.87"
+rust-version = "1.88"
 exclude = [
     ".dracon/",
     ".ralph/",
@@ -71,7 +71,7 @@ ctrlc = { version = "3", optional = true }
 [features]
 default = ["cli", "gui"]
 cli = ["clap", "notify-rust", "ctrlc"]
-gui = ["eframe", "egui", "rfd", "chrono", "notify-rust"]
+gui = ["eframe", "egui", "rfd", "chrono", "notify-rust", "cli"]
 
 [dev-dependencies]
 tempfile = "3.25.0"
