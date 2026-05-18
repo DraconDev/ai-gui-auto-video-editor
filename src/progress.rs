@@ -219,4 +219,64 @@ mod tests {
         assert_eq!(loaded.failed.len(), 1);
         Ok(())
     }
+
+    // ── BatchProgress method tests ──────────────────────────────────────────
+    #[test]
+    fn test_batch_progress_completed_count() {
+        let mut progress = BatchProgress::default();
+        progress.total = 5;
+        progress.completed.insert(PathBuf::from("/a.mp4"), 123);
+        progress.completed.insert(PathBuf::from("/b.mp4"), 124);
+
+        assert_eq!(progress.completed.len(), 2);
+        assert_eq!(progress.total - progress.completed.len(), 3);
+    }
+
+    #[test]
+    fn test_batch_progress_failed_count() {
+        let mut progress = BatchProgress::default();
+        progress.total = 5;
+        progress.failed.insert(PathBuf::from("/a.mp4"));
+
+        assert_eq!(progress.failed.len(), 1);
+    }
+
+    #[test]
+    fn test_batch_progress_remaining_count() {
+        let mut progress = BatchProgress::default();
+        progress.total = 10;
+        progress.completed.insert(PathBuf::from("/a.mp4"), 123);
+        progress.completed.insert(PathBuf::from("/b.mp4"), 124);
+        progress.failed.insert(PathBuf::from("/c.mp4"));
+
+        let remaining = progress.total - progress.completed.len();
+        assert_eq!(remaining, 8);
+    }
+
+    #[test]
+    fn test_batch_progress_from_file_not_found() -> Result<()> {
+        let dir = tempdir()?;
+        let path = dir.path().join("nonexistent.json");
+
+        let result = BatchProgress::from_file(&path);
+        assert!(result.is_err(), "Should error on missing file");
+        Ok(())
+    }
+
+    #[test]
+    fn test_batch_progress_to_file_roundtrip() -> Result<()> {
+        let dir = tempdir()?;
+        let path = dir.path().join("p2.json");
+
+        let mut progress = BatchProgress::default();
+        progress.total = 10;
+        progress.completed.insert(PathBuf::from("/test.mp4"), 456);
+
+        progress.to_file(&path)?;
+        assert!(path.exists());
+
+        let loaded = BatchProgress::from_file(&path)?;
+        assert_eq!(loaded.total, 10);
+        Ok(())
+    }
 }

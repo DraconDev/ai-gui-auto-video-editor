@@ -2124,4 +2124,88 @@ enhance = false
         assert!(deserialized.validate().is_ok());
         Ok(())
     }
+
+    // ── VideoResolution edge cases ────────────────────────────────────────
+    #[test]
+    fn test_video_resolution_all_variants_have_dimensions() {
+        use VideoResolution::*;
+        for res in [
+            Hd720p,
+            Fhd1080p,
+            Qhd1440p,
+            Uhd4k,
+            Vertical1080p,
+            Vertical720p,
+        ] {
+            let (w, h) = res.dimensions();
+            assert!(w > 0 && h > 0, "Invalid dimensions for {:?}", res);
+        }
+    }
+
+    #[test]
+    fn test_video_resolution_ffmpeg_scale_consistency() {
+        use VideoResolution::*;
+        for res in [Hd720p, Fhd1080p, Vertical1080p] {
+            let (w, h) = res.dimensions();
+            let scale = res.to_ffmpeg_scale();
+            assert_eq!(scale, format!("{}:{}", w, h));
+        }
+    }
+
+    #[test]
+    fn test_video_resolution_vertical_dimensions() {
+        use VideoResolution::*;
+        let (w, h) = Vertical1080p.dimensions();
+        assert!(h > w, "Vertical resolution should have height > width");
+    }
+
+    #[test]
+    fn test_video_resolution_horizontal_dimensions() {
+        use VideoResolution::*;
+        let (w, h) = Fhd1080p.dimensions();
+        assert!(w > h, "Horizontal resolution should have width > height");
+    }
+
+    // ── Preset edge cases ─────────────────────────────────────────────────
+    #[test]
+    fn test_preset_parse_name_case_insensitive() {
+        use Preset::*;
+        assert_eq!(Preset::parse_name("youtube"), Some(Youtube));
+        assert_eq!(Preset::parse_name("YOUTUBE"), Some(Youtube));
+        assert_eq!(Preset::parse_name("YouTube"), Some(Youtube));
+    }
+
+    #[test]
+    fn test_preset_parse_name_known_aliases() {
+        use Preset::*;
+        // These are actual aliases supported by the parser
+        assert_eq!(Preset::parse_name("youtube"), Some(Youtube));
+        assert_eq!(Preset::parse_name("ytshorts"), Some(Shorts));
+        assert_eq!(Preset::parse_name("shorts"), Some(Shorts));
+        assert_eq!(Preset::parse_name("tiktok"), Some(Tiktok));
+        assert_eq!(Preset::parse_name("reels"), Some(Reels));
+        assert_eq!(Preset::parse_name("instagram"), Some(Reels));
+        assert_eq!(Preset::parse_name("podcast"), Some(Podcast));
+        assert_eq!(Preset::parse_name("twitter"), Some(Twitter));
+        assert_eq!(Preset::parse_name("x"), Some(Twitter));
+        assert_eq!(Preset::parse_name("minimal"), Some(Minimal));
+    }
+
+    #[test]
+    fn test_preset_as_str_all_variants() {
+        use Preset::*;
+        for preset in [Youtube, Shorts, Tiktok, Reels, Podcast, Twitter, Minimal] {
+            let s = preset.as_str();
+            assert!(!s.is_empty(), "as_str should not be empty for {:?}", preset);
+        }
+    }
+
+    #[test]
+    fn test_preset_roundtrip_parse_as_str() {
+        use Preset::*;
+        for preset in [Youtube, Shorts, Tiktok, Reels, Podcast, Twitter, Minimal] {
+            let s = preset.as_str();
+            assert_eq!(Preset::parse_name(s), Some(preset));
+        }
+    }
 }
