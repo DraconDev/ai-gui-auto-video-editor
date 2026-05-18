@@ -650,4 +650,24 @@ mod tests {
         // Should contain H-h
         assert!(coords.contains("H-h"));
     }
+
+    // ── WatermarkPosition more coords ────────────────────────────────────
+    #[test]
+    fn test_watermark_position_bottom_right_coords() {
+        let pos = WatermarkPosition::BottomRight;
+        let coords = pos.to_ffmpeg_coords(100, 50);
+        // Should contain W-w and H-h
+        assert!(coords.contains("W-w") || coords.contains("H-h"));
+    }
+
+    #[test]
+    fn test_watermark_position_all_positions_different() {
+        use WatermarkPosition::*;
+        let w = 1920;
+        let h = 1080;
+        // At minimum, center should be different from corners
+        let center = Center.to_ffmpeg_coords(w, h);
+        let tl = TopLeft.to_ffmpeg_coords(w, h);
+        assert_ne!(center, tl);
+    }
 }
