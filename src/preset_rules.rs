@@ -287,4 +287,63 @@ mod tests {
         assert_eq!(rule.pattern, "test");
         assert!(matches!(rule.preset, Preset::Podcast));
     }
+
+    // ── PresetRule edge cases ───────────────────────────────────────────────
+    #[test]
+    fn test_preset_rule_pattern_lowercase() {
+        let rule = PresetRule::new("TEST", Preset::Youtube);
+        // Pattern should be lowercased
+        assert_eq!(rule.pattern, "test");
+    }
+
+    #[test]
+    fn test_preset_rule_empty_pattern() {
+        let rule = PresetRule::new("", Preset::Minimal);
+        assert_eq!(rule.pattern, "");
+    }
+
+    #[test]
+    fn test_preset_for_file_pattern_case_insensitive() {
+        let rules = vec![PresetRule::new("podcast", Preset::Podcast)];
+        // Should match regardless of case
+        assert_eq!(
+            preset_for_file(Path::new("PODCAST.mp4"), &rules, Preset::Minimal),
+            Preset::Podcast
+        );
+        assert_eq!(
+            preset_for_file(Path::new("Podcast.mp4"), &rules, Preset::Minimal),
+            Preset::Podcast
+        );
+    }
+
+    #[test]
+    fn test_preset_for_file_substring_in_path() {
+        let rules = vec![PresetRule::new("interview", Preset::Podcast)];
+        // Substring match
+        assert_eq!(
+            preset_for_file(Path::new("my_interview.mp4"), &rules, Preset::Minimal),
+            Preset::Podcast
+        );
+    }
+
+    #[test]
+    fn test_preset_for_file_no_substring_in_path() {
+        let rules = vec![PresetRule::new("podcast", Preset::Podcast)];
+        // Pattern not in path
+        let result = preset_for_file(Path::new("/videos/speech.mp4"), &rules, Preset::Twitter);
+        assert_eq!(result, Preset::Twitter);
+    }
+
+    #[test]
+    fn test_preset_rule_order_matters() {
+        let rules = vec![
+            PresetRule::new("podcast", Preset::Podcast),
+            PresetRule::new("pod", Preset::Minimal), // Different pattern
+        ];
+        // First matching rule wins
+        assert_eq!(
+            preset_for_file(Path::new("podcast_ep1.mp4"), &rules, Preset::Minimal),
+            Preset::Podcast
+        );
+    }
 }

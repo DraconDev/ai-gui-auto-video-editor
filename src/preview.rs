@@ -193,4 +193,54 @@ mod tests {
         let preview = preview_path(output);
         assert!(preview.to_string_lossy().contains("_preview"));
     }
+
+    // ── preview_path more edge cases ─────────────────────────────────────
+    #[test]
+    fn test_preview_path_all_video_formats() {
+        let extensions = ["mp4", "mov", "avi", "mkv", "webm", "flv"];
+        for ext in extensions.iter() {
+            let path_str = format!("video.{}", ext);
+            let output = Path::new(path_str.as_str());
+            let preview = preview_path(output);
+            assert!(preview.to_string_lossy().contains("_preview"));
+            assert!(preview.to_string_lossy().ends_with(&format!(".{}", ext)));
+        }
+    }
+
+    #[test]
+    fn test_preview_path_preserves_subdir() {
+        let output = Path::new("/path/to/videos/video.mp4");
+        let preview = preview_path(output);
+        let preview_str = preview.to_string_lossy();
+        // Should preserve directory structure
+        assert!(preview_str.contains("/path/to/videos/"));
+        assert!(preview_str.contains("_preview"));
+    }
+
+    #[test]
+    fn test_preview_path_base_filename() {
+        let output = Path::new("video.mp4");
+        let preview = preview_path(output);
+        let preview_str = preview.to_string_lossy();
+        // Should have preview suffix
+        assert!(preview_str.contains("_preview"));
+        assert!(preview_str.ends_with(".mp4"));
+    }
+
+    #[test]
+    fn test_preview_path_with_date() {
+        let output = Path::new("video_20240101.mp4");
+        let preview = preview_path(output);
+        // Should add _preview before extension
+        assert!(preview.to_string_lossy().contains("_preview"));
+    }
+
+    #[test]
+    fn test_preview_path_missing_extension() {
+        let output = Path::new("video_no_ext");
+        let preview = preview_path(output);
+        let preview_str = preview.to_string_lossy();
+        // Should still have preview suffix
+        assert!(preview_str.contains("_preview"));
+    }
 }

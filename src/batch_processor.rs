@@ -2198,8 +2198,14 @@ mod tests {
     #[test]
     fn test_merge_silences_gap_calculation() {
         let silences = vec![
-            crate::analyzer::Segment { start: 0.0, end: 5.0 },
-            crate::analyzer::Segment { start: 10.0, end: 15.0 },
+            crate::analyzer::Segment {
+                start: 0.0,
+                end: 5.0,
+            },
+            crate::analyzer::Segment {
+                start: 10.0,
+                end: 15.0,
+            },
         ];
         // Gap between silences
         let gap = silences[1].start - silences[0].end;
@@ -2209,8 +2215,14 @@ mod tests {
     #[test]
     fn test_merge_silences_total_removed() {
         let silences = vec![
-            crate::analyzer::Segment { start: 5.0, end: 10.0 },
-            crate::analyzer::Segment { start: 20.0, end: 25.0 },
+            crate::analyzer::Segment {
+                start: 5.0,
+                end: 10.0,
+            },
+            crate::analyzer::Segment {
+                start: 20.0,
+                end: 25.0,
+            },
         ];
         let total_removed: f32 = silences.iter().map(|s| s.end - s.start).sum();
         // Total removed is 10 seconds
@@ -2220,9 +2232,18 @@ mod tests {
     #[test]
     fn test_merge_silences_sequential() {
         let silences = vec![
-            crate::analyzer::Segment { start: 0.0, end: 5.0 },
-            crate::analyzer::Segment { start: 5.0, end: 10.0 },
-            crate::analyzer::Segment { start: 10.0, end: 15.0 },
+            crate::analyzer::Segment {
+                start: 0.0,
+                end: 5.0,
+            },
+            crate::analyzer::Segment {
+                start: 5.0,
+                end: 10.0,
+            },
+            crate::analyzer::Segment {
+                start: 10.0,
+                end: 15.0,
+            },
         ];
         // Sequential silences form continuous region
         let total: f32 = silences.iter().map(|s| s.end - s.start).sum();
