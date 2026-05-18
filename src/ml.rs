@@ -1073,4 +1073,60 @@ mod tests {
         // Duration=0 should fall back to static crop
         assert!(filter.contains("crop=iw*0.5:ih:iw*0.2:0"));
     }
+
+    // ── SegmentationMask bounds tests ──────────────────────────────────────
+    #[test]
+    fn test_segmentation_mask_manual_construction() {
+        let mask = SegmentationMask {
+            data: vec![0.5; 100],
+            width: 10,
+            height: 10,
+        };
+        // Out of bounds returns 0
+        assert_eq!(mask.get(100, 100), 0.0);
+        assert_eq!(mask.get(5, 5), 0.5); // Valid bounds, should return data
+    }
+
+    #[test]
+    fn test_segmentation_mask_manual_boundary() {
+        let mask = SegmentationMask {
+            data: vec![0.0; 100],
+            width: 10,
+            height: 10,
+        };
+        // At the boundary (9, 9) should work
+        let val = mask.get(9, 9);
+        assert_eq!(val, 0.0);
+    }
+
+    // ── CropRegion utility tests ──────────────────────────────────────────
+    #[test]
+    fn test_crop_region_fields_exist() {
+        let region = CropRegion {
+            x: 0.25,
+            y: 0.0,
+            width: 0.5,
+            height: 1.0,
+        };
+        // All fields should be accessible
+        assert_eq!(region.x, 0.25);
+        assert_eq!(region.y, 0.0);
+        assert_eq!(region.width, 0.5);
+        assert_eq!(region.height, 1.0);
+    }
+
+    #[test]
+    fn test_crop_region_center_16_9() {
+        let region = CropRegion::center_crop_9_16(16.0 / 9.0);
+        // Width should be less than height for vertical crop
+        assert!(region.width < 1.0);
+        assert_eq!(region.height, 1.0);
+    }
+
+    #[test]
+    fn test_crop_region_center_vertical() {
+        let region = CropRegion::center_crop_9_16(9.0 / 16.0);
+        // Vertical video - function always returns full height
+        assert_eq!(region.height, 1.0);
+    }
 }
