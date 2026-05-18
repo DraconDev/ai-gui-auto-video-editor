@@ -503,4 +503,67 @@ mod tests {
         .unwrap();
         assert!(output.exists(), "text watermarked output should exist");
     }
+
+    // ── WatermarkPosition pure logic tests (no FFmpeg needed) ───────────────
+
+    #[test]
+    fn test_watermark_position_all_positions() {
+        let positions = vec![
+            WatermarkPosition::TopLeft,
+            WatermarkPosition::TopRight,
+            WatermarkPosition::BottomLeft,
+            WatermarkPosition::BottomRight,
+            WatermarkPosition::Center,
+        ];
+        for pos in positions {
+            let coords = pos.to_ffmpeg_coords(100, 50);
+            assert!(!coords.is_empty(), "Every position should produce coords");
+        }
+    }
+
+    #[test]
+    fn test_watermark_position_parse_name_case_insensitive() {
+        // Test that parsing is case-insensitive
+        assert_eq!(
+            WatermarkPosition::parse_name("TOP-LEFT"),
+            Some(WatermarkPosition::TopLeft)
+        );
+        assert_eq!(
+            WatermarkPosition::parse_name("Top-Left"),
+            Some(WatermarkPosition::TopLeft)
+        );
+        assert_eq!(
+            WatermarkPosition::parse_name("CENTER"),
+            Some(WatermarkPosition::Center)
+        );
+        assert_eq!(
+            WatermarkPosition::parse_name("Middle"),
+            Some(WatermarkPosition::Center)
+        );
+    }
+
+    #[test]
+    fn test_watermark_position_parse_name_unknown() {
+        assert_eq!(WatermarkPosition::parse_name("invalid"), None);
+        assert_eq!(WatermarkPosition::parse_name(""), None);
+        assert_eq!(WatermarkPosition::parse_name("top_center"), None);
+        assert_eq!(WatermarkPosition::parse_name("bottom-center"), None);
+    }
+
+    #[test]
+    fn test_watermark_position_coords_padding() {
+        // Verify that padding is consistently applied
+        let top_left = WatermarkPosition::TopLeft.to_ffmpeg_coords(100, 50);
+        assert_eq!(top_left, "10:10", "TopLeft should use padding");
+
+
+        let top_right = WatermarkPosition::TopRight.to_ffmpeg_coords(100, 50);
+        assert_eq!(top_right, "W-w-10:10", "TopRight should use padding");
+    }
+
+    #[test]
+    fn test_watermark_position_center_formula() {
+        let center = WatermarkPosition::Center.to_ffmpeg_coords(100, 50);
+        assert_eq!(center, "(W-w)/2:(H-h)/2", "Center uses centering formula");
+    }
 }
