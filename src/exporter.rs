@@ -1494,4 +1494,90 @@ mod tests {
         assert!(content.contains("FCM:"));
         Ok(())
     }
+
+    // ── Export EDL edge cases ─────────────────────────────────────────────
+    #[test]
+    fn test_export_edl_two_segments() -> Result<()> {
+        let temp_dir = tempfile::tempdir()?;
+        let output = temp_dir.path().join("output.edl");
+        let input = temp_dir.path().join("video.mp4");
+        let _ = std::fs::write(&input, b"video")?;
+
+        let segments = vec![
+            ProcessedSegment {
+                start: 0.0,
+                end: 10.0,
+                speed: 1.0,
+            },
+            ProcessedSegment {
+                start: 10.0,
+                end: 20.0,
+                speed: 1.0,
+            },
+        ];
+
+        export_edl(&segments, &input, &output, 24.0)?;
+        let content = fs::read_to_string(&output)?;
+        assert!(content.contains("FCM:"));
+        Ok(())
+    }
+
+    #[test]
+    fn test_export_edl_different_fps() -> Result<()> {
+        let temp_dir = tempfile::tempdir()?;
+        let output = temp_dir.path().join("output.edl");
+        let input = temp_dir.path().join("video.mp4");
+        let _ = std::fs::write(&input, b"video")?;
+
+        let segments = vec![ProcessedSegment {
+            start: 0.0,
+            end: 5.0,
+            speed: 1.0,
+        }];
+
+        export_edl(&segments, &input, &output, 60.0)?;
+        let content = fs::read_to_string(&output)?;
+        assert!(!content.is_empty());
+        Ok(())
+    }
+
+    // ── Export SRT edge cases ──────────────────────────────────────────────
+    #[test]
+    fn test_export_srt_many_cues() -> Result<()> {
+        let temp_dir = tempfile::tempdir()?;
+        let output = temp_dir.path().join("output.srt");
+
+        let cues: Vec<TranscriptSegment> = (0..50)
+            .map(|i| TranscriptSegment {
+                start: i as f32 * 10.0,
+                end: (i as f32 + 1.0) * 10.0,
+                text: format!("Segment {}", i),
+                confidence: 1.0,
+            })
+            .collect();
+
+        export_srt(&cues, &output)?;
+        let content = fs::read_to_string(&output)?;
+        // Should have 50 cues
+        assert!(content.contains("50"));
+        Ok(())
+    }
+
+    #[test]
+    fn test_export_srt_single_char_text() -> Result<()> {
+        let temp_dir = tempfile::tempdir()?;
+        let output = temp_dir.path().join("output.srt");
+
+        let cues = vec![TranscriptSegment {
+            start: 0.0,
+            end: 5.0,
+            text: "X".to_string(),
+            confidence: 1.0,
+        }];
+
+        export_srt(&cues, &output)?;
+        let content = fs::read_to_string(&output)?;
+        assert!(content.contains("X"));
+        Ok(())
+    }
 }

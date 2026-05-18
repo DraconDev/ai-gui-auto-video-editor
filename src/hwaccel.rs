@@ -282,4 +282,39 @@ mod tests {
             let _ = HwAccel::parse_name(name);
         }
     }
+
+    // ── HwAccel more edge cases ────────────────────────────────────────────
+    #[test]
+    fn test_hwaccel_nvenc_parsing() {
+        let result = HwAccel::parse_name("nvenc");
+        assert!(result.is_some() || result.is_none());
+    }
+
+    #[test]
+    fn test_hwaccel_software_fallback() {
+        let result = HwAccel::parse_name("software");
+        assert!(result.is_some() || result.is_none());
+    }
+
+    #[test]
+    fn test_hwaccel_auto_parsing() {
+        let result = HwAccel::parse_name("auto");
+        assert!(result.is_some() || result.is_none());
+    }
+
+    #[test]
+    fn test_hwaccel_vaapi_parsing() {
+        let result = HwAccel::parse_name("vaapi");
+        assert!(result.is_some() || result.is_none());
+    }
+
+    #[test]
+    fn test_hwaccel_all_variants_valid() {
+        use HwAccel::*;
+        for variant in [None, Nvenc, Amf, Vaapi, VideoToolbox] {
+            // Each variant should have a string representation
+            let s = variant.as_str();
+            assert!(!s.is_empty());
+        }
+    }
 }

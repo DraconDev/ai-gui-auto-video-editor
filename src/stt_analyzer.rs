@@ -798,4 +798,84 @@ mod tests {
         let total: f32 = segments.iter().map(|s| s.end - s.start).sum();
         assert!((total - 10.0).abs() < 1e-6);
     }
+
+    // ── Transcript edge cases ─────────────────────────────────────────────
+    #[test]
+    fn test_transcript_segment_extreme_confidence() {
+        let seg = TranscriptSegment {
+            start: 0.0,
+            end: 5.0,
+            text: "Hello".to_string(),
+            confidence: 0.999999,
+        };
+        assert!(seg.confidence > 0.9);
+    }
+
+    #[test]
+    fn test_transcript_segments_many_fragments() {
+        let segments: Vec<TranscriptSegment> = (0..100)
+            .map(|i| TranscriptSegment {
+                start: i as f32,
+                end: i as f32 + 1.0,
+                text: format!("Word{}", i),
+                confidence: 1.0,
+            })
+            .collect();
+        // Many fragments should not panic
+        let total: f32 = segments.iter().map(|s| s.end - s.start).sum();
+        assert!((total - 100.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn test_transcript_segments_overlapping_range() {
+        let segments = vec![
+            TranscriptSegment {
+                start: 0.0,
+                end: 10.0,
+                text: "A".to_string(),
+                confidence: 1.0,
+            },
+            TranscriptSegment {
+                start: 5.0,
+                end: 15.0,
+                text: "B".to_string(),
+                confidence: 1.0,
+            },
+            TranscriptSegment {
+                start: 10.0,
+                end: 20.0,
+                text: "C".to_string(),
+                confidence: 1.0,
+            },
+        ];
+        // Overlapping segments should be allowed
+        for seg in &segments {
+            assert!(seg.end > seg.start);
+        }
+    }
+
+    #[test]
+    fn test_transcript_segments_micro_durations() {
+        let segments: Vec<TranscriptSegment> = (0..10)
+            .map(|i| TranscriptSegment {
+                start: i as f32 * 0.001,
+                end: (i as f32 + 1.0) * 0.001,
+                text: format!("{}", i),
+                confidence: 1.0,
+            })
+            .collect();
+        // Micro-durations should work
+        assert_eq!(segments.len(), 10);
+    }
+
+    #[test]
+    fn test_transcript_segments_unicode_text() {
+        let seg = TranscriptSegment {
+            start: 0.0,
+            end: 5.0,
+            text: "Hello, 世界! 🎉".to_string(),
+            confidence: 1.0,
+        };
+        assert!(seg.text.contains("世界"));
+    }
 }

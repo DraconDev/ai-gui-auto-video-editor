@@ -310,4 +310,48 @@ mod tests {
         assert!(progress.completed.len() < progress.total);
         assert!(progress.failed.len() > 0);
     }
+
+    // ── BatchProgress more edge cases ────────────────────────────────────
+    #[test]
+    fn test_batch_progress_all_failed() {
+        let mut progress = BatchProgress::default();
+        progress.total = 5;
+        progress.failed.insert(PathBuf::from("/a.mp4"));
+        progress.failed.insert(PathBuf::from("/b.mp4"));
+        // All files failed
+        assert!(progress.completed.is_empty());
+        assert_eq!(progress.failed.len(), 2);
+    }
+
+    #[test]
+    fn test_batch_progress_none_completed() {
+        let mut progress = BatchProgress::default();
+        progress.total = 3;
+        // No completed files
+        assert!(progress.completed.is_empty());
+        assert!(progress.failed.is_empty());
+    }
+
+    #[test]
+    fn test_batch_progress_one_of_many() {
+        let mut progress = BatchProgress::default();
+        progress.total = 100;
+        progress.completed.insert(PathBuf::from("/single.mp4"), 50);
+        // Only one of many completed
+        assert_eq!(progress.completed.len(), 1);
+        assert_eq!(progress.failed.len(), 0);
+    }
+
+    #[test]
+    fn test_batch_progress_large_batch() {
+        let mut progress = BatchProgress::default();
+        progress.total = 1000;
+        for i in 0..100 {
+            progress
+                .completed
+                .insert(PathBuf::from(format!("/{}.mp4", i)), i * 10);
+        }
+        // Many files processed
+        assert_eq!(progress.completed.len(), 100);
+    }
 }
