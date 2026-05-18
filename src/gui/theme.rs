@@ -159,19 +159,19 @@ pub fn text_edit_style(text: &mut String) -> egui::TextEdit<'_> {
 }
 
 pub fn button_secondary(text: impl Into<String>) -> egui::Button<'static> {
-    egui::Button::new(egui::RichText::new(text).color(TEXT_PRIMARY).size(15.0))
+    egui::Button::new(egui::RichText::new(text).color(TEXT_PRIMARY).size(14.0))
         .fill(PANEL_BG_LIGHTER)
         .stroke(egui::Stroke::new(1.0, BORDER_LIGHT))
         .corner_radius(CORNER_RADIUS_SMALL)
-        .min_size(egui::vec2(80.0, 38.0))
+        .min_size(egui::vec2(88.0, 38.0))
 }
 
 pub fn button_small(text: impl Into<String>) -> egui::Button<'static> {
-    egui::Button::new(egui::RichText::new(text).color(TEXT_SECONDARY).size(14.0))
+    egui::Button::new(egui::RichText::new(text).color(TEXT_SECONDARY).size(13.0))
         .fill(PANEL_BG_LIGHT)
         .stroke(egui::Stroke::new(1.0, BORDER))
         .corner_radius(CORNER_RADIUS_SMALL)
-        .min_size(egui::vec2(60.0, 34.0))
+        .min_size(egui::vec2(72.0, 34.0))
 }
 
 #[allow(dead_code)]
@@ -188,21 +188,21 @@ pub fn button_primary(text: impl Into<String>) -> egui::Button<'static> {
     egui::Button::new(
         egui::RichText::new(text)
             .color(egui::Color32::WHITE)
-            .size(17.0)
+            .size(15.0)
             .strong(),
     )
     .fill(ACCENT_PRIMARY)
     .stroke(egui::Stroke::new(2.0, ACCENT_DARK))
     .corner_radius(CORNER_RADIUS_PILL)
-    .min_size(egui::vec2(180.0, 52.0))
+    .min_size(egui::vec2(120.0, 44.0))
 }
 
 pub fn button_danger(text: impl Into<String>) -> egui::Button<'static> {
-    egui::Button::new(egui::RichText::new(text).color(ERROR).size(15.0).strong())
+    egui::Button::new(egui::RichText::new(text).color(ERROR).size(14.0).strong())
         .fill(ERROR_BG)
         .stroke(egui::Stroke::new(1.0, ERROR))
         .corner_radius(CORNER_RADIUS_SMALL)
-        .min_size(egui::vec2(80.0, 38.0))
+        .min_size(egui::vec2(88.0, 38.0))
 }
 
 pub fn button_toggle(is_active: bool, text: impl Into<String>) -> egui::Button<'static> {
@@ -221,7 +221,7 @@ pub fn button_toggle(is_active: bool, text: impl Into<String>) -> egui::Button<'
             .stroke(egui::Stroke::new(1.0, BORDER))
     };
     btn.corner_radius(CORNER_RADIUS_SMALL)
-        .min_size(egui::vec2(55.0, 30.0))
+        .min_size(egui::vec2(72.0, 34.0))
 }
 
 pub fn button_pill(is_active: bool, text: impl Into<String>) -> egui::Button<'static> {
@@ -229,25 +229,25 @@ pub fn button_pill(is_active: bool, text: impl Into<String>) -> egui::Button<'st
         egui::Button::new(
             egui::RichText::new(text)
                 .color(TEXT_PRIMARY)
-                .size(14.0)
+                .size(13.0)
                 .strong(),
         )
         .fill(ACCENT_PRIMARY)
         .stroke(egui::Stroke::new(1.0, ACCENT_DARK))
     } else {
-        egui::Button::new(egui::RichText::new(text).color(TEXT_SECONDARY).size(14.0))
+        egui::Button::new(egui::RichText::new(text).color(TEXT_SECONDARY).size(13.0))
             .fill(PANEL_BG_LIGHT)
             .stroke(egui::Stroke::new(1.0, BORDER))
     };
-    btn.corner_radius(0.0).min_size(egui::vec2(60.0, 32.0))
+    btn.corner_radius(0.0).min_size(egui::vec2(72.0, 34.0))
 }
 
 pub fn button_add(text: impl Into<String>) -> egui::Button<'static> {
-    egui::Button::new(egui::RichText::new(text).color(ACCENT_PRIMARY).size(14.0))
+    egui::Button::new(egui::RichText::new(text).color(ACCENT_PRIMARY).size(13.0))
         .fill(PANEL_BG)
         .stroke(egui::Stroke::new(1.0, ACCENT_PRIMARY))
         .corner_radius(CORNER_RADIUS_SMALL)
-        .min_size(egui::vec2(65.0, 32.0))
+        .min_size(egui::vec2(72.0, 34.0))
 }
 
 pub fn dropdown_selector<T: PartialEq + Copy>(
