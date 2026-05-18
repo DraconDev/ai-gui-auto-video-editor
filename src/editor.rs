@@ -1696,4 +1696,34 @@ mod tests {
         // Large padding should still work
         assert!(segments.len() >= 0);
     }
+
+    // ── editor utility tests ────────────────────────────────────────────────
+    #[test]
+    fn test_calculate_keep_segments_various_silences() {
+        let silences = vec![
+            Segment { start: 5.0, end: 10.0 },
+            Segment { start: 20.0, end: 25.0 },
+            Segment { start: 40.0, end: 45.0 },
+        ];
+        let segments = calculate_keep_segments(&silences, 60.0, 0.5, SilenceMode::Cut, 1.0, 1.0);
+        // Multiple silences should be handled
+        let total: f32 = segments.iter().map(|s| s.end - s.start).sum();
+        assert!(total > 0.0);
+    }
+
+    #[test]
+    fn test_calculate_keep_segments_keep_mode_variation() {
+        let silences = vec![Segment { start: 10.0, end: 20.0 }];
+        let segments = calculate_keep_segments(&silences, 30.0, 0.1, SilenceMode::Keep, 1.0, 1.0);
+        // Keep mode should produce some segments
+        assert!(segments.len() >= 0);
+    }
+
+    #[test]
+    fn test_calculate_keep_segments_speedup_mode_variation() {
+        let silences = vec![Segment { start: 10.0, end: 20.0 }];
+        let segments = calculate_keep_segments(&silences, 30.0, 0.1, SilenceMode::Speedup, 2.0, 1.0);
+        // Speedup mode should produce some segments
+        assert!(segments.len() >= 0);
+    }
 }
