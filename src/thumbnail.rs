@@ -257,4 +257,37 @@ mod tests {
         extract_frame_at_time(&video, &frame, 320, 180, 0.0).unwrap();
         assert!(frame.exists(), "frame should be extracted at time 0");
     }
+
+    // ── parse_entropy edge cases ─────────────────────────────────────────
+    #[test]
+    fn test_parse_entropy_high_value() {
+        let output = "entropy:15.5";
+        assert_eq!(parse_entropy(output), Some(15.5));
+    }
+
+    #[test]
+    fn test_parse_entropy_malformed() {
+        assert_eq!(parse_entropy("not an entropy line"), None);
+        assert_eq!(parse_entropy(""), None);
+        assert_eq!(parse_entropy("entropy:"), None);
+    }
+
+    #[test]
+    fn test_parse_entropy_scientific_notation() {
+        let output = "entropy:1e-5";
+        assert_eq!(parse_entropy(output), Some(1e-5));
+    }
+
+    // ── extract_frame_at_time edge cases ─────────────────────────────────
+    #[test]
+    fn test_extract_frame_at_time_middle() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let video = temp_dir.path().join("input.mp4");
+        let frame = temp_dir.path().join("frame.jpg");
+        let _ = create_test_video(&video, 5.0);
+
+        // Extract at middle of video
+        extract_frame_at_time(&video, &frame, 320, 180, 2.5).unwrap();
+        assert!(frame.exists(), "frame should be extracted at middle");
+    }
 }
