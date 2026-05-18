@@ -65,20 +65,20 @@ pub fn create_test_audio_file(output_path: &std::path::Path, duration_secs: u32)
 #[allow(dead_code)]
 pub fn create_test_watermark_png(output_path: &std::path::Path, size: u32) -> bool {
     use std::process::Command;
-    let status = Command::new("python3")
+    // Use FFmpeg to create a red semi-transparent PNG watermark
+    let status = Command::new("ffmpeg")
         .args([
-            "-c",
-            &format!(
-                "from PIL import Image; img = Image.new('RGBA', ({}, {}), (255, 0, 0, 200)); img.save('{}')",
-                size,
-                size,
-                output_path.to_str().unwrap()
-            ),
+            "-f", "lavfi",
+            "-i", &format!("color=c=0xFF000080:size={}x{},format=rgba", size, size),
+            "-frames:v", "1",
+            "-update", "1",
+            "-y",
+            output_path.to_str().unwrap_or(""),
         ])
-        .status()
-        .is_ok();
+        .stderr(std::process::Stdio::null())
+        .status();
 
-    status && output_path.exists()
+    status.map(|s| s.success()).unwrap_or(false) && output_path.exists()
 }
 
 #[allow(dead_code)]
