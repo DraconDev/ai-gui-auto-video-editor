@@ -171,13 +171,13 @@ fn concatenate_videos(
 
     // Collect video paths in order
     let mut video_paths: Vec<&Path> = Vec::new();
-    if let Some(ref p) = intro {
+    if let Some(p) = intro.as_ref() {
         if !p.as_os_str().is_empty() {
             video_paths.push(p);
         }
     }
     video_paths.push(main);
-    if let Some(ref p) = outro {
+    if let Some(p) = outro.as_ref() {
         if !p.as_os_str().is_empty() {
             video_paths.push(p);
         }
