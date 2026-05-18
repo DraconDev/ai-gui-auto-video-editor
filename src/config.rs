@@ -2267,4 +2267,46 @@ enhance = false
         assert!(deserialized.validate().is_ok());
         Ok(())
     }
+
+    // ── Config more edge cases ───────────────────────────────────────────
+    #[test]
+    fn test_config_audio_enhance_toggle() {
+        let mut config = Config::default();
+        config.audio.enhance = false;
+        assert!(config.validate().is_ok());
+        config.audio.enhance = true;
+        assert!(config.validate().is_ok());
+    }
+
+    #[test]
+    fn test_config_audio_noise_reduction() {
+        let mut config = Config::default();
+        config.audio.noise_reduction = true;
+        assert!(config.validate().is_ok());
+    }
+
+    #[test]
+    fn test_config_audio_duck_volume() {
+        let mut config = Config::default();
+        config.audio.duck_volume = 0.0;
+        assert!(config.validate().is_ok());
+        config.audio.duck_volume = 1.0;
+        assert!(config.validate().is_ok());
+    }
+
+    #[test]
+    fn test_config_audio_music_file() {
+        let mut config = Config::default();
+        config.audio.music_file = Some(PathBuf::from("/path/to/music.mp3"));
+        assert!(config.validate().is_ok());
+    }
+
+    #[test]
+    fn test_config_silence_padding_range() {
+        let mut config = Config::default();
+        config.silence.padding = 0.0;
+        assert!(config.validate().is_ok());
+        config.silence.padding = 10.0;
+        assert!(config.validate().is_ok());
+    }
 }

@@ -721,9 +721,21 @@ more noise
     #[test]
     fn test_segments_total_duration() {
         let segs = vec![
-            ProcessedSegment { start: 0.0, end: 10.0, speed: 1.0 },
-            ProcessedSegment { start: 10.0, end: 25.0, speed: 1.0 },
-            ProcessedSegment { start: 25.0, end: 40.0, speed: 1.0 },
+            ProcessedSegment {
+                start: 0.0,
+                end: 10.0,
+                speed: 1.0,
+            },
+            ProcessedSegment {
+                start: 10.0,
+                end: 25.0,
+                speed: 1.0,
+            },
+            ProcessedSegment {
+                start: 25.0,
+                end: 40.0,
+                speed: 1.0,
+            },
         ];
         let total = segs.iter().map(|s| s.end - s.start).sum::<f32>();
         assert!((total - 40.0).abs() < 1e-6);
@@ -732,9 +744,21 @@ more noise
     #[test]
     fn test_segments_with_gaps() {
         let segs = vec![
-            ProcessedSegment { start: 0.0, end: 10.0, speed: 1.0 },
-            ProcessedSegment { start: 20.0, end: 30.0, speed: 1.0 },
-            ProcessedSegment { start: 50.0, end: 60.0, speed: 1.0 },
+            ProcessedSegment {
+                start: 0.0,
+                end: 10.0,
+                speed: 1.0,
+            },
+            ProcessedSegment {
+                start: 20.0,
+                end: 30.0,
+                speed: 1.0,
+            },
+            ProcessedSegment {
+                start: 50.0,
+                end: 60.0,
+                speed: 1.0,
+            },
         ];
         // Calculate gap between segments
         let gap1 = segs[1].start - segs[0].end;
@@ -745,8 +769,16 @@ more noise
 
     #[test]
     fn test_segment_speed_effects() {
-        let seg1 = ProcessedSegment { start: 0.0, end: 10.0, speed: 2.0 };
-        let seg2 = ProcessedSegment { start: 0.0, end: 10.0, speed: 0.5 };
+        let seg1 = ProcessedSegment {
+            start: 0.0,
+            end: 10.0,
+            speed: 2.0,
+        };
+        let seg2 = ProcessedSegment {
+            start: 0.0,
+            end: 10.0,
+            speed: 0.5,
+        };
         // Speed 2x -> 5 seconds output, Speed 0.5x -> 20 seconds output
         let out1 = (seg1.end - seg1.start) / seg1.speed;
         let out2 = (seg2.end - seg2.start) / seg2.speed;

@@ -1195,4 +1195,82 @@ mod tests {
         // Should be Result type
         assert!(result.is_ok() || result.is_err());
     }
+
+    // ── ML edge cases ─────────────────────────────────────────────────────
+    #[test]
+    fn test_segmentation_mask_construction() {
+        let mask = SegmentationMask {
+            data: vec![1.0; 1000],
+            width: 10,
+            height: 100,
+        };
+        assert_eq!(mask.width, 10);
+        assert_eq!(mask.height, 100);
+    }
+
+    #[test]
+    fn test_segmentation_mask_get_pixel() {
+        let mask = SegmentationMask {
+            data: vec![0.0, 1.0, 0.5],
+            width: 3,
+            height: 1,
+        };
+        assert!((mask.get(0, 0) - 0.0).abs() < 1e-6);
+        assert!((mask.get(1, 0) - 1.0).abs() < 1e-6);
+        assert!((mask.get(2, 0) - 0.5).abs() < 1e-6);
+    }
+
+    #[test]
+    fn test_segmentation_mask_oob_returns_zero() {
+        let mask = SegmentationMask {
+            data: vec![1.0; 100],
+            width: 10,
+            height: 10,
+        };
+        // Out of bounds should return 0.0
+        assert!((mask.get(100, 0) - 0.0).abs() < 1e-6);
+        assert!((mask.get(0, 100) - 0.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn test_crop_region_creation() {
+        let region = CropRegion {
+            x: 0.1,
+            y: 0.2,
+            width: 0.5,
+            height: 0.6,
+        };
+        assert!((region.x - 0.1).abs() < 1e-6);
+        assert!((region.width - 0.5).abs() < 1e-6);
+    }
+
+    #[test]
+    fn test_crop_region_normalized_coords() {
+        let region = CropRegion {
+            x: 0.0,
+            y: 0.0,
+            width: 1.0,
+            height: 1.0,
+        };
+        // Full frame crop
+        assert_eq!(region.x, 0.0);
+        assert_eq!(region.y, 0.0);
+        assert_eq!(region.width, 1.0);
+        assert_eq!(region.height, 1.0);
+    }
+
+    #[test]
+    fn test_crop_region_centered_crop() {
+        let region = CropRegion {
+            x: 0.25,
+            y: 0.25,
+            width: 0.5,
+            height: 0.5,
+        };
+        // Centered 50% crop
+        assert_eq!(region.x, 0.25);
+        assert_eq!(region.y, 0.25);
+        assert_eq!(region.width, 0.5);
+        assert_eq!(region.height, 0.5);
+    }
 }
