@@ -659,7 +659,7 @@ fn concat_chunk_files(chunk_files: &[PathBuf], output: &Path) -> Result<()> {
         .collect::<String>();
     fs::write(&concat_list, concat_contents)?;
 
-    let status = Command::new("ffmpeg")
+    let output_result = Command::new("ffmpeg")
         .args([
             "-f",
             "concat",
@@ -672,16 +672,24 @@ fn concat_chunk_files(chunk_files: &[PathBuf], output: &Path) -> Result<()> {
             "-y",
             output.to_str().context("invalid output path")?,
         ])
-        .status()
+        .output()
         .context("failed to execute ffmpeg concat")?;
 
+    // Clean up temp files AFTER checking status
     let _ = fs::remove_file(&concat_list);
-    for chunk_file in chunk_files {
-        let _ = fs::remove_file(chunk_file);
-    }
-
-    if !status.success() {
-        anyhow::bail!("ffmpeg concat failed with status: {}", status);
+    if output_result.status.success() {
+        for chunk_file in chunk_files {
+            let _ = fs::remove_file(chunk_file);
+        }
+    } else {
+        // Leave chunk files for debugging if concat failed
+        let stderr = String::from_utf8_lossy(&output_result.stderr);
+        let last_lines = stderr.lines().rev().take(5).collect::<Vec<_>>().join("\n");
+        anyhow::bail!(
+            "ffmpeg concat failed with status: {}\n{}",
+            output_result.status,
+            last_lines
+        );
     }
 
     Ok(())

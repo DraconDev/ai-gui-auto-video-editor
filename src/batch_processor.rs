@@ -196,16 +196,22 @@ fn concatenate_videos(
     let list_file = TempFile::new("agave-concat-list", "txt")?;
     std::fs::write(list_file.path(), list_content)?;
 
-    let status = std::process::Command::new("ffmpeg")
+    let output_result = std::process::Command::new("ffmpeg")
         .args(["-f", "concat", "-safe", "0", "-i"])
         .arg(list_file.path())
         .args(["-c", "copy", "-y"])
         .arg(output)
-        .status()
+        .output()
         .context("failed to execute ffmpeg for concat")?;
 
-    if !status.success() {
-        anyhow::bail!("ffmpeg concat failed with status: {}", status);
+    if !output_result.status.success() {
+        let stderr = String::from_utf8_lossy(&output_result.stderr);
+        let last_lines = stderr.lines().rev().take(5).collect::<Vec<_>>().join("\n");
+        anyhow::bail!(
+            "ffmpeg concat failed with status: {}\n{}",
+            output_result.status,
+            last_lines
+        );
     }
 
     Ok(())
