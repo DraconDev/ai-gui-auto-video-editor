@@ -28,9 +28,9 @@ PREFIX="/usr/local"
 USER_INSTALL=false
 UNINSTALL=false
 QUICK=false
-BIN_NAME="ai-vid-editor"
-CONFIG_DIR="$HOME/.config/ai-vid-editor"
-SERVICE_FILE="/etc/systemd/system/ai-vid-editor.service"
+BIN_NAME="ai-gui-auto-video-editor"
+CONFIG_DIR="$HOME/.config/ai-gui-auto-video-editor"
+SERVICE_FILE="/etc/systemd/system/ai-gui-auto-video-editor.service"
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
@@ -112,8 +112,8 @@ if [ "$UNINSTALL" = true ]; then
     # Remove systemd service (if exists and running as root)
     if [ -f "$SERVICE_FILE" ]; then
         if [ "$EUID" -eq 0 ]; then
-            systemctl stop ai-vid-editor 2>/dev/null || true
-            systemctl disable ai-vid-editor 2>/dev/null || true
+            systemctl stop ai-gui-auto-video-editor 2>/dev/null || true
+            systemctl disable ai-gui-auto-video-editor 2>/dev/null || true
             rm -f "$SERVICE_FILE"
             systemctl daemon-reload
             echo -e "${GREEN}✓ Removed systemd service${NC}"
@@ -246,8 +246,8 @@ if [ -f "$CONFIG_FILE" ]; then
     echo -e "${YELLOW}Config file already exists at $CONFIG_FILE${NC}"
     echo -e "${YELLOW}Skipping config installation (backup your config and re-run to update)${NC}"
 else
-    if [ -f "ai-vid-editor.example.toml" ]; then
-        cp "ai-vid-editor.example.toml" "$CONFIG_FILE"
+    if [ -f "ai-gui-auto-video-editor.example.toml" ]; then
+        cp "ai-gui-auto-video-editor.example.toml" "$CONFIG_FILE"
         echo -e "${GREEN}✓ Installed config to $CONFIG_FILE${NC}"
     else
         # Generate default config
@@ -279,7 +279,7 @@ After=network.target
 Type=simple
 User=%USER%
 WorkingDirectory=%HOME%
-ExecStart=/usr/local/bin/ai-vid-editor --config %HOME%/.config/ai-vid-editor/config.toml
+ExecStart=/usr/local/bin/ai-gui-auto-video-editor --config %HOME%/.config/ai-gui-auto-video-editor/config.toml
 Restart=always
 RestartSec=10
 
@@ -293,8 +293,8 @@ EOF
         systemctl daemon-reload
         echo -e "${GREEN}✓ Installed systemd service${NC}"
         echo -e "${BLUE}To enable and start:${NC}"
-        echo "  sudo systemctl enable ai-vid-editor"
-        echo "  sudo systemctl start ai-vid-editor"
+        echo "  sudo systemctl enable ai-gui-auto-video-editor"
+        echo "  sudo systemctl start ai-gui-auto-video-editor"
     fi
 fi
 
@@ -316,8 +316,8 @@ echo "  3. Run:          $BIN_NAME --config $CONFIG_FILE"
 echo ""
 echo "For daemon mode (background):"
 if [ "$USER_INSTALL" = true ]; then
-    echo "  nohup $BIN_NAME --config $CONFIG_FILE > /tmp/ai-vid-editor.log 2>&1 &"
+    echo "  nohup $BIN_NAME --config $CONFIG_FILE > /tmp/ai-gui-auto-video-editor.log 2>&1 &"
 else
-    echo "  sudo systemctl enable --now ai-vid-editor"
+    echo "  sudo systemctl enable --now ai-gui-auto-video-editor"
 fi
 echo ""

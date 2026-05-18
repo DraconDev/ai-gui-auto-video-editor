@@ -2,13 +2,13 @@
 
 ## ✅ Remove stale release artifacts
 - [x] Deleted `release/0.1.424/`, `release/0.1.467/`, `release/3.0.0/`, `release/13.2.0/`, `release/19.1.9/`, `release/19.2.2/`
-- [x] Deleted all tarballs and checksums (`ai-vid-editor-0.1.424.*`, `0.1.467.*`, `3.0.0.*`, `13.2.0.*`, `19.1.9.*`, `19.2.2.*`)
+- [x] Deleted all tarballs and checksums (`ai-gui-auto-video-editor-0.1.424.*`, `0.1.467.*`, `3.0.0.*`, `13.2.0.*`, `19.1.9.*`, `19.2.2.*`)
 
 ## ✅ Update CHANGELOG.md
 - [x] Added `[19.58.0]` section with all changes (bug fixes, code quality, features, GUI, cleanup)
 
 ## ✅ Update example config
-- [x] `ai-vid-editor.example.toml` — added blur_background clarification comment
+- [x] `ai-gui-auto-video-editor.example.toml` — added blur_background clarification comment
 - [x] Added missing `[video]` fields: watermark, watermark_position, watermark_scale, blur_background, reframe, target_resolution
 - [x] Added missing `speedup_factor` in `[silence]`
 

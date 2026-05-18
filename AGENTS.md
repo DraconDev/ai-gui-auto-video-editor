@@ -7,7 +7,7 @@ AI-powered video editor for content creators. Processes raw footage through auto
 ## Repository Structure
 
 ```
-ai-vid-editor/
+ai-gui-auto-video-editor/
 ├── src/
 │   ├── main.rs              # CLI entry point, arg parsing, watch mode, signal handling
 │   ├── lib.rs               # Library exports (incl. pub tests_common)
@@ -49,7 +49,7 @@ ai-vid-editor/
 │   ├── podcast.toml
 │   └── minimal.toml
 ├── Cargo.toml
-└── ai-vid-editor.example.toml
+└── ai-gui-auto-video-editor.example.toml
 ```
 
 ## Build Commands
@@ -168,7 +168,7 @@ cargo check --all-features    # Type-check all feature combos
 
 ## Default Behavior (CLI vs GUI)
 
-When running `ai-vid-editor` with no arguments:
+When running `ai-gui-auto-video-editor` with no arguments:
 - **GUI launches by default** (when compiled with `gui` feature)
 - Use `--headless` flag to enter watch/daemon mode instead
 - Use `--gui` flag to explicitly request GUI (same as default)

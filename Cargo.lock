@@ -140,7 +140,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "ai-vid-editor"
+name = "ai-gui-auto-video-editor"
 version = "19.59.0"
 dependencies = [
  "anyhow",

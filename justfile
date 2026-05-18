@@ -42,7 +42,7 @@ test-full:
 
 # Generate default config
 config:
-    cargo run --release -- --generate-config > ai-vid-editor.toml
+    cargo run --release -- --generate-config > ai-gui-auto-video-editor.toml
 
 # Watch a folder
 watch input output:

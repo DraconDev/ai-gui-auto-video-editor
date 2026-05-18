@@ -1,8 +1,8 @@
-# AI Video Editor
+# AGAVE - AI GUI Auto Video Editor
 
-[![crates.io](https://img.shields.io/crates/v/ai-vid-editor.svg)](https://crates.io/crates/ai-vid-editor) [![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/DraconDev/ai-vid-editor?label=)](https://github.com/DraconDev/ai-vid-editor/releases) [![CI](https://github.com/DraconDev/ai-vid-editor/actions/workflows/ci.yml/badge.svg)](https://github.com/DraconDev/ai-vid-editor/actions/workflows/ci.yml) [![License](https://img.shields.io/crates/l/ai-vid-editor.svg)](https://crates.io/crates/ai-vid-editor)
+[![crates.io](https://img.shields.io/crates/v/ai-gui-auto-video-editor.svg)](https://crates.io/crates/ai-gui-auto-video-editor) [![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/DraconDev/ai-vid-editor?label=)](https://github.com/DraconDev/ai-vid-editor/releases) [![CI](https://github.com/DraconDev/ai-vid-editor/actions/workflows/ci.yml/badge.svg)](https://github.com/DraconDev/ai-vid-editor/actions/workflows/ci.yml) [![License](https://img.shields.io/crates/l/ai-gui-auto-video-editor.svg)](https://crates.io/crates/ai-gui-auto-video-editor)
 
-A command-line and GUI tool for automated video editing using AI. Designed for content creators who want to drop in raw footage and get polished results without manual editing.
+AGAVE (AI GUI Auto Video Editor) is a command-line and GUI tool for automated video editing using AI. Designed for content creators who want to drop in raw footage and get polished results without manual editing.
 
 ![AI Video Editor GUI](assets/Screenshot_20260319_124018.png)
 
