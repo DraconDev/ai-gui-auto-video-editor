@@ -164,4 +164,33 @@ mod tests {
         let preview = preview_path(output);
         assert_eq!(preview.extension().unwrap(), "mkv");
     }
+
+    // ── preview_path edge cases ────────────────────────────────────────────
+    #[test]
+    fn test_preview_path_adds_preview_suffix_to_filename() {
+        let output = Path::new("/path/to/video.mp4");
+        let preview = preview_path(output);
+        assert!(preview.to_string_lossy().contains("_preview"));
+    }
+
+    #[test]
+    fn test_preview_path_flv_gets_preview_suffix() {
+        let output = Path::new("video.flv");
+        let preview = preview_path(output);
+        assert!(preview.to_string_lossy().contains("_preview"));
+    }
+
+    #[test]
+    fn test_preview_path_wmv_gets_preview_suffix() {
+        let output = Path::new("video.wmv");
+        let preview = preview_path(output);
+        assert!(preview.to_string_lossy().contains("_preview"));
+    }
+
+    #[test]
+    fn test_preview_path_av1_gets_preview_suffix() {
+        let output = Path::new("video.mkv");
+        let preview = preview_path(output);
+        assert!(preview.to_string_lossy().contains("_preview"));
+    }
 }

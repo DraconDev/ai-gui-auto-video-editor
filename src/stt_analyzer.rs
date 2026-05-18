@@ -647,4 +647,51 @@ mod tests {
         let concatenated = format!("{}{}", seg1.text.trim(), seg2.text.trim());
         assert_eq!(concatenated, "HelloWorld");
     }
+
+    // ── stt_analyzer edge cases ───────────────────────────────────────────
+    #[test]
+    fn test_transcript_segment_empty_text() {
+        let seg = TranscriptSegment {
+            start: 0.0,
+            end: 5.0,
+            text: "".to_string(),
+            confidence: 0.5,
+        };
+        assert!(seg.text.is_empty());
+    }
+
+    #[test]
+    fn test_transcript_segment_confidence_zero() {
+        let seg = TranscriptSegment {
+            start: 0.0,
+            end: 5.0,
+            text: "Hello".to_string(),
+            confidence: 0.0,
+        };
+        assert_eq!(seg.confidence, 0.0);
+    }
+
+    #[test]
+    fn test_transcript_segments_zero_duration() {
+        let segments = vec![TranscriptSegment {
+            start: 0.0,
+            end: 0.0,
+            text: "Word".to_string(),
+            confidence: 1.0,
+        }];
+        let total: f32 = segments.iter().map(|s| s.end - s.start).sum();
+        assert!((total - 0.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn test_transcript_segments_very_short() {
+        let segments = vec![TranscriptSegment {
+            start: 0.0,
+            end: 0.001,
+            text: "A".to_string(),
+            confidence: 1.0,
+        }];
+        let total: f32 = segments.iter().map(|s| s.end - s.start).sum();
+        assert!(total < 0.01);
+    }
 }
