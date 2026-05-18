@@ -174,4 +174,73 @@ mod tests {
             Preset::Shorts
         );
     }
+
+    // ── Preset matching edge cases ─────────────────────────────────────────
+
+
+    #[test]
+    fn test_preset_rule_exact_match() {
+        let rule = PresetRule::new("podcast", Preset::Podcast);
+        let rules = vec![rule];
+
+        assert_eq!(
+            preset_for_file(Path::new("my_podcast.mp3"), &rules, Preset::Minimal),
+            Preset::Podcast
+        );
+    }
+
+    #[test]
+    fn test_preset_for_file_substring_match() {
+        // "short" should match "shorts" and "short_video"
+        let rules = vec![PresetRule::new("short", Preset::Shorts)];
+        assert_eq!(
+            preset_for_file(Path::new("my_short_video.mp4"), &rules, Preset::Minimal),
+            Preset::Shorts
+        );
+    }
+
+    #[test]
+    fn test_preset_for_file_no_match_returns_default() {
+        let rules = vec![PresetRule::new("podcast", Preset::Podcast)];
+        assert_eq!(
+            preset_for_file(Path::new("random_video.mp4"), &rules, Preset::Minimal),
+            Preset::Minimal
+        );
+    }
+
+    #[test]
+    fn test_preset_for_file_empty_rules_returns_default() {
+        let rules: Vec<PresetRule> = vec![];
+        assert_eq!(
+            preset_for_file(Path::new("anything.mp4"), &rules, Preset::Youtube),
+            Preset::Youtube
+        );
+    }
+
+    #[test]
+    fn test_preset_rule_preserves_priority() {
+        // First matching rule wins
+        let rules = vec![
+            PresetRule::new("interview", Preset::Podcast),
+            PresetRule::new("interview", Preset::Shorts), // Same pattern, should not override
+        ];
+        assert_eq!(
+            preset_for_file(Path::new("my_interview.mp4"), &rules, Preset::Minimal),
+            Preset::Podcast
+        );
+    }
+
+    #[test]
+    fn test_preset_for_file_with_path() {
+        let rules = vec![PresetRule::new("vlog", Preset::Minimal)];
+        // Full path should still match
+        assert_eq!(
+            preset_for_file(
+                Path::new("/home/user/videos/my_vlog.mp4"),
+                &rules,
+                Preset::Minimal
+            ),
+            Preset::Minimal
+        );
+    }
 }
