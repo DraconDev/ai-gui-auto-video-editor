@@ -1462,4 +1462,118 @@ mod tests {
         assert!(result.is_ok(), "Blur background should succeed");
         assert!(output.exists(), "Blurred output should exist");
     }
+    // ── parse_loudnorm_stats edge cases ───────────────────────────────────
+
+    #[test]
+    fn test_parse_loudnorm_stats_minimal_output() {
+        let ffmpeg_output = r#"{
+	"input_i" : "-20.0",
+	"input_tp" : "-1.0",
+	"input_lra" : "0.0",
+	"input_thresh" : "-20.0",
+	"output_i" : "-20.0",
+	"output_tp" : "-1.0",
+	"input_lra" : "0.0",
+	"output_thresh" : "-20.0",
+	"normalization_type" : "dynamic",
+	"target_offset" : "0.0"
+}"#;
+        let stats = parse_loudnorm_stats(ffmpeg_output).expect("should parse");
+        assert_eq!(stats.i, "-20.0");
+        assert_eq!(stats.offset, "0.0");
+    }
+
+    #[test]
+    fn test_parse_loudnorm_stats_invalid_json() {
+        let invalid_output = "not json at all";
+        assert!(parse_loudnorm_stats(invalid_output).is_none());
+    }
+
+
+    // ── Duck filter generation tests ──────────────────────────────────────
+
+    #[test]
+    fn test_generate_duck_filter_custom_values() {
+        let transcript = vec![TranscriptSegment {
+            start: 0.0,
+            end: 5.0,
+            text: "Speaking".to_string(),
+            confidence: 0.9,
+        }];
+        let filter = generate_duck_filter(&transcript, 0.5);
+        assert!(filter.contains("0.5"));
+    }
+
+
+    #[test]
+    fn test_generate_duck_filter_aggressive() {
+        let transcript = vec![TranscriptSegment {
+            start: 0.0,
+            end: 10.0,
+            text: "A".to_string(),
+            confidence: 0.9,
+        }];
+        let filter = generate_duck_filter(&transcript, 0.1);
+        assert!(filter.contains("0.1"));
+    }
+    #[test]
+    fn test_generate_duck_filter_no_duck() {
+        let transcript: Vec<TranscriptSegment> = vec![];
+        let filter = generate_duck_filter(&transcript, 1.0);
+        assert!(filter.contains("1.0"));
+    }
+
+    // ── calculate_keep_segments edge cases ─────────────────────────────────
+
+    #[test]
+    fn test_calculate_keep_segments_empty_silences() {
+        let silences: Vec<Segment> = vec![];
+        let segments = calculate_keep_segments(
+            &silences, 60.0, 0.1, SilenceMode::Cut, 2.0, 0.5,
+        );
+        assert_eq!(segments.len(), 1);
+        assert_eq!(segments[0].start, 0.0);
+        assert_eq!(segments[0].end, 60.0);
+    }
+
+    #[test]
+    fn test_calculate_keep_segments_single_short_silence() {
+        let silences = vec![Segment { start: 10.0, end: 11.0 }];
+        let segments = calculate_keep_segments(
+            &silences, 60.0, 0.1, SilenceMode::Cut, 2.0, 0.5,
+        );
+        assert!(segments.len() >= 1);
+        assert!(segments[0].start >= 0.0);
+    }
+
+    #[test]
+    fn test_calculate_keep_segments_silence_at_start() {
+        let silences = vec![Segment { start: 0.0, end: 5.0 }];
+        let segments = calculate_keep_segments(
+            &silences, 60.0, 0.1, SilenceMode::Cut, 2.0, 0.5,
+        );
+        assert!(segments[0].start >= 0.0);
+    }
+
+    #[test]
+    fn test_calculate_keep_segments_silence_at_end() {
+        let silences = vec![Segment { start: 55.0, end: 60.0 }];
+        let segments = calculate_keep_segments(
+            &silences, 60.0, 0.1, SilenceMode::Cut, 2.0, 0.5,
+        );
+        assert!(segments.last().unwrap().end <= 60.0);
+    }
+
+    #[test]
+    fn test_calculate_keep_segments_consecutive_silences() {
+        let silences = vec![
+            Segment { start: 10.0, end: 15.0 },
+            Segment { start: 20.0, end: 25.0 },
+            Segment { start: 30.0, end: 35.0 },
+        ];
+        let segments = calculate_keep_segments(
+            &silences, 60.0, 0.1, SilenceMode::Cut, 2.0, 0.5,
+        );
+        assert!(segments.len() >= 2);
+    }
 }
