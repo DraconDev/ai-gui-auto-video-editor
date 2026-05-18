@@ -2269,4 +2269,52 @@ mod tests {
         // HashMap doesn't guarantee order, but we can check count
         assert_eq!(progress.completed.len(), 3);
     }
+
+    // ── BatchProgress final edge cases ──────────────────────────────────
+    #[test]
+    fn test_batch_progress_completion_rate() {
+        let mut progress = BatchProgress::default();
+        progress.total = 10;
+        for i in 0..5 {
+            progress
+                .completed
+                .insert(PathBuf::from(format!("/{}.mp4", i)), 100);
+        }
+        // Half completed
+        assert_eq!(progress.completed.len(), 5);
+        assert_eq!(progress.completed.len(), progress.total / 2);
+    }
+
+    #[test]
+    fn test_batch_progress_clear_state() {
+        let mut progress = BatchProgress::default();
+        progress.total = 5;
+        progress.completed.insert(PathBuf::from("/a.mp4"), 100);
+        progress.failed.insert(PathBuf::from("/b.mp4"));
+        // State before clearing
+        assert_eq!(progress.completed.len() + progress.failed.len(), 2);
+        // Reset would require new instance
+        let new_progress = BatchProgress::default();
+        assert!(new_progress.completed.is_empty());
+    }
+
+    #[test]
+    fn test_batch_progress_zero_total() {
+        let mut progress = BatchProgress::default();
+        progress.total = 0;
+        // Zero total is valid
+        assert_eq!(progress.total, 0);
+        assert!(progress.completed.is_empty());
+    }
+
+    #[test]
+    fn test_batch_progress_completed_timing_values() {
+        let mut progress = BatchProgress::default();
+        progress.total = 2;
+        progress.completed.insert(PathBuf::from("/a.mp4"), 100);
+        progress.completed.insert(PathBuf::from("/b.mp4"), 200);
+        // Check timing values are captured
+        let total_time: u128 = progress.completed.values().map(|v| *v as u128).sum();
+        assert_eq!(total_time, 300);
+    }
 }

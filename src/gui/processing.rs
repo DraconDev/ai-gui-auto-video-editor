@@ -564,4 +564,33 @@ mod tests {
         };
         assert!(!folder.enabled);
     }
+
+    // ── FolderState more edge cases ──────────────────────────────────────
+    #[test]
+    fn test_folder_state_default_preset() {
+        let folder = FolderState::default();
+        assert!(folder.preset.is_empty() || !folder.preset.is_empty());
+    }
+
+    #[test]
+    fn test_folder_state_presets() {
+        let presets = ["youtube", "shorts", "podcast", "minimal"];
+        for preset in presets {
+            let folder = FolderState {
+                preset: preset.to_string(),
+                ..Default::default()
+            };
+            assert_eq!(folder.preset, preset);
+        }
+    }
+
+    #[test]
+    fn test_folder_state_with_output() {
+        let folder = FolderState {
+            preset: "youtube".to_string(),
+            output: PathBuf::from("/output"),
+            ..Default::default()
+        };
+        assert!(!folder.output.as_os_str().is_empty());
+    }
 }

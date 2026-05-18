@@ -346,4 +346,35 @@ mod tests {
             Preset::Podcast
         );
     }
+
+    // ── PresetRule final edge cases ───────────────────────────────────────
+    #[test]
+    fn test_preset_for_file_exact_match() {
+        let rules = vec![PresetRule::new("video", Preset::Twitter)];
+        // Exact match
+        assert_eq!(
+            preset_for_file(Path::new("video.mp4"), &rules, Preset::Minimal),
+            Preset::Twitter
+        );
+    }
+
+    #[test]
+    fn test_preset_for_file_partial_filename() {
+        let rules = vec![PresetRule::new("content", Preset::Reels)];
+        // Partial match in longer filename
+        assert_eq!(
+            preset_for_file(Path::new("my_content_v1.mp4"), &rules, Preset::Minimal),
+            Preset::Reels
+        );
+    }
+
+    #[test]
+    fn test_preset_for_file_no_rules() {
+        let rules: Vec<PresetRule> = vec![];
+        // Empty rules should use default
+        assert_eq!(
+            preset_for_file(Path::new("video.mp4"), &rules, Preset::Shorts),
+            Preset::Shorts
+        );
+    }
 }

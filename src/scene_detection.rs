@@ -316,4 +316,35 @@ mod tests {
         // Markers beyond video duration - edge case
         assert!(segments.len() >= 1);
     }
+
+    // ── scenes_to_segments final edge cases ──────────────────────────────
+    #[test]
+    fn test_scenes_to_segments_exact_end_marker() {
+        let scenes = vec![10.0, 30.0]; // Ends exactly at video duration
+        let segments = scenes_to_segments(&scenes, 30.0);
+        assert!(segments.len() >= 2);
+    }
+
+    #[test]
+    fn test_scenes_to_segments_exact_start_marker() {
+        let scenes = vec![0.0, 15.0]; // Starts at 0
+        let segments = scenes_to_segments(&scenes, 30.0);
+        assert!(segments.len() >= 2);
+    }
+
+    #[test]
+    fn test_scenes_to_segments_single_segment_video() {
+        let scenes = vec![0.0, 60.0]; // Full video is one segment
+        let segments = scenes_to_segments(&scenes, 60.0);
+        // Single marker pair should give one segment
+        assert!(segments.len() >= 1);
+    }
+
+    #[test]
+    fn test_scenes_to_segments_very_close_markers() {
+        let scenes = vec![10.0, 10.0001, 10.0002, 10.0003];
+        let segments = scenes_to_segments(&scenes, 30.0);
+        // Should not panic with very close markers
+        assert!(segments.len() >= 1);
+    }
 }
