@@ -19,7 +19,9 @@ impl App {
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                     #[allow(clippy::collapsible_if)]
                     if ui.add(button_add("+ Add Files")).clicked() {
-                        if let Some(paths) = rfd::FileDialog::new().pick_files() {
+                        if let Some(paths) = rfd::FileDialog::new()
+                            .add_filter("Video", &["mp4", "mov", "mkv", "avi", "webm", "flv", "wmv", "m4v"])
+                            .pick_files() {
                             for path in paths {
                                 let folder = self.state.folders.get(self.state.selected_folder_idx);
                                 let output_dir = folder

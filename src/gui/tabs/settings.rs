@@ -122,10 +122,28 @@ impl App {
             ui.separator();
             ui.add_space(8.0);
             ui.horizontal(|ui| {
-                if ui.add(button_small("🔄 Re-run Setup Wizard")).clicked() {
-                    self.state.show_setup = true;
-                    self.state.setup_step = super::SetupStep::Welcome;
+                // Two-click confirmation: first click shows confirm text, second click runs
+                let confirm_id = ui.id().with("setup_confirm");
+                let mut confirm_shown = ui.data(|d| d.get_temp::<bool>(confirm_id).unwrap_or(false));
+                if confirm_shown {
+                    ui.label(egui::RichText::new("This will add a new folder (existing folders kept). Continue?")
+                        .size(12.0)
+                        .color(WARNING));
+                    ui.add_space(8.0);
+                    if ui.add(button_primary("Yes, Run Setup")).clicked() {
+                        self.state.show_setup = true;
+                        self.state.setup_step = super::SetupStep::Welcome;
+                        confirm_shown = false;
+                    }
+                    if ui.add(button_small("Cancel")).clicked() {
+                        confirm_shown = false;
+                    }
+                } else {
+                    if ui.add(button_small("⚙ Re-run Setup Wizard")).clicked() {
+                        confirm_shown = true;
+                    }
                 }
+                ui.data_mut(|d| d.insert_temp(confirm_id, confirm_shown));
             });
 
             if needs_save {

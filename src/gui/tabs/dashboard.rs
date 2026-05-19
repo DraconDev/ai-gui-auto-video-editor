@@ -23,6 +23,13 @@ impl App {
             .filter(|f| matches!(f.status, QueueStatus::Processing | QueueStatus::Queued))
             .count();
 
+        let completed_count = self
+            .state
+            .activity_log
+            .iter()
+            .filter(|e| e.status == EntryStatus::Success)
+            .count();
+
         panel_frame().show(ui, |ui| {
             ui.horizontal_wrapped(|ui| {
                 ui.set_width(ui.available_width());
@@ -30,6 +37,7 @@ impl App {
                     ("Folders", format!("{}/{}", enabled_count, folder_count)),
                     ("Queue", format!("{}", queued_count)),
                     ("Processing", format!("{}", processing_count)),
+                    ("Done", format!("{}", completed_count)),
                 ];
                 for (label, value) in stat_items {
                     ui.horizontal(|ui| {
@@ -98,7 +106,7 @@ impl App {
         let column_spacing = 12.0;
         let available_width = ui.available_width();
         // On narrow screens (<600px), stack vertically; otherwise two columns
-        let use_two_columns = available_width >= 600.0;
+        let use_two_columns = available_width >= 720.0;
 
         if use_two_columns {
             let left_width = (available_width - column_spacing) * 0.58;
