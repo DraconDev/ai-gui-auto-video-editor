@@ -747,4 +747,14 @@ impl App {
             || path.to_string_lossy() == "videos"
             || path.to_string_lossy() == "videos/output"
     }
+
+    /// Check if the setup folder path looks like a default (so we update it on preset switch)
+    pub(crate) fn is_default_setup_path(path: &std::path::Path, preset: &str) -> bool {
+        let filename = path.file_name().map(|n| n.to_string_lossy().to_string());
+        // It's a default path if the folder name matches the current preset
+        // or is "Videos" (the initial default)
+        filename.as_deref() == Some(preset)
+            || filename.as_deref() == Some("Videos")
+            || Self::is_default_path(path, preset)
+    }
 }
