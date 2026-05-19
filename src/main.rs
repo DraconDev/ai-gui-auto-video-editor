@@ -235,6 +235,10 @@ pub struct Cli {
     #[arg(long)]
     pub start_minimized: bool,
 
+    /// Re-run the first-time setup wizard on launch
+    #[arg(long)]
+    pub setup: bool,
+
     /// Verbose output (-v, -vv, -vvv)
     #[arg(short, long, action = clap::ArgAction::Count)]
     pub verbose: u8,
@@ -335,7 +339,7 @@ fn main() -> Result<()> {
     if cli.gui {
         #[cfg(feature = "gui")]
         {
-            return run_gui(cli.start_minimized);
+            return run_gui(cli.start_minimized, cli.setup);
         }
         #[cfg(not(feature = "gui"))]
         {
@@ -395,7 +399,7 @@ fn main() -> Result<()> {
         #[cfg(feature = "gui")]
         {
             info!("Launching GUI. Use --headless for watch/daemon mode.");
-            return run_gui(start_minimized);
+            return run_gui(start_minimized, cli.setup);
         }
 
         #[cfg(not(feature = "gui"))]
@@ -1035,7 +1039,7 @@ fn handle_dry_run(cli: &Cli, config: &Config) -> Result<()> {
 }
 
 #[cfg(feature = "gui")]
-fn run_gui(start_minimized: bool) -> Result<()> {
+fn run_gui(start_minimized: bool, force_setup: bool) -> Result<()> {
     use eframe::egui;
 
     let options = eframe::NativeOptions {
@@ -1054,7 +1058,7 @@ fn run_gui(start_minimized: bool) -> Result<()> {
         Box::new(|cc| {
             configure_emoji_fonts(&cc.egui_ctx);
             configure_dark_theme(&cc.egui_ctx);
-            Ok(Box::new(gui::App::new(start_minimized)))
+            Ok(Box::new(gui::App::new(start_minimized, force_setup)))
         }),
     )
     .map_err(|e| anyhow::anyhow!("GUI error: {}", e))

@@ -991,9 +991,14 @@ pub struct App {
 }
 
 impl App {
-    pub fn new(_start_minimized: bool) -> Self {
+    pub fn new(_start_minimized: bool, force_setup: bool) -> Self {
+        let mut state = AppState::new();
+        if force_setup {
+            state.show_setup = true;
+            state.setup_step = super::SetupStep::Welcome;
+        }
         Self {
-            state: AppState::new(),
+            state,
         }
     }
 

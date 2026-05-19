@@ -89,8 +89,6 @@ impl App {
                     if ui.add(button_secondary("+ Add Folder")).clicked() {
                         self.state.modal.reset_for_add();
                     }
-                        self.state.modal.reset_for_add();
-                    }
                 });
             });
         });
