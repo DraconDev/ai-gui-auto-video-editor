@@ -449,6 +449,15 @@ impl App {
     }
 
     pub(crate) fn draw_setup_options(&mut self, ui: &mut egui::Ui) {
+        egui::Frame::NONE
+            .fill(PANEL_BG)
+            .inner_margin(egui::vec2(40.0, 32.0))
+            .show(ui, |ui| {
+                self.draw_setup_options_inner(ui);
+            });
+    }
+
+    fn draw_setup_options_inner(&mut self, ui: &mut egui::Ui) {
         ui.label(
             RichText::new("Processing Options")
                 .size(24.0)
@@ -527,6 +536,15 @@ impl App {
     }
 
     pub(crate) fn draw_setup_complete(&mut self, ui: &mut egui::Ui) {
+        egui::Frame::NONE
+            .fill(PANEL_BG)
+            .inner_margin(egui::vec2(40.0, 32.0))
+            .show(ui, |ui| {
+                self.draw_setup_complete_inner(ui);
+            });
+    }
+
+    fn draw_setup_complete_inner(&mut self, ui: &mut egui::Ui) {
         ui.vertical_centered(|ui| {
             ui.label(RichText::new("🎉").size(64.0));
             ui.add_space(16.0);
