@@ -660,6 +660,7 @@ impl AppState {
         self.auto_save_config();
     }
 
+    #[allow(dead_code)]
     fn duplicate_folder(&mut self, index: usize) {
         if let Some(original) = self.folders.get(index).cloned() {
             let mut new_input = original.input.clone();
