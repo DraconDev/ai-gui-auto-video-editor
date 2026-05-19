@@ -299,76 +299,96 @@ impl App {
     pub(crate) fn draw_setup_folder(&mut self, ui: &mut egui::Ui) {
         ui.label(
             RichText::new("Choose Your Video Folder")
-                .size(24.0)
+                .size(20.0)
                 .color(ACCENT_PRIMARY)
                 .strong(),
         );
-        ui.add_space(8.0);
+        ui.add_space(4.0);
         ui.label(
-            RichText::new("Select where your raw videos are stored.\nWe'll create an 'output' folder next to it.")
-                .size(14.0)
+            RichText::new("Select where your raw videos are stored. We'll create an 'output' folder next to it.")
+                .size(13.0)
                 .color(TEXT_SECONDARY),
         );
-        ui.add_space(24.0);
+        ui.add_space(16.0);
 
         // Folder path display
         egui::Frame::NONE
-            .fill(PANEL_BG)
+            .fill(PANEL_BG_LIGHT)
             .corner_radius(0.0)
-            .inner_margin(egui::vec2(16.0, 12.0))
+            .inner_margin(egui::vec2(12.0, 10.0))
+            .stroke(egui::Stroke::new(1.0, BORDER))
             .show(ui, |ui| {
                 ui.horizontal(|ui| {
                     ui.label(
-                        RichText::new(self.state.setup_folder.to_string_lossy().as_ref())
+                        RichText::new("📁")
                             .size(14.0)
+                            .color(TEXT_MUTED),
+                    );
+                    ui.add_space(8.0);
+                    ui.label(
+                        RichText::new(self.state.setup_folder.to_string_lossy().as_ref())
+                            .size(13.0)
                             .color(TEXT_PRIMARY),
                     );
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                        if ui.add(button_small("Browse...")).clicked()
+                            && let Some(path) = FileDialog::new().pick_folder()
+                        {
+                            self.state.setup_folder = path;
+                        }
+                    });
                 });
             });
 
-        ui.add_space(12.0);
+        ui.add_space(16.0);
 
-        ui.horizontal(|ui| {
-            if ui.add(button_secondary("📁 Choose Folder...")).clicked()
-                && let Some(path) = FileDialog::new().pick_folder()
-            {
-                self.state.setup_folder = path;
-            }
-        });
-
-        ui.add_space(24.0);
-
-        // Preset selection
+        // Preset selection — compact pill layout
         ui.label(
-            RichText::new("What type of content?")
-                .size(16.0)
+            RichText::new("Content Type")
+                .size(14.0)
                 .color(TEXT_PRIMARY)
                 .strong(),
         );
-        ui.add_space(12.0);
+        ui.add_space(8.0);
 
         ui.horizontal_wrapped(|ui| {
-            for (preset, icon, desc) in [
-                ("youtube", "🎬", "YouTube videos (landscape)"),
-                ("shorts", "📱", "Shorts/Reels/TikTok (vertical)"),
-                ("podcast", "🎙", "Podcast/audio focus"),
-                ("tiktok", "♪", "TikTok-specific style"),
-                ("reels", "📸", "Instagram Reels style"),
-                ("twitter", "🐦", "Twitter/video style"),
-                ("minimal", "⬜", "Minimal/no processing"),
-            ] {
+            let presets = [
+                ("youtube", "🎬 YouTube"),
+                ("shorts", "📱 Shorts"),
+                ("podcast", "🎙 Podcast"),
+                ("tiktok", "♪ TikTok"),
+                ("reels", "📸 Reels"),
+                ("twitter", "🐦 Twitter"),
+                ("minimal", "⬜ Minimal"),
+            ];
+            for (preset, label) in presets {
                 let selected = self.state.setup_preset == preset;
-                if self
-                    .setup_preset_card(ui, selected, icon, preset, desc)
-                    .clicked()
-                {
+                if ui.add(button_pill(selected, label)).clicked() {
                     self.state.setup_preset = preset.to_string();
                 }
-                ui.add_space(8.0);
+                ui.add_space(4.0);
             }
         });
 
-        ui.add_space(32.0);
+        // Show description of selected preset
+        let selected_desc = match self.state.setup_preset.as_str() {
+            "youtube" => "Landscape video with silence removal & audio enhancement",
+            "shorts" => "Vertical 9:16 with auto-reframe and face tracking",
+            "podcast" => "Audio-focused with noise reduction and loudness normalization",
+            "tiktok" => "Vertical format optimized for TikTok",
+            "reels" => "Vertical format optimized for Instagram Reels",
+            "twitter" => "Compressed landscape for Twitter/X video posts",
+            "minimal" => "No processing — just copy/mux the input",
+            _ => "",
+        };
+        ui.add_space(6.0);
+        ui.label(
+            egui::RichText::new(selected_desc)
+                .size(12.0)
+                .color(TEXT_SECONDARY),
+        );
+
+        ui.add_space(24.0);
 
         ui.horizontal(|ui| {
             if ui.add(button_small("← Back")).clicked() {
@@ -380,51 +400,6 @@ impl App {
                 }
             });
         });
-    }
-
-    pub(crate) fn setup_preset_card(
-        &self,
-        ui: &mut egui::Ui,
-        selected: bool,
-        icon: &str,
-        name: &str,
-        desc: &str,
-    ) -> egui::Response {
-        let bg_color = if selected { ACCENT_PRIMARY } else { PANEL_BG };
-        let stroke_color = if selected {
-            ACCENT_PRIMARY
-        } else {
-            PANEL_BG_LIGHT
-        };
-
-        egui::Frame::NONE
-            .fill(bg_color)
-            .corner_radius(0.0)
-            .stroke(egui::Stroke::new(2.0, stroke_color))
-            .inner_margin(egui::vec2(16.0, 12.0))
-            .show(ui, |ui| {
-                ui.set_min_width(140.0);
-                ui.vertical_centered(|ui| {
-                    ui.label(RichText::new(icon).size(28.0));
-                    ui.add_space(4.0);
-                    ui.label(
-                        RichText::new(name)
-                            .size(14.0)
-                            .color(if selected {
-                                egui::Color32::WHITE
-                            } else {
-                                TEXT_PRIMARY
-                            })
-                            .strong(),
-                    );
-                    ui.label(RichText::new(desc).size(11.0).color(if selected {
-                        egui::Color32::WHITE
-                    } else {
-                        TEXT_SECONDARY
-                    }));
-                });
-            })
-            .response
     }
 
     pub(crate) fn draw_setup_options(&mut self, ui: &mut egui::Ui) {
