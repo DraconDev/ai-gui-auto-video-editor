@@ -102,6 +102,16 @@ impl App {
                 }
             }
 
+            ui.add_space(20.0);
+            ui.separator();
+            ui.add_space(8.0);
+            ui.horizontal(|ui| {
+                if ui.add(button_small("🔄 Re-run Setup Wizard")).clicked() {
+                    self.state.show_setup = true;
+                    self.state.setup_step = super::SetupStep::Welcome;
+                }
+            });
+
             if needs_save {
                 self.state.auto_save_config();
             }

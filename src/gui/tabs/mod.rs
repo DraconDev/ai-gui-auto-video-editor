@@ -90,7 +90,7 @@ impl App {
                     let muted_color = if enabled { TEXT_SECONDARY } else { TEXT_MUTED };
                     let text_color = if enabled { TEXT_PRIMARY } else { TEXT_MUTED };
 
-                    let response = folder_card_compact(enabled).show(ui, |ui| {
+                    folder_card_compact(enabled).show(ui, |ui| {
                         ui.horizontal(|ui| {
                             if ui
                                 .add(button_toggle(enabled, if enabled { "ON" } else { "OFF" }))

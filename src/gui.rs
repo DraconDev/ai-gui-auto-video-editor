@@ -94,6 +94,7 @@ pub(crate) enum SettingsCategory {
 }
 
 impl SettingsCategory {
+    #[allow(dead_code)]
     fn label(&self) -> &'static str {
         match self {
             SettingsCategory::Processing => "Processing",
@@ -104,6 +105,7 @@ impl SettingsCategory {
         }
     }
 
+    #[allow(dead_code)]
     fn icon(&self) -> &'static str {
         match self {
             SettingsCategory::Processing => "🎬",
