@@ -191,7 +191,12 @@ fn concatenate_videos(
         .iter()
         .map(|p| {
             let path_str = p.to_string_lossy();
-            let escaped = path_str.replace("'", "'\\''");
+            // Escape single quotes and newlines for concat demuxer safety
+            let escaped = path_str
+                .replace('\\', "\\\\")
+                .replace("'", "'\\''")
+                .replace('\n', "\\n")
+                .replace('\r', "");
             format!("file '{}'\n", escaped)
         })
         .collect();

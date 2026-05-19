@@ -26,6 +26,10 @@ impl BatchProgress {
 
     /// Save progress to a state file
     pub fn to_file(&self, path: &Path) -> Result<()> {
+        if let Some(parent) = path.parent() {
+            std::fs::create_dir_all(parent)
+                .with_context(|| format!("Failed to create progress directory: {:?}", parent))?;
+        }
         let content = serde_json::to_string_pretty(self).context("Failed to serialize progress")?;
         std::fs::write(path, content)
             .with_context(|| format!("Failed to write progress file: {:?}", path))?;

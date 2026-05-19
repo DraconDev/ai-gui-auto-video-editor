@@ -185,9 +185,9 @@ pub fn add_text_watermark(
     info!(text, ?position, "Adding text watermark to video");
 
     let escaped_text = text
-        .replace('\'', "'\\''")
+        .replace('\\', "\\\\")
         .replace(':', "\\:")
-        .replace('\\', "\\\\");
+        .replace('\'', "'\\''");
 
     let overlay_pos = match position {
         WatermarkPosition::TopLeft => "x=10:y=10",
