@@ -501,8 +501,8 @@ impl AppState {
         let mut state = Self {
             config,
             folders,
-            status: ProcessingStatus::Watching,
-            activity_log: vec![ActivityEntry::simple("Started watching for videos", true)],
+            status: ProcessingStatus::Idle,
+            activity_log: vec![ActivityEntry::simple("Ready. Click Process All to start.", true)],
             config_path: None,
             current_tab: Tab::All,
             modal: ModalState::default(),
@@ -541,10 +541,7 @@ impl AppState {
             ));
         }
 
-        if !state.show_setup {
-            state.restart_watcher();
-        }
-
+        // Don't auto-start watcher — user must click Process All
         state
     }
 
@@ -616,8 +613,10 @@ impl AppState {
             self.last_save_time = Some(now);
         }
 
-        // Always restart watcher when config changes (debounced internally)
-        self.restart_watcher();
+        // Only restart watcher if it's already running (not if user stopped it)
+        if self.watcher_rx.is_some() {
+            self.restart_watcher();
+        }
     }
 
     fn add_folder_from_modal(&mut self) {
