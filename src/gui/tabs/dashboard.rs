@@ -1,6 +1,5 @@
 use eframe::egui;
 use egui::RichText;
-use tracing::warn;
 
 use super::super::{App, EntryStatus, ProcessingStatus, QueueStatus, Tab, ToastKind};
 use crate::config::SilenceMode;

@@ -995,7 +995,7 @@ impl App {
         let mut state = AppState::new();
         if force_setup {
             state.show_setup = true;
-            state.setup_step = super::SetupStep::Welcome;
+            state.setup_step = SetupStep::Welcome;
         }
         Self {
             state,
