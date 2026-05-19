@@ -70,7 +70,6 @@ impl App {
             let mut toggle_idx: Option<usize> = None;
             let mut edit_idx: Option<usize> = None;
             let mut delete_idx: Option<usize> = None;
-            let mut duplicate_idx: Option<usize> = None;
 
             if self.state.folders.is_empty() {
                 inner_panel().show(ui, |ui| {
@@ -132,8 +131,8 @@ impl App {
                             ui.with_layout(
                                 egui::Layout::right_to_left(egui::Align::Center),
                                 |ui| {
-                                    if ui.add(button_small("Duplicate")).clicked() {
-                                        duplicate_idx = Some(idx);
+                                    if ui.add(button_small("Edit")).clicked() {
+                                        edit_idx = Some(idx);
                                     }
                                     if ui.add(button_small("Remove")).clicked() {
                                         delete_idx = Some(idx);
@@ -143,9 +142,7 @@ impl App {
                         });
                     });
 
-                    if response.response.clicked() {
-                        edit_idx = Some(idx);
-                    }
+                    // Removed click-to-edit on card body — explicit Edit button above
 
                     ui.add_space(8.0);
                 }
@@ -156,9 +153,6 @@ impl App {
             }
             if let Some(idx) = delete_idx {
                 self.state.modal.prompt_delete(idx);
-            }
-            if let Some(idx) = duplicate_idx {
-                self.state.duplicate_folder(idx);
             }
             if let Some(idx) = edit_idx {
                 let folder = &self.state.folders[idx];

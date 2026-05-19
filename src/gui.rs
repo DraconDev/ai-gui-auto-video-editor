@@ -1159,16 +1159,16 @@ impl eframe::App for App {
         // Left sidebar with navigation
         egui::SidePanel::left("sidebar_nav")
             .resizable(false)
-            .default_width(160.0)
-            .max_width(160.0)
-            .min_width(160.0)
+            .default_width(180.0)
+            .max_width(180.0)
+            .min_width(180.0)
             .frame(
                 egui::Frame::NONE
                     .fill(PANEL_BG_LIGHT)
                     .inner_margin(egui::vec2(0.0, 0.0)),
             )
             .show(ctx, |ui| {
-                ui.set_width(160.0);
+                ui.set_width(180.0);
                 ui.vertical(|ui| {
                     // App title area
                     ui.add_space(12.0);
@@ -1188,24 +1188,14 @@ impl eframe::App for App {
                     });
                     ui.add_space(16.0);
 
-                    // Section: Process
-                    ui.horizontal_wrapped(|ui| {
-                        ui.add_space(12.0);
-                        ui.label(
-                            egui::RichText::new("PROCESS")
-                                .size(10.0)
-                                .color(TEXT_MUTED)
-                                .strong(),
-                        );
-                    });
-                    ui.add_space(4.0);
-
-                    let process_items = [
+                    // Main nav items
+                    let nav_items = [
                         (Tab::All, "🏠", "All"),
                         (Tab::Folders, "📁", "Folders"),
                         (Tab::Queue, "📋", "Queue"),
+                        (Tab::Activity, "📊", "Activity"),
                     ];
-                    for tab in process_items {
+                    for tab in nav_items {
                         let (_, icon, label) = tab;
                         let is_active = self.state.current_tab == tab.0;
                         sidebar_item(
@@ -1219,12 +1209,14 @@ impl eframe::App for App {
                     }
 
                     ui.add_space(12.0);
+                    ui.separator();
+                    ui.add_space(8.0);
 
-                    // Section: Config
+                    // Settings section header
                     ui.horizontal_wrapped(|ui| {
                         ui.add_space(12.0);
                         ui.label(
-                            egui::RichText::new("CONFIG")
+                            egui::RichText::new("SETTINGS")
                                 .size(10.0)
                                 .color(TEXT_MUTED)
                                 .strong(),
@@ -1232,21 +1224,49 @@ impl eframe::App for App {
                     });
                     ui.add_space(4.0);
 
-                    let config_items = [
-                        (Tab::Settings, "⚙", "Settings"),
-                        (Tab::Activity, "📊", "Activity"),
+                    // Settings categories directly in sidebar
+                    let settings_categories = [
+                        (SettingsCategory::Processing, "🎬", "Processing"),
+                        (SettingsCategory::Audio, "🎵", "Audio"),
+                        (SettingsCategory::Video, "📹", "Video"),
+                        (SettingsCategory::Exports, "📤", "Exports"),
+                        (SettingsCategory::Advanced, "⚙", "Advanced"),
                     ];
-                    for tab in config_items {
-                        let (_, icon, label) = tab;
-                        let is_active = self.state.current_tab == tab.0;
-                        sidebar_item(
-                            ui,
-                            is_active,
-                            icon,
-                            label,
-                            tab.0,
-                            &mut self.state.current_tab,
-                        );
+                    for (cat, icon, label) in settings_categories {
+                        let is_active = self.state.current_tab == Tab::Settings
+                            && self.state.settings_category == cat;
+                        let text = format!("{}  {}", icon, label);
+                        let bg = if is_active {
+                            egui::Color32::from_rgb(42, 22, 28)
+                        } else {
+                            PANEL_BG
+                        };
+                        let text_color = if is_active {
+                            ACCENT_PRIMARY
+                        } else {
+                            TEXT_SECONDARY
+                        };
+                        let border = if is_active {
+                            egui::Stroke::new(2.0, ACCENT_PRIMARY)
+                        } else {
+                            egui::Stroke::new(0.0, egui::Color32::TRANSPARENT)
+                        };
+
+                        let btn = egui::Button::new(
+                            egui::RichText::new(&text)
+                                .color(text_color)
+                                .size(13.0)
+                                .strong(),
+                        )
+                        .fill(bg)
+                        .stroke(border)
+                        .corner_radius(CORNER_RADIUS_SMALL)
+                        .min_size(egui::vec2(164.0, 36.0));
+
+                        if ui.add(btn).clicked() {
+                            self.state.current_tab = Tab::Settings;
+                            self.state.settings_category = cat;
+                        }
                     }
 
                     // Spacer and status at bottom
