@@ -1041,9 +1041,12 @@ impl eframe::App for App {
             || ctx.wants_keyboard_input()
             || ctx.input(|i| !i.raw.dropped_files.is_empty());
 
-        // Escape key closes setup wizard
+        // Escape key closes setup wizard — only if there's a config already
         if self.state.show_setup && ctx.input(|i| i.key_pressed(egui::Key::Escape)) {
-            self.state.show_setup = false;
+            // Only dismiss if user has completed setup before (config exists)
+            if self.state.config_path.is_some() || !self.state.folders.is_empty() {
+                self.state.show_setup = false;
+            }
         }
 
         // Handle file drops onto the Queue tab

@@ -154,10 +154,10 @@ impl App {
             if let Some(idx) = delete_idx {
                 self.state.modal.prompt_delete(idx);
             }
-            if let Some(idx) = edit_idx {
-                if let Some(folder) = self.state.folders.get(idx) {
-                    self.state.modal.set_for_edit(idx, folder);
-                }
+            if let Some(idx) = edit_idx
+                && let Some(folder) = self.state.folders.get(idx)
+            {
+                self.state.modal.set_for_edit(idx, folder);
             }
         });
 
