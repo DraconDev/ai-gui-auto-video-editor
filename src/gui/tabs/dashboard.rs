@@ -376,10 +376,10 @@ impl App {
 
             let bg_alpha = ((alpha * 220.0) as u8).min(220);
             let bg_color = match toast.kind {
-                ToastKind::Success => egui::Color32::from_rgba_unmultiplied(18, 40, 26, bg_alpha),
-                ToastKind::Error => egui::Color32::from_rgba_unmultiplied(45, 16, 16, bg_alpha),
-                ToastKind::Warning => egui::Color32::from_rgba_unmultiplied(50, 40, 10, bg_alpha),
-                ToastKind::Info => egui::Color32::from_rgba_unmultiplied(20, 36, 60, bg_alpha),
+                ToastKind::Success => egui::Color32::from_rgba_unmultiplied(SUCCESS_BG.r(), SUCCESS_BG.g(), SUCCESS_BG.b(), bg_alpha),
+                ToastKind::Error => egui::Color32::from_rgba_unmultiplied(ERROR_BG.r(), ERROR_BG.g(), ERROR_BG.b(), bg_alpha),
+                ToastKind::Warning => egui::Color32::from_rgba_unmultiplied(WARNING_BG.r(), WARNING_BG.g(), WARNING_BG.b(), bg_alpha),
+                ToastKind::Info => egui::Color32::from_rgba_unmultiplied(PROCESSING_BG.r(), PROCESSING_BG.g(), PROCESSING_BG.b(), bg_alpha),
             };
 
             let toast_id = egui::Id::new(format!("toast_{}", i));

@@ -101,7 +101,7 @@ impl App {
             .show(ctx, |ui| {
                 ui.allocate_exact_size(screen_rect.size(), egui::Sense::hover());
                 ui.painter()
-                    .rect_filled(screen_rect, 0.0, egui::Color32::from_rgb(10, 10, 12));
+                    .rect_filled(screen_rect, 0.0, PANEL_BG);
             });
 
         // Center the wizard with border and shadow
@@ -802,9 +802,11 @@ impl App {
     pub(crate) fn is_default_setup_path(path: &std::path::Path, preset: &str) -> bool {
         let filename = path.file_name().map(|n| n.to_string_lossy().to_string());
         // It's a default path if the folder name matches the current preset
-        // or is "Videos" (the initial default)
+        // or is "Videos" (the initial parent default)
+        // or the path itself is the Videos root (user hasn't customized)
         filename.as_deref() == Some(preset)
             || filename.as_deref() == Some("Videos")
             || Self::is_default_path(path, preset)
+            || path.ends_with("Videos")
     }
 }

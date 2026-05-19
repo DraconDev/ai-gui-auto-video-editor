@@ -155,8 +155,9 @@ impl App {
                 self.state.modal.prompt_delete(idx);
             }
             if let Some(idx) = edit_idx {
-                let folder = &self.state.folders[idx];
-                self.state.modal.set_for_edit(idx, folder);
+                if let Some(folder) = self.state.folders.get(idx) {
+                    self.state.modal.set_for_edit(idx, folder);
+                }
             }
         });
 
