@@ -142,21 +142,25 @@ impl App {
             let left_width = (available_width - column_spacing) * 0.58;
             let right_width = available_width - left_width - column_spacing;
 
-            ui.horizontal(|ui| {
+            ui.horizontal_top(|ui| {
                 // Left column: Recent Activity
-                ui.allocate_ui(egui::vec2(left_width, 1.0), |ui| {
-                    ui.set_width(left_width);
+                ui.push_id("dash_col_left", |ui| {
+                    ui.set_min_width(left_width);
+                    ui.set_max_width(left_width);
                     self.draw_dashboard_recent_activity(ui);
                 });
 
                 ui.add_space(column_spacing);
 
                 // Right column: Watch Folders + Settings stacked
-                ui.allocate_ui(egui::vec2(right_width, 1.0), |ui| {
-                    ui.set_width(right_width);
-                    self.draw_dashboard_folders_summary(ui);
-                    ui.add_space(12.0);
-                    self.draw_dashboard_settings_summary(ui);
+                ui.push_id("dash_col_right", |ui| {
+                    ui.set_min_width(right_width);
+                    ui.set_max_width(right_width);
+                    ui.vertical(|ui| {
+                        self.draw_dashboard_folders_summary(ui);
+                        ui.add_space(12.0);
+                        self.draw_dashboard_settings_summary(ui);
+                    });
                 });
             });
         } else {
