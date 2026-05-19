@@ -342,7 +342,7 @@ impl App {
 
         ui.add_space(16.0);
 
-        // Preset selection — compact pill layout
+        // Preset selection — 2 clean rows
         ui.label(
             RichText::new("Content Type")
                 .size(14.0)
@@ -351,24 +351,38 @@ impl App {
         );
         ui.add_space(8.0);
 
-        ui.horizontal_wrapped(|ui| {
-            let presets = [
-                ("youtube", "🎬 YouTube"),
-                ("shorts", "📱 Shorts"),
-                ("podcast", "🎙 Podcast"),
-                ("tiktok", "♪ TikTok"),
-                ("reels", "📸 Reels"),
-                ("twitter", "🐦 Twitter"),
-                ("minimal", "⬜ Minimal"),
-            ];
-            for (preset, label) in presets {
-                let selected = self.state.setup_preset == preset;
-                if ui.add(button_pill(selected, label)).clicked() {
-                    self.state.setup_preset = preset.to_string();
+        let presets_row1 = [
+            ("youtube", "🎬 YouTube"),
+            ("shorts", "📱 Shorts"),
+            ("podcast", "🎵 Podcast"),
+        ];
+        let presets_row2 = [
+            ("tiktok", "📱 TikTok"),
+            ("reels", "📸 Reels"),
+            ("twitter", "🐦 Twitter"),
+            ("minimal", "⚙ Minimal"),
+        ];
+
+        for row in [presets_row1, presets_row2] {
+            ui.horizontal(|ui| {
+                for (preset, label) in row {
+                    let selected = self.state.setup_preset == preset;
+                    if ui.add(button_pill(selected, label)).clicked() {
+                        // Update folder path when switching presets
+                        let old_preset = self.state.setup_preset.clone();
+                        if Self::is_default_setup_path(&self.state.setup_folder, &old_preset) {
+                            self.state.setup_folder = self.state.setup_folder
+                                .parent()
+                                .map(|p| p.join(preset))
+                                .unwrap_or_else(|| PathBuf::from(format!("videos/{}", preset)));
+                        }
+                        self.state.setup_preset = preset.to_string();
+                    }
+                    ui.add_space(4.0);
                 }
-                ui.add_space(4.0);
-            }
-        });
+            });
+            ui.add_space(4.0);
+        }
 
         // Show description of selected preset
         let selected_desc = match self.state.setup_preset.as_str() {
