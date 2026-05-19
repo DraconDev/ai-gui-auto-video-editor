@@ -2,7 +2,7 @@ use eframe::egui;
 use egui::RichText;
 use tracing::warn;
 
-use super::super::{App, EntryStatus, QueueStatus, Tab, ToastKind};
+use super::super::{App, EntryStatus, ProcessingStatus, QueueStatus, Tab, ToastKind};
 use crate::config::SilenceMode;
 use crate::gui::theme::*;
 
@@ -61,69 +61,34 @@ impl App {
                         .strong(),
                 );
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                    if ui.add(button_primary("Process All")).clicked() {
-                        let mut added = 0;
-                        let mut errors = Vec::new();
-                        // Collect already-queued paths to avoid duplicates
-                        let mut existing_paths: std::collections::HashSet<_> = self.state.batch_queue
-                            .iter()
-                            .map(|f| f.path.clone())
-                            .collect();
-                        for folder in &self.state.folders {
-                            if folder.enabled {
-                                match crate::utils::find_video_files(&folder.input) {
-                                    Ok(video_files) => {
-                                        for path in video_files {
-                                            if !existing_paths.contains(&path) {
-                                                self.state.batch_queue.push(crate::gui::QueuedFile {
-                                                    path: path.clone(),
-                                                    output_dir: folder.output.clone(),
-                                                    preset: folder.preset.clone(),
-                                                    settings: folder.settings.clone(),
-                                                    status: QueueStatus::Queued,
-                                                    progress: 0.0,
-                                                    output_path: None,
-                                                    completed_at: None,
-                                                });
-                                                existing_paths.insert(path);
-                                                added += 1;
-                                            }
-                                        }
-                                    }
-                                    Err(e) => {
-                                        warn!(error = %e, folder = ?folder.input, "Failed to read folder");
-                                        errors.push(folder.input.display().to_string());
-                                    }
-                                }
+                    // Toggle watcher on/off
+                    let is_watching = self.state.watcher_rx.is_some();
+                    let watch_label = if is_watching { "■ Stop" } else { "▶ Watch" };
+                    let watch_btn = if is_watching {
+                        button_danger(watch_label)
+                    } else {
+                        button_primary(watch_label)
+                    };
+                    if ui.add(watch_btn).clicked() {
+                        if is_watching {
+                            // Stop watcher
+                            if let Some(stop) = self.state.watcher_stop.take() {
+                                stop.store(true, std::sync::atomic::Ordering::SeqCst);
                             }
-                        }
-                        if added > 0 {
-                            self.state.add_toast(
-                                format!("Added {} files to queue", added),
-                                ToastKind::Success,
-                            );
-                        }
-                        if !errors.is_empty() {
-                            let msg = if errors.len() == 1 {
-                                format!("Failed to read: {}", errors[0])
-                            } else {
-                                let joined = errors.join(", ");
-                                if joined.len() > 80 {
-                                    format!("Failed to read {} folders", errors.len())
-                                } else {
-                                    format!("Failed to read: {}", joined)
-                                }
-                            };
-                            self.state.add_toast(msg, ToastKind::Error);
-                        }
-                        if added == 0 && errors.is_empty() {
-                            self.state.add_toast(
-                                "No video files found in enabled folders".to_string(),
-                                ToastKind::Info,
-                            );
+                            self.state.watcher_rx = None;
+                            self.state.status = ProcessingStatus::Idle;
+                        } else {
+                            // Start watcher
+                            self.state.restart_watcher();
+                            self.state.add_toast("Started watching for videos", ToastKind::Success);
                         }
                     }
+
+                    ui.add_space(8.0);
+
                     if ui.add(button_secondary("+ Add Folder")).clicked() {
+                        self.state.modal.reset_for_add();
+                    }
                         self.state.modal.reset_for_add();
                     }
                 });
