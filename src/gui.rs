@@ -68,8 +68,7 @@ fn sidebar_item(
     .corner_radius(CORNER_RADIUS_SMALL)
     .min_size(egui::vec2(160.0, 36.0));
 
-    let response = ui.add(btn);
-    response.on_hover_text(format!("Switch to {} tab", label));
+    let response = ui.add(btn).on_hover_text(format!("Switch to {} tab", label));
     if response.clicked() {
         *current_tab = tab;
     }
@@ -1271,8 +1270,7 @@ impl eframe::App for App {
                         .corner_radius(CORNER_RADIUS_SMALL)
                         .min_size(egui::vec2(164.0, 36.0));
 
-                        let response = ui.add(btn);
-                        response.on_hover_text(format!("{} settings", label));
+                        let response = ui.add(btn).on_hover_text(format!("{} settings", label));
                         if response.clicked() {
                             self.state.current_tab = Tab::Settings;
                             self.state.settings_category = cat;

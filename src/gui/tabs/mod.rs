@@ -37,7 +37,7 @@ impl App {
                     }
                 } else {
                     if ui.add(button_primary("▶ Watch")).clicked() {
-                        self.restart_watcher();
+                        self.state.restart_watcher();
                     }
                 }
                 ui.add_space(12.0);

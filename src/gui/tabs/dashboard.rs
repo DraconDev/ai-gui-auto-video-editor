@@ -391,7 +391,7 @@ impl App {
             };
 
             let toast_id = egui::Id::new(format!("toast_{}", i));
-            let response = egui::Area::new(toast_id)
+            let _response = egui::Area::new(toast_id)
                 .anchor(
                     egui::Align2::RIGHT_BOTTOM,
                     egui::vec2(-20.0, -20.0 - stack_y),
