@@ -204,10 +204,10 @@ impl App {
                                 });
                             });
 
-                        // Content area with generous padding
+                        // Content area — no outer padding; each step manages its own
                         egui::Frame::NONE
                             .fill(PANEL_BG)
-                            .inner_margin(egui::vec2(40.0, 32.0))
+                            .inner_margin(0.0)
                             .show(ui, |ui| {
                                 match self.state.setup_step {
                                     SetupStep::Welcome => self.draw_setup_welcome(ui),
@@ -221,58 +221,63 @@ impl App {
     }
 
     pub(crate) fn draw_setup_welcome(&mut self, ui: &mut egui::Ui) {
-        ui.vertical_centered(|ui| {
-            ui.label(
-                RichText::new("Welcome to AI Video Editor")
-                    .size(28.0)
-                    .color(ACCENT_PRIMARY)
-                    .strong(),
-            );
-            ui.add_space(16.0);
-            ui.label(
-                RichText::new("Let's get you set up in just a few clicks.")
-                    .size(16.0)
-                    .color(TEXT_SECONDARY),
-            );
-            ui.add_space(32.0);
-
-            // Feature highlights
-            egui::Frame::NONE
-                .fill(PANEL_BG)
-                .corner_radius(0.0)
-                .inner_margin(egui::vec2(24.0, 16.0))
-                .show(ui, |ui| {
-                    ui.vertical(|ui| {
-                        self.setup_feature_row(
-                            ui,
-                            "Auto-remove silence",
-                            "Cuts dead air automatically",
-                        );
-                        ui.add_space(8.0);
-                        self.setup_feature_row(
-                            ui,
-                            "Audio enhancement",
-                            "Makes your voice sound professional",
-                        );
-                        ui.add_space(8.0);
-                        self.setup_feature_row(
-                            ui,
-                            "Auto-reframe",
-                            "Convert to vertical video for Shorts/Reels",
-                        );
-                    });
-                });
-
-            ui.add_space(32.0);
-
-            ui.horizontal(|ui| {
-                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                    if ui.add(button_primary("Get Started →")).clicked() {
-                        self.state.setup_step = SetupStep::ChooseFolder;
-                    }
+        // Full-width hero section
+        egui::Frame::NONE
+            .fill(PANEL_BG_LIGHT)
+            .inner_margin(egui::vec2(40.0, 32.0))
+            .show(ui, |ui| {
+                ui.vertical_centered(|ui| {
+                    ui.label(
+                        RichText::new("Welcome to AI Video Editor")
+                            .size(28.0)
+                            .color(ACCENT_PRIMARY)
+                            .strong(),
+                    );
+                    ui.add_space(12.0);
+                    ui.label(
+                        RichText::new("Let's get you set up in just a few clicks.")
+                            .size(16.0)
+                            .color(TEXT_SECONDARY),
+                    );
                 });
             });
-        });
+
+        // Padded content below
+        egui::Frame::NONE
+            .fill(PANEL_BG)
+            .inner_margin(egui::vec2(40.0, 24.0))
+            .show(ui, |ui| {
+                // Feature highlights
+                ui.vertical(|ui| {
+                    self.setup_feature_row(
+                        ui,
+                        "Auto-remove silence",
+                        "Cuts dead air automatically",
+                    );
+                    ui.add_space(10.0);
+                    self.setup_feature_row(
+                        ui,
+                        "Audio enhancement",
+                        "Makes your voice sound professional",
+                    );
+                    ui.add_space(10.0);
+                    self.setup_feature_row(
+                        ui,
+                        "Auto-reframe",
+                        "Convert to vertical video for Shorts/Reels",
+                    );
+                });
+
+                ui.add_space(24.0);
+
+                ui.horizontal(|ui| {
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                        if ui.add(button_primary("Get Started →")).clicked() {
+                            self.state.setup_step = SetupStep::ChooseFolder;
+                        }
+                    });
+                });
+            });
     }
 
     pub(crate) fn setup_feature_row(&self, ui: &mut egui::Ui, title: &str, desc: &str) {
@@ -297,6 +302,15 @@ impl App {
     }
 
     pub(crate) fn draw_setup_folder(&mut self, ui: &mut egui::Ui) {
+        egui::Frame::NONE
+            .fill(PANEL_BG)
+            .inner_margin(egui::vec2(40.0, 32.0))
+            .show(ui, |ui| {
+                self.draw_setup_folder_inner(ui);
+            });
+    }
+
+    fn draw_setup_folder_inner(&mut self, ui: &mut egui::Ui) {
         ui.label(
             RichText::new("Choose Your Video Folder")
                 .size(20.0)
