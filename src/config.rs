@@ -836,6 +836,11 @@ impl Config {
 
     /// Save configuration to a file
     pub fn to_file(&self, path: &Path) -> Result<()> {
+        if let Some(parent) = path.parent() {
+            fs::create_dir_all(parent)
+                .with_context(|| format!("Failed to create config directory: {:?}", parent))?;
+        }
+
         let content = toml::to_string_pretty(self).context("Failed to serialize config")?;
 
         fs::write(path, content)

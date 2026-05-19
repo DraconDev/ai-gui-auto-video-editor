@@ -602,13 +602,15 @@ impl AppState {
                 Config::default_config_path()
             };
 
-            if let Some(path) = path
-                && let Err(e) = self.config.to_file(&path)
-            {
-                self.activity_log.push(ActivityEntry::simple(
-                    format!("Failed to auto-save config: {}", e),
-                    false,
-                ));
+            if let Some(path) = path {
+                if let Err(e) = self.config.to_file(&path) {
+                    self.activity_log.push(ActivityEntry::simple(
+                        format!("Failed to auto-save config: {}", e),
+                        false,
+                    ));
+                }
+                // Remember the path for subsequent saves
+                self.config_path = Some(path);
             }
 
             self.last_save_time = Some(now);
