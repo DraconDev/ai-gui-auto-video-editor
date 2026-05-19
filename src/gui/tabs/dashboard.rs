@@ -439,11 +439,7 @@ impl App {
                             }
                         });
                 });
-            // Check if toast was clicked (only primary/left button)
-            let clicked = response.response.interact(egui::Sense::click()).clicked();
-            if clicked {
-                dismiss_indices.push(i);
-            }
+            // Toast dismissed only via × button — no area-level click dismiss
         }
 
         // Remove dismissed toasts (in reverse order to maintain indices)

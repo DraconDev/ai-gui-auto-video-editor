@@ -653,7 +653,7 @@ impl App {
             },
         };
 
-        self.state.folders = vec![folder];
+        self.state.folders.push(folder);
         self.state.activity_log.push(ActivityEntry::simple(
             format!(
                 "Setup complete! Watching: {}",
@@ -697,10 +697,8 @@ impl App {
             .interactable(true)
             .show(ctx, |ui| {
                 modal_dialog().show(ui, |ui| {
-                    ui.set_min_width(320.0);
-                    ui.set_max_width(320.0);
-
-                    ui.label(label_secondary("Input Folder"));
+                    ui.set_min_width(460.0);
+                    ui.set_max_width(460.0);;
                     ui.add_space(3.0);
                     ui.horizontal(|ui| {
                         let mut input_str = self.state.modal.input.to_string_lossy().to_string();

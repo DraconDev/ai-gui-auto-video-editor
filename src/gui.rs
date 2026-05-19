@@ -1196,10 +1196,10 @@ impl eframe::App for App {
 
                     // Main nav items
                     let nav_items = [
-                        (Tab::All, "🏠", "All"),
+                        (Tab::All, "🎬", "All"),
                         (Tab::Folders, "📁", "Folders"),
-                        (Tab::Queue, "📋", "Queue"),
-                        (Tab::Activity, "📊", "Activity"),
+                        (Tab::Queue, "📤", "Queue"),
+                        (Tab::Activity, "🔧", "Activity"),
                     ];
                     for tab in nav_items {
                         let (_, icon, label) = tab;

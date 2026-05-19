@@ -70,6 +70,22 @@ impl App {
                 return;
             }
 
+            // Category title — shows which settings section is active
+            let category_title = match self.state.settings_category {
+                SettingsCategory::Processing => "Processing Settings",
+                SettingsCategory::Audio => "Audio Settings",
+                SettingsCategory::Video => "Video Settings",
+                SettingsCategory::Exports => "Export Settings",
+                SettingsCategory::Advanced => "Advanced Settings",
+            };
+            ui.label(
+                RichText::new(category_title)
+                    .size(18.0)
+                    .color(ACCENT_PRIMARY)
+                    .strong(),
+            );
+            ui.add_space(8.0);
+
             let is_processing = self.state.queue_processing
                 || matches!(self.state.status, ProcessingStatus::Processing(_));
 
