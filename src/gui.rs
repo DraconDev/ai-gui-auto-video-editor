@@ -513,7 +513,8 @@ impl AppState {
                 .or_else(|_| std::env::var("USERPROFILE"))
                 .map(PathBuf::from)
                 .unwrap_or_default()
-                .join("Videos"),
+                .join("Videos")
+                .join("youtube"),
             setup_preset: "youtube".to_string(),
             setup_enhance: true,
             setup_remove_silence: true,

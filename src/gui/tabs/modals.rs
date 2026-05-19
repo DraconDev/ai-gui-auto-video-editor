@@ -342,7 +342,7 @@ impl App {
 
         ui.add_space(16.0);
 
-        // Preset selection — 2 clean rows
+        // Preset selection — 2 clean rows, evenly spaced
         ui.label(
             RichText::new("Content Type")
                 .size(14.0)
@@ -364,10 +364,17 @@ impl App {
         ];
 
         for row in [presets_row1, presets_row2] {
+            let count = row.len();
+            let spacing = 8.0;
+            let total_spacing = spacing * (count as f32 - 1.0);
+            let pill_width = (ui.available_width() - total_spacing) / count as f32;
+
             ui.horizontal(|ui| {
-                for &(preset, label) in row {
+                for (i, &(preset, label)) in row.iter().enumerate() {
                     let selected = self.state.setup_preset == preset;
-                    if ui.add(button_pill(selected, label)).clicked() {
+                    let btn = button_pill(selected, label)
+                        .min_size(egui::vec2(pill_width, 36.0));
+                    if ui.add(btn).clicked() {
                         // Update folder path when switching presets
                         let old_preset = self.state.setup_preset.clone();
                         if Self::is_default_setup_path(&self.state.setup_folder, &old_preset) {
@@ -378,10 +385,12 @@ impl App {
                         }
                         self.state.setup_preset = preset.to_string();
                     }
-                    ui.add_space(4.0);
+                    if i < count - 1 {
+                        ui.add_space(spacing);
+                    }
                 }
             });
-            ui.add_space(4.0);
+            ui.add_space(8.0);
         }
 
         // Show description of selected preset
