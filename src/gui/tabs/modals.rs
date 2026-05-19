@@ -101,28 +101,121 @@ impl App {
             .show(ctx, |ui| {
                 ui.allocate_exact_size(screen_rect.size(), egui::Sense::hover());
                 ui.painter()
-                    .rect_filled(screen_rect, 0.0, egui::Color32::from_rgb(15, 15, 20));
+                    .rect_filled(screen_rect, 0.0, egui::Color32::from_rgb(10, 10, 12));
             });
 
-        // Center the wizard
+        // Center the wizard with border and shadow
         egui::Area::new(egui::Id::new("setup_wizard"))
             .anchor(egui::Align2::CENTER_CENTER, egui::vec2(0.0, 0.0))
             .order(egui::Order::Foreground)
             .show(ctx, |ui| {
                 egui::Frame::NONE
-                    .fill(PANEL_BG_LIGHT)
+                    .fill(PANEL_BG)
                     .corner_radius(0.0)
-                    .inner_margin(egui::vec2(48.0, 40.0))
+                    .inner_margin(0.0)
+                    .stroke(egui::Stroke::new(1.0, BORDER_LIGHT))
+                    .shadow(egui::epaint::Shadow {
+                        offset: [0, 12],
+                        blur: 48,
+                        spread: 0,
+                        color: egui::Color32::from_black_alpha(120),
+                    })
                     .show(ui, |ui| {
-                        ui.set_min_width(520.0);
-                        ui.set_max_width(520.0);
+                        ui.set_min_width(540.0);
+                        ui.set_max_width(540.0);
 
-                        match self.state.setup_step {
-                            SetupStep::Welcome => self.draw_setup_welcome(ui),
-                            SetupStep::ChooseFolder => self.draw_setup_folder(ui),
-                            SetupStep::ProcessingOptions => self.draw_setup_options(ui),
-                            SetupStep::Complete => self.draw_setup_complete(ui),
-                        }
+                        // Accent bar at top of wizard
+                        accent_bar().show(ui, |_ui| {});
+
+                        // Step indicator
+                        let steps = [
+                            (SetupStep::Welcome, "Welcome"),
+                            (SetupStep::ChooseFolder, "Folder"),
+                            (SetupStep::ProcessingOptions, "Options"),
+                            (SetupStep::Complete, "Done"),
+                        ];
+                        let current_idx = match self.state.setup_step {
+                            SetupStep::Welcome => 0,
+                            SetupStep::ChooseFolder => 1,
+                            SetupStep::ProcessingOptions => 2,
+                            SetupStep::Complete => 3,
+                        };
+
+                        egui::Frame::NONE
+                            .fill(PANEL_BG_LIGHT)
+                            .inner_margin(egui::vec2(32.0, 20.0))
+                            .show(ui, |ui| {
+                                ui.horizontal(|ui| {
+                                    for (i, (_, label)) in steps.iter().enumerate() {
+                                        if i > 0 {
+                                            // Connector line
+                                            let (rect, _) = ui.allocate_exact_size(
+                                                egui::vec2(40.0, 2.0),
+                                                egui::Sense::hover(),
+                                            );
+                                            let line_color = if i <= current_idx {
+                                                ACCENT_PRIMARY
+                                            } else {
+                                                BORDER
+                                            };
+                                            ui.painter().rect_filled(
+                                                rect,
+                                                0.0,
+                                                line_color,
+                                            );
+                                        }
+
+                                        let is_done = i < current_idx;
+                                        let is_current = i == current_idx;
+                                        let dot_color = if is_done || is_current {
+                                            ACCENT_PRIMARY
+                                        } else {
+                                            TEXT_MUTED
+                                        };
+                                        let text_color = if is_current {
+                                            TEXT_PRIMARY
+                                        } else if is_done {
+                                            ACCENT_PRIMARY
+                                        } else {
+                                            TEXT_MUTED
+                                        };
+
+                                        ui.vertical(|ui| {
+                                            ui.horizontal_centered(|ui| {
+                                                let (rect, _) = ui.allocate_exact_size(
+                                                    egui::vec2(12.0, 12.0),
+                                                    egui::Sense::hover(),
+                                                );
+                                                ui.painter().circle_filled(
+                                                    rect.center(),
+                                                    if is_done || is_current { 5.0 } else { 3.5 },
+                                                    dot_color,
+                                                );
+                                                ui.add_space(8.0);
+                                                ui.label(
+                                                    egui::RichText::new(*label)
+                                                        .size(12.0)
+                                                        .color(text_color)
+                                                        .strong(),
+                                                );
+                                            });
+                                        });
+                                    }
+                                });
+                            });
+
+                        // Content area with generous padding
+                        egui::Frame::NONE
+                            .fill(PANEL_BG)
+                            .inner_margin(egui::vec2(40.0, 32.0))
+                            .show(ui, |ui| {
+                                match self.state.setup_step {
+                                    SetupStep::Welcome => self.draw_setup_welcome(ui),
+                                    SetupStep::ChooseFolder => self.draw_setup_folder(ui),
+                                    SetupStep::ProcessingOptions => self.draw_setup_options(ui),
+                                    SetupStep::Complete => self.draw_setup_complete(ui),
+                                }
+                            });
                     });
             });
     }
