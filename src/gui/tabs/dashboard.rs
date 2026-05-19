@@ -132,7 +132,44 @@ impl App {
 
         ui.add_space(12.0);
 
-        // Recent activity
+        // Two-column row: Recent Activity (left) + Watch Folders & Settings (right)
+        let column_spacing = 12.0;
+        let available_width = ui.available_width();
+        // On narrow screens (<600px), stack vertically; otherwise two columns
+        let use_two_columns = available_width >= 600.0;
+
+        if use_two_columns {
+            let left_width = (available_width - column_spacing) * 0.58;
+            let right_width = available_width - left_width - column_spacing;
+
+            ui.horizontal(|ui| {
+                // Left column: Recent Activity
+                ui.allocate_ui(egui::vec2(left_width, 1.0), |ui| {
+                    ui.set_width(left_width);
+                    self.draw_dashboard_recent_activity(ui);
+                });
+
+                ui.add_space(column_spacing);
+
+                // Right column: Watch Folders + Settings stacked
+                ui.allocate_ui(egui::vec2(right_width, 1.0), |ui| {
+                    ui.set_width(right_width);
+                    self.draw_dashboard_folders_summary(ui);
+                    ui.add_space(12.0);
+                    self.draw_dashboard_settings_summary(ui);
+                });
+            });
+        } else {
+            // Narrow layout: stack everything vertically
+            self.draw_dashboard_recent_activity(ui);
+            ui.add_space(12.0);
+            self.draw_dashboard_folders_summary(ui);
+            ui.add_space(12.0);
+            self.draw_dashboard_settings_summary(ui);
+        }
+    }
+
+    fn draw_dashboard_recent_activity(&mut self, ui: &mut egui::Ui) {
         panel_frame().show(ui, |ui| {
             ui.vertical(|ui| {
                 ui.horizontal_wrapped(|ui| {
@@ -199,10 +236,9 @@ impl App {
                 }
             });
         });
+    }
 
-        ui.add_space(12.0);
-
-        // Watch folders summary (compact)
+    fn draw_dashboard_folders_summary(&mut self, ui: &mut egui::Ui) {
         panel_frame().show(ui, |ui| {
             ui.vertical(|ui| {
                 ui.horizontal_wrapped(|ui| {
@@ -272,10 +308,9 @@ impl App {
                 }
             });
         });
+    }
 
-        ui.add_space(12.0);
-
-        // Settings summary
+    fn draw_dashboard_settings_summary(&mut self, ui: &mut egui::Ui) {
         panel_frame().show(ui, |ui| {
             ui.vertical(|ui| {
                 ui.horizontal_wrapped(|ui| {
