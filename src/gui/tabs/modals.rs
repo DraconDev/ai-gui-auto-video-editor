@@ -351,13 +351,13 @@ impl App {
         );
         ui.add_space(8.0);
 
-        let presets_row1 = [
+        let presets_row1: &[(&str, &str)] = &[
             ("youtube", "🎬 YouTube"),
             ("shorts", "📱 Shorts"),
             ("podcast", "🎵 Podcast"),
-        ];
-        let presets_row2 = [
             ("tiktok", "📱 TikTok"),
+        ];
+        let presets_row2: &[(&str, &str)] = &[
             ("reels", "📸 Reels"),
             ("twitter", "🐦 Twitter"),
             ("minimal", "⚙ Minimal"),
@@ -365,7 +365,7 @@ impl App {
 
         for row in [presets_row1, presets_row2] {
             ui.horizontal(|ui| {
-                for (preset, label) in row {
+                for &(preset, label) in row {
                     let selected = self.state.setup_preset == preset;
                     if ui.add(button_pill(selected, label)).clicked() {
                         // Update folder path when switching presets
