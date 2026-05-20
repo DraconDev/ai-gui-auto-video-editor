@@ -835,14 +835,13 @@ fn generate_trim_filters(segments: &[ProcessedSegment]) -> (String, String) {
 /// ffmpeg's atempo only supports 0.5 to 2.0 per filter instance.
 ///
 /// Uses sqrt-chaining for high speedups (3x+) to avoid sample-skipping artifacts:
-/// - Instead of `atempo=2.0,atempo=2.0` (skips samples, robotic voice)
-/// - Uses `atempo=sqrt(N)` chained twice for smoother quality
+/// - Instead of `atempo=2.0,atempo=1.5` (skips samples at high atempo)
+/// - Uses `atempo=sqrt(N)` chained twice for smoother phase vocoder quality
 ///
 /// For slowdown (0.5x-), uses 0.5x chained filters.
 fn chain_atempo_filters(speed: f32) -> String {
     const ATEMPO_MIN: f32 = 0.5;
     const ATEMPO_MAX: f32 = 2.0;
-
 
     if (ATEMPO_MIN..=ATEMPO_MAX).contains(&speed) {
         return format!("atempo={}", speed);
@@ -850,36 +849,27 @@ fn chain_atempo_filters(speed: f32) -> String {
 
     let mut filters = Vec::new();
 
-
     if speed > ATEMPO_MAX {
         // High speedup (3x+): use sqrt chaining for smoother phase vocoder
-        // This avoids the "skip samples" artifact at high atempo values
         if speed > 4.0 {
-            // 4x = 2.0 * 2.0 exactly, no sqrt needed
+            // Very high speedup (>4x): chain 2.0x filters
             filters.push("atempo=2.0".to_string());
             filters.push("atempo=2.0".to_string());
         } else {
-            // For 3x or other values, use sqrt for smoother quality
+            // For 3x-4x: use sqrt for smoother quality (e.g., sqrt(3) ≈ 1.73)
             let sqrt_speed = speed.sqrt();
-            if sqrt_speed > ATEMPO_MAX {
-                // e.g., 9x: sqrt(9)=3, still >2, so chain sqrt then full
-                filters.push(format!("atempo={:.3}", ATEMPO_MAX));
-                filters.push(format!("atempo={:.3}", sqrt_speed / ATEMPO_MAX));
-            } else {
-                // e.g., 4x: sqrt(4)=2 exactly
-                filters.push(format!("atempo={:.3}", sqrt_speed));
-                filters.push(format!("atempo={:.3}", sqrt_speed));
-            }
+            filters.push(format!("atempo={:.1}", sqrt_speed));
+            filters.push(format!("atempo={:.1}", sqrt_speed));
         }
     } else if speed < ATEMPO_MIN {
-        // Slowdown: chain multiple 0.5x filters (multiply remaining by 0.5 to decrease)
+        // Slowdown: chain 0.5x filters (multiply to decrease, not divide)
         let mut remaining = speed;
         while remaining < ATEMPO_MIN {
             filters.push("atempo=0.5".to_string());
-            remaining *= 0.5; // FIX: multiply to decrease, not divide
+            remaining *= 0.5;
         }
         if remaining < 1.0 && remaining >= ATEMPO_MIN {
-            filters.push(format!("atempo={:.3}", remaining));
+            filters.push(format!("atempo={:.1}", remaining));
         }
     }
 
@@ -1213,9 +1203,9 @@ mod tests {
         assert_eq!(chain_atempo_filters(0.75), "atempo=0.75");
 
         // Speed up 4.0x: use exact 2.0x chained (no sqrt needed for power of 2)
-        assert_eq!(chain_atempo_filters(4.0), "atempo=2.000,atempo=2.000");
-        // Speed up 3.0x: use sqrt(3) chained for smoother quality (~1.732x each)
-        assert_eq!(chain_atempo_filters(3.0), "atempo=1.732,atempo=1.732");
+        assert_eq!(chain_atempo_filters(4.0), "atempo=2.0,atempo=2.0");
+        // Speed up 3.0x: use sqrt(3) chained for smoother quality (~1.7x each)
+        assert_eq!(chain_atempo_filters(3.0), "atempo=1.7,atempo=1.7");
 
         // Slow down below 0.5: chain multiple 0.5x filters
         assert_eq!(chain_atempo_filters(0.25), "atempo=0.5,atempo=0.5");
