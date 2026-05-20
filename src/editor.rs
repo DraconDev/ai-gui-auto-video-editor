@@ -389,9 +389,8 @@ impl VideoEditor for FfmpegEditor {
         // afftdn removes steady background noise (fans, AC, hiss).
         // nf=-15: 15dB reduction — removes noise while preserving voice clarity.
         // nf=-25 was too aggressive (causes muffled/underwater artifacts).
-        // tn=1: low complexity model for faster processing.
-        // detection=peak: more accurate for voice content than rms (default).
-        let filter = "afftdn=nf=-15:tn=1:detection=peak";
+        // tn=true: track noise for better quality but slower processing.
+        let filter = "afftdn=nf=-15:tn=true";
 
         let status = Command::new("ffmpeg")
             .args([
