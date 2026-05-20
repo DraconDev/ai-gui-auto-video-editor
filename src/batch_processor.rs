@@ -899,7 +899,7 @@ fn export_additional_files(
                 .arg("-i")
                 .arg(output_file)
                 .args(["-vf", &format!("scale={}:{}", w, h)])
-                .args(["-c:a", "copy", "-y"])
+                .args(["-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-y"])
                 .arg(&multi_path)
                 .status()
                 .context("failed to execute ffmpeg for multi-format")?;

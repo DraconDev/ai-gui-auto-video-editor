@@ -385,9 +385,13 @@ impl VideoEditor for FfmpegEditor {
     }
 
     fn reduce_noise(&self, input: &Path, output: &Path) -> Result<()> {
-        // Apply FFT-based noise reduction
-        // afftdn removes steady background noise (fans, AC, hiss)
-        let filter = "afftdn=nf=-25:tn=1";
+        // Apply FFT-based noise reduction with balanced settings.
+        // afftdn removes steady background noise (fans, AC, hiss).
+        // nf=-15: 15dB reduction — removes noise while preserving voice clarity.
+        // nf=-25 was too aggressive (causes muffled/underwater artifacts).
+        // tn=1: low complexity model for faster processing.
+        // detection=peak: more accurate for voice content than rms (default).
+        let filter = "afftdn=nf=-15:tn=1:detection=peak";
 
         let status = Command::new("ffmpeg")
             .args([
@@ -574,32 +578,52 @@ fn run_trim_filter_job(
 ) -> Result<()> {
     let (v_filter, a_filter) = generate_trim_filters(segments);
 
-    let status = Command::new("ffmpeg")
-        .args([
-            "-i",
-            input.to_str().context("invalid input path")?,
-            "-filter_complex",
-            &format!("{}{}", v_filter, a_filter),
-            "-map",
-            "[outv]",
-            "-map",
-            "[outa]",
-            "-c:v",
-            codec,
-            "-preset",
-            "veryfast",
-            "-crf",
-            "20",
-            "-c:a",
-            "aac",
-            "-b:a",
-            "192k",
-            "-movflags",
-            "+faststart",
-            "-y",
-            output.to_str().context("invalid output path")?,
-        ])
-        .status()
+    // Build codec-specific args:
+    // - NVENC/AMF: use VBR high quality with adaptive quantization for best perceptual quality
+    // - Software (libx264): use CRF for constant quality
+    let is_hw = matches!(codec, "h264_nvenc" | "h264_amf");
+    let mut args = vec![
+        "-i",
+        input.to_str().context("invalid input path")?,
+        "-filter_complex",
+        &format!("{}{}", v_filter, a_filter),
+        "-map",
+        "[outv]",
+        "-map",
+        "[outa]",
+    ];
+    args.extend(["-c:v", codec]);
+    if is_hw {
+        // Hardware encoders: VBR HQ + spatial AQ for perceptual quality
+        // YouTube recommends VBR, High Profile, CABAC
+        args.extend(["-preset", "p7"]); // p7 = slow = max quality
+        args.extend(["-rc:v", "vbr_hq"]);
+        args.extend(["-cq:v", "23"]); // Quality level (0-51, lower=better)
+        args.extend(["-refs:v", "16"]); // Reference frames for quality
+        args.extend(["-bf:v", "3"]); // B-frames
+        args.extend(["-spatial_aq:v", "1"]); // Spatial adaptive quantization
+        args.extend(["-aq-strength:v", "8"]); // AQ strength (1-15)
+        args.extend(["-coder:v", "cabac"]); // CABAC > CAVLC
+    } else {
+        // Software: CRF for constant quality, slower preset
+        args.extend(["-preset", "slow"]);
+        args.extend(["-crf", "20"]);
+    }
+    args.extend(["-profile:v", "high"]); // High profile for better compression
+    args.extend([
+        "-c:a",
+        "aac",
+        "-b:a",
+        "192k",
+        "-ar",
+        "48000",  // 48kHz sample rate (YouTube recommended)
+        "-movflags",
+        "+faststart", // Moov atom at front for web streaming
+        "-y",
+    ]);
+    args.push(output.to_str().context("invalid output path")?);
+
+    let status = Command::new("ffmpeg").args(&args).status()
         .context("failed to execute ffmpeg")?;
 
     if !status.success() {
