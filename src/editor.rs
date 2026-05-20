@@ -332,7 +332,7 @@ impl VideoEditor for FfmpegEditor {
 
         // Pass 1: Measure audio loudness
         let measure_filter = format!(
-            "highpass=f=80,lowpass=f=12000,equalizer=f=1500:t=q:w=3:g=1.5,loudnorm=I={target_lufs}:TP=-1.5:LRA=11:print_format=json"
+            "highpass=f=60,equalizer=f=3000:t=q:w=2:g=1.0,loudnorm=I={target_lufs}:TP=-2.0:LRA=7:print_format=json"
         );
 
         let measure_output = Command::new("ffmpeg")
@@ -353,13 +353,13 @@ impl VideoEditor for FfmpegEditor {
         // Pass 2: Apply measured normalization
         let filter = if let Some(s) = stats {
             format!(
-                "highpass=f=80,lowpass=f=12000,equalizer=f=1500:t=q:w=3:g=1.5,loudnorm=I={}:TP=-1.5:LRA=11:measured_I={}:measured_TP={}:measured_LRA={}:measured_thresh={}:offset={}:linear=true",
+                "highpass=f=60,equalizer=f=3000:t=q:w=2:g=1.0,loudnorm=I={}:TP=-2.0:LRA=7:measured_I={}:measured_TP={}:measured_LRA={}:measured_thresh={}:offset={}:linear=true",
                 target_lufs, s.i, s.tp, s.lra, s.thresh, s.offset
             )
         } else {
             // Fallback to single-pass if measurement failed
             format!(
-                "highpass=f=80,lowpass=f=12000,equalizer=f=1500:t=q:w=3:g=1.5,loudnorm=I={target_lufs}:TP=-1.5:LRA=11"
+                "highpass=f=60,equalizer=f=3000:t=q:w=2:g=1.0,loudnorm=I={target_lufs}:TP=-2.0:LRA=7"
             )
         };
 
