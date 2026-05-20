@@ -611,8 +611,7 @@ fn run_trim_filter_job(
         args.extend(&["-preset", "slow"]);
         args.extend(&["-crf", "20"]);
     }
-    args.extend(&["-profile:v", "high"]); // High profile for better compression
-    args.extend(&[
+    args.extend(&[ // Audio: AAC-LC @ 192kbps, 48kHz (YouTube recommended)
         "-c:a",
         "aac",
         "-b:a",
