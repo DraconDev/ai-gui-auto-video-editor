@@ -387,10 +387,11 @@ impl VideoEditor for FfmpegEditor {
     fn reduce_noise(&self, input: &Path, output: &Path) -> Result<()> {
         // Apply FFT-based noise reduction with balanced settings.
         // afftdn removes steady background noise (fans, AC, hiss).
-        // nf=-15: 15dB reduction — removes noise while preserving voice clarity.
-        // nf=-25 was too aggressive (causes muffled/underwater artifacts).
+        // noise_reduction=15 (not nf=-25 which was too aggressive).
+        // nr=15: 15dB reduction — removes noise while preserving voice clarity.
+        // nf=-25 caused muffled/underwater artifacts.
         // tn=true: track noise for better quality but slower processing.
-        let filter = "afftdn=nf=-15:tn=true";
+        let filter = "afftdn=nr=15:tn=true";
 
         let status = Command::new("ffmpeg")
             .args([
