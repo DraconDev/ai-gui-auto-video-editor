@@ -862,13 +862,13 @@ fn chain_atempo_filters(speed: f32) -> String {
             filters.push(format!("atempo={:.1}", sqrt_speed));
         }
     } else if speed < ATEMPO_MIN {
-        // Slowdown: chain 0.5x filters (multiply to decrease, not divide)
+        // Slow down: chain multiple 0.5x filters
         let mut remaining = speed;
         while remaining < ATEMPO_MIN {
             filters.push("atempo=0.5".to_string());
-            remaining *= 0.5;
+            remaining /= 0.5; // divide by 0.5 = multiply by 2 (accelerates toward 1.0)
         }
-        if remaining < 1.0 && remaining >= ATEMPO_MIN {
+        if (ATEMPO_MIN..1.0).contains(&remaining) {
             filters.push(format!("atempo={:.1}", remaining));
         }
     }
