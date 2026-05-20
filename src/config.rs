@@ -191,7 +191,9 @@ fn default_min_silence_for_speedup() -> f32 {
     0.5
 }
 fn default_scene_threshold() -> f32 {
-    0.3
+    // 0.10 = recommended default per FFmpeg scdet docs (8.0-14.0% = 0.08-0.14)
+    // Higher values (0.3) only detect very obvious scene changes
+    0.10
 }
 fn default_watermark_position() -> String {
     "bottom-right".to_string()
