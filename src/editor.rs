@@ -577,46 +577,48 @@ fn run_trim_filter_job(
     codec: &str,
 ) -> Result<()> {
     let (v_filter, a_filter) = generate_trim_filters(segments);
+    let filter_complex = format!("{}{}", v_filter, a_filter);
 
     // Build codec-specific args:
     // - NVENC/AMF: use VBR high quality with adaptive quantization for best perceptual quality
     // - Software (libx264): use CRF for constant quality
     let is_hw = matches!(codec, "h264_nvenc" | "h264_amf");
-    let mut args = vec![
+    let mut args: Vec<&str> = vec![
         "-i",
         input.to_str().context("invalid input path")?,
         "-filter_complex",
-        &format!("{}{}", v_filter, a_filter),
+        &filter_complex,
         "-map",
         "[outv]",
         "-map",
         "[outa]",
+        "-c:v",
+        codec,
     ];
-    args.extend(["-c:v", codec]);
     if is_hw {
         // Hardware encoders: VBR HQ + spatial AQ for perceptual quality
         // YouTube recommends VBR, High Profile, CABAC
-        args.extend(["-preset", "p7"]); // p7 = slow = max quality
-        args.extend(["-rc:v", "vbr_hq"]);
-        args.extend(["-cq:v", "23"]); // Quality level (0-51, lower=better)
-        args.extend(["-refs:v", "16"]); // Reference frames for quality
-        args.extend(["-bf:v", "3"]); // B-frames
-        args.extend(["-spatial_aq:v", "1"]); // Spatial adaptive quantization
-        args.extend(["-aq-strength:v", "8"]); // AQ strength (1-15)
-        args.extend(["-coder:v", "cabac"]); // CABAC > CAVLC
+        args.extend(&["-preset", "p7"]); // p7 = slow = max quality
+        args.extend(&["-rc:v", "vbr_hq"]);
+        args.extend(&["-cq:v", "23"]); // Quality level (0-51, lower=better)
+        args.extend(&["-refs:v", "16"]); // Reference frames for quality
+        args.extend(&["-bf:v", "3"]); // B-frames
+        args.extend(&["-spatial_aq:v", "1"]); // Spatial adaptive quantization
+        args.extend(&["-aq-strength:v", "8"]); // AQ strength (1-15)
+        args.extend(&["-coder:v", "cabac"]); // CABAC > CAVLC
     } else {
         // Software: CRF for constant quality, slower preset
-        args.extend(["-preset", "slow"]);
-        args.extend(["-crf", "20"]);
+        args.extend(&["-preset", "slow"]);
+        args.extend(&["-crf", "20"]);
     }
-    args.extend(["-profile:v", "high"]); // High profile for better compression
-    args.extend([
+    args.extend(&["-profile:v", "high"]); // High profile for better compression
+    args.extend(&[
         "-c:a",
         "aac",
         "-b:a",
         "192k",
         "-ar",
-        "48000",  // 48kHz sample rate (YouTube recommended)
+        "48000", // 48kHz sample rate (YouTube recommended)
         "-movflags",
         "+faststart", // Moov atom at front for web streaming
         "-y",
