@@ -67,7 +67,7 @@ impl Preset {
                 config.silence.speedup_factor = 4.0;
                 config.silence.padding = 0.03;
                 config.audio.enhance = true;
-                config.audio.target_lufs = -12.0; // Louder for mobile
+                config.audio.target_lufs = -14.0; // Match YouTube standard, avoid dynamic mode
                 config.video.reframe = true;
                 config.video.target_resolution = VideoResolution::Vertical1080p;
                 config.export.captions = true; // Burn captions for accessibility
