@@ -87,10 +87,8 @@ name = "ai-gui-auto-video-editor"
 path = "src/main.rs"
 
 [profile.release]
-lto = "thin"
+lto = true
+panic = "abort"
 strip = true
 opt-level = 2
 codegen-units = 1
-
-[profile.dev]
-opt-level = 1
