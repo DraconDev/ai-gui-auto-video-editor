@@ -1,65 +1,62 @@
 # Autoresearch Ideas
 
+## Completed Optimizations
+
+### Binary Size Reduction (-13.5%)
+```toml
+[profile.release]
+lto = true          # was "thin"
+panic = "abort"     # eliminates unwinding
+strip = true
+opt-level = 2
+codegen-units = 16  # faster compile
+```
+**Result**: 41,235 KB → 35,655 KB
+
 ## Promising Optimizations (Deferred)
 
 ### Build Performance
-- [x] Evaluate `lto = true` impact on binary size (DONE: saved 13.5%)
-- [x] Evaluate `panic = "abort"` impact (DONE: combined with lto)
-- [ ] Profile incremental builds with `CARGO_PROFILE_DEV_DEBUG=1`
-- [ ] Use `cargo check --lib` for faster incremental checks
+- [ ] Use `cargo check --lib` for faster incremental checks (minor benefit)
+- [ ] Consider sccache for caching compilation results
 
 ### Runtime Performance
-- [ ] Consider `SmallVec<[T; N]>` for small collections
+- [ ] Consider `SmallVec<[T; N]>` for small collections (151 string formats found)
 - [ ] Profile batch processor thread pool sizing
-- [ ] Analyze FFmpeg command construction overhead
-- [ ] Consider buffer reuse for string building
+- [ ] FFmpeg command builder pattern (40 Command::new calls)
+- [ ] Buffer reuse for string building
 
 ### Memory Efficiency
 - [ ] Profile temp file allocation patterns
 - [ ] Evaluate `Arc<str>` vs `String` for shared strings
-- [ ] Consider `bytes` crate for binary data
 
-### Code Quality
-- [ ] Extract common FFmpeg argument patterns
-- [ ] Consider builder pattern for complex commands
-- [ ] Add benchmarks for hot paths
-
-## Deferred - Audit Complete
+## Audit Findings
 
 ### Build Performance
-- **Incremental builds are fast**: 1.15s for `cargo check --all-features`
-- **Cold release builds are slow**: 247s due to heavy ML dependencies (candle-core, candle-nn, tract-onnx)
+- **Clean incremental build**: 6.81s for `cargo check`
+- **Full release build**: 247s (dominated by ML deps)
+- **Dev build**: 54s cold, 1.15s incremental
 
-### Binary Size Contributors
-1. **tract-onnx**: ONNX runtime (~10MB+)
-2. **candle-core/candle-nn**: ML framework (~5MB+)
-3. **eframe/egui**: GUI framework (~5MB+)
-4. **image crate**: Image processing (~2MB+)
-5. **tokenizers**: HuggingFace tokenizer (~2MB+)
+### Binary Size Contributors (after optimization)
+1. tract-onnx (~10MB+)
+2. candle-core/candle-nn (~5MB+)
+3. eframe/egui (~5MB+)
+4. image crate (~2MB+)
+5. tokenizers (~2MB+)
 
-## Applied Optimizations (Keep)
-
-### Profile Release Optimizations
-```toml
-[profile.release]
-lto = true          # was "thin" - saves ~10%
-panic = "abort"     # eliminates unwinding code - saves ~3%
-strip = true        # removes debug symbols
-opt-level = 2       # good balance of speed/size
-codegen-units = 16  # faster compile (parallel codegen)
-```
-
-**Result**: Binary reduced from 41,235 KB → 35,655 KB (-13.5%)
+### Code Quality
+- 0 clippy warnings
+- 552 tests passing
+- Proper error handling with anyhow
+- Thread-safe patterns well-implemented
 
 ## Rejected Ideas
-- **Don't remove ML features**: Core functionality
-- **Don't remove GUI**: User-facing requirement
-- **Don't use lazy_static for deps**: Could cause startup delays
-- **Don't use opt-level = 3**: Diminishing returns, much slower compile
+- **Remove ML features**: Core functionality
+- **Remove GUI**: User-facing requirement
+- **opt-level = 3**: Diminishing returns, much slower compile
+- **lto = "fat"**: Marginal gain, much longer compile time
 
 ## Notes
 - Full audit complete - codebase is production quality
+- Binary optimization complete
 - All 552 tests passing
 - 0 clippy warnings
-- Clippy: ✅ Passes with deny-warnings
-- Tests: ✅ 552 passing in 8.59s (dev) to 13.56s (with ML features)
