@@ -1,39 +1,76 @@
-# TODO — Full File Cleanup
+# Code Review TODO — AI Video Editor
 
-## ✅ Remove stale release artifacts
-- [x] Deleted `release/0.1.424/`, `release/0.1.467/`, `release/3.0.0/`, `release/13.2.0/`, `release/19.1.9/`, `release/19.2.2/`
-- [x] Deleted all tarballs and checksums (`ai-gui-auto-video-editor-0.1.424.*`, `0.1.467.*`, `3.0.0.*`, `13.2.0.*`, `19.1.9.*`, `19.2.2.*`)
+## 🔴 CRITICAL
 
-## ✅ Update CHANGELOG.md
-- [x] Added `[19.58.0]` section with all changes (bug fixes, code quality, features, GUI, cleanup)
+### 1. `progress.rs:44,65` — `SystemTime::elapsed()` used as age-stamp (LOGIC BUG)
+- [ ] `is_completed()` and `mark_completed()` store file *age* (elapsed time) instead of absolute mtime
+- [ ] Comparison `saved_mtime.abs_diff(current_mtime)` fails when time passes between mark and check
+- **Fix**: Store raw `SystemTime` from `modified()`, compare with `duration_since()`
 
-## ✅ Update example config
-- [x] `ai-gui-auto-video-editor.example.toml` — added blur_background clarification comment
-- [x] Added missing `[video]` fields: watermark, watermark_position, watermark_scale, blur_background, reframe, target_resolution
-- [x] Added missing `speedup_factor` in `[silence]`
+### 2. `editor.rs:648-656` — Join path can exceed `NAME_MAX`
+- [ ] `{:x}` on u128 produces up to 32 hex chars + prefix, risks exceeding filesystem limits
+- **Fix**: Use `{:016x}` (fixed width) or hash the nanoseconds
 
-## ✅ Update docs with stale refs
-- [x] `docs/superpowers/plans/2026-04-25-big-features.md` — `gui/tabs.rs` → `gui/tabs/mod.rs`
-- [x] `docs/customer-facing.md` — added Ctrl+C graceful shutdown note
+### 3. `ml.rs:121-125` — Silent FPS default hides parse failures
+- [ ] `unwrap_or(25.0)` silently returns wrong fps on malformed ffprobe output
+- **Fix**: Propagate errors with `.context()` — downstream ops produce wrong results silently
 
-## ✅ Verify presets
-- [x] All 4 presets (youtube, shorts, podcast, minimal) checked — no stale/renamed fields
+---
 
-## ✅ Check install.sh and scripts/release.sh
-- [x] No references to old `tabs.rs` or old file structure
+## 🟠 MEDIUM
 
-## Assets — Needs Manual Update
-- [ ] `assets/Screenshot_20260319_124018.png` — outdated (shows old UI with rounded corners). Needs a new screenshot from the current build (zero-radius, red-highlight sidebar).
+### 4. `gui.rs:416-445` — `activity_log` grows unbounded
+- [ ] `activity_log` has no cap; long-running sessions consume unbounded RAM
+- **Fix**: Cap at e.g. 1000 entries, trim oldest
 
-## ✅ Review other tracked files
-- [x] `plans/project-specs.md` — no stale refs
-- [x] `.github/dependabot.yml` — configured correctly
-- [x] `.github/workflows/release.yml` — no stale refs
-- [x] `CONTRIBUTING.md` — fine
-- [x] `flake.nix` — no stale refs
-- [x] `benches/parsers.rs` — compiles, relevant
-- [x] `proptest-regressions/analyzer.txt` — normal, auto-managed
-- [x] `.gitattributes` — managed by dracon-warden
-- [x] `install.sh` — no stale refs
-- [x] `scripts/release.sh` — no stale refs
-- [x] `CHANGELOG.md` — historical `tabs.rs` refs are fine (they describe past versions)
+### 5. `hwaccel.rs:264,273` — `panic!` in tests (style)
+- [ ] Use `assert_eq!(default, HwAccel::None)` instead of match+panic
+- **Fix**: Replace panic with proper assertion
+
+### 6. `config.rs:merge()` — No compile-time enforcement for new fields
+- [ ] New fields on config structs silently bypass merge logic
+- **Fix**: Consider derive macro or at minimum add a test that compares merge behavior for all fields
+
+### 7. Dead code cleanup — 12 `#[allow(dead_code)]` across 5 files
+- [ ] `src/gui.rs:98,109,262,428,433,474,664` — unused sidebar items, SettingsCategory methods
+- [ ] `src/gui/theme.rs:125,178` — unused style functions
+- [ ] `src/gui/processing.rs:261,408` — test helpers
+- [ ] `src/batch_processor.rs:1632` — test mock
+- **Fix**: Remove or gate behind feature flags
+
+### 8. `batch_processor.rs:700-715` — ANSI escapes in format string
+- [ ] `\x1b[32m` etc. produces garbage if output redirected to file
+- **Fix**: Detect non-TTY, strip ANSI or use a terminal color crate
+
+---
+
+## 🟡 LOW / OBSERVATIONS
+
+### 9. `stt_analyzer.rs:600` — `partial_cmp.unwrap()` in test
+- [ ] Works but fragile if NaN introduced
+- **Fix**: Use `total_cmp()` or `unwrap_or_else`
+
+### 10. `watch.rs:95` — `thread::sleep` in watch loop
+- [ ] Sleep blocks thread, but stop flag is checked after each sleep — acceptable
+- **Observation**: Could use `park_timeout` for cleaner shutdown
+
+### 11. `ml.rs` — Duplicated dimension-fetching logic
+- [ ] `FrameExtractor::get_video_dimensions` duplicates `FfmpegDurationGetter` pattern
+- **Fix**: Extract to shared utility or use `FfmpegDurationGetter`-like trait
+
+### 12. `batch_processor.rs:126,137` — CachingDurationGetter two-phase locking
+- [ ] Correct pattern but cache could miss concurrent requests
+- **Observation**: Not a bug but worth reviewing under high-concurrency loads
+
+---
+
+## ✅ DONE WELL (leave as-is)
+
+- [x] FFmpeg escaping via `escape_ffmpeg_filter_path()` consistently used
+- [x] Mutex poisoning handled with `unwrap_or_else(|p| p.into_inner())`
+- [x] Bounded channels `sync_channel(1000)` prevent memory growth
+- [x] AtomicBool stop flags with `Ordering::SeqCst`
+- [x] RAII temp cleanup with `TempFileGuard`, `TempDir`, `TempFile`
+- [x] Config priority: CLI > file > preset > defaults
+- [x] Atomic rename pattern for model caching
+- [x] Error provenance with `.context()`
