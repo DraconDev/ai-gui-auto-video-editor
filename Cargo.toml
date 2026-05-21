@@ -90,5 +90,5 @@ path = "src/main.rs"
 lto = true
 panic = "abort"
 strip = true
-opt-level = 3
-codegen-units = 1
+opt-level = 2
+codegen-units = 16
