@@ -116,11 +116,12 @@ mod tests {
 
     #[test]
     fn test_progress_serialization_roundtrip() -> Result<()> {
+        use std::time::SystemTime;
         let progress = BatchProgress {
             total: 3,
             completed: vec![
-                (PathBuf::from("/tmp/video1.mp4"), 1000),
-                (PathBuf::from("/tmp/video2.mov"), 2000),
+                (PathBuf::from("/tmp/video1.mp4"), SystemTime::now()),
+                (PathBuf::from("/tmp/video2.mov"), SystemTime::now()),
             ]
             .into_iter()
             .collect(),
@@ -215,9 +216,10 @@ mod tests {
 
     #[test]
     fn test_progress_serialization_preserves_all_fields() -> Result<()> {
+        use std::time::SystemTime;
         let progress = BatchProgress {
             total: 42,
-            completed: vec![(PathBuf::from("/a.mp4"), 123)].into_iter().collect(),
+            completed: vec![(PathBuf::from("/a.mp4"), SystemTime::now())].into_iter().collect(),
             failed: vec![PathBuf::from("/b.mp4")].into_iter().collect(),
         };
 
@@ -237,8 +239,8 @@ mod tests {
     fn test_batch_progress_completed_count() {
         let mut progress = BatchProgress::default();
         progress.total = 5;
-        progress.completed.insert(PathBuf::from("/a.mp4"), 123);
-        progress.completed.insert(PathBuf::from("/b.mp4"), 124);
+        progress.completed.insert(PathBuf::from("/a.mp4"), SystemTime::now());
+        progress.completed.insert(PathBuf::from("/b.mp4"), SystemTime::now());
 
         assert_eq!(progress.completed.len(), 2);
         assert_eq!(progress.total - progress.completed.len(), 3);
@@ -282,7 +284,7 @@ mod tests {
 
         let mut progress = BatchProgress::default();
         progress.total = 10;
-        progress.completed.insert(PathBuf::from("/test.mp4"), 456);
+        progress.completed.insert(PathBuf::from("/test.mp4"), SystemTime::now());
 
         progress.to_file(&path)?;
         assert!(path.exists());
@@ -305,9 +307,9 @@ mod tests {
     fn test_batch_progress_full_completion() {
         let mut progress = BatchProgress::default();
         progress.total = 3;
-        progress.completed.insert(PathBuf::from("/a.mp4"), 100);
-        progress.completed.insert(PathBuf::from("/b.mp4"), 200);
-        progress.completed.insert(PathBuf::from("/c.mp4"), 300);
+        progress.completed.insert(PathBuf::from("/a.mp4"), SystemTime::now());
+        progress.completed.insert(PathBuf::from("/b.mp4"), SystemTime::now());
+        progress.completed.insert(PathBuf::from("/c.mp4"), SystemTime::now());
         // All files completed
         assert_eq!(progress.completed.len(), progress.total);
     }
@@ -348,7 +350,7 @@ mod tests {
     fn test_batch_progress_one_of_many() {
         let mut progress = BatchProgress::default();
         progress.total = 100;
-        progress.completed.insert(PathBuf::from("/single.mp4"), 50);
+        progress.completed.insert(PathBuf::from("/single.mp4"), SystemTime::now());
         // Only one of many completed
         assert_eq!(progress.completed.len(), 1);
         assert_eq!(progress.failed.len(), 0);
@@ -361,7 +363,7 @@ mod tests {
         for i in 0..100 {
             progress
                 .completed
-                .insert(PathBuf::from(format!("/{}.mp4", i)), i * 10);
+                .insert(PathBuf::from(format!("/{}.mp4", i)), SystemTime::now());
         }
         // Many files processed
         assert_eq!(progress.completed.len(), 100);

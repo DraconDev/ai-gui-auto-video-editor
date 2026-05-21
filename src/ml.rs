@@ -118,12 +118,23 @@ impl FrameExtractor {
         let fps_str = String::from_utf8_lossy(&output.stdout);
         let parts: Vec<&str> = fps_str.trim().split('/').collect();
         let fps = if parts.len() == 2 {
-            let num: f32 = parts[0].parse().unwrap_or(25.0);
-            let den: f32 = parts[1].parse().unwrap_or(1.0);
-            if den > 0.0 { num / den } else { 25.0 }
+            let num: f32 = parts[0]
+                .parse()
+                .with_context(|| format!("failed to parse FPS numerator from: {}", parts[0]))?;
+            let den: f32 = parts[1]
+                .parse()
+                .with_context(|| format!("failed to parse FPS denominator from: {}", parts[1]))?;
+            if den > 0.0 {
+                Ok(num / den)
+            } else {
+                Err(anyhow::anyhow!("FPS denominator must be > 0, got {}", den))
+            }
         } else {
-            fps_str.trim().parse::<f32>().unwrap_or(25.0)
-        };
+            fps_str
+                .trim()
+                .parse::<f32>()
+                .with_context(|| format!("failed to parse FPS from: {}", fps_str.trim()))
+        }?;
         Ok(fps)
     }
 

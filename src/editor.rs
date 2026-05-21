@@ -646,13 +646,14 @@ fn create_trim_chunk_dir(output: &Path) -> Result<PathBuf> {
         .map(|stem| stem.to_string_lossy().to_string())
         .unwrap_or_else(|| "trim".to_string());
     let chunk_dir = parent.join(format!(
-        ".agave-{}-{}-{:x}",
+        ".agave-{}-{:x}-{:016x}",
         stem,
         std::process::id(),
         std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap_or_default()
             .as_nanos()
+            .min(u128::MAX)
     ));
 
     if chunk_dir.exists() {
