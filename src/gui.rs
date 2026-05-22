@@ -30,7 +30,7 @@ use std::sync::{
 };
 use std::time::Duration;
 
-use crate::config::{Config, FolderSettings, JoinMode, WatchFolder};
+use crate::config::{Config, FolderSettings, WatchFolder};
 
 fn sidebar_item(
     ui: &mut egui::Ui,
@@ -349,6 +349,7 @@ enum QueueStatus {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
+#[allow(dead_code)]
 pub(crate) enum ToastKind {
     Success,
     Error,
