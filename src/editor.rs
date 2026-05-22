@@ -737,7 +737,11 @@ fn parse_loudnorm_stats(stderr: &str) -> Option<LoudnormStats> {
     // Find the JSON block in ffmpeg stderr output
     let json_start = stderr.find('{')?;
     let json_str = &stderr[json_start..];
-    let json_end = json_str.find('}')? + 1;
+
+    // Use the LAST '}' in the block — "dynamic" has '}' in the string value,
+    // which would truncate JSON if we used the first '}':
+    //   "normalization_type" : "dynamic"
+    let json_end = json_str.rfind('}').map(|p| p + 1).unwrap_or(json_str.len());
     let json_str = &json_str[..json_end];
 
     let get_val = |key: &str| -> Option<String> {
