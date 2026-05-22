@@ -39,6 +39,7 @@ fn sidebar_item(
     label: &str,
     tab: Tab,
     current_tab: &mut Tab,
+    pad: f32,
 ) {
     let text = format!("{}  {}", icon, label);
     let bg = if is_active {
@@ -57,21 +58,24 @@ fn sidebar_item(
         egui::Stroke::new(0.0, egui::Color32::TRANSPARENT)
     };
 
-    let btn = egui::Button::new(
-        egui::RichText::new(&text)
-            .color(text_color)
-            .size(13.0)
-            .strong(),
-    )
-    .fill(bg)
-    .stroke(border)
-    .corner_radius(CORNER_RADIUS_SMALL)
-    .min_size(egui::vec2(160.0, 36.0));
+    ui.horizontal(|ui| {
+        ui.add_space(pad);
+        let btn = egui::Button::new(
+            egui::RichText::new(&text)
+                .color(text_color)
+                .size(13.0)
+                .strong(),
+        )
+        .fill(bg)
+        .stroke(border)
+        .corner_radius(CORNER_RADIUS_SMALL)
+        .min_size(egui::vec2(160.0, 36.0));
 
-    let response = ui.add(btn).on_hover_text(format!("Switch to {} tab", label));
-    if response.clicked() {
-        *current_tab = tab;
-    }
+        let response = ui.add(btn).on_hover_text(format!("Switch to {} tab", label));
+        if response.clicked() {
+            *current_tab = tab;
+        }
+    });
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
@@ -1135,11 +1139,12 @@ impl eframe::App for App {
             )
             .show(ctx, |ui| {
                 ui.set_width(180.0);
+                const PAD: f32 = 12.0;
                 ui.vertical(|ui| {
                     // App title area
                     ui.add_space(12.0);
                     ui.horizontal(|ui| {
-                        ui.add_space(12.0);
+                        ui.add_space(PAD);
                         ui.label(
                             egui::RichText::new("AI Video")
                                 .size(14.0)
@@ -1171,6 +1176,7 @@ impl eframe::App for App {
                             label,
                             tab.0,
                             &mut self.state.current_tab,
+                            PAD,
                         );
                     }
 
@@ -1180,7 +1186,7 @@ impl eframe::App for App {
 
                     // Settings section header
                     ui.horizontal_wrapped(|ui| {
-                        ui.add_space(12.0);
+                        ui.add_space(PAD);
                         ui.label(
                             egui::RichText::new("SETTINGS")
                                 .size(10.0)
