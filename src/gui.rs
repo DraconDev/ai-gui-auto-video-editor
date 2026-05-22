@@ -1224,22 +1224,25 @@ impl eframe::App for App {
                             egui::Stroke::new(0.0, egui::Color32::TRANSPARENT)
                         };
 
-                        let btn = egui::Button::new(
-                            egui::RichText::new(&text)
-                                .color(text_color)
-                                .size(13.0)
-                                .strong(),
-                        )
-                        .fill(bg)
-                        .stroke(border)
-                        .corner_radius(CORNER_RADIUS_SMALL)
-                        .min_size(egui::vec2(164.0, 36.0));
+                        ui.horizontal(|ui| {
+                            ui.add_space(PAD);
+                            let btn = egui::Button::new(
+                                egui::RichText::new(&text)
+                                    .color(text_color)
+                                    .size(13.0)
+                                    .strong(),
+                            )
+                            .fill(bg)
+                            .stroke(border)
+                            .corner_radius(CORNER_RADIUS_SMALL)
+                            .min_size(egui::vec2(160.0, 36.0));
 
-                        let response = ui.add(btn).on_hover_text(format!("{} settings", label));
-                        if response.clicked() {
-                            self.state.current_tab = Tab::Settings;
-                            self.state.settings_category = cat;
-                        }
+                            let response = ui.add(btn).on_hover_text(format!("{} settings", label));
+                            if response.clicked() {
+                                self.state.current_tab = Tab::Settings;
+                                self.state.settings_category = cat;
+                            }
+                        });
                     }
 
                     // Spacer and status at bottom
