@@ -597,7 +597,7 @@ mod tests {
                 confidence: 0.9,
             },
         ];
-        segments.sort_by(|a, b| a.start.partial_cmp(&b.start).unwrap());
+        segments.sort_by_key(|s| s.start);
         assert_eq!(segments[0].text, "First");
         assert_eq!(segments[1].text, "Second");
         assert_eq!(segments[2].text, "Third");

@@ -4,6 +4,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicUsize, Ordering};
+use std::time::SystemTime;
 use tracing::{debug, info, warn};
 
 use crate::analyzer::ProcessedSegment;
@@ -2279,8 +2280,8 @@ mod tests {
     fn test_batch_progress_insertion() {
         let mut progress = BatchProgress::default();
         progress.total = 5;
-        progress.completed.insert(PathBuf::from("/a.mp4"), 100);
-        progress.completed.insert(PathBuf::from("/b.mp4"), 200);
+        progress.completed.insert(PathBuf::from("/a.mp4"), SystemTime::now());
+        progress.completed.insert(PathBuf::from("/b.mp4"), SystemTime::now());
         assert_eq!(progress.completed.len(), 2);
     }
 
@@ -2288,9 +2289,9 @@ mod tests {
     fn test_batch_progress_retains_insertion_order() {
         let mut progress = BatchProgress::default();
         progress.total = 3;
-        progress.completed.insert(PathBuf::from("/first.mp4"), 100);
-        progress.completed.insert(PathBuf::from("/second.mp4"), 200);
-        progress.completed.insert(PathBuf::from("/third.mp4"), 300);
+        progress.completed.insert(PathBuf::from("/first.mp4"), SystemTime::now());
+        progress.completed.insert(PathBuf::from("/second.mp4"), SystemTime::now());
+        progress.completed.insert(PathBuf::from("/third.mp4"), SystemTime::now());
         // HashMap doesn't guarantee order, but we can check count
         assert_eq!(progress.completed.len(), 3);
     }
@@ -2303,7 +2304,7 @@ mod tests {
         for i in 0..5 {
             progress
                 .completed
-                .insert(PathBuf::from(format!("/{}.mp4", i)), 100);
+                .insert(PathBuf::from(format!("/{}.mp4", i)), SystemTime::now());
         }
         // Half completed
         assert_eq!(progress.completed.len(), 5);
@@ -2314,7 +2315,7 @@ mod tests {
     fn test_batch_progress_clear_state() {
         let mut progress = BatchProgress::default();
         progress.total = 5;
-        progress.completed.insert(PathBuf::from("/a.mp4"), 100);
+        progress.completed.insert(PathBuf::from("/a.mp4"), SystemTime::now());
         progress.failed.insert(PathBuf::from("/b.mp4"));
         // State before clearing
         assert_eq!(progress.completed.len() + progress.failed.len(), 2);
