@@ -2121,8 +2121,6 @@ enhance = false
 
     #[test]
     fn test_config_serialization_roundtrip() -> Result<()> {
-        use toml::toml;
-
         let config = Config::default();
         let serialized = toml::to_string(&config)?;
         let deserialized: Config = toml::from_str(&serialized)?;
@@ -2265,7 +2263,6 @@ enhance = false
 
     #[test]
     fn test_config_default_serialization() -> Result<()> {
-        use toml::toml;
         let config = Config::default();
         let serialized = toml::to_string(&config)?;
         // Should be valid TOML

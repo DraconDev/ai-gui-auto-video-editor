@@ -2167,7 +2167,7 @@ mod tests {
         let scenes: Vec<f32> = vec![15.0, 35.0];
         let result = merge_silences_and_scenes(&silences, &scenes, 60.0);
         // Result depends on overlap handling
-        assert!(result.len() >= 0);
+        debug_assert!(result.len() <= 100);
     }
 
     #[test]

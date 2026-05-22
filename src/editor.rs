@@ -1694,7 +1694,7 @@ mod tests {
         }];
         let segments = calculate_keep_segments(&silences, 20.0, 0.1, SilenceMode::Cut, 16.0, 1.0);
         // Extreme speedup should still work
-        assert!(segments.len() >= 0);
+        debug_assert!(!segments.is_empty());
     }
 
     #[test]
@@ -1705,7 +1705,7 @@ mod tests {
         }];
         let segments = calculate_keep_segments(&silences, 30.0, 0.1, SilenceMode::Cut, 1.0, 0.0);
         // Zero speedup should not panic
-        assert!(segments.len() >= 0);
+        debug_assert!(!segments.is_empty());
     }
 
     // ── editor more edge cases ─────────────────────────────────────────────
@@ -1729,7 +1729,8 @@ mod tests {
         }];
         let segments = calculate_keep_segments(&silences, 30.0, -0.5, SilenceMode::Cut, 1.0, 1.0);
         // Negative padding may produce empty or different segments
-        assert!(segments.len() >= 0);
+        // (empty segments are a valid edge case)
+        debug_assert!(segments.len() <= 1000);
     }
 
     #[test]
@@ -1752,7 +1753,7 @@ mod tests {
         }];
         let segments = calculate_keep_segments(&silences, 60.0, 5.0, SilenceMode::Cut, 1.0, 1.0);
         // Large padding should still work
-        assert!(segments.len() >= 0);
+        debug_assert!(segments.len() <= 10000);
     }
 
     // ── editor utility tests ────────────────────────────────────────────────
@@ -1786,7 +1787,7 @@ mod tests {
         }];
         let segments = calculate_keep_segments(&silences, 30.0, 0.1, SilenceMode::Keep, 1.0, 1.0);
         // Keep mode should produce some segments
-        assert!(segments.len() >= 0);
+        debug_assert!(!segments.is_empty());
     }
 
     #[test]
@@ -1798,6 +1799,6 @@ mod tests {
         let segments =
             calculate_keep_segments(&silences, 30.0, 0.1, SilenceMode::Speedup, 2.0, 1.0);
         // Speedup mode should produce some segments
-        assert!(segments.len() >= 0);
+        debug_assert!(!segments.is_empty());
     }
 }
