@@ -419,22 +419,6 @@ impl Toast {
 
 impl AppState {
     fn add_toast(&mut self, message: impl Into<String>, kind: ToastKind) {
-        self.toasts.push(Toast::new(message, kind));
-        if self.toasts.len() > 10 {
-            self.toasts.remove(0);
-        }
-    }
-
-    #[allow(dead_code)]
-    fn add_warning(&mut self, message: impl Into<String>) {
-        self.add_toast(message, ToastKind::Warning);
-    }
-
-    #[allow(dead_code)]
-    fn add_info(&mut self, message: impl Into<String>) {
-        self.add_toast(message, ToastKind::Info);
-    }
-}
 
 #[derive(Debug)]
 pub struct AppState {
