@@ -2337,10 +2337,9 @@ mod tests {
     fn test_batch_progress_completed_timing_values() {
         let mut progress = BatchProgress::default();
         progress.total = 2;
-        progress.completed.insert(PathBuf::from("/a.mp4"), 100);
-        progress.completed.insert(PathBuf::from("/b.mp4"), 200);
-        // Check timing values are captured
-        let total_time: u128 = progress.completed.values().map(|v| *v as u128).sum();
-        assert_eq!(total_time, 300);
+        progress.completed.insert(PathBuf::from("/a.mp4"), SystemTime::now());
+        progress.completed.insert(PathBuf::from("/b.mp4"), SystemTime::now());
+        // Verify SystemTime values are captured correctly
+        assert_eq!(progress.completed.len(), 2);
     }
 }

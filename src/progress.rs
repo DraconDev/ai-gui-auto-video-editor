@@ -259,8 +259,8 @@ mod tests {
     fn test_batch_progress_remaining_count() {
         let mut progress = BatchProgress::default();
         progress.total = 10;
-        progress.completed.insert(PathBuf::from("/a.mp4"), 123);
-        progress.completed.insert(PathBuf::from("/b.mp4"), 124);
+        progress.completed.insert(PathBuf::from("/a.mp4"), SystemTime::now());
+        progress.completed.insert(PathBuf::from("/b.mp4"), SystemTime::now());
         progress.failed.insert(PathBuf::from("/c.mp4"));
 
         let remaining = progress.total - progress.completed.len();
@@ -318,7 +318,7 @@ mod tests {
     fn test_batch_progress_mixed_results() {
         let mut progress = BatchProgress::default();
         progress.total = 10;
-        progress.completed.insert(PathBuf::from("/a.mp4"), 100);
+        progress.completed.insert(PathBuf::from("/a.mp4"), SystemTime::now());
         progress.failed.insert(PathBuf::from("/b.mp4"));
         // Some completed, some failed
         assert!(progress.completed.len() < progress.total);
