@@ -734,15 +734,18 @@ struct LoudnormStats {
 }
 
 fn parse_loudnorm_stats(stderr: &str) -> Option<LoudnormStats> {
-    // Find the JSON block in ffmpeg stderr output
-    let json_start = stderr.find('{')?;
-    let json_str = &stderr[json_start..];
-
-    // Use the LAST '}' in the block — "dynamic" has '}' in the string value,
-    // which would truncate JSON if we used the first '}':
-    //   "normalization_type" : "dynamic"
-    let json_end = json_str.rfind('}').map(|p| p + 1).unwrap_or(json_str.len());
-    let json_str = &json_str[..json_end];
+    // Find the JSON block in ffmpeg stderr output.
+    // FFmpeg's loudnorm filter outputs multi-line JSON ending with:
+    //
+    //       "normalization_type" : "dynamic",
+    //       "target_offset" : "0.04"
+    //   }
+    //
+    // CRITICAL: the string value "dynamic" contains a '}' character.
+    // Using str::find('}') finds that inner '}' first, truncating the JSON
+    // and losing all fields after "normalization_type" (the entire file gets
+    // parsed as ~264 bytes, with only the first 5 fields present).
+    // Solution: use rfind to get the LAST '}' in the block.
 
     let get_val = |key: &str| -> Option<String> {
         // Pattern matches quoted key (handles spaces around colon)
