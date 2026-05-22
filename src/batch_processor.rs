@@ -1391,6 +1391,7 @@ where
 mod tests {
     use super::*;
     use crate::analyzer::Segment;
+    use std::time::SystemTime;
     use tempfile::tempdir;
 
     #[test]
