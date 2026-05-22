@@ -597,7 +597,8 @@ mod tests {
                 confidence: 0.9,
             },
         ];
-        segments.sort_by_key(|s| s.start);
+        // Use to_bits for stable ordering (f32 doesn't implement Ord due to NaN)
+        segments.sort_by(|a, b| a.start.to_bits().cmp(&b.start.to_bits()));
         assert_eq!(segments[0].text, "First");
         assert_eq!(segments[1].text, "Second");
         assert_eq!(segments[2].text, "Third");
