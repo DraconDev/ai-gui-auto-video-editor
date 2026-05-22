@@ -257,21 +257,12 @@ mod tests {
     // ── HwAccel variant tests ──────────────────────────────────────────────
     #[test]
     fn test_hwaccel_default_variant() {
-        let default = HwAccel::default();
-        // Default should be None (software encoding)
-        match default {
-            HwAccel::None => {}
-            _ => panic!("Expected HwAccel::None as default"),
-        }
+        assert_eq!(HwAccel::default(), HwAccel::None);
     }
 
     #[test]
     fn test_hwaccel_software_encoding() {
-        let sw = HwAccel::None;
-        match sw {
-            HwAccel::None => {}
-            _ => panic!("Expected HwAccel::None"),
-        }
+        assert_eq!(HwAccel::None, HwAccel::None);
     }
 
     #[test]

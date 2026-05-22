@@ -94,27 +94,7 @@ pub(crate) enum SettingsCategory {
     Advanced,
 }
 
-impl SettingsCategory {
-    fn label(&self) -> &'static str {
-        match self {
-            SettingsCategory::Processing => "Processing",
-            SettingsCategory::Audio => "Audio",
-            SettingsCategory::Video => "Video",
-            SettingsCategory::Exports => "Exports",
-            SettingsCategory::Advanced => "Advanced",
-        }
-    }
-
-    fn icon(&self) -> &'static str {
-        match self {
-            SettingsCategory::Processing => "🎬",
-            SettingsCategory::Audio => "🎵",
-            SettingsCategory::Video => "📹",
-            SettingsCategory::Exports => "📤",
-            SettingsCategory::Advanced => "⚙",
-        }
-    }
-}
+impl SettingsCategory {}
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum SetupStep {
@@ -372,8 +352,6 @@ enum QueueStatus {
 pub(crate) enum ToastKind {
     Success,
     Error,
-    Warning,
-    Info,
 }
 
 #[derive(Debug, Clone)]
@@ -457,15 +435,6 @@ pub struct AppState {
     last_save_time: Option<std::time::Instant>,
     // Recent outputs (quick access)
     recent_outputs: Vec<PathBuf>,
-}
-
-fn join_mode_display(mode: &JoinMode) -> String {
-    match mode {
-        JoinMode::Off => "Off".to_string(),
-        JoinMode::ByDate => "By Date".to_string(),
-        JoinMode::ByName => "By Name".to_string(),
-        JoinMode::AfterCount => "After N Files".to_string(),
-    }
 }
 
 impl AppState {

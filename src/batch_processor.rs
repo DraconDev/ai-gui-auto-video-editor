@@ -710,10 +710,12 @@ fn format_batch_summary(total: usize, successful: usize, failed: usize, skipped:
         .and_then(|v| v.checked_div(total))
         .unwrap_or(0);
 
-    let green = "\x1b[32m";
-    let red = "\x1b[31m";
-    let yellow = "\x1b[33m";
-    let reset = "\x1b[0m";
+    // Only use ANSI color codes when writing to a terminal
+    let (green, red, yellow, reset) = if atty::is(atty::Stream::Stdout) {
+        ("\x1b[32m", "\x1b[31m", "\x1b[33m", "\x1b[0m")
+    } else {
+        ("", "", "", "")
+    };
 
     format!(
         "\n=== BATCH SUMMARY ===\n\
