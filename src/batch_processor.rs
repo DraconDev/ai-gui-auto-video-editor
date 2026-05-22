@@ -5,6 +5,9 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::time::SystemTime;
+
+#[cfg(test)]
+use std::time::SystemTime;
 use tracing::{debug, info, warn};
 
 use crate::analyzer::ProcessedSegment;
