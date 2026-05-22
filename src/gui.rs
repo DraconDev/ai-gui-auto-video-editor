@@ -39,7 +39,6 @@ fn sidebar_item(
     label: &str,
     tab: Tab,
     current_tab: &mut Tab,
-    pad: f32,
 ) {
     let text = format!("{}  {}", icon, label);
     let bg = if is_active {
@@ -59,7 +58,9 @@ fn sidebar_item(
     };
 
     ui.horizontal(|ui| {
-        ui.add_space(pad);
+        // Center the button: (180 - 160) / 2 = 10px each side
+        let space = 10.0;
+        ui.add_space(space);
         let btn = egui::Button::new(
             egui::RichText::new(&text)
                 .color(text_color)
@@ -75,6 +76,7 @@ fn sidebar_item(
         if response.clicked() {
             *current_tab = tab;
         }
+        ui.add_space(space);
     });
 }
 
@@ -1176,7 +1178,6 @@ impl eframe::App for App {
                             label,
                             tab.0,
                             &mut self.state.current_tab,
-                            PAD,
                         );
                     }
 
