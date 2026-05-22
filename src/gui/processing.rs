@@ -413,7 +413,7 @@ pub fn build_folder_config(config: &Config, folder: &FolderState) -> Config {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::config::{FolderSettings, SilenceMode};
+    use crate::config::SilenceMode;
     use crate::gui::FolderState;
 
     fn make_test_folder_state() -> FolderState {

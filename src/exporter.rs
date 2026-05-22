@@ -1012,7 +1012,7 @@ mod tests {
         let dir = tempdir()?;
         let output_srt = dir.path().join("subs.srt");
         // Add out-of-order transcript segments
-        let mut transcript = vec![
+        let transcript = vec![
             TranscriptSegment {
                 start: 5.0,
                 end: 10.0,
@@ -1086,7 +1086,7 @@ mod tests {
         let input_path = dir.path().join("video.mp4");
 
         // Add segments out of order
-        let mut segments = vec![
+        let segments = vec![
             crate::analyzer::ProcessedSegment {
                 start: 10.0,
                 end: 20.0,
