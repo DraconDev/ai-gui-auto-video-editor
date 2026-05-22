@@ -98,13 +98,18 @@ mod tests {
 
     #[test]
     fn test_progress_tracking() {
+        use tempfile::tempdir;
+        let dir = tempdir().unwrap();
+        let file1 = dir.path().join("video1.mp4");
+        let file2 = dir.path().join("video2.mp4");
+        // Create files so mtime can be read
+        std::fs::write(&file1, b"x").unwrap();
+        std::fs::write(&file2, b"x").unwrap();
+
         let mut progress = BatchProgress {
             total: 5,
             ..Default::default()
         };
-
-        let file1 = PathBuf::from("/tmp/video1.mp4");
-        let file2 = PathBuf::from("/tmp/video2.mp4");
 
         assert!(!progress.is_completed(&file1));
         progress.mark_completed(&file1);
@@ -117,15 +122,24 @@ mod tests {
     #[test]
     fn test_progress_serialization_roundtrip() -> Result<()> {
         use std::time::SystemTime;
+        use tempfile::tempdir;
+        let dir = tempdir()?;
+        let file1 = dir.path().join("video1.mp4");
+        let file2 = dir.path().join("video2.mov");
+        let file3 = dir.path().join("video3.avi");
+        std::fs::write(&file1, b"x").unwrap();
+        std::fs::write(&file2, b"x").unwrap();
+        std::fs::write(&file3, b"x").unwrap();
+
         let progress = BatchProgress {
             total: 3,
             completed: vec![
-                (PathBuf::from("/tmp/video1.mp4"), SystemTime::now()),
-                (PathBuf::from("/tmp/video2.mov"), SystemTime::now()),
+                (file1.clone(), SystemTime::now()),
+                (file2.clone(), SystemTime::now()),
             ]
             .into_iter()
             .collect(),
-            failed: vec![PathBuf::from("/tmp/video3.avi")].into_iter().collect(),
+            failed: vec![file3].into_iter().collect(),
         };
 
         let dir = tempdir()?;
@@ -136,7 +150,7 @@ mod tests {
         assert_eq!(loaded.total, 3);
         assert_eq!(loaded.completed.len(), 2);
         assert_eq!(loaded.failed.len(), 1);
-        assert!(loaded.is_completed(PathBuf::from("/tmp/video1.mp4").as_path()));
+        assert!(loaded.is_completed(&file1));
         Ok(())
     }
 
