@@ -232,7 +232,6 @@ pub fn add_text_watermark(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::process::Command;
 
     fn create_test_video(path: &Path, duration_secs: f32) -> Result<(), String> {
         crate::tests_common::create_test_video(path, duration_secs)
