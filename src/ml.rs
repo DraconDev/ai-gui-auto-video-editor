@@ -6,7 +6,7 @@
 //!
 //! Models are lazy-loaded to minimize memory usage when features aren't used.
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 use image::GenericImageView;
 use std::path::Path;
 use std::process::Command;
