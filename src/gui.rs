@@ -1141,12 +1141,11 @@ impl eframe::App for App {
             )
             .show(ctx, |ui| {
                 ui.set_width(180.0);
-                const PAD: f32 = 12.0;
                 ui.vertical(|ui| {
                     // App title area
                     ui.add_space(12.0);
                     ui.horizontal(|ui| {
-                        ui.add_space(PAD);
+                        ui.add_space(10.0);
                         ui.label(
                             egui::RichText::new("AI Video")
                                 .size(14.0)
@@ -1187,7 +1186,7 @@ impl eframe::App for App {
 
                     // Settings section header
                     ui.horizontal_wrapped(|ui| {
-                        ui.add_space(PAD);
+                        ui.add_space(10.0);
                         ui.label(
                             egui::RichText::new("SETTINGS")
                                 .size(10.0)
