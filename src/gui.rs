@@ -1226,7 +1226,9 @@ impl eframe::App for App {
                         };
 
                         ui.horizontal(|ui| {
-                            ui.add_space(PAD);
+                            // Center the button: (180 - 160) / 2 = 10px each side
+                            let space = 10.0;
+                            ui.add_space(space);
                             let btn = egui::Button::new(
                                 egui::RichText::new(&text)
                                     .color(text_color)
@@ -1243,6 +1245,7 @@ impl eframe::App for App {
                                 self.state.current_tab = Tab::Settings;
                                 self.state.settings_category = cat;
                             }
+                            ui.add_space(space);
                         });
                     }
 
