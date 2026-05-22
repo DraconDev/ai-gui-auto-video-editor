@@ -419,6 +419,12 @@ impl Toast {
 
 impl AppState {
     fn add_toast(&mut self, message: impl Into<String>, kind: ToastKind) {
+        self.toasts.push(Toast::new(message, kind));
+        if self.toasts.len() > 10 {
+            self.toasts.remove(0);
+        }
+    }
+}
 
 #[derive(Debug)]
 pub struct AppState {
