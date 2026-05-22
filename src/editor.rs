@@ -653,7 +653,6 @@ fn create_trim_chunk_dir(output: &Path) -> Result<PathBuf> {
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap_or_default()
             .as_nanos()
-            .min(u128::MAX)
     ));
 
     if chunk_dir.exists() {
