@@ -711,7 +711,7 @@ fn format_batch_summary(total: usize, successful: usize, failed: usize, skipped:
         .unwrap_or(0);
 
     // Only use ANSI color codes when writing to a terminal
-    let (green, red, yellow, reset) = if atty::is(atty::Stream::Stdout) {
+    let (green, red, yellow, reset) = if std::io::IsTerminal::is_terminal(&std::io::stdout()) {
         ("\x1b[32m", "\x1b[31m", "\x1b[33m", "\x1b[0m")
     } else {
         ("", "", "", "")
