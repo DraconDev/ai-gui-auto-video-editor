@@ -1,6 +1,6 @@
 mod common;
 
-use ai_vid_editor::ml::{AutoReframeProcessor, FaceDetector, FrameExtractor, PersonSegmenter};
+use crate::ml::{AutoReframeProcessor, FaceDetector, FrameExtractor, PersonSegmenter};
 use common::*;
 
 fn check_ffmpeg() {

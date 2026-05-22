@@ -1,9 +1,9 @@
 mod common;
 
-use ai_vid_editor::config::{Config, Preset, SilenceMode, VideoResolution};
-use ai_vid_editor::gui::FolderState;
-use ai_vid_editor::gui::processing::build_folder_config;
-use ai_vid_editor::gui::processing::make_test_folder_state;
+use crate::config::{Config, Preset, SilenceMode, VideoResolution};
+use crate::gui::FolderState;
+use crate::gui::processing::build_folder_config;
+use crate::gui::processing::make_test_folder_state;
 
 fn make_folder_state() -> FolderState {
     make_test_folder_state()

@@ -1,15 +1,15 @@
 mod common;
 
-use ai_vid_editor::FfmpegAnalyzer;
-use ai_vid_editor::FfmpegEditor;
-use ai_vid_editor::analyzer::ProcessedSegment;
-use ai_vid_editor::analyzer::VideoAnalyzer;
-use ai_vid_editor::config::{Config, VideoResolution};
-use ai_vid_editor::editor::VideoEditor;
-use ai_vid_editor::exporter;
-use ai_vid_editor::preview;
-use ai_vid_editor::stt_analyzer::TranscriptSegment;
-use ai_vid_editor::thumbnail;
+use crate::FfmpegAnalyzer;
+use crate::FfmpegEditor;
+use crate::analyzer::ProcessedSegment;
+use crate::analyzer::VideoAnalyzer;
+use crate::config::{Config, VideoResolution};
+use crate::editor::VideoEditor;
+use crate::exporter;
+use crate::preview;
+use crate::stt_analyzer::TranscriptSegment;
+use crate::thumbnail;
 use common::*;
 
 use std::path::PathBuf;
@@ -172,7 +172,7 @@ fn test_auto_reframe() {
     let result = editor.reframe(
         &video_path,
         &output_path,
-        ai_vid_editor::config::VideoResolution::Vertical1080p,
+        crate::config::VideoResolution::Vertical1080p,
     );
 
     // Note: This will use center crop if ML models fail to load
@@ -527,9 +527,9 @@ fn test_full_pipeline_all_features_disabled() {
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
-    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+    let duration_getter = crate::batch_processor::FfmpegDurationGetter;
 
-    let result = ai_vid_editor::batch_processor::process_single_file(
+    let result = crate::batch_processor::process_single_file(
         video_path.clone(),
         output_path.clone(),
         &config,
@@ -567,9 +567,9 @@ fn test_full_pipeline_noise_reduction_and_enhance() {
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
-    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+    let duration_getter = crate::batch_processor::FfmpegDurationGetter;
 
-    let result = ai_vid_editor::batch_processor::process_single_file(
+    let result = crate::batch_processor::process_single_file(
         video_path.clone(),
         output_path.clone(),
         &config,
@@ -606,9 +606,9 @@ fn test_full_pipeline_reframe_and_scale() {
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
-    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+    let duration_getter = crate::batch_processor::FfmpegDurationGetter;
 
-    let result = ai_vid_editor::batch_processor::process_single_file(
+    let result = crate::batch_processor::process_single_file(
         video_path,
         output_path,
         &config,
@@ -645,9 +645,9 @@ fn test_full_pipeline_with_preview_export() {
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
-    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+    let duration_getter = crate::batch_processor::FfmpegDurationGetter;
 
-    let result = ai_vid_editor::batch_processor::process_single_file(
+    let result = crate::batch_processor::process_single_file(
         video_path,
         output_path.clone(),
         &config,
@@ -671,7 +671,7 @@ fn test_full_pipeline_with_preview_export() {
 
 #[test]
 fn test_all_video_resolutions_are_valid() {
-    use ai_vid_editor::config::VideoResolution;
+    use crate::config::VideoResolution;
 
     let resolutions = [
         VideoResolution::Hd720p,
@@ -706,7 +706,7 @@ fn test_all_video_resolutions_are_valid() {
 
 #[test]
 fn test_hwaccel_all_variants() {
-    use ai_vid_editor::hwaccel::HwAccel;
+    use crate::hwaccel::HwAccel;
 
     let variants = [
         HwAccel::None,
@@ -745,18 +745,18 @@ fn test_folder_settings_silences_config_structure() {
     let mut config = Config::default();
 
     // Cut silence mode
-    config.silence.mode = ai_vid_editor::config::SilenceMode::Cut;
+    config.silence.mode = crate::config::SilenceMode::Cut;
     config.silence.min_duration = 0.5;
 
-    assert_eq!(config.silence.mode, ai_vid_editor::config::SilenceMode::Cut);
+    assert_eq!(config.silence.mode, crate::config::SilenceMode::Cut);
     assert_eq!(config.silence.min_duration, 0.5);
 
     // Keep silence mode
     let mut config2 = Config::default();
-    config2.silence.mode = ai_vid_editor::config::SilenceMode::Keep;
+    config2.silence.mode = crate::config::SilenceMode::Keep;
     assert_eq!(
         config2.silence.mode,
-        ai_vid_editor::config::SilenceMode::Keep
+        crate::config::SilenceMode::Keep
     );
 }
 
@@ -856,9 +856,9 @@ fn test_watermark_in_pipeline() {
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
-    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+    let duration_getter = crate::batch_processor::FfmpegDurationGetter;
 
-    let result = ai_vid_editor::batch_processor::process_single_file(
+    let result = crate::batch_processor::process_single_file(
         video_path.clone(),
         output_path.clone(),
         &config,
@@ -907,9 +907,9 @@ fn test_background_music_in_pipeline() {
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
-    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+    let duration_getter = crate::batch_processor::FfmpegDurationGetter;
 
-    let result = ai_vid_editor::batch_processor::process_single_file(
+    let result = crate::batch_processor::process_single_file(
         video_path.clone(),
         output_path.clone(),
         &config,
@@ -951,9 +951,9 @@ fn test_scene_detection_in_pipeline() {
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
-    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+    let duration_getter = crate::batch_processor::FfmpegDurationGetter;
 
-    let result = ai_vid_editor::batch_processor::process_single_file(
+    let result = crate::batch_processor::process_single_file(
         video_path.clone(),
         output_path.clone(),
         &config,
@@ -998,7 +998,7 @@ fn test_full_pipeline_all_features() {
 
     let mut config = Config::default();
     // Silence
-    config.silence.mode = ai_vid_editor::config::SilenceMode::Cut;
+    config.silence.mode = crate::config::SilenceMode::Cut;
     config.silence.scene_detect = true;
     config.silence.scene_threshold = 0.3;
     // Audio
@@ -1015,9 +1015,9 @@ fn test_full_pipeline_all_features() {
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
-    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+    let duration_getter = crate::batch_processor::FfmpegDurationGetter;
 
-    let result = ai_vid_editor::batch_processor::process_single_file(
+    let result = crate::batch_processor::process_single_file(
         video_path.clone(),
         output_path.clone(),
         &config,
@@ -1062,9 +1062,9 @@ fn test_exports_through_pipeline() {
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
-    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+    let duration_getter = crate::batch_processor::FfmpegDurationGetter;
 
-    let result = ai_vid_editor::batch_processor::process_single_file(
+    let result = crate::batch_processor::process_single_file(
         video_path.clone(),
         output_path.clone(),
         &config,
@@ -1111,7 +1111,7 @@ fn test_exports_through_pipeline() {
 
 #[test]
 fn test_multi_format_export() {
-    use ai_vid_editor::config::VideoResolution;
+    use crate::config::VideoResolution;
     use tempfile::tempdir;
 
     let video_path = test_video_path();
@@ -1130,9 +1130,9 @@ fn test_multi_format_export() {
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
-    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+    let duration_getter = crate::batch_processor::FfmpegDurationGetter;
 
-    let result = ai_vid_editor::batch_processor::process_single_file(
+    let result = crate::batch_processor::process_single_file(
         video_path.clone(),
         output_path.clone(),
         &config,
@@ -1184,9 +1184,9 @@ fn test_clip_extraction() {
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
-    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+    let duration_getter = crate::batch_processor::FfmpegDurationGetter;
 
-    let result = ai_vid_editor::batch_processor::process_single_file(
+    let result = crate::batch_processor::process_single_file(
         long_video_path.clone(),
         output_path.clone(),
         &config,
@@ -1255,8 +1255,8 @@ watermark_position = "top-left"
     // Load config from file, apply shorts preset, run pipeline
     // Merge: file config fields override preset defaults on scalar fields;
     // preset enum fields override file config; vec fields come from file if non-empty
-    let file_config = ai_vid_editor::config::Config::from_file(&config_path).ok();
-    let preset_config = ai_vid_editor::config::Preset::Shorts.to_config();
+    let file_config = crate::config::Config::from_file(&config_path).ok();
+    let preset_config = crate::config::Preset::Shorts.to_config();
     let config = if let Some(fc) = file_config {
         fc.merge(preset_config)
     } else {
@@ -1265,9 +1265,9 @@ watermark_position = "top-left"
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
-    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+    let duration_getter = crate::batch_processor::FfmpegDurationGetter;
 
-    let result = ai_vid_editor::batch_processor::process_single_file(
+    let result = crate::batch_processor::process_single_file(
         video_path.clone(),
         output_path.clone(),
         &config,
@@ -1308,14 +1308,14 @@ fn test_speedup_in_pipeline() {
     let output_path = output_dir.path().join("output_speedup.mp4");
 
     let mut config = Config::default();
-    config.silence.mode = ai_vid_editor::config::SilenceMode::Speedup;
+    config.silence.mode = crate::config::SilenceMode::Speedup;
     config.silence.speedup_factor = 1.5;
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
-    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+    let duration_getter = crate::batch_processor::FfmpegDurationGetter;
 
-    let result = ai_vid_editor::batch_processor::process_single_file(
+    let result = crate::batch_processor::process_single_file(
         video_path.clone(),
         output_path.clone(),
         &config,
@@ -1343,13 +1343,13 @@ fn test_keep_mode_in_pipeline() {
     let output_path = output_dir.path().join("output_keep_mode.mp4");
 
     let mut config = Config::default();
-    config.silence.mode = ai_vid_editor::config::SilenceMode::Keep;
+    config.silence.mode = crate::config::SilenceMode::Keep;
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
-    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+    let duration_getter = crate::batch_processor::FfmpegDurationGetter;
 
-    let result = ai_vid_editor::batch_processor::process_single_file(
+    let result = crate::batch_processor::process_single_file(
         video_path.clone(),
         output_path.clone(),
         &config,
@@ -1381,9 +1381,9 @@ fn test_scaling_in_pipeline() {
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
-    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+    let duration_getter = crate::batch_processor::FfmpegDurationGetter;
 
-    let result = ai_vid_editor::batch_processor::process_single_file(
+    let result = crate::batch_processor::process_single_file(
         video_path.clone(),
         output_path.clone(),
         &config,
@@ -1452,9 +1452,9 @@ fn test_intro_outro_in_pipeline() {
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
-    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+    let duration_getter = crate::batch_processor::FfmpegDurationGetter;
 
-    let result = ai_vid_editor::batch_processor::process_single_file(
+    let result = crate::batch_processor::process_single_file(
         video_path.clone(),
         output_path.clone(),
         &config,
@@ -1485,9 +1485,9 @@ fn test_multi_resolution_output() {
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
-    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+    let duration_getter = crate::batch_processor::FfmpegDurationGetter;
 
-    let result = ai_vid_editor::batch_processor::process_single_file(
+    let result = crate::batch_processor::process_single_file(
         video_path.clone(),
         output_dir.path().join("output.mp4").clone(),
         &config,
@@ -1523,9 +1523,9 @@ fn test_thumbnail_dimensions_in_pipeline() {
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
-    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+    let duration_getter = crate::batch_processor::FfmpegDurationGetter;
 
-    let result = ai_vid_editor::batch_processor::process_single_file(
+    let result = crate::batch_processor::process_single_file(
         video_path.clone(),
         output_path.clone(),
         &config,
@@ -1564,9 +1564,9 @@ fn test_watermark_in_pipeline_image() {
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
-    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+    let duration_getter = crate::batch_processor::FfmpegDurationGetter;
 
-    let result = ai_vid_editor::batch_processor::process_single_file(
+    let result = crate::batch_processor::process_single_file(
         video_path.clone(),
         output_path.clone(),
         &config,
@@ -1602,9 +1602,9 @@ fn test_preview_duration_in_pipeline() {
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
-    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+    let duration_getter = crate::batch_processor::FfmpegDurationGetter;
 
-    let result = ai_vid_editor::batch_processor::process_single_file(
+    let result = crate::batch_processor::process_single_file(
         video_path.clone(),
         output_path.clone(),
         &config,
@@ -1643,9 +1643,9 @@ fn test_captions_in_pipeline_with_speech() {
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
-    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+    let duration_getter = crate::batch_processor::FfmpegDurationGetter;
 
-    let result = ai_vid_editor::batch_processor::process_single_file(
+    let result = crate::batch_processor::process_single_file(
         video_path.clone(),
         output_path.clone(),
         &config,
@@ -1677,9 +1677,9 @@ fn test_subtitles_export_with_speech() {
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
-    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+    let duration_getter = crate::batch_processor::FfmpegDurationGetter;
 
-    let result = ai_vid_editor::batch_processor::process_single_file(
+    let result = crate::batch_processor::process_single_file(
         video_path.clone(),
         output_path.clone(),
         &config,
@@ -1711,9 +1711,9 @@ fn test_srt_export_with_speech() {
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
-    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+    let duration_getter = crate::batch_processor::FfmpegDurationGetter;
 
-    let result = ai_vid_editor::batch_processor::process_single_file(
+    let result = crate::batch_processor::process_single_file(
         video_path.clone(),
         output_path.clone(),
         &config,
@@ -1745,9 +1745,9 @@ fn test_chapters_with_speech() {
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
-    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+    let duration_getter = crate::batch_processor::FfmpegDurationGetter;
 
-    let result = ai_vid_editor::batch_processor::process_single_file(
+    let result = crate::batch_processor::process_single_file(
         video_path.clone(),
         output_path.clone(),
         &config,
@@ -1782,9 +1782,9 @@ fn test_clips_extraction_with_speech() {
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
-    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+    let duration_getter = crate::batch_processor::FfmpegDurationGetter;
 
-    let result = ai_vid_editor::batch_processor::process_single_file(
+    let result = crate::batch_processor::process_single_file(
         video_path.clone(),
         output_path.clone(),
         &config,
@@ -1839,9 +1839,9 @@ fn test_audio_ducking_with_speech() {
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
-    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+    let duration_getter = crate::batch_processor::FfmpegDurationGetter;
 
-    let result = ai_vid_editor::batch_processor::process_single_file(
+    let result = crate::batch_processor::process_single_file(
         video_path.clone(),
         output_path.clone(),
         &config,
@@ -1875,9 +1875,9 @@ fn test_filler_word_removal_pipeline() {
 
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
-    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+    let duration_getter = crate::batch_processor::FfmpegDurationGetter;
 
-    let result = ai_vid_editor::batch_processor::process_single_file(
+    let result = crate::batch_processor::process_single_file(
         video_path.clone(),
         output_path.clone(),
         &config,
@@ -1915,9 +1915,9 @@ fn test_batch_processing_multiple_files() {
     let config = Config::default();
     let editor = FfmpegEditor::default();
     let analyzer = FfmpegAnalyzer;
-    let duration_getter = ai_vid_editor::batch_processor::FfmpegDurationGetter;
+    let duration_getter = crate::batch_processor::FfmpegDurationGetter;
 
-    let result1 = ai_vid_editor::batch_processor::process_single_file(
+    let result1 = crate::batch_processor::process_single_file(
         video_path.clone(),
         output_path1.clone(),
         &config,
@@ -1926,7 +1926,7 @@ fn test_batch_processing_multiple_files() {
         &duration_getter,
     );
 
-    let result2 = ai_vid_editor::batch_processor::process_single_file(
+    let result2 = crate::batch_processor::process_single_file(
         video_path.clone(),
         output_path2.clone(),
         &config,
@@ -1955,13 +1955,13 @@ fn test_batch_progress_persistence() {
     let output_dir = tempdir().unwrap();
     let state_path = output_dir.path().join("test_progress.json");
 
-    let mut progress = ai_vid_editor::progress::BatchProgress::default();
+    let mut progress = crate::progress::BatchProgress::default();
     progress.total = 1;
     progress.mark_completed(&video_path);
 
     progress.to_file(&state_path).unwrap();
 
-    let loaded = ai_vid_editor::progress::BatchProgress::from_file(&state_path).unwrap();
+    let loaded = crate::progress::BatchProgress::from_file(&state_path).unwrap();
     assert_eq!(loaded.total, progress.total);
     assert!(loaded.is_completed(&video_path));
 }
