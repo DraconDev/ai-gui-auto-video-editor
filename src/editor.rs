@@ -746,6 +746,10 @@ fn parse_loudnorm_stats(stderr: &str) -> Option<LoudnormStats> {
     // and losing all fields after "normalization_type" (the entire file gets
     // parsed as ~264 bytes, with only the first 5 fields present).
     // Solution: use rfind to get the LAST '}' in the block.
+    let json_start = stderr.find('{')?;
+    let json_str = &stderr[json_start..];
+    let json_end = json_str.rfind('}').map(|p| p + 1).unwrap_or(json_str.len());
+    let json_str = &json_str[..json_end];
 
     let get_val = |key: &str| -> Option<String> {
         // Pattern matches quoted key (handles spaces around colon)
