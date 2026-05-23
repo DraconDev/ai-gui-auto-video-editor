@@ -12,8 +12,6 @@ pub enum SilenceMode {
     /// Cut out silences completely (default)
     #[default]
     Cut,
-    /// Speed up silences instead of cutting
-    Speedup,
 }
 
 /// Preset profiles for common use cases
@@ -154,17 +152,9 @@ pub struct SilenceConfig {
     #[serde(default = "default_padding")]
     pub padding: f32,
 
-    /// How to handle silences: "cut" or "speedup"
+    /// How to handle silences: "cut" or "keep"
     #[serde(default)]
     pub mode: SilenceMode,
-
-    /// Speed multiplier when mode = "speedup"
-    #[serde(default = "default_speedup_factor")]
-    pub speedup_factor: f32,
-
-    /// Only speedup silences longer than this (seconds)
-    #[serde(default = "default_min_silence_for_speedup")]
-    pub min_silence_for_speedup: f32,
 
     /// Enable scene-change detection to augment silence-based cuts
     #[serde(default)]
@@ -183,12 +173,6 @@ fn default_min_duration() -> f32 {
 }
 fn default_padding() -> f32 {
     0.1
-}
-fn default_speedup_factor() -> f32 {
-    4.0
-}
-fn default_min_silence_for_speedup() -> f32 {
-    0.5
 }
 fn default_scene_threshold() -> f32 {
     // 0.10 = recommended default per FFmpeg scdet docs (8.0-14.0% = 0.08-0.14)
