@@ -284,7 +284,7 @@ fn default_target_lufs() -> f32 {
     -14.0
 }
 fn default_duck_volume() -> f32 {
-    0.2
+    0.15
 }
 
 impl Default for AudioConfig {
