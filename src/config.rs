@@ -12,8 +12,6 @@ pub enum SilenceMode {
     /// Cut out silences completely (default)
     #[default]
     Cut,
-    /// Speed up silences (off by default — use Cut or Keep instead)
-    Speedup,
 }
 
 /// Preset profiles for common use cases
@@ -162,14 +160,6 @@ pub struct SilenceConfig {
     /// Scene detection threshold (0.0-1.0, higher = fewer scenes)
     #[serde(default = "default_scene_threshold")]
     pub scene_threshold: f32,
-
-    /// Speedup factor for SilenceMode::Speedup (only used when mode = Speedup)
-    #[serde(default = "default_speedup_factor")]
-    pub speedup_factor: f32,
-
-    /// Minimum silence duration to trigger speedup (only used when mode = Speedup)
-    #[serde(default = "default_min_silence_for_speedup")]
-    pub min_silence_for_speedup: f32,
 }
 
 fn default_threshold_db() -> f32 {
@@ -208,8 +198,6 @@ impl Default for SilenceConfig {
             mode: SilenceMode::Cut,
             scene_detect: false,
             scene_threshold: default_scene_threshold(),
-            speedup_factor: default_speedup_factor(),
-            min_silence_for_speedup: default_min_silence_for_speedup(),
         }
     }
 }
