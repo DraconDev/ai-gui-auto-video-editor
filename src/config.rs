@@ -178,6 +178,12 @@ fn default_scene_threshold() -> f32 {
     // Higher values (0.3) only detect very obvious scene changes
     0.10
 }
+fn default_speedup_factor() -> f32 {
+    2.0
+}
+fn default_min_silence_for_speedup() -> f32 {
+    0.5
+}
 fn default_watermark_position() -> String {
     "bottom-right".to_string()
 }

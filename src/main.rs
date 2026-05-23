@@ -462,9 +462,6 @@ fn main() -> Result<()> {
     if let Some(padding) = cli.padding {
         config.silence.padding = padding;
     }
-    if cli.speedup {
-        config.silence.mode = crate::config::SilenceMode::Speedup;
-    }
     if cli.enhance {
         config.audio.enhance = true;
     }
