@@ -549,10 +549,10 @@ impl App {
             .and_then(|f| f.settings.watermark_scale)
             .unwrap_or(1.0);
 
-        let ml_blur_strength = folder
+        let _ml_blur_strength = folder
             .and_then(|f| f.settings.ml_blur_strength)
             .unwrap_or(15.0);
-        let ml_inference_scale = folder
+        let _ml_inference_scale = folder
             .and_then(|f| f.settings.ml_inference_scale)
             .unwrap_or(0.5);
 
@@ -702,54 +702,69 @@ impl App {
         ));
         ui.add_space(12.0);
 
-        let mut enabled = folder
+        let mut ml_enabled = self
+            .state
+            .folders
+            .get(folder_idx)
             .and_then(|f| f.settings.blur_background)
             .unwrap_or(false);
         if Self::draw_settings_toggle(
             ui,
             "ML Background Blur",
             "Person segmentation: keep subject sharp, blur everything else",
-            &mut enabled,
+            &mut ml_enabled,
         ) && let Some(f) = self.state.folders.get_mut(folder_idx)
         {
-            f.settings.blur_background = Some(enabled);
+            f.settings.blur_background = Some(ml_enabled);
             needs_save = true;
         }
 
-        if enabled {
+        if ml_enabled {
             ui.add_space(8.0);
             ui.label(label_secondary("Blur Strength"));
             ui.add_space(4.0);
-            let strength_label = format!("{:.0}", ml_blur_strength);
+            let mut ml_strength = self
+                .state
+                .folders
+                .get(folder_idx)
+                .and_then(|f| f.settings.ml_blur_strength)
+                .unwrap_or(15.0);
+            let strength_label = format!("{:.0}", ml_strength);
             if Self::draw_advanced_slider(
                 ui,
                 "Blur Strength",
                 "Higher = more blur on background (sigma)",
-                &mut ml_blur_strength,
+                &mut ml_strength,
                 5.0..=50.0,
                 strength_label,
                 1.0,
             ) && let Some(f) = self.state.folders.get_mut(folder_idx)
             {
-                f.settings.ml_blur_strength = Some(ml_blur_strength);
+                f.settings.ml_blur_strength = Some(ml_strength);
                 needs_save = true;
             }
 
             ui.add_space(8.0);
             ui.label(label_secondary("Inference Scale"));
             ui.add_space(4.0);
-            let scale_label = format!("{:.1}x", ml_inference_scale);
+            let mut ml_scale = self
+                .state
+                .folders
+                .get(folder_idx)
+                .and_then(|f| f.settings.ml_inference_scale)
+                .unwrap_or(0.5);
+            let scale_label = format!("{:.1}x", ml_scale);
             if Self::draw_advanced_slider(
                 ui,
                 "Inference Scale",
                 "Lower = faster processing, lower quality (0.5 = half res)",
-                &mut ml_inference_scale,
+                &mut ml_scale,
                 0.25..=1.0,
                 scale_label,
                 0.05,
             ) && let Some(f) = self.state.folders.get_mut(folder_idx)
             {
-                f.settings.ml_inference_scale = Some(ml_inference_scale);
+                f.settings.ml_inference_scale = Some(ml_scale);
                 needs_save = true;
             }
         }
