@@ -12,8 +12,6 @@ pub enum SilenceMode {
     /// Cut out silences completely (default)
     #[default]
     Cut,
-    /// Speed up silences (off by default — use Cut or Keep instead)
-    Speedup,
 }
 
 /// Preset profiles for common use cases
@@ -162,6 +160,14 @@ pub struct SilenceConfig {
     /// Scene detection threshold (0.0-1.0, higher = fewer scenes)
     #[serde(default = "default_scene_threshold")]
     pub scene_threshold: f32,
+
+    /// Speedup factor for SilenceMode::Speedup (only used when mode = Speedup)
+    #[serde(default = "default_speedup_factor")]
+    pub speedup_factor: f32,
+
+    /// Minimum silence duration to trigger speedup (only used when mode = Speedup)
+    #[serde(default = "default_min_silence_for_speedup")]
+    pub min_silence_for_speedup: f32,
 }
 
 fn default_threshold_db() -> f32 {
@@ -1390,7 +1396,6 @@ mod tests {
         assert_eq!(config.silence.min_duration, 0.5);
         assert_eq!(config.silence.padding, 0.1);
         assert_eq!(config.silence.mode, SilenceMode::Cut);
-        assert_eq!(config.silence.speedup_factor, 4.0);
     }
 
     #[test]
@@ -1419,8 +1424,7 @@ enhance = false
 
         let config = Config::from_file(&config_path).unwrap();
         assert_eq!(config.silence.threshold_db, -35.0);
-        assert_eq!(config.silence.mode, SilenceMode::Speedup);
-        assert_eq!(config.silence.speedup_factor, 2.0);
+        assert_eq!(config.silence.mode, SilenceMode::Cut);
         assert!(!config.audio.enhance);
     }
 
@@ -1431,13 +1435,13 @@ enhance = false
 
         let mut config = Config::default();
         config.silence.threshold_db = -40.0;
-        config.silence.mode = SilenceMode::Speedup;
+        config.silence.mode = SilenceMode::Cut;
 
         config.to_file(&config_path).unwrap();
 
         let loaded = Config::from_file(&config_path).unwrap();
         assert_eq!(loaded.silence.threshold_db, -40.0);
-        assert_eq!(loaded.silence.mode, SilenceMode::Speedup);
+        assert_eq!(loaded.silence.mode, SilenceMode::Cut);
     }
 
     #[test]
@@ -1446,12 +1450,12 @@ enhance = false
 
         let mut override_config = Config::default();
         override_config.silence.threshold_db = -40.0;
-        override_config.silence.mode = SilenceMode::Speedup;
+        override_config.silence.mode = SilenceMode::Cut;
         override_config.export.subtitles = true;
 
         let merged = base.merge(override_config);
         assert_eq!(merged.silence.threshold_db, -40.0);
-        assert_eq!(merged.silence.mode, SilenceMode::Speedup);
+        assert_eq!(merged.silence.mode, SilenceMode::Cut);
         assert!(merged.export.subtitles);
     }
 
@@ -1469,23 +1473,7 @@ enhance = false
         assert_eq!(config.silence.threshold_db, -50.0);
         assert_eq!(config.silence.min_duration, 1.0);
         assert_eq!(config.silence.padding, 0.2);
-        assert_eq!(config.silence.mode, SilenceMode::Speedup);
-    }
-
-    #[test]
-    fn test_silence_mode_serde() {
-        // Test serialization through a config struct
-        let mut config = Config::default();
-        config.silence.mode = SilenceMode::Speedup;
-
-        let serialized = toml::to_string_pretty(&config).unwrap();
-        assert!(serialized.contains("mode = \"speedup\""));
-
-        let deserialized: Config = toml::from_str(&serialized).unwrap();
-        assert_eq!(deserialized.silence.mode, SilenceMode::Speedup);
-
-        // Test cut mode
-        config.silence.mode = SilenceMode::Cut;
+        assert_eq!(config.silence.mode, SilenceMode::Cut);
         let serialized = toml::to_string_pretty(&config).unwrap();
         let deserialized: Config = toml::from_str(&serialized).unwrap();
         assert_eq!(deserialized.silence.mode, SilenceMode::Cut);
@@ -1504,8 +1492,7 @@ enhance = false
     #[test]
     fn test_preset_shorts() {
         let config = Preset::Shorts.to_config();
-        assert_eq!(config.silence.mode, SilenceMode::Speedup);
-        assert_eq!(config.silence.speedup_factor, 3.0);
+        assert_eq!(config.silence.mode, SilenceMode::Cut);
         assert_eq!(config.silence.padding, 0.05);
         assert!(config.audio.enhance);
         assert!(config.export.clips);
@@ -1556,23 +1543,6 @@ enhance = false
         let result = config.validate();
         assert!(result.is_err());
         assert!(result.unwrap_err().to_string().contains("threshold_db"));
-    }
-
-    #[test]
-    fn test_validate_negative_speedup_fails() {
-        let mut config = Config::default();
-        config.silence.speedup_factor = 0.0;
-        let result = config.validate();
-        assert!(result.is_err());
-        assert!(result.unwrap_err().to_string().contains("speedup_factor"));
-    }
-
-    #[test]
-    fn test_validate_zero_speedup_fails() {
-        let mut config = Config::default();
-        config.silence.speedup_factor = -1.0;
-        let result = config.validate();
-        assert!(result.is_err());
     }
 
     #[test]
