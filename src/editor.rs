@@ -680,16 +680,20 @@ impl VideoEditor for FfmpegEditor {
 
         info!(processed = processed_count, "ML frames processed");
 
-        // Step 4: Re-encode frames back to video
+        // Step 4: Re-encode frames back to video, preserving audio
         let status = Command::new("ffmpeg")
             .args([
                 "-framerate", "1",
                 "-i",
                 frame_pattern_str,
-                "-c:v",
-                "libx264",
-                "-pix_fmt",
-                "yuv420p",
+                "-i",
+                input.to_str().context("invalid input path")?,
+                "-c:v", "libx264",
+                "-pix_fmt", "yuv420p",
+                "-c:a", "copy",
+                "-map", "0:v",
+                "-map", "1:a",
+                "-shortest",
                 "-y",
                 output.to_str().context("invalid output path")?,
             ])
