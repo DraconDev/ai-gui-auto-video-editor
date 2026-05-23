@@ -656,10 +656,19 @@ impl VideoEditor for FfmpegEditor {
                 frame.clone()
             };
 
+
             // Run ML segmentation + blur + composite
             let blurred = processor
                 .process_frame(&frame_for_inference, blur_strength as u32)
                 .with_context(|| format!("failed to process frame: {:?}", frame_path))?;
+
+            // Upscale blurred result back to original frame dimensions
+            let blurred = if inference_scale < 1.0 {
+                let (orig_w, orig_h) = frame.dimensions();
+                blurred.resize(orig_w, orig_h, image::imageops::FilterType::Triangle)
+            } else {
+                blurred
+            };
 
             // Save composited frame
             blurred
