@@ -1,71 +1,78 @@
 # Audio/Video Options Audit
 
-## Status: In Progress
+## Status: Research Complete — Pending Implementation
 
 ---
 
-## Audio
+## ✅ Completed
 
-### ✅ `enhance_audio` (loudnorm)
-- **Status**: Fixed
-- **File**: `src/editor.rs:330`
-- **Defaults**: highpass=60, TP=-2.0, LRA=7, no EQ
-- **Target**: -14 LUFS (YouTube)
-- **Bug fixed**: JSON parse truncation (`rfind('}')` instead of `find('}')`) — was causing distorted audio
+### `enhance_audio` (loudnorm)
+- **Fixed**: JSON parse truncation bug (`rfind('}')`)
+- **Safe defaults**: highpass=60, TP=-2.0, LRA=7, no EQ, -14 LUFS
 
-### ✅ Silence Speedup
-- **Status**: Fixed — off by default across all presets
-- **Shorts, TikTok, Reels**: now use `SilenceMode::Cut` instead of `Speedup`
-- **GUI**: "Speed Up" option available in dropdown for users who want it
-- **Default speedup_factor**: 2.0x (safer than previous 4.0x)
-- **Fields**: `speedup_factor` and `min_silence_for_speedup` added to `SilenceConfig`
+### Silence Speedup
+- **Off by default** across all presets (Shorts, TikTok, Reels → Cut)
+- `Speedup` mode still available in GUI
+- Default `speedup_factor=2.0x`
 
-### 🔍 `noise_reduction` (afftdn)
+---
+
+## 🔍 Research Findings
+
+### `afftdn` noise reduction
+- FFmpeg default: `nr=12`
+- Current: `nr=15` (too aggressive — can muffle voice)
+- **Source**: User reports indicate nr=15 removes harmonics, making voice sound unnatural
+- **Recommendation**: Lower to `nr=12`
+
+### `duck_volume`
+- Current: `0.2` (-14dBFS)
+- Research: Background music should be -18 to -25dBFS during speech
+- **Recommendation**: Lower to `0.15` (-16dBFS)
+
+### `threshold_db` (silence detection)
+- Current: `-30dB`
+- Research: Standard for voice recordings, FFmpeg default (-60dB) is too sensitive
+- **Recommendation**: Keep `-30dB`
+
+### `speedup_factor`
+- Current default: `2.0x`
+- Research: 1.5x is sweet spot, 2x acceptable for deliberate speakers
+- **Recommendation**: Keep `2.0x` default
+
+### Loudnorm
+- Current: `TP=-2.0` (conservative, good)
+- YouTube target: `-14 LUFS`, True Peak `-1.5dBTP`
+- **Recommendation**: Keep `TP=-2.0` (safer than -1.5 for unknown source quality)
+
+---
+
+## 📋 Pending Changes
+
+### 1. `afftdn nr=15` → `nr=12`
 - **File**: `src/editor.rs:393`
-- **Current**: `afftdn=nr=15:tn=true`
-- **TODO**: Is `nr=15` too aggressive? FFmpeg default is 12.
-- **TODO**: Check if `tn=true` is worth the slowdown
+- **Change**: `afftdn=nr=15:tn=true` → `afftdn=nr=12:tn=true`
 
-### 🔍 `duck_volume`
+### 2. `duck_volume 0.2` → `0.15`
 - **File**: `src/config.rs:283`
-- **Default**: 0.2 (-14dB during speech)
-- **TODO**: Is 0.2 appropriate? Could be too quiet or too loud.
-
-### 🔍 Silence detection thresholds
-- **Files**: `src/config.rs`, `src/analyzer.rs`
-- **Params**: threshold_db=-30, padding=0.1s, min_duration=0.5s
-- **TODO**: Audit for reasonableness (all seem fine)
+- **Change**: `default_duck_volume()` returns `0.15` instead of `0.2`
 
 ---
 
-## Video
+## 🔜 Future Audit Items (lower priority)
 
-### 🔍 Stabilization
-- **File**: `src/editor.rs:429`
-- **Current**: `shakiness=5, accuracy=15, smoothing=10, optzoom=1, interpol=bicubic`
-- **TODO**: Settings seem reasonable, low priority
-
-### 🔍 Video quality
-- **File**: `src/editor.rs:run_trim_filter_job`
-- **Current**: libx264 CRF=20, NVENC cq=23, AAC 192kbps 48kHz
-- **TODO**: Are these CRF values appropriate? Seems fine.
-
-### 🔍 Auto-reframe (ML)
-- **File**: `src/ml.rs`
-- **TODO**: Check face detection confidence threshold
-- **TODO**: Check smoothing/interpolation settings
-
-### 🔍 Scene detection
-- **File**: `src/scene_detection.rs`, `src/config.rs`
-- **TODO**: Check threshold defaults (currently 0.10)
+- [ ] Auto-reframe confidence threshold (`src/ml.rs`)
+- [ ] Stabilization settings (`src/editor.rs:429`)
+- [ ] Scene detection threshold (`src/config.rs`)
+- [ ] Video quality CRF values (`src/editor.rs`)
+- [ ] Color correction (currently pass-through)
 
 ---
 
-## Priority Order
-1. [x] ~~`enhance_audio`~~ — done
-2. [x] ~~Silence speedup off by default~~ — done
-3. [ ] `noise_reduction` (afftdn) — next
-4. [ ] `duck_volume`
-5. [ ] Silence detection thresholds
-6. [ ] Auto-reframe settings
-7. [ ] All others (lower impact)
+## References
+
+- FFmpeg afftdn docs: ayosec.github.io/ffmpeg-filters-docs/8.1/Filters/Audio/afftdn.html
+- YouTube LUFS target: -14 LUFS, -1.5dBTP (2025)
+- Apple Podcasts: -16 LUFS, -1.0dBTP
+- Music ducking: -18 to -25dBFS during speech
+- Speedup: 1.5x sweet spot, 2x acceptable for deliberate speakers
