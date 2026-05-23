@@ -1,8 +1,10 @@
 use crate::analyzer::{ProcessedSegment, Segment};
 use crate::config::SilenceMode;
 use crate::ml::AutoReframeProcessor;
+use crate::ml::BackgroundBlurProcessor;
 use crate::stt_analyzer::TranscriptSegment;
 use anyhow::{Context, Result};
+use image::GenericImageView;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -207,6 +209,13 @@ pub trait VideoEditor: Send + Sync {
         target_resolution: crate::config::VideoResolution,
     ) -> Result<()>;
     fn blur_background(&self, input: &Path, output: &Path) -> Result<()>;
+    fn ml_blur_background(
+        &self,
+        input: &Path,
+        output: &Path,
+        blur_strength: f32,
+        inference_scale: f32,
+    ) -> Result<()>;
 }
 
 pub struct FfmpegEditor {
@@ -571,6 +580,119 @@ impl VideoEditor for FfmpegEditor {
             anyhow::bail!("ffmpeg failed with status: {}", status);
         }
 
+        Ok(())
+    }
+
+    fn ml_blur_background(
+        &self,
+        input: &Path,
+        output: &Path,
+        blur_strength: f32,
+        inference_scale: f32,
+    ) -> Result<()> {
+        info!(
+            strength = blur_strength,
+            scale = inference_scale,
+            "ML background blur: starting person segmentation pipeline"
+        );
+
+        // Create temp directory for frame extraction
+        let frame_dir = crate::utils::TempDir::new("agave-ml-blur")?;
+        let frame_pattern = frame_dir.path().join("frame_%06d.png");
+        let frame_pattern_str = frame_pattern.to_str().context("invalid frame path")?;
+
+        // Step 1: Extract all frames as PNG
+        let status = Command::new("ffmpeg")
+            .args([
+                "-i",
+                input.to_str().context("invalid input path")?,
+                "-vf", "fps=1", // 1 fps = 1 frame per second (adjustable)
+                "-y",
+                frame_pattern_str,
+            ])
+            .status()
+            .context("ffmpeg frame extraction failed")?;
+
+        if !status.success() {
+            anyhow::bail!("ffmpeg frame extraction failed with status: {}", status);
+        }
+
+        // Collect frame files and sort
+        let mut frame_files: Vec<_> = std::fs::read_dir(frame_dir.path())
+            .context("failed to read frame directory")?
+            .filter_map(|e| e.ok())
+            .filter(|e| {
+                e.path()
+                    .extension()
+                    .map(|ext| ext == "png")
+                    .unwrap_or(false)
+            })
+            .collect();
+
+        if frame_files.is_empty() {
+            anyhow::bail!("no frames extracted from video");
+        }
+
+        frame_files.sort_by_key(|e| e.file_name());
+
+        // Step 2: Load ML model once (reused for all frames)
+        let processor = BackgroundBlurProcessor::new()?;
+        info!(frames = frame_files.len(), "loaded background blur processor");
+
+        // Step 3: Process each frame
+        let mut processed_count = 0;
+        for entry in &frame_files {
+            let frame_path = entry.path();
+            let frame = image::open(&frame_path)
+                .with_context(|| format!("failed to load frame: {:?}", frame_path))?;
+
+            // Scale down if inference_scale < 1.0
+            let frame_for_inference = if inference_scale < 1.0 {
+                let (w, h) = frame.dimensions();
+                let new_w = (w as f32 * inference_scale) as u32;
+                let new_h = (h as f32 * inference_scale) as u32;
+                frame.resize(new_w, new_h, image::imageops::FilterType::Triangle)
+            } else {
+                frame.clone()
+            };
+
+            // Run ML segmentation + blur + composite
+            let blurred = processor
+                .process_frame(&frame_for_inference, blur_strength as u32)
+                .with_context(|| format!("failed to process frame: {:?}", frame_path))?;
+
+            // Save composited frame
+            blurred
+                .save(&frame_path)
+                .with_context(|| format!("failed to save frame: {:?}", frame_path))?;
+
+            processed_count += 1;
+        }
+
+        info!(processed = processed_count, "ML frames processed");
+
+        // Step 4: Re-encode frames back to video
+        let status = Command::new("ffmpeg")
+            .args([
+                "-framerate", "1",
+                "-i",
+                frame_pattern_str,
+                "-c:v",
+                "libx264",
+                "-pix_fmt",
+                "yuv420p",
+                "-y",
+                output.to_str().context("invalid output path")?,
+            ])
+            .status()
+            .context("ffmpeg re-encode failed")?;
+
+        if !status.success() {
+            anyhow::bail!("ffmpeg re-encode failed with status: {}", status);
+        }
+
+        // TempDir and TempFile auto-cleanup on drop
+        info!("ML background blur complete");
         Ok(())
     }
 }

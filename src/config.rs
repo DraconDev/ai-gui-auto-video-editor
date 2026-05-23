@@ -201,6 +201,12 @@ fn default_watermark_position() -> String {
 fn default_watermark_scale() -> f32 {
     1.0
 }
+fn default_ml_blur_strength() -> f32 {
+    15.0
+}
+fn default_ml_inference_scale() -> f32 {
+    0.5
+}
 
 impl Default for SilenceConfig {
     fn default() -> Self {
@@ -700,6 +706,14 @@ pub struct VideoConfig {
     #[serde(default)]
     pub blur_background: bool,
 
+    /// ML blur strength (sigma for boxblur of background, 0.0 = no blur)
+    #[serde(default = "default_ml_blur_strength")]
+    pub ml_blur_strength: f32,
+
+    /// Downscale factor for ML inference (lower = faster, 0.5 = half resolution)
+    #[serde(default = "default_ml_inference_scale")]
+    pub ml_inference_scale: f32,
+
     /// Target output resolution
     #[serde(default)]
     pub target_resolution: VideoResolution,
@@ -733,6 +747,8 @@ impl Default for VideoConfig {
             watermark: None,
             watermark_position: default_watermark_position(),
             watermark_scale: default_watermark_scale(),
+            ml_blur_strength: default_ml_blur_strength(),
+            ml_inference_scale: default_ml_inference_scale(),
         }
     }
 }

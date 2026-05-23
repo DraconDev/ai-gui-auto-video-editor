@@ -548,6 +548,27 @@ where
         }
         guard.track(blurred.clone());
         current_file = blurred;
+
+        // ML-based person segmentation blur (if configured and available)
+        if config.video.ml_blur_strength > 0.0 && config.video.ml_inference_scale > 0.0 {
+            let ml_blurred = output_file.with_extension("ml_blurred.mp4");
+            report_progress(&mut progress, 0.96, "ML background blur (person segmentation)");
+            info!(
+                strength = config.video.ml_blur_strength,
+                scale = config.video.ml_inference_scale,
+                "ML background blur"
+            );
+            editor.ml_blur_background(
+                &current_file,
+                &ml_blurred,
+                config.video.ml_blur_strength,
+                config.video.ml_inference_scale,
+            )?;
+            guard.untrack(&current_file);
+            let _ = fs::remove_file(&current_file);
+            guard.track(ml_blurred.clone());
+            current_file = ml_blurred;
+        }
     }
 
     // Apply target resolution scaling if configured and not already reframed
@@ -1433,6 +1454,16 @@ mod tests {
             Ok(())
         }
 
+        fn ml_blur_background(
+            &self,
+            _input: &Path,
+            _output: &Path,
+            _blur_strength: f32,
+            _inference_scale: f32,
+        ) -> Result<()> {
+            Ok(())
+        }
+
         fn trim_video(
             &self,
             _input: &Path,
@@ -1644,6 +1675,15 @@ mod tests {
             Ok(())
         }
         fn blur_background(&self, _input: &Path, _output: &Path) -> Result<()> {
+            Ok(())
+        }
+        fn ml_blur_background(
+            &self,
+            _input: &Path,
+            _output: &Path,
+            _blur_strength: f32,
+            _inference_scale: f32,
+        ) -> Result<()> {
             Ok(())
         }
         fn trim_video(
