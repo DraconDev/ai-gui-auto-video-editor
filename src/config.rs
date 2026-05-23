@@ -208,6 +208,8 @@ impl Default for SilenceConfig {
             mode: SilenceMode::Cut,
             scene_detect: false,
             scene_threshold: default_scene_threshold(),
+            speedup_factor: default_speedup_factor(),
+            min_silence_for_speedup: default_min_silence_for_speedup(),
         }
     }
 }
