@@ -1174,22 +1174,16 @@ mod tests {
         ];
         let duration = 10.0;
         let padding = 0.1;
-        let processed =
-            calculate_keep_segments(&silences, duration, padding, SilenceMode::Speedup, 4.0, 0.5);
+        let processed = calculate_keep_segments(&silences, duration, padding, SilenceMode::Cut);
 
-        // Should have 3 segments: before silence, silence (sped up), after silence
-        assert_eq!(processed.len(), 3);
+        // Should have 2 segments: before and after silence (silence removed)
+        assert_eq!(processed.len(), 2);
         assert_eq!(processed[0].end, 2.1);
         assert_eq!(processed[0].speed, 1.0);
 
-        // Silence segment should be sped up
-        assert_eq!(processed[1].start, 2.1);
-        assert_eq!(processed[1].end, 3.9);
-        assert_eq!(processed[1].speed, 4.0);
-
         // After silence
-        assert_eq!(processed[2].start, 3.9);
-        assert_eq!(processed[2].speed, 1.0);
+        assert_eq!(processed[1].start, 3.9);
+        assert_eq!(processed[1].speed, 1.0);
     }
 
     #[test]
