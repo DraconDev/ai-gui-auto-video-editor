@@ -368,8 +368,6 @@ where
                 video_duration,
                 config.silence.padding,
                 config.silence.mode,
-                config.silence.speedup_factor,
-                config.silence.min_silence_for_speedup,
             ),
         }
     } else {
@@ -378,8 +376,6 @@ where
             video_duration,
             config.silence.padding,
             config.silence.mode,
-            config.silence.speedup_factor,
-            config.silence.min_silence_for_speedup,
         )
     };
     debug!(count = processed_segments.len(), "Segments to process");
