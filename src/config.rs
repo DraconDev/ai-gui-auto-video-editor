@@ -12,6 +12,8 @@ pub enum SilenceMode {
     /// Cut out silences completely (default)
     #[default]
     Cut,
+    /// Speed up silences (off by default — use Cut or Keep instead)
+    Speedup,
 }
 
 /// Preset profiles for common use cases
@@ -176,12 +178,6 @@ fn default_scene_threshold() -> f32 {
     // Higher values (0.3) only detect very obvious scene changes
     0.10
 }
-fn default_speedup_factor() -> f32 {
-    2.0
-}
-fn default_min_silence_for_speedup() -> f32 {
-    0.5
-}
 fn default_watermark_position() -> String {
     "bottom-right".to_string()
 }
@@ -204,8 +200,6 @@ impl Default for SilenceConfig {
             mode: SilenceMode::Cut,
             scene_detect: false,
             scene_threshold: default_scene_threshold(),
-            speedup_factor: default_speedup_factor(),
-            min_silence_for_speedup: default_min_silence_for_speedup(),
         }
     }
 }
