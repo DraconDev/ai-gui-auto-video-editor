@@ -440,10 +440,10 @@ mod tests {
     fn test_build_folder_config_silence_mode_override() {
         let base_config = Config::default();
         let mut folder = make_test_folder_state();
-        folder.settings.silence_mode = Some(SilenceMode::Speedup);
+        folder.settings.silence_mode = Some(SilenceMode::Cut);
 
         let merged = base_config.with_folder_settings(&folder.preset, &folder.settings);
-        assert_eq!(merged.silence.mode, SilenceMode::Speedup);
+        assert_eq!(merged.silence.mode, SilenceMode::Cut);
     }
 
     #[test]
@@ -472,11 +472,11 @@ mod tests {
     fn test_build_folder_config_silence_mode_wins_over_legacy() {
         let base_config = Config::default();
         let mut folder = make_test_folder_state();
-        folder.settings.silence_mode = Some(SilenceMode::Speedup);
+        folder.settings.silence_mode = Some(SilenceMode::Cut);
         folder.settings.remove_silence = Some(true); // Legacy value should be ignored
 
         let merged = base_config.with_folder_settings(&folder.preset, &folder.settings);
-        assert_eq!(merged.silence.mode, SilenceMode::Speedup);
+        assert_eq!(merged.silence.mode, SilenceMode::Cut);
     }
 
     #[test]

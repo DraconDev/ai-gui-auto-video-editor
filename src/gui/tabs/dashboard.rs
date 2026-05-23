@@ -353,7 +353,6 @@ impl App {
         match mode {
             SilenceMode::Keep => "Keep All",
             SilenceMode::Cut => "Cut",
-            SilenceMode::Speedup => "Speed Up",
         }
     }
 

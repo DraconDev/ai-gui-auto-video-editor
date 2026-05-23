@@ -1338,7 +1338,7 @@ mod tests {
             &silences,
             duration,
             padding,
-            SilenceMode::Speedup,
+            SilenceMode::Cut,
             4.0,
             min_silence,
         );
@@ -1371,7 +1371,7 @@ mod tests {
             &silences,
             duration,
             padding,
-            SilenceMode::Speedup,
+            SilenceMode::Cut,
             4.0,
             min_silence,
         );
@@ -1558,12 +1558,10 @@ mod tests {
             &silences,
             duration,
             padding,
-            SilenceMode::Speedup,
-            4.0,
-            0.2, // min_silence_for_speedup = 0.2s
+            SilenceMode::Cut,
         );
 
-        // With padding=0.6, silence_start(2.6) > silence_end(2.4), so speedup segment is skipped
+        // With padding=0.6, silence_start(2.6) > silence_end(2.4), so segment is skipped
         // Should have 2 segments: before and after silence
         assert_eq!(processed.len(), 2);
         // Check no overlap
