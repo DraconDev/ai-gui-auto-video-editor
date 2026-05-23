@@ -595,6 +595,9 @@ impl VideoEditor for FfmpegEditor {
             scale = inference_scale,
             "ML background blur: starting person segmentation pipeline"
         );
+        // Probe original video frame rate for accurate re-encode
+        let fps = probe_fps(input).with_context(|| "failed to probe video frame rate")?;
+        info!(fps, "probed input video frame rate");
 
         // Create temp directory for frame extraction
         let frame_dir = crate::utils::TempDir::new("agave-ml-blur")?;
@@ -704,10 +707,43 @@ impl VideoEditor for FfmpegEditor {
             anyhow::bail!("ffmpeg re-encode failed with status: {}", status);
         }
 
-        // TempDir and TempFile auto-cleanup on drop
         info!("ML background blur complete");
         Ok(())
     }
+}
+
+
+/// Probe the frame rate of a video file using FFmpeg
+fn probe_fps(path: &Path) -> Result<f64> {
+    let output = std::process::Command::new("ffprobe")
+        .args([
+            "-v", "error",
+            "-select_streams", "v:0",
+            "-count_packets",
+            "-show_entries", "stream=avg_frame_rate",
+            "-of", "csv=p=0",
+            path.to_str().context("invalid path")?,
+        ])
+        .output()
+        .context("ffprobe failed")?;
+
+    if !output.status.success() {
+        anyhow::bail!("ffprobe failed for: {:?}", path);
+    }
+
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let fps: f64 = stdout
+        .trim()
+        .splitn(2, '/')
+        .collect::<Vec<_>>()
+        .iter()
+        .filter_map(|s| s.trim().parse::<f64>().ok())
+        .fold(1.0, |acc, val| if acc == 1.0 { val } else { acc / val });
+    if fps <= 0.0 || fps.is_nan() {
+        anyhow::bail!("invalid fps from ffprobe: {:?}", stdout);
+    }
+
+    Ok(fps)
 }
 
 fn run_trim_filter_job(
