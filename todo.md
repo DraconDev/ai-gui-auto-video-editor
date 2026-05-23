@@ -1,98 +1,262 @@
-# Code Review — Full Audit (2026-05-22/23)
+# Investigation: ML Person Segmentation Integration
 
-## Stats
-- **Source**: 27 files, ~21,600 lines (`src/`)
-- **Tests**: 552 passing, 0 failing
-- **Build**: clean, clippy clean (`-D warnings`)
+**Goal**: Integrate `PersonSegmenter` (MODNet ONNX model) into the video processing pipeline for automated background blur with person preservation.
 
----
-
-## 🔴 CRITICAL — FIXED
-
-- [x] `progress.rs:44,65` — `SystemTime::elapsed()` logic bug → raw mtime comparison with 5s tolerance
-- [x] `editor.rs:652` — `{:x}` path truncation → `{:016x}` fixed-width hex
-- [x] `ml.rs:121-125` — silent `unwrap_or(25.0)` fps default → error propagation with `.context()`
-- [x] `editor.rs:744` — **loudnorm JSON parse bug** → `rfind('}')` instead of `find('}')`
-  - FFmpeg outputs `"normalization_type" : "dynamic"` where `"dynamic"` contains a `}`
-  - `find('}')` found the `}` inside the string value first → truncated JSON → missing `offset`
-  - Missing `offset` → FFmpeg used `offset=0.0` → over-corrected gain → loud/distorted audio
+**Status**: Paused — requires architectural decision before proceeding.
 
 ---
 
-## 🟠 MEDIUM — FIXED
+## What Exists
 
-- [x] `hwaccel.rs:264,273` — `panic!` in tests → `assert_eq!`
-- [x] `gui.rs:416-445` — unbounded `activity_log` → already capped at 500
-- [x] `batch_processor.rs:700-715` — ANSI escapes always on → `std::io::IsTerminal` TTY detection
-- [x] `stt_analyzer.rs:600` — `partial_cmp.unwrap()` → `to_bits().cmp()`
-- [x] Dead code removed (9 of 12 `#[allow(dead_code)]` items removed)
+### `PersonSegmenter` (`src/ml.rs:359-450`)
 
----
+- Downloads [MODNet](https://huggingface.co/dhkim2810/MODNet) from HuggingFace on first use
+- `load()` → `PersonSegmenter` instance (Arc-wrapped ONNX model via tract-onnx)
+- `segment(frame) → SegmentationMask` — outputs H×W alpha mask, values 0.0–1.0
+- Fully functional, tested, downloads automatically
 
-## 🟡 CLIPPY / WARNINGS — FIXED (this audit round)
+### `BackgroundBlurProcessor` (`src/ml.rs:700-748`)
 
-- [x] `editor.rs:652` — `.min(u128::MAX)` on `as_nanos()` is never > MAX → **removed**
-- [x] `editor.rs:1697,1708,1732,1755,1789,1801` — `assert!(len >= 0)` useless comparisons → `debug_assert!` with meaningful bounds
-- [x] `batch_processor.rs:2170` — `assert!(result.len() >= 0)` → `debug_assert!(result.len() <= 100)`
-- [x] `config.rs:2124,2268` — unused `use toml::toml` in tests → removed
-- [x] `watermark.rs:233` — broken `mod tests` structure (missing opening brace) → fixed
-- [x] `gui/processing.rs:416` — unused `FolderSettings` import → removed
-- [x] `exporter.rs:1015,1089` — `mut` on vectors used by value only → removed `mut`
+- Wraps `PersonSegmenter` — loads model, gets mask, blurs full frame, composites pixel-by-pixel
+- `process_frame(frame, blur_strength) → blurred_image`
+- Works for single frames in Rust, no FFmpeg dependency in the compositing
 
----
+### `FrameExtractor` (`src/ml.rs:450-550`)
 
-## ⚪ PRODUCTION CODE ANALYSIS
+- Extracts frames from video to PNG files at specified intervals
+- Used by `AutoReframeProcessor` — already does per-frame extraction
+- Can be reused as the frame source for segmentation
 
-### `.unwrap()` / `.expect()` in production (non-test) code
+### `editor.blur_background()` (`src/editor.rs:545-570`)
 
-**Result: 0 panics in production paths.**
+- Current implementation: single FFmpeg `boxblur=20:5` call on the video
+- Works on any video, fast, no ML needed
+- Produces uniform blur — person AND background both blurred
+- **Doc comment explicitly states this is NOT ML segmentation**: *"see ml::BackgroundBlurProcessor (not yet integrated into the video pipeline)"*
 
-Every `.unwrap()` outside `#[cfg(test)]`/`mod tests` is either:
-- `tempfile::tempdir()` in test-only wrappers (always succeeds)
-- `fs::write()` in `#[test]` modules (controlled test temp dirs)
-- `Cli::try_parse_from(...).unwrap()` in `main.rs` tests only
+### Pipeline wiring (`src/batch_processor.rs`)
 
-### `.expect("Index 1/2")` in `exporter.rs`
-
-Lines 1038/1044 — inside `#[test] fn test_export_srt_sorted_by_start_time()`.
-Searches for `"1\n"` and `"2\n"` in generated SRT output. **Test-only, safe.**
-
-### `panic!` in production
-
-**0 panics.** 2 previous `panic!` calls (hwaccel.rs) were in `#[test]` functions and fixed.
-
-### `unsafe` blocks
-
-**1 block, documented, safe:**
-`src/stt_analyzer.rs:81` — mmap of safetensor weight files. File length verified before mmap; fd held through use.
-
-### Integration tests
-
-**Status: non-compiling (pre-existing).** Tests in `tests/` reference `ai_vid_editor` (underscore) instead of `ai-gui-auto-video-editor` (hyphens) — broken since the crate was originally named. This is a pre-existing issue not introduced by this audit. The unit test suite (`cargo test --lib`) is fully functional and runs 552 tests clean.
+- `blur_background` is called at step 8 of 9 in the main pipeline
+- Passes through `editor.blur_background()` which runs FFmpeg boxblur
+- No ML calls anywhere in batch_processor
 
 ---
 
-## 📋 OPEN / DEFERRED
+## What's Missing
 
-1. **`config.rs:merge()`** — no compile-time enforcement for new fields
-   - Low risk: defaults-only merge, low churn
-2. **Duplicated dimension-fetching** in `ml.rs` — cosmetic, not a bug
-3. **3 remaining `#[allow(dead_code)]`** — reserved for future use:
-   - `QueueEvent` (cross-module queue worker)
-   - `duplicate_folder` (future folder management)
-   - `make_test_folder_state` / `build_folder_config` (integration test helpers)
-4. **Integration test crate name** — `ai_vid_editor` vs `ai-gui-auto-video-editor` — pre-existing, not part of this audit scope
+| Component | Status | Notes |
+|---|---|---|
+| FFmpeg alpha compositing | ❌ | Need `alphamerge` + `overlay` filter graph to composite alpha mask onto video |
+| Frame extraction → ML → video | ❌ | No pipeline stage that feeds frames to ML and gets composited video back |
+| Per-frame ML integration point | ❌ | Current pipeline processes whole segments via FFmpeg filter_complex; ML needs per-frame loop |
+| Batch processing hook | ❌ | `PersonSegmenter` can't be called from `batch_processor.rs` — no integration point |
+| Performance benchmarking | ❌ | Unknown how fast MODNet runs via tract-onnx on typical hardware (1080p, 4K) |
+| Memory bounds | ❌ | No measurement of RAM usage for full-HD frame processing |
 
 ---
 
-## ✅ STATUS
+## Integration Options
 
-| Check | Result |
+### Option A: Separate Re-Encode Pass (Like Stabilize)
+
+**Approach**: Add `ml_blur_background()` as a standalone pass in batch_processor, called after main processing. Works like `editor.stabilize()` — separate video file → ML processing → re-encode → intermediate file.
+
+**Pros**:
+- Architecture matches existing pattern (stabilize, color_correct, enhance_audio all work this way)
+- No changes to main pipeline segment processing
+- Can be toggled independently via config
+- Progress callback fits the existing pattern
+
+**Cons**:
+- Requires full video re-encode (no stream copy possible)
+- Slow — ML inference on every frame, then FFmpeg encode
+- Memory: frames held in memory during ML processing (or temp files on disk)
+- Storage: intermediate files accumulate during processing
+
+**Implementation sketch**:
+```rust
+// In editor.rs
+fn ml_blur_background(&self, input: &Path, output: &Path, config: &VideoConfig) -> Result<()> {
+    // 1. Extract frames via FrameExtractor (or reuse existing)
+    // 2. For each frame: PersonSegmenter::segment() → mask
+    // 3. For each frame: composite mask onto blurred frame
+    // 4. Save composited frames as temp PNG sequence
+    // 5. FFmpeg: convert PNG sequence to video with re-encode
+    // 6. Use alphamerge + overlay filter graph for proper alpha blending
+    // 7. Cleanup temp files
+}
+```
+
+**Effort**: ~200-300 lines of new code in `editor.rs`, ~50 lines in `batch_processor.rs`
+
+### Option B: Pre-Process Segments Before Pipeline
+
+**Approach**: Run ML blur on the raw input video first, then feed the "person-preserved, background blurred" video through the full pipeline.
+
+**Pros**:
+- ML blur happens once, before all other processing
+- All subsequent pipeline steps work on the ML-processed video
+- Simpler mental model: "input video → ML blur → normal pipeline"
+
+**Cons**:
+- ML processing on full raw input (not just segments) is slower
+- All subsequent steps re-encode the video unnecessarily
+- Config toggle is "before or after pipeline" — less flexible
+
+### Option C: Integrate Into Trim Filter Complex
+
+**Approach**: Modify `run_trim_filter_job` to include ML-composited frames in the filter graph. Requires a sidecar process or FFI bridge.
+
+**Pros**:
+- Single re-encode pass at the end
+- Could use GPU if tract-onnx supports it
+
+**Cons**:
+- Complex — MODNet isn't an FFmpeg filter, needs external process or Rust FFI
+- Architecture change to the core trim pipeline
+- FFmpeg's alpha compositing pipeline with external matting data is non-trivial
+- High risk of breaking existing trim functionality
+
+**Recommendation**: Avoid for v1
+
+---
+
+## Technical Deep Dive
+
+### Alpha Compositing with FFmpeg
+
+MODNet outputs a grayscale PNG alpha mask per frame. To composite person sharp over blurred background:
+
+```
+Input video (raw) ──────────────────────────────────┐
+                                                   │
+                    ┌─────────────────────────────▼──────────────┐
+                    │  FFmpeg filter_complex                     │
+                    │                                          │
+                    │  [0:v] split=3 [src][blur][alpha]         │
+                    │                                          │
+                    │  [blur] boxblur=20:5 [blurred]            │
+                    │  [alpha] alphamerge [merged]              │
+                    │  [blurred] [merged] overlay [out]          │
+                    │                                          │
+                    └───────────────────────────────────────────▲┘
+                                                               │
+                                          ML-generated alpha PNGs (one per frame)
+                                                               │
+```
+
+**Problem**: FFmpeg's `overlay` needs the alpha as a video stream, not a series of PNG files it reads at runtime. The alpha mask must be provided as a parallel video stream.
+
+**Alternative approach** — process frames to disk:
+1. Extract all frames from video to temp dir
+2. Run MODNet on each frame → alpha PNG
+3. Blur each frame with boxblur
+4. Composite: blurred + alpha → sharp person over blurred background
+5. Save composited frames to another temp dir
+6. FFmpeg: concat PNG sequence → video
+
+This is what Option A's implementation sketch describes.
+
+### Performance Considerations
+
+| Factor | Estimate |
 |---|---|
-| Production `.unwrap()` panics | 0 |
-| Production `panic!` | 0 |
-| `unsafe` blocks | 1 (safe, documented) |
-| Clippy errors | 0 |
-| Clippy warnings | 0 (lib + bin) |
-| Tests (lib) | 552/552 pass |
-| Build | clean |
+| MODNet inference (tract-onnx, 1920×1080) | ~200-500ms/frame (unverified, depends on hardware) |
+| Frame blur (Rust image crate) | ~50-100ms/frame |
+| Frame composite (Rust pixel loop) | ~100-200ms/frame |
+| FFmpeg PNG encode/decode | ~50ms/frame |
+| Total per frame | ~400-850ms |
+| 60s 30fps video | 1800 frames → 12-25 minutes |
+| 5min 30fps video | 9000 frames → 60-125 minutes |
+
+This is too slow for interactive use but acceptable for batch processing with a progress bar.
+
+**Optimization paths**:
+- Batch frames (process 10 at a time, reduce model load overhead)
+- Downscale input to 720p for mask generation, upscale mask for compositing
+- GPU inference via candle-core or onnxruntime-gpu (but tract-onnx is CPU-only)
+- Skip frames (every 2nd or 3rd frame), interpolate masks for missing frames
+
+### Memory Considerations
+
+- 1080p RGB frame: 1920×1080×3 = 6.2MB
+- 1080p RGBA frame: 1920×1080×4 = 8.3MB
+- Processing 10 frames in memory: ~80MB (acceptable)
+- Processing all frames of a 30min video: ~15GB (not acceptable)
+
+→ Must process in batches, write to temp files, clean up.
+
+### Frame Interpolation
+
+If frames are skipped (every 2nd frame), masks need interpolation to avoid temporal artifacts:
+- Linear blend between frame N and frame N+2 for frame N+1
+- Or: use frame N's mask for N+1 (acceptable quality tradeoff)
+
+---
+
+## Config Design
+
+Add to `VideoConfig`:
+
+```rust
+pub struct VideoConfig {
+    // ... existing fields ...
+    
+    /// Enable ML-based background blur (person stays sharp, background blurred)
+    #[serde(default)]
+    pub ml_background_blur: bool,
+    
+    /// Blur strength for background (sigma value, 0.0 = no blur)
+    #[serde(default = "default_blur_strength")]
+    pub ml_blur_strength: f32,
+    
+    /// Downscale factor for ML inference (lower = faster, lower quality)
+    /// 1.0 = full resolution, 0.5 = half resolution (4x faster)
+    #[serde(default = "1.0")]
+    pub ml_inference_scale: f32,
+    
+    /// Skip every N frames for ML processing (1 = every frame, 2 = every 2nd frame)
+    /// Higher = faster, more temporal artifacts
+    #[serde(default = "1")]
+    pub ml_frame_skip: u32,
+}
+```
+
+**UI**: Add "ML Background Blur" toggle in Video settings tab, with strength slider and inference scale option.
+
+---
+
+## Blocking Issues
+
+1. **Option choice not made** — cannot proceed without knowing whether to implement Option A, B, or C
+2. **Performance unknown** — tract-onnx MODNet inference speed on typical hardware is unmeasured
+3. **Architecture change required** — current pipeline has no per-frame ML integration point; Option A adds a new pass type
+4. **Memory strategy needed** — batch processing vs temp files decision affects implementation
+5. **Alpha compositing FFI gap** — FFmpeg's alphamerge needs parallel video stream; frame-by-frame PNG approach (Option A) avoids this but adds disk I/O
+
+---
+
+## Next Steps
+
+- [ ] **Decide Option A vs B vs C** — recommend Option A (separate pass, like stabilize)
+- [ ] **Benchmark MODNet inference** — measure tract-onnx speed on 1080p, 720p, 480p inputs
+- [ ] **Design memory strategy** — batch processing vs temp file approach
+- [ ] **Sketch `ml_blur_background()` signature** — frame extraction → ML → composite → video
+- [ ] **Write integration test** — single video, 10 frames, verify alpha compositing works
+- [ ] **Wire into batch_processor** — add as optional pass after main processing
+- [ ] **Add config fields** — `ml_background_blur`, `ml_blur_strength`, `ml_inference_scale`, `ml_frame_skip`
+- [ ] **GUI toggle** — Video settings tab, "ML Background Blur" switch with strength slider
+
+---
+
+## Related Code
+
+| File | Relevant Section | Notes |
+|---|---|---|
+| `src/ml.rs:359-450` | `PersonSegmenter` | Model download, inference, mask output |
+| `src/ml.rs:700-748` | `BackgroundBlurProcessor` | Frame-level blur+composite (Rust pixel loop) |
+| `src/ml.rs:450-550` | `FrameExtractor` | Frame export (reusable for ML input) |
+| `src/editor.rs:545-570` | `blur_background` | Current boxblur (non-ML) |
+| `src/batch_processor.rs:480-550` | Pipeline step 8 | Where blur_background is called |
+| `src/config.rs:270-310` | `VideoConfig` | Add ML fields here |
+| `src/gui/tabs/settings.rs` | Video section | Add GUI toggle |
