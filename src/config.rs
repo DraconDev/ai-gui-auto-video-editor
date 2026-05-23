@@ -444,6 +444,10 @@ pub struct FolderSettings {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub blur_background: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub ml_blur_strength: Option<f32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ml_inference_scale: Option<f32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub noise_reduction: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub preview: Option<bool>,
