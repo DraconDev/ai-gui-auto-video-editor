@@ -1885,7 +1885,7 @@ mod tests {
         }];
         let segments =
             calculate_keep_segments(&silences, 30.0, 0.1, SilenceMode::Cut);
-        // Speedup mode should produce some segments
+        // Cut mode should produce some segments
         debug_assert!(!segments.is_empty());
     }
 }
