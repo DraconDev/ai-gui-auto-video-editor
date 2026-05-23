@@ -50,20 +50,18 @@ impl Preset {
                 config.video.target_resolution = VideoResolution::Fhd1080p;
             }
             Preset::Shorts => {
-                // Short-form: speedup silences, enhance audio, extract clips
-                config.silence.mode = SilenceMode::Speedup;
-                config.silence.speedup_factor = 3.0;
-                config.silence.padding = 0.05; // Tighter for fast-paced content
+                // Short-form: cut silences (no speedup), enhance audio, extract clips
+                config.silence.mode = SilenceMode::Cut;
+                config.silence.padding = 0.05;
                 config.audio.enhance = true;
                 config.export.clips = true;
                 config.video.reframe = true; // Auto vertical
                 config.video.target_resolution = VideoResolution::Vertical1080p;
             }
             Preset::Tiktok => {
-                // TikTok: 9:16 vertical, fast cuts, max 3min, trending style
-                config.silence.mode = SilenceMode::Speedup;
-                config.silence.speedup_factor = 4.0;
-                config.silence.padding = 0.03;
+                // TikTok: 9:16 vertical, cut silences, max 3min, trending style
+                config.silence.mode = SilenceMode::Cut;
+                config.silence.padding = 0.05;
                 config.audio.enhance = true;
                 config.audio.target_lufs = -14.0; // Match YouTube standard, avoid dynamic mode
                 config.video.reframe = true;
@@ -72,9 +70,8 @@ impl Preset {
             }
             Preset::Reels => {
                 // Instagram Reels: 9:16, 90s max, engaging
-                config.silence.mode = SilenceMode::Speedup;
-                config.silence.speedup_factor = 3.5;
-                config.silence.padding = 0.05;
+                config.silence.mode = SilenceMode::Cut;
+                config.silence.padding = 0.1;
                 config.audio.enhance = true;
                 config.video.reframe = true;
                 config.video.target_resolution = VideoResolution::Vertical1080p;
@@ -199,8 +196,6 @@ impl Default for SilenceConfig {
             min_duration: default_min_duration(),
             padding: default_padding(),
             mode: SilenceMode::Cut,
-            speedup_factor: default_speedup_factor(),
-            min_silence_for_speedup: default_min_silence_for_speedup(),
             scene_detect: false,
             scene_threshold: default_scene_threshold(),
         }

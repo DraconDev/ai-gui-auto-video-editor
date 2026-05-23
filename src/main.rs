@@ -963,10 +963,6 @@ fn handle_dry_run(cli: &Cli, config: &Config) -> Result<()> {
     let output_duration = match config.silence.mode {
         crate::config::SilenceMode::Keep => video_duration,
         crate::config::SilenceMode::Cut => video_duration - total_silence,
-        crate::config::SilenceMode::Speedup => {
-            // Approximate: silences are sped up
-            video_duration - total_silence + (total_silence / config.silence.speedup_factor)
-        }
     };
 
     if cli.json {

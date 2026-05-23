@@ -18,16 +18,12 @@ const TRIM_SEGMENTS_PER_CHUNK: usize = 48;
 /// * `silence_segments` - Detected silent segments
 /// * `total_duration` - Total video duration in seconds
 /// * `padding` - Padding around cuts in seconds
-/// * `mode` - How to handle silences (Cut or Speedup)
-/// * `speedup_factor` - Speed multiplier when mode is Speedup
-/// * `min_silence_for_speedup` - Minimum silence duration to speedup (seconds)
+/// * `mode` - How to handle silences (Cut or Keep)
 pub fn calculate_keep_segments(
     silence_segments: &[Segment],
     total_duration: f32,
     padding: f32,
     mode: SilenceMode,
-    speedup_factor: f32,
-    min_silence_for_speedup: f32,
 ) -> Vec<ProcessedSegment> {
     if mode == SilenceMode::Keep {
         return vec![ProcessedSegment {
@@ -41,8 +37,6 @@ pub fn calculate_keep_segments(
     let mut current_pos = 0.0;
 
     for silence in silence_segments {
-        let silence_duration = silence.end - silence.start;
-
         // Add the non-silent segment before this silence
         let keep_end = (silence.start + padding).min(total_duration);
         if keep_end > current_pos {
@@ -53,28 +47,9 @@ pub fn calculate_keep_segments(
             });
         }
 
-        // Handle the silence based on mode
-        // Note: SilenceMode::Keep is handled by early return at function entry
-        match mode {
-            SilenceMode::Cut => {
-                let cut_end = (silence.end - padding).max(0.0);
-                current_pos = current_pos.max(keep_end).max(cut_end);
-            }
-            SilenceMode::Speedup => {
-                let silence_start = (silence.start + padding).max(0.0);
-                let silence_end = (silence.end - padding).min(total_duration);
-
-                if silence_duration >= min_silence_for_speedup && silence_end > silence_start {
-                    processed.push(ProcessedSegment {
-                        start: silence_start,
-                        end: silence_end,
-                        speed: speedup_factor,
-                    });
-                }
-                current_pos = current_pos.max(keep_end).max(silence_end);
-            }
-            SilenceMode::Keep => unreachable!(),
-        }
+        // Cut the silence (skip it)
+        let cut_end = (silence.end - padding).max(0.0);
+        current_pos = current_pos.max(keep_end).max(cut_end);
     }
 
     // Add the final segment after the last silence
@@ -100,8 +75,6 @@ pub fn calculate_keep_segments_simple(
         total_duration,
         padding,
         SilenceMode::Cut,
-        4.0,
-        0.5,
     )
 }
 
