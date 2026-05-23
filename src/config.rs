@@ -903,10 +903,6 @@ impl Config {
         if let Some(padding) = cli_padding {
             config.silence.padding = padding;
         }
-        if cli_speedup {
-            config.silence.mode = SilenceMode::Speedup;
-        }
-
         config.validate()?;
 
         Ok(config)
@@ -930,12 +926,6 @@ impl Config {
             self.silence.padding = other.silence.padding;
         }
         self.silence.mode = other.silence.mode;
-        if other.silence.speedup_factor != default.silence.speedup_factor {
-            self.silence.speedup_factor = other.silence.speedup_factor;
-        }
-        if other.silence.min_silence_for_speedup != default.silence.min_silence_for_speedup {
-            self.silence.min_silence_for_speedup = other.silence.min_silence_for_speedup;
-        }
         self.silence.scene_detect = other.silence.scene_detect;
         if other.silence.scene_threshold != default.silence.scene_threshold {
             self.silence.scene_threshold = other.silence.scene_threshold;
