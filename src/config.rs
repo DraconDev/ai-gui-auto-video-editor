@@ -12,6 +12,8 @@ pub enum SilenceMode {
     /// Cut out silences completely (default)
     #[default]
     Cut,
+    /// Speed up silences (off by default — use Cut or Keep instead)
+    Speedup,
 }
 
 /// Preset profiles for common use cases
@@ -863,7 +865,7 @@ impl Config {
         cli_threshold: Option<f32>,
         cli_duration: Option<f32>,
         cli_padding: Option<f32>,
-        cli_speedup: bool,
+        _cli_speedup: bool,
     ) -> Result<Self> {
         let mut config = Config::default();
 
