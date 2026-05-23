@@ -339,13 +339,10 @@ impl VideoEditor for FfmpegEditor {
     fn enhance_audio(&self, input: &Path, output: &Path, target_lufs: f32) -> Result<()> {
         let input_str = input.to_str().context("invalid input path")?;
 
-        // Two-pass loudnorm with EQ for voice clarity:
-        // - highpass=60: removes rumble, preserves deep male voices
-        // - equalizer=f=4000: presence region (3-5kHz), boosts vocal clarity
-        // - loudnorm: EBU R128 standardization, LRA=7 for speech (keeps linear mode)
-        // Note: 4kHz is the "s" and "t" frequency region — gives crispness without harshness
+        // Two-pass loudnorm for EBU R128 loudness normalization.
+        // Pass 1: measure audio levels.
         let measure_filter = format!(
-            "highpass=f=60,equalizer=f=4000:t=q:w=2:g=1.5,loudnorm=I={target_lufs}:TP=-2.0:LRA=7:print_format=json"
+            "highpass=f=80,loudnorm=I={target_lufs}:TP=-1.5:LRA=11:print_format=json"
         );
 
         let measure_output = Command::new("ffmpeg")
@@ -363,17 +360,16 @@ impl VideoEditor for FfmpegEditor {
             None
         };
 
-        // Pass 2: Apply measured normalization with presence EQ
-        // Uses measured values from pass 1 for accurate normalization
+        // Pass 2: Apply measured normalization.
         let filter = if let Some(s) = stats {
             format!(
-                "highpass=f=60,equalizer=f=4000:t=q:w=2:g=1.5,loudnorm=I={}:TP=-2.0:LRA=7:measured_I={}:measured_TP={}:measured_LRA={}:measured_thresh={}:offset={}:linear=true",
+                "highpass=f=80,loudnorm=I={}:TP=-1.5:LRA=11:measured_I={}:measured_TP={}:measured_LRA={}:measured_thresh={}:offset={}:linear=true",
                 target_lufs, s.i, s.tp, s.lra, s.thresh, s.offset
             )
         } else {
             // Fallback to single-pass if measurement failed
             format!(
-                "highpass=f=60,equalizer=f=4000:t=q:w=2:g=1.5,loudnorm=I={target_lufs}:TP=-2.0:LRA=7"
+                "highpass=f=80,loudnorm=I={target_lufs}:TP=-1.5:LRA=11"
             )
         };
 
