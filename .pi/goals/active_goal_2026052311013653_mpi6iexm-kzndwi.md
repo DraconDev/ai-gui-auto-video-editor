@@ -10,7 +10,7 @@
   },
   "sisyphus": false,
   "createdAt": "2026-05-23T10:01:36.538Z",
-  "updatedAt": "2026-05-23T10:12:42.302Z",
+  "updatedAt": "2026-05-23T13:03:09.212Z",
   "activePath": ".pi/goals/active_goal_2026052311013653_mpi6iexm-kzndwi.md",
   "stopReason": "agent",
   "pauseReason": "Objective says \"release the net for best strategy for auto matred video processing\" — the auditor correctly identifies this as integrating the ML person segmentation model (`PersonSegmenter` in `ml.rs`) into the pipeline. The `PersonSegmenter` struct exists with `download_model()` and `segment()` methods but has zero callers; `blur_background()` in the pipeline currently uses simple `boxblur` without any ML. A maintenance release was built instead of the ML integration the goal described. The actual work needed: wire `PersonSegmenter` into the video processing pipeline and document the integration strategy.",
