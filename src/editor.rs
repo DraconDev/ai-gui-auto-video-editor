@@ -1326,58 +1326,49 @@ mod tests {
     }
     #[test]
     fn test_calculate_keep_segments_boundary_at_min_silence() {
-        // Silence exactly at min_silence_for_speedup should be sped up
+        // Silence exactly at minimum duration should be processed
         let silences = vec![Segment {
             start: 2.0,
             end: 2.5, // exactly 0.5s silence
         }];
         let duration = 10.0;
         let padding = 0.0;
-        let min_silence = 0.5;
         let processed = calculate_keep_segments(
             &silences,
             duration,
             padding,
             SilenceMode::Cut,
-            4.0,
-            min_silence,
         );
 
-        // Silence at boundary should be included (>= not >)
-        // 3 segments: before silence (0.0-2.0), sped-up silence (2.0-2.5), after silence (2.5-10.0)
-        assert_eq!(processed.len(), 3);
+
+        // Silence should be removed (Cut mode)
+        // 2 segments: before (0.0-2.0) and after (2.5-10.0)
+        assert_eq!(processed.len(), 2);
         assert_eq!(processed[0].speed, 1.0);
         assert_eq!(processed[0].start, 0.0);
         assert_eq!(processed[0].end, 2.0);
-        assert_eq!(processed[1].speed, 4.0);
-        assert_eq!(processed[1].start, 2.0);
-        assert_eq!(processed[1].end, 2.5);
-        assert_eq!(processed[2].speed, 1.0);
-        assert_eq!(processed[2].start, 2.5);
-        assert_eq!(processed[2].end, 10.0);
+        assert_eq!(processed[1].speed, 1.0);
+        assert_eq!(processed[1].start, 2.5);
+        assert_eq!(processed[1].end, 10.0);
     }
 
     #[test]
-    fn test_calculate_keep_segments_just_below_min_silence() {
-        // Silence just below min_silence_for_speedup should be cut (skipped)
+    fn test_calculate_keep_segments_short_silence() {
+        // Short silence should be removed
         let silences = vec![Segment {
             start: 2.0,
             end: 2.49, // just below 0.5s
         }];
         let duration = 10.0;
         let padding = 0.0;
-        let min_silence = 0.5;
         let processed = calculate_keep_segments(
             &silences,
             duration,
             padding,
             SilenceMode::Cut,
-            4.0,
-            min_silence,
         );
 
-        // Short silence should be cut (skipped in speedup mode)
-        // But the segments before and after silence should still exist
+        // Short silence should be removed
         // 2 segments: before (0.0-2.0) and after (2.49-10.0)
         assert_eq!(processed.len(), 2);
         assert_eq!(processed[0].speed, 1.0);

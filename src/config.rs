@@ -12,6 +12,8 @@ pub enum SilenceMode {
     /// Cut out silences completely (default)
     #[default]
     Cut,
+    /// Speed up silences (off by default — use Cut or Keep instead)
+    Speedup,
 }
 
 /// Preset profiles for common use cases
@@ -1624,20 +1626,6 @@ enhance = false
         let result = config.validate();
         assert!(result.is_err());
         assert!(result.unwrap_err().to_string().contains("padding"));
-    }
-
-    #[test]
-    fn test_validate_min_silence_for_speedup_negative_fails() {
-        let mut config = Config::default();
-        config.silence.min_silence_for_speedup = -0.1;
-        let result = config.validate();
-        assert!(result.is_err());
-        assert!(
-            result
-                .unwrap_err()
-                .to_string()
-                .contains("min_silence_for_speedup")
-        );
     }
 
     #[test]
