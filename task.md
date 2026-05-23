@@ -7,27 +7,27 @@
 ## Phase 1: Code Quality
 
 ### 1.1 Error Handling
-- [ ] No `.unwrap()` or `.expect()` in production code paths
-- [ ] All fallible operations use `anyhow::Result<T>` with `?`
-- [ ] Context added via `.context()` at crate boundaries
-- [ ] No `panic!()` in production code
-- [ ] `unimplemented!()` or `todo!()` checked (should be 0)
+- [x] No `.unwrap()` or `.expect()` in production code paths ✅
+- [x] All fallible operations use `anyhow::Result<T>` with `?` ✅
+- [x] Context added via `.context()` at crate boundaries ✅
+- [x] No `panic!()` in production code ✅
+- [x] `unimplemented!()` or `todo!()` checked (should be 0) ✅
 
 ### 1.2 Enum Exhaustiveness
-- [ ] All `match` statements handle all variants
-- [ ] No wildcard `_` matches unless intentional
-- [ ] Check: `SilenceMode`, `Preset`, `VideoResolution`, `JoinMode`, `WatermarkPosition`, `HwAccel`
+- [x] All `match` statements handle all variants ✅
+- [x] No wildcard `_` matches unless intentional ✅
+- [x] Check: `SilenceMode`, `Preset`, `VideoResolution`, `JoinMode`, `WatermarkPosition`, `HwAccel` ✅
 
 ### 1.3 Safety
-- [ ] No `unsafe` blocks in production (FFT in stt_analyzer is OK, documented)
-- [ ] No division by zero possibilities
-- [ ] No out-of-bounds array access
-- [ ] No integer overflow in release builds
+- [x] No `unsafe` blocks in production (FFT in stt_analyzer is OK, documented) ✅
+- [x] No division by zero possibilities ✅
+- [x] No out-of-bounds array access ✅
+- [x] No integer overflow in release builds ✅
 
 ### 1.4 FFmpeg Security
-- [ ] All paths escaped for filter strings (`escape_ffmpeg_filter_path`)
-- [ ] No direct string interpolation into shell commands
-- [ ] Numeric args (scale, bitrate) validated
+- [x] All paths escaped for filter strings (`escape_ffmpeg_filter_path`) ✅
+- [x] No direct string interpolation into shell commands ✅
+- [x] Numeric args (scale, bitrate) validated ✅
 
 ---
 
