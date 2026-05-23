@@ -280,16 +280,14 @@ impl App {
 
         ui.label(label_secondary("Silence Mode"));
         ui.add_space(4.0);
-        let mode_options: [(String, SilenceMode); 3] = [
+        let mode_options: [(String, SilenceMode); 2] = [
             (String::from("Keep All"), SilenceMode::Keep),
             (String::from("Cut"), SilenceMode::Cut),
-            (String::from("Speed Up"), SilenceMode::Speedup),
         ];
         let mut selected_mode = silence_mode;
         let mode_label = match selected_mode {
             SilenceMode::Keep => "Keep All",
             SilenceMode::Cut => "Cut",
-            SilenceMode::Speedup => "Speed Up",
         };
         dropdown_selector(
             ui,
@@ -299,11 +297,9 @@ impl App {
             mode_label,
         );
         ui.add(egui::Label::new(
-            egui::RichText::new(
-                "Keep All = no changes. Cut = remove silence. Speed Up = keep but play faster",
-            )
-            .size(11.0)
-            .color(TEXT_SECONDARY),
+            egui::RichText::new("Keep All = no changes. Cut = remove silence.")
+                .size(11.0)
+                .color(TEXT_SECONDARY),
         ));
         if selected_mode != silence_mode
             && let Some(f) = self.state.folders.get_mut(folder_idx)
