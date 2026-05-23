@@ -280,16 +280,14 @@ impl App {
 
         ui.label(label_secondary("Silence Mode"));
         ui.add_space(4.0);
-        let mode_options: [(String, SilenceMode); 3] = [
+        let mode_options: [(String, SilenceMode); 2] = [
             (String::from("Keep All"), SilenceMode::Keep),
             (String::from("Cut"), SilenceMode::Cut),
-            (String::from("Speed Up"), SilenceMode::Speedup),
         ];
         let mut selected_mode = silence_mode;
         let mode_label = match selected_mode {
             SilenceMode::Keep => "Keep All",
             SilenceMode::Cut => "Cut",
-            SilenceMode::Speedup => "Speed Up",
         };
         dropdown_selector(
             ui,
