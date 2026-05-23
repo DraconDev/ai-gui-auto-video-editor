@@ -346,42 +346,6 @@ impl App {
             ui.add_space(6.0);
         }
 
-        if selected_mode == SilenceMode::Speedup {
-            let mut silence_speedup_factor = silence_speedup_factor;
-            let speedup_label = format!("{:.1}x", silence_speedup_factor);
-            if Self::draw_advanced_slider(
-                ui,
-                "Speed Up Factor",
-                "How much to speed up silent sections",
-                &mut silence_speedup_factor,
-                1.5..=8.0,
-                speedup_label,
-                0.1,
-            ) && let Some(f) = self.state.folders.get_mut(folder_idx)
-            {
-                f.settings.silence_speedup_factor = Some(silence_speedup_factor);
-                needs_save = true;
-            }
-            ui.add_space(6.0);
-
-            let mut silence_min_for_speedup = silence_min_for_speedup;
-            let min_speedup_label = format!("{:.1}s", silence_min_for_speedup);
-            if Self::draw_advanced_slider(
-                ui,
-                "Min Speedup Duration",
-                "Only speed up silences longer than this",
-                &mut silence_min_for_speedup,
-                0.1..=2.0,
-                min_speedup_label,
-                0.1,
-            ) && let Some(f) = self.state.folders.get_mut(folder_idx)
-            {
-                f.settings.silence_min_silence_for_speedup = Some(silence_min_for_speedup);
-                needs_save = true;
-            }
-            ui.add_space(6.0);
-        }
-
         if scene_detect {
             let mut silence_scene_threshold = silence_scene_threshold;
             let scene_label = format!("{:.2}", silence_scene_threshold);
