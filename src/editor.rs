@@ -1155,7 +1155,7 @@ mod tests {
         let duration = 10.0;
         let padding = 0.1;
         let processed =
-            calculate_keep_segments(&silences, duration, padding, SilenceMode::Cut, 4.0, 0.5);
+            calculate_keep_segments(&silences, duration, padding, SilenceMode::Cut);
 
         assert_eq!(processed.len(), 2);
         assert_eq!(processed[0].end, 2.1);
@@ -1202,12 +1202,10 @@ mod tests {
             &silences,
             duration,
             padding,
-            SilenceMode::Speedup,
-            4.0,
-            min_silence,
+            SilenceMode::Cut,
         );
 
-        // Short silence should be cut, not sped up
+        // Short silence should be cut (silence removed)
         assert_eq!(processed.len(), 2);
         assert_eq!(processed[0].speed, 1.0);
         assert_eq!(processed[1].speed, 1.0);
@@ -1228,7 +1226,7 @@ mod tests {
         let duration = 10.0;
         let padding = 0.1;
         let processed =
-            calculate_keep_segments(&silences, duration, padding, SilenceMode::Cut, 4.0, 0.5);
+            calculate_keep_segments(&silences, duration, padding, SilenceMode::Cut);
 
         assert_eq!(processed.len(), 3);
         assert_eq!(processed[0].start, 0.0);
@@ -1431,7 +1429,7 @@ mod tests {
         let duration = 10.0;
         let padding = 0.6;
         let processed =
-            calculate_keep_segments(&silences, duration, padding, SilenceMode::Cut, 4.0, 0.5);
+            calculate_keep_segments(&silences, duration, padding, SilenceMode::Cut);
 
         assert_eq!(processed.len(), 2);
         // First segment ends at 2.6 (2.0 + 0.6)
@@ -1454,7 +1452,7 @@ mod tests {
         let duration = 10.0;
         let padding = 0.9;
         let processed =
-            calculate_keep_segments(&silences, duration, padding, SilenceMode::Cut, 4.0, 0.5);
+            calculate_keep_segments(&silences, duration, padding, SilenceMode::Cut);
 
         assert_eq!(processed.len(), 2);
         // keep_end = 2.9, cut_end = 2.1, current_pos = max(2.9, 2.1) = 2.9
@@ -1486,7 +1484,7 @@ mod tests {
         let duration = 10.0;
         let padding = 0.3;
         let processed =
-            calculate_keep_segments(&silences, duration, padding, SilenceMode::Cut, 4.0, 0.5);
+            calculate_keep_segments(&silences, duration, padding, SilenceMode::Cut);
 
         // Should have 3 segments: before first silence, between, after second
         assert_eq!(processed.len(), 3);
@@ -1513,7 +1511,7 @@ mod tests {
         let duration = 10.0;
         let padding = 0.0;
         let processed =
-            calculate_keep_segments(&silences, duration, padding, SilenceMode::Cut, 4.0, 0.5);
+            calculate_keep_segments(&silences, duration, padding, SilenceMode::Cut);
 
         assert_eq!(processed.len(), 2);
         assert_eq!(processed[0].end, 2.0); // keep_end = 2.0 + 0 = 2.0
@@ -1534,7 +1532,7 @@ mod tests {
         let duration = 10.0;
         let padding = 0.4; // padding > half silence duration
         let processed =
-            calculate_keep_segments(&silences, duration, padding, SilenceMode::Cut, 4.0, 0.5);
+            calculate_keep_segments(&silences, duration, padding, SilenceMode::Cut);
 
         // keep_end = 2.4, cut_end = 2.1, current_pos = max(2.4, 2.1) = 2.4
         assert_eq!(processed.len(), 2);
@@ -1684,7 +1682,7 @@ mod tests {
     #[test]
     fn test_calculate_keep_segments_empty_silences() {
         let silences: Vec<Segment> = vec![];
-        let segments = calculate_keep_segments(&silences, 60.0, 0.1, SilenceMode::Cut, 2.0, 0.5);
+        let segments = calculate_keep_segments(&silences, 60.0, 0.1, SilenceMode::Cut);
         assert_eq!(segments.len(), 1);
         assert_eq!(segments[0].start, 0.0);
         assert_eq!(segments[0].end, 60.0);
@@ -1696,7 +1694,7 @@ mod tests {
             start: 10.0,
             end: 11.0,
         }];
-        let segments = calculate_keep_segments(&silences, 60.0, 0.1, SilenceMode::Cut, 2.0, 0.5);
+        let segments = calculate_keep_segments(&silences, 60.0, 0.1, SilenceMode::Cut);
         assert!(segments.len() >= 1);
         assert!(segments[0].start >= 0.0);
     }
@@ -1707,7 +1705,7 @@ mod tests {
             start: 0.0,
             end: 5.0,
         }];
-        let segments = calculate_keep_segments(&silences, 60.0, 0.1, SilenceMode::Cut, 2.0, 0.5);
+        let segments = calculate_keep_segments(&silences, 60.0, 0.1, SilenceMode::Cut);
         assert!(segments[0].start >= 0.0);
     }
 
@@ -1717,7 +1715,7 @@ mod tests {
             start: 55.0,
             end: 60.0,
         }];
-        let segments = calculate_keep_segments(&silences, 60.0, 0.1, SilenceMode::Cut, 2.0, 0.5);
+        let segments = calculate_keep_segments(&silences, 60.0, 0.1, SilenceMode::Cut);
         assert!(segments.last().unwrap().end <= 60.0);
     }
 
@@ -1737,7 +1735,7 @@ mod tests {
                 end: 35.0,
             },
         ];
-        let segments = calculate_keep_segments(&silences, 60.0, 0.1, SilenceMode::Cut, 2.0, 0.5);
+        let segments = calculate_keep_segments(&silences, 60.0, 0.1, SilenceMode::Cut);
         assert!(segments.len() >= 2);
     }
 
@@ -1745,7 +1743,7 @@ mod tests {
     #[test]
     fn test_calculate_keep_segments_no_silences() {
         let silences: Vec<Segment> = vec![];
-        let segments = calculate_keep_segments(&silences, 30.0, 0.1, SilenceMode::Cut, 2.0, 1.0);
+        let segments = calculate_keep_segments(&silences, 30.0, 0.1, SilenceMode::Cut);
         // No silences means no segments to remove, so we should have one keep segment
         assert!(segments.len() >= 1);
     }
@@ -1756,7 +1754,7 @@ mod tests {
             start: 0.0,
             end: 30.0,
         }]; // Entire video is silence
-        let segments = calculate_keep_segments(&silences, 30.0, 0.1, SilenceMode::Cut, 2.0, 1.0);
+        let segments = calculate_keep_segments(&silences, 30.0, 0.1, SilenceMode::Cut);
         // If entire video is silence, result depends on mode
         let total_duration: f32 = segments.iter().map(|s| s.end - s.start).sum();
         assert!(total_duration <= 30.0);
@@ -1769,8 +1767,8 @@ mod tests {
             end: 15.0,
         }];
         // Test silence modes don't panic
-        for mode in [SilenceMode::Cut, SilenceMode::Keep, SilenceMode::Speedup] {
-            let _ = calculate_keep_segments(&silences, 30.0, 0.1, mode, 2.0, 1.0);
+        for mode in [SilenceMode::Cut, SilenceMode::Keep] {
+            let _ = calculate_keep_segments(&silences, 30.0, 0.1, mode);
         }
     }
 
@@ -1780,7 +1778,7 @@ mod tests {
             start: 3600.0,
             end: 3700.0,
         }]; // 1 hour video
-        let segments = calculate_keep_segments(&silences, 7200.0, 0.1, SilenceMode::Cut, 2.0, 1.0);
+        let segments = calculate_keep_segments(&silences, 7200.0, 0.1, SilenceMode::Cut);
         // Should handle long videos without issue
         let total_duration: f32 = segments.iter().map(|s| s.end - s.start).sum();
         assert!(total_duration > 0.0);
@@ -1792,7 +1790,7 @@ mod tests {
             start: 0.0,
             end: 10.0,
         }];
-        let segments = calculate_keep_segments(&silences, 20.0, 0.1, SilenceMode::Cut, 16.0, 1.0);
+        let segments = calculate_keep_segments(&silences, 20.0, 0.1, SilenceMode::Cut);
         // Extreme speedup should still work
         debug_assert!(!segments.is_empty());
     }
@@ -1803,7 +1801,7 @@ mod tests {
             start: 0.0,
             end: 5.0,
         }];
-        let segments = calculate_keep_segments(&silences, 30.0, 0.1, SilenceMode::Cut, 1.0, 0.0);
+        let segments = calculate_keep_segments(&silences, 30.0, 0.1, SilenceMode::Cut);
         // Zero speedup should not panic
         debug_assert!(!segments.is_empty());
     }
@@ -1815,7 +1813,7 @@ mod tests {
             start: 10.0,
             end: 20.0,
         }];
-        let segments = calculate_keep_segments(&silences, 60.0, 0.2, SilenceMode::Cut, 1.0, 1.0);
+        let segments = calculate_keep_segments(&silences, 60.0, 0.2, SilenceMode::Cut);
         // Single silence should produce 2 keep segments (before and after)
         let total: f32 = segments.iter().map(|s| s.end - s.start).sum();
         assert!(total > 0.0);
@@ -1827,7 +1825,7 @@ mod tests {
             start: 10.0,
             end: 20.0,
         }];
-        let segments = calculate_keep_segments(&silences, 30.0, -0.5, SilenceMode::Cut, 1.0, 1.0);
+        let segments = calculate_keep_segments(&silences, 30.0, -0.5, SilenceMode::Cut);
         // Negative padding may produce empty or different segments
         // (empty segments are a valid edge case)
         debug_assert!(segments.len() <= 1000);
@@ -1839,7 +1837,7 @@ mod tests {
             start: 0.0,
             end: 10.0,
         }];
-        let segments = calculate_keep_segments(&silences, 30.0, 0.1, SilenceMode::Cut, 0.5, 1.0);
+        let segments = calculate_keep_segments(&silences, 30.0, 0.1, SilenceMode::Cut);
         // Minimum speedup should work
         let total: f32 = segments.iter().map(|s| s.end - s.start).sum();
         assert!(total >= 0.0);
@@ -1851,7 +1849,7 @@ mod tests {
             start: 10.0,
             end: 20.0,
         }];
-        let segments = calculate_keep_segments(&silences, 60.0, 5.0, SilenceMode::Cut, 1.0, 1.0);
+        let segments = calculate_keep_segments(&silences, 60.0, 5.0, SilenceMode::Cut);
         // Large padding should still work
         debug_assert!(segments.len() <= 10000);
     }
@@ -1873,7 +1871,7 @@ mod tests {
                 end: 45.0,
             },
         ];
-        let segments = calculate_keep_segments(&silences, 60.0, 0.5, SilenceMode::Cut, 1.0, 1.0);
+        let segments = calculate_keep_segments(&silences, 60.0, 0.5, SilenceMode::Cut);
         // Multiple silences should be handled
         let total: f32 = segments.iter().map(|s| s.end - s.start).sum();
         assert!(total > 0.0);
@@ -1885,7 +1883,7 @@ mod tests {
             start: 10.0,
             end: 20.0,
         }];
-        let segments = calculate_keep_segments(&silences, 30.0, 0.1, SilenceMode::Keep, 1.0, 1.0);
+        let segments = calculate_keep_segments(&silences, 30.0, 0.1, SilenceMode::Keep);
         // Keep mode should produce some segments
         debug_assert!(!segments.is_empty());
     }
@@ -1897,7 +1895,7 @@ mod tests {
             end: 20.0,
         }];
         let segments =
-            calculate_keep_segments(&silences, 30.0, 0.1, SilenceMode::Speedup, 2.0, 1.0);
+            calculate_keep_segments(&silences, 30.0, 0.1, SilenceMode::Cut);
         // Speedup mode should produce some segments
         debug_assert!(!segments.is_empty());
     }
