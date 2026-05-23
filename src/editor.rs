@@ -595,10 +595,6 @@ impl VideoEditor for FfmpegEditor {
             scale = inference_scale,
             "ML background blur: starting person segmentation pipeline"
         );
-        // Probe original video frame rate for accurate re-encode
-        let fps = probe_fps(input).with_context(|| "failed to probe video frame rate")?;
-        info!(fps, "probed input video frame rate");
-
         // Create temp directory for frame extraction
         let frame_dir = crate::utils::TempDir::new("agave-ml-blur")?;
         let frame_pattern = frame_dir.path().join("frame_%06d.png");
