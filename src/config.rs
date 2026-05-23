@@ -12,8 +12,6 @@ pub enum SilenceMode {
     /// Cut out silences completely (default)
     #[default]
     Cut,
-    /// Speed up silences (off by default — use Cut or Keep instead)
-    Speedup,
 }
 
 /// Preset profiles for common use cases
@@ -1408,8 +1406,7 @@ mod tests {
         let content = r#"
 [silence]
 threshold_db = -35.0
-mode = "speedup"
-speedup_factor = 2.0
+mode = "cut"
 
 [audio]
 enhance = false
