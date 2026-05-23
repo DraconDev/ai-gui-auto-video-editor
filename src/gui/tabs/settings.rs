@@ -176,14 +176,8 @@ impl App {
         let silence_padding = folder
             .and_then(|f| f.settings.silence_padding)
             .unwrap_or(0.1);
-        let silence_speedup_factor = folder
-            .and_then(|f| f.settings.silence_speedup_factor)
-            .unwrap_or(4.0);
         let silence_min_duration = folder
             .and_then(|f| f.settings.silence_min_duration)
-            .unwrap_or(0.5);
-        let silence_min_for_speedup = folder
-            .and_then(|f| f.settings.silence_min_silence_for_speedup)
             .unwrap_or(0.5);
         let silence_scene_threshold = folder
             .and_then(|f| f.settings.silence_scene_threshold)

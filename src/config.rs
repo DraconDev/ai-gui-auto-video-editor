@@ -12,6 +12,8 @@ pub enum SilenceMode {
     /// Cut out silences completely (default)
     #[default]
     Cut,
+    /// Speed up silences (off by default — use Cut or Keep instead)
+    Speedup,
 }
 
 /// Preset profiles for common use cases
@@ -406,10 +408,6 @@ pub struct FolderSettings {
     pub silence_padding: Option<f32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub silence_mode: Option<SilenceMode>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub silence_speedup_factor: Option<f32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub silence_min_silence_for_speedup: Option<f32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub silence_scene_threshold: Option<f32>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1074,12 +1072,6 @@ impl Config {
         if let Some(padding) = settings.silence_padding {
             merged.silence.padding = padding;
         }
-        if let Some(speedup_factor) = settings.silence_speedup_factor {
-            merged.silence.speedup_factor = speedup_factor;
-        }
-        if let Some(min_silence_for_speedup) = settings.silence_min_silence_for_speedup {
-            merged.silence.min_silence_for_speedup = min_silence_for_speedup;
-        }
         if let Some(scene_threshold) = settings.silence_scene_threshold {
             merged.silence.scene_threshold = scene_threshold;
         }
@@ -1220,18 +1212,6 @@ impl Config {
                 self.silence.padding
             );
         }
-        if self.silence.speedup_factor <= 0.0 {
-            anyhow::bail!(
-                "silence.speedup_factor must be positive (got {})",
-                self.silence.speedup_factor
-            );
-        }
-        if self.silence.min_silence_for_speedup < 0.0 {
-            anyhow::bail!(
-                "silence.min_silence_for_speedup must be non-negative (got {})",
-                self.silence.min_silence_for_speedup
-            );
-        }
         if self.silence.scene_threshold < 0.0 || self.silence.scene_threshold > 1.0 {
             anyhow::bail!(
                 "silence.scene_threshold must be between 0.0 and 1.0 (got {})",
@@ -1308,13 +1288,6 @@ impl Config {
         if self.audio.noise_reduction && !self.audio.enhance {
             tracing::info!(
                 "Noise reduction enabled without audio enhancement. Consider enabling audio.enhance for better results."
-            );
-        }
-
-        if self.silence.mode == SilenceMode::Speedup && self.silence.speedup_factor < 1.0 {
-            tracing::warn!(
-                "Speedup factor {} is less than 1.0. This will slow down silences instead of speeding them up.",
-                self.silence.speedup_factor
             );
         }
 
