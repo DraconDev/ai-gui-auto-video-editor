@@ -5,12 +5,12 @@
   "status": "active",
   "autoContinue": true,
   "usage": {
-    "tokensUsed": 434306,
-    "activeSeconds": 512
+    "tokensUsed": 452075,
+    "activeSeconds": 535
   },
   "sisyphus": false,
   "createdAt": "2026-05-23T10:01:36.538Z",
-  "updatedAt": "2026-05-23T10:10:22.221Z",
+  "updatedAt": "2026-05-23T10:10:45.961Z",
   "activePath": ".pi/goals/active_goal_2026052311013653_mpi6iexm-kzndwi.md"
 }
 
@@ -23,5 +23,5 @@ lets release the net for best strategy for auto matred video processing like we 
 - Status: running
 - Auto-continue: on
 - Sisyphus mode: no
-- Time spent: 8m32s
-- Tokens used: 434K (434,306) tokens
+- Time spent: 8m55s
+- Tokens used: 452K (452,075) tokens
