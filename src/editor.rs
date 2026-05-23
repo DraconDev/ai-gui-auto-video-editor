@@ -341,10 +341,10 @@ impl VideoEditor for FfmpegEditor {
 
         // Two-pass loudnorm for EBU R128 loudness normalization.
         // Pass 1: measure audio levels.
-        // Params: highpass=60 (rumble cut), TP=-1.5 (broadcast headroom),
+        // Params: highpass=60 (rumble cut), TP=-2.0 (safe ceiling, prevents clipping),
         //         LRA=7 (consistent speech loudness for streaming platforms).
         let measure_filter = format!(
-            "highpass=f=60,loudnorm=I={target_lufs}:TP=-1.5:LRA=7:print_format=json"
+            "highpass=f=60,loudnorm=I={target_lufs}:TP=-2.0:LRA=7:print_format=json"
         );
 
         let measure_output = Command::new("ffmpeg")
@@ -365,13 +365,13 @@ impl VideoEditor for FfmpegEditor {
         // Pass 2: Apply measured normalization.
         let filter = if let Some(s) = stats {
             format!(
-                "highpass=f=60,loudnorm=I={}:TP=-1.5:LRA=7:measured_I={}:measured_TP={}:measured_LRA={}:measured_thresh={}:offset={}:linear=true",
+                "highpass=f=60,loudnorm=I={}:TP=-2.0:LRA=7:measured_I={}:measured_TP={}:measured_LRA={}:measured_thresh={}:offset={}:linear=true",
                 target_lufs, s.i, s.tp, s.lra, s.thresh, s.offset
             )
         } else {
             // Fallback to single-pass if measurement failed
             format!(
-                "highpass=f=60,loudnorm=I={target_lufs}:TP=-1.5:LRA=7"
+                "highpass=f=60,loudnorm=I={target_lufs}:TP=-2.0:LRA=7"
             )
         };
 
