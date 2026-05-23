@@ -12,6 +12,8 @@ pub enum SilenceMode {
     /// Cut out silences completely (default)
     #[default]
     Cut,
+    /// Speed up silences (off by default — use Cut or Keep instead)
+    Speedup,
 }
 
 /// Preset profiles for common use cases
