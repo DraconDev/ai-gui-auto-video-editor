@@ -74,7 +74,7 @@ jobs:
           7z a ai-gui-auto-video-editor-${{ matrix.target }}.zip ai-gui-auto-video-editor
       
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ai-gui-auto-video-editor-${{ matrix.target }}
           path: |
